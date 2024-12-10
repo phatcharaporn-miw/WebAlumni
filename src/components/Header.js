@@ -3,7 +3,7 @@ import "../css/Header.css";
 import 'bootstrap/dist/css/bootstrap.min.css'; 
 import { SlMagnifier } from "react-icons/sl";
 import { SlArrowDown } from "react-icons/sl";
-
+import { NavLink } from "react-router-dom";
 
 function Header() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -44,20 +44,72 @@ function Header() {
 
       <nav>
         <ul className="nav">
-          <li className="nav-item"><a href="/" className="nav-link" activeClassName="active-link">หน้าหลัก</a></li>
-          <li className="nav-item"><a href="/about" className="nav-link">เกี่ยวกับ</a></li>          
-            <li className="dropdown">
-            <li className="dropbtn">ประชาสัมพันธ์</li>
+          <li className="nav-item">
+            <NavLink 
+              to="/" 
+              className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}
+            >
+              หน้าหลัก
+            </NavLink>
+          </li>
+          <li className="nav-item">
+            <NavLink 
+              to="/about" 
+              className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}
+            >
+              เกี่ยวกับ
+            </NavLink>
+          </li>          
+          <li className="dropdown">
+            <div className="dropbtn">ประชาสัมพันธ์</div>
             <SlArrowDown className="arrow-down"/>
             <div className="dropdown-content">
-                <a href="/news">ประชาสัมพันธ์</a>
-                <a href="/activity">กิจกรรม</a>
+              <NavLink 
+                to="/news" 
+                className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}
+              >
+                ประชาสัมพันธ์
+              </NavLink>
+              <NavLink 
+                to="/activity" 
+                className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}
+              >
+                กิจกรรม
+              </NavLink>
             </div>
-            </li>
-          <li className="nav-item"><a href="/donate" className="nav-link">บริจาค</a></li>
-          <li className="nav-item"><a href="/alumni" className="nav-link">ทำเนียบศิษย์เก่า</a></li>
-          <li className="nav-item"><a href="/souvenir" className="nav-link">ของที่ระลึก</a></li>
-          <li className="nav-item"><a href="/webboard" className="nav-link">เว็บบอร์ด</a></li>
+          </li>
+          <li className="nav-item">
+            <NavLink 
+              to="/donate" 
+              className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}
+            >
+              บริจาค
+            </NavLink>
+          </li>
+          <li className="nav-item">
+            <NavLink 
+              to="/alumni" 
+              className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}
+            >
+              ทำเนียบศิษย์เก่า
+            </NavLink>
+          </li>
+          <li className="nav-item">
+            <NavLink 
+              to="/souvenir" 
+              className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}
+            >
+              ของที่ระลึก
+            </NavLink>
+          </li>
+          <li className="nav-item">
+            <NavLink 
+              to="/webboard" 
+              className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}
+            >
+              เว็บบอร์ด
+            </NavLink>
+          </li>
         </ul>
       </nav>
     </header>
