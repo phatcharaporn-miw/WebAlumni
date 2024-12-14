@@ -3,7 +3,7 @@ import "../css/Header.css";
 import 'bootstrap/dist/css/bootstrap.min.css'; 
 import { SlMagnifier } from "react-icons/sl";
 import { SlArrowDown } from "react-icons/sl";
-import { NavLink } from "react-router-dom";
+import {  NavLink } from "react-router-dom";
 
 function Header() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -36,8 +36,10 @@ function Header() {
               <SlMagnifier className="search-icon" />
             </button>
           </div>
-
+        <NavLink to="/login">
           <button className="login-btn m-2 ms-5">เข้าสู่ระบบ</button>
+        </NavLink>
+
         </div>
       </div>
 

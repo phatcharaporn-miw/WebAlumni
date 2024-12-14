@@ -1,9 +1,9 @@
 import React from "react";
 import { Link } from 'react-router-dom';
-import './Login.css';
+import '../css/Login.css';
 
 function Login() {
-    const logo = <img className="form-login-logo" src="./images/สมาคม-logo.png" alt="Logo" />;
+    const logo = <img className="form-login-logo" src="./image/สมาคม-logo.png" alt="Logo" />;
     return (
         <div className="all-form">
             {logo}
@@ -12,28 +12,28 @@ function Login() {
                     <form>
                         <h2>เข้าสู่ระบบ</h2>
                         <p>
-                            <label >ชื่อผู้ใช้งาน:</label><br />
+                            <label>ชื่อผู้ใช้งาน<span className="important">*</span></label><br />
                             <input placeholder="ชื่อผู้ใช้งาน" type="text" />
                         </p>
                         <p>
-                            <label>รหัสผ่าน:</label><br />
+                            <label>รหัสผ่าน<span className="important">*</span></label><br />
                             <input placeholder="รหัสผ่าน" type="password" />
                         </p>
-                        <div>
-            
+                        <div className="fn-login">
+                            <Link to="/register"><p className="regist">สมัครสมาชิก</p></Link>
                             <Link to="/"><p className="forget-pass">ลืมรหัสผ่าน?</p></Link>
                         </div>
-                        <p className="login-submit">
-                          
-                            <Link to="/"><button type="button">เข้าสู่ระบบ</button></Link>
-                        </p>
 
-                        <p>
-                           
-                            <Link to="/register">
-                                <button type="button">สมัครสมาชิก</button>
-                            </Link>
-                        </p>
+                        <div className="button-group">
+                            <div>
+                                <Link to="/">
+                                    <button className="regist-bt" type="button">ยกเลิก</button></Link>
+                            </div>
+                            <div>
+                                <Link to="/"><button className="login-bt" type="button">เข้าสู่ระบบ</button></Link>
+                            </div>
+                        </div>
+
                     </form>
                 </div>
             </div>

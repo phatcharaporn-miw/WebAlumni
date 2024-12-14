@@ -9,7 +9,6 @@ function AppLayout() {
 
      const hideHeaderPaths = ["/login","register"];
      const shouldHideHeader = hideHeaderPaths.includes(location.pathname);
-     const shouldHideFooter = hideHeaderPaths.includes(location.pathname);
 
   return (
     <div>

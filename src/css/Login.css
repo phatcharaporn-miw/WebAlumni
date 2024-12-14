@@ -1,0 +1,118 @@
+body {
+    font-family: 'Prompt', sans-serif;
+}  
+
+.form-login-logo {
+    width: 500px;
+    height: 150px;
+    margin: 0 auto 20px auto;
+    object-fit: cover;
+}
+
+.all-form {
+    display: grid; 
+    justify-content: center; 
+}
+
+.form-login-bg {
+    background-color: #F5F5F5;
+    border-radius: 9px;
+    padding: 20px;
+    height: fit-content;
+}
+
+.form-login {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.form-login p {
+    margin: 10px 0;
+}
+
+.form-login label {
+    font-size: 16px;
+    color: #0F75BC;
+    margin-bottom: 5px;
+}
+.form-login input{
+    flex: 1;
+    padding: 10px 20px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    width: 400px;
+}
+.form-login input:focus {
+    border-color: #0F75BC;
+    box-shadow: 0 0 5px rgba(15, 117, 188, 0.3);
+}
+.form-login h2 {
+    font-size: 30px;
+    text-align: center;
+    color: #0F75BC;
+}
+
+.login-bt {
+    background-color: #0F75BC;
+    color: white;
+}
+.regist-bt {
+    background-color: #ccc;
+    color: rgb(0, 0, 0);
+    border: none;
+}
+.login-bt, .regist-bt {
+    font-size: 16px;
+    width: 100%;
+    border: none;
+    cursor: pointer;
+    padding: 10px 20px;
+    border-radius: 5px;
+    box-sizing: border-box;
+    text-align: center;
+    transition: background-color 0.3s ease;
+}
+
+.button-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr; 
+    gap: 10px;
+}
+
+.fn-login{
+    display: flex;
+    justify-content: space-between;
+    font-size: small;
+    color: #0F75BC;
+
+}
+button:hover {
+    opacity: 0.9;
+}
+
+.important {
+    color: red;
+}
+
+
+@media (max-width: 768px) {
+    .form-login-logo {
+        width: 350px;
+        height: 120px;
+    }
+
+    .form-login {
+        width: 100%;
+    }
+    .button-group {
+        grid-template-columns: 1fr;
+    }
+    button {
+        width: 100%;
+    }
+}
