@@ -1,0 +1,33 @@
+
+  .news-card img {
+    width: 100%;
+    height: auto;
+    border-bottom: 4px solid #004F9F; 
+  }
+  
+  .news-card .card-body {
+    padding: 20px;
+  }
+  
+  #card-news-home{
+    height: 500px;
+  }
+
+  #head-text{
+    text-align: center;
+    margin: 40px;
+    color: #0F75BC;
+    font-weight: bold;
+  }
+  
+  .card-title{
+    font-weight: bold;
+  }
+
+  .content{
+    margin-bottom: 100px;
+  }
+
+  .home-about{
+    margin: 0 100px ;
+  }

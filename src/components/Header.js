@@ -21,7 +21,7 @@ function Header() {
       {/* โลโก้ และช่องค้นหา */}
       <div className="header-top">
         {/* โลโก้ */}
-        <img className="logo" src="/image/logoCP.png" alt="College of Computing Logo"/>
+        <img className="logo" src="/image/logoCP1.png" alt="College of Computing Logo"/>
 
         {/* ช่องค้นหาและปุ่มเข้าสู่ระบบ */}
         <div className="search-and-login">
@@ -31,7 +31,6 @@ function Header() {
               value={searchTerm} 
               onChange={handleSearchChange} 
               className="form-control" 
-          
             />
             <button onClick={handleSearchClick} className="search-icon-btn">
               <SlMagnifier className="search-icon" />

@@ -17,7 +17,7 @@ import Register from './pages/register';
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
+    <Routes>
         <Route element={<AppLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="about" element={<About />} />
@@ -30,8 +30,8 @@ function App() {
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
         </Route>
-      </Routes>
-    </BrowserRouter>
+    </Routes>
+  </BrowserRouter>
   );
 }
 
