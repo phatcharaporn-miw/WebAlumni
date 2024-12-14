@@ -21,14 +21,15 @@ function App() {
     <Route element={<AppLayout />}>
       <Route index element={<Home />} />
       <Route path="/" element={<Home />} />
-      <Route path="about" element={<About />} />
-      <Route path="news" element={<News />} />
-      <Route path="activity" element={<Activity />} />
-      <Route path="donate" element={<Donate />} />
-      <Route path="alumni" element={<Alumni />} />
-      <Route path="souvenir" element={<Souvenir />} />
-      <Route path="webboard" element={<Webboard />} />
-      <Route path="ploy" element={<Webboard />} />
+      <Route path="/about" element={<About />} />
+      <Route path="/news" element={<News />} />
+      <Route path="/activity" element={<Activity />} />
+      <Route path="/donate" element={<Donate />} />
+      <Route path="/alumni" element={<Alumni />} />
+      <Route path="/souvenir" element={<Souvenir />} />
+      <Route path="/webboard" element={<Webboard />} />
+     
+     
     </Route>
     </Routes>
   </BrowserRouter>

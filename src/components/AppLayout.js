@@ -1,32 +1,26 @@
-// src/components/AppLayout.js
 import React from 'react';
 import Header from './Header';
+import Footer from './Footer';
 import { Outlet, useLocation } from "react-router-dom";
 
 
 function AppLayout() {
-    // const location = useLocation();
+     const location = useLocation();
+
+     const hideHeaderPaths = ["/login","register"];
+     const shouldHideHeader = hideHeaderPaths.includes(location.pathname);
+     const shouldHideFooter = hideHeaderPaths.includes(location.pathname);
 
   return (
     <div>
       {/* Header จะแสดงเหมือนกันทุกหน้า */}
-      <Header />
-
-      {/* <nav aria-label="breadcrumb" className="container mt-2">
-        <ul className="breadcrumb">
-          <li className="breadcrumb-item">
-            <a href="/">หน้าหลัก</a>
-          </li>
-          <li className="breadcrumb-item active" aria-current="page">
-            {location.pathname.replace("/", "") || "หน้าปัจจุบัน"}
-          </li>
-        </ul>
-      </nav> */}
+      {!shouldHideHeader && <Header />} 
 
         <main className="main-content">
           <Outlet />
         </main>
 
+        {!shouldHideFooter && <Footer />}
       </div>
 
      

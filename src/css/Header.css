@@ -11,11 +11,10 @@
   .header-top {
     display: flex;
   }
-  
+
   .logo {
-    max-width: 260px;
+    max-width: 260px; 
     width: 100%;
-    
   }
   
   .search-and-login {
@@ -68,7 +67,7 @@
   }
   
   nav {
-    margin-top: -105px; 
+    margin-top: -13px; 
   }
 
   .nav {
@@ -81,15 +80,14 @@
   
   .nav-item a {
     margin: 0 25px;
-    color: #333;
-    
+    color: #333;  
   }
   
   .nav-link {
     color: #333;
     text-decoration: none;
     padding: 8px 12px;
-    /* transition: color 0.3s ease; */
+    
   }
   
   .active-link {
@@ -183,6 +181,6 @@
   } */
   
   .main-content {
-    margin-top: 140px; 
+    margin-top: 155px; 
   } 
   
