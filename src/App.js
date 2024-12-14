@@ -28,7 +28,7 @@ function App() {
       <Route path="alumni" element={<Alumni />} />
       <Route path="souvenir" element={<Souvenir />} />
       <Route path="webboard" element={<Webboard />} />
-      
+      <Route path="ploy" element={<Webboard />} />
     </Route>
     </Routes>
   </BrowserRouter>
