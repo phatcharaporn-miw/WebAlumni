@@ -7,12 +7,13 @@ import { Outlet, useLocation } from "react-router-dom";
 function AppLayout() {
      const location = useLocation();
 
-     const hideHeaderPaths = ["/login","register"];
+     const hideHeaderPaths = ["/login","/register"];
      const shouldHideHeader = hideHeaderPaths.includes(location.pathname);
+     const shouldHideFooter = hideHeaderPaths.includes(location.pathname);
 
   return (
     <div>
-      {/* Header จะแสดงเหมือนกันทุกหน้า */}
+    
       {!shouldHideHeader && <Header />} 
 
         <main className="main-content">

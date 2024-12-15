@@ -1,6 +1,6 @@
 .footer {
     background-color: #f8f9fa;
-    height: 100%;
+    height: auto;
     text-align: center;
     border-top: 2px solid #0F75BC;
   }
@@ -14,11 +14,11 @@
     object-fit: cover;
   }
   
-  .footer .row {
+  /* .footer .row {
     margin-bottom: 20px;
   }
-  
-  .footer .col h4 {
+   */
+  .footer  h4 {
     font-size: 1.2rem;
     font-weight: bold;
     margin: 30px 0;
@@ -59,8 +59,6 @@
     display: flex;
     margin-left: 50px;
 }
-  
-
   
   .footer-contact .footer-icon {
     font-size: 1.2rem;

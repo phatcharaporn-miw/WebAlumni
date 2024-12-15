@@ -1,5 +1,5 @@
 import React from "react";
-import 'bootstrap/dist/css/bootstrap.min.css'; 
+import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import "../css/home.css"
 
@@ -40,7 +40,8 @@ function Home(){
           <section>
             <div className="news-card">
               <h3 id="head-text">ข่าวประชาสัมพันธ์</h3>
-              <div class="container">
+              
+            <div class="container">
             <div class="row">
               <div class="col">
                 <div class="card" id="card-news-home">
