@@ -9,15 +9,19 @@
     padding: 20px;
   }
   
-  #card-news-home{
-    height: 500px;
-  }
+  /* #card-news-home{
+    height: 400px;
+  } */
 
   #head-text{
     text-align: center;
     margin: 40px;
     color: #0F75BC;
     font-weight: bold;
+  }
+
+  .card {
+    height: 100%; /* ความสูงเต็มคอลัมน์ */
   }
   
   .card-title{
