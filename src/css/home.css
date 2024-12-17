@@ -21,7 +21,7 @@
   }
 
   .card {
-    height: 100%; /* ความสูงเต็มคอลัมน์ */
+    height: 100%;
   }
   
   .card-title{
@@ -35,3 +35,15 @@
   .home-about{
     margin: 0 100px ;
   }
+
+  .content {
+    background-image: url('/public/image/back-1.jpg');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed; 
+    background-size: cover;
+    min-height: 80vh;
+    color: #fff;
+}
+
+

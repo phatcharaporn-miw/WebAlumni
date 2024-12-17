@@ -55,8 +55,9 @@ function Register() {
                                     <div className="header-education">ปีการศึกษาที่จบ</div>
                                     <div className="header-education">หลักสูตร</div>
                                     <div className="header-education">สาขา</div>
-
-                                    <div className="row">
+                                    
+                                    {/* เปลี่ยน row เป็น education-row */}
+                                    <div className="education-row ">
                                         <div className="education-item">
                                             <label>
                                                 <input type="checkbox" name="degree" value="doctor" /> ป.ตรี
@@ -78,7 +79,7 @@ function Register() {
                                         </select>
                                     </div>
 
-                                    <div className="row">
+                                    <div className="education-row">
                                         <div className="education-item">
                                             <label>
                                                 <input type="checkbox" name="degree" value="doctor" /> ป.โท
@@ -100,7 +101,7 @@ function Register() {
                                         </select>
                                     </div>
 
-                                    <div className="row">
+                                    <div className="education-row">
                                         <div className="education-item">
                                             <label>
                                                 <input type="checkbox" name="degree" value="doctor" /> ป.เอก

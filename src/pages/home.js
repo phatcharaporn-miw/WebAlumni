@@ -1,11 +1,32 @@
-import React from "react";
+import React, {useState, useEffect} from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import "../css/home.css"
 
+
 function Home(){
+
+  const [background, setBackground] = useState("/image/back-2.png");
+
+  useState(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      if (scrollPosition < 500) {
+        setBackground("/image/back-2.png");
+      }else if (scrollPosition >= 500 && scrollPosition < 600){
+        setBackground("/image/2.jpeg");
+      }else{
+        setBackground("/image/3.jpeg");
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return() => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
     return(
-        <div className="content">
+        <div className="content"  style={{ backgroundImage: `url(${background})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
             <div id="carouselExampleCaptions" className="carousel slide" data-bs-ride="carousel">
             <div className="carousel-indicators">
               <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="0" className="active" aria-current="true" aria-label="Slide 1"></button>
@@ -82,36 +103,70 @@ function Home(){
             
             {/* ส่วนของเว็บบอร์ด */}
             <div className="home-webboard">
-                <h3 id="head-text">เว็บบอร์ด</h3>
-                <div class="container">
-                  <div class="row">
+            <h3 id="head-text">เว็บบอร์ด</h3>
+            <div className="container">
+                <div className="row ">
+                
+                    <div className="col-md-5 mb-4">
+                        <div className="card shadow-sm">
+                            <div className="d-flex p-3">
+                                <img src="./image/profile-picture.png" alt="User" className="rounded-circle me-3" width="50" height="50" />
+                                <div>
+                                    <h5 className="card-title fw-bold mb-1">ประสบการณ์เป็น SA 3 ปี</h5>
+                                    <p className="text-muted mb-1">จากคุณ คอมพิวเตอร์ ไอดี</p>
+                                    <p className="text-muted small">5 นาทีที่แล้ว</p>
+                                </div>
+                            </div>
+                            <div className="card-body">
+                                <p className="card-text text-secondary">
+                                    Lorem Ipsum is simply dummy text of the printing and typesetting industry...
+                                </p>
+                            </div>
+                            <div className="card-footer d-flex justify-content-between">
+                                <div>
+                                    <i className="bi bi-chat me-2"></i> 8 ความคิดเห็น
+                                </div>
+                                <div>
+                                    <span className="badge bg-success">ประสบการณ์</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                    <div class="col">
-                      <div class="card" id="card-webboard">
-                        <div class="card-body">
-                          <h5 class="card-title">Card title</h5>
-                          <h6 class="card-subtitle mb-2 text-body-secondary">Card subtitle</h6>
-                          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                          <a href="#" class="card-link">Card link</a>
-                          <a href="#" class="card-link">Another link</a>
+                  
+                    <div className="col-md-5 mb-4">
+                        <div className="card shadow-sm">
+                            <div className="d-flex p-3">
+                                <img src="./image/profile-picture.png" alt="User" className="rounded-circle me-3" width="50" height="50" />
+                                <div>
+                                    <h5 className="card-title fw-bold mb-1">การทำเรซูเม่ในการสมัครงาน</h5>
+                                    <p className="text-muted mb-1">จากคุณ พัชรพร นิลพงษ์</p>
+                                    <p className="text-muted small">4 วันที่แล้ว</p>
+                                </div>
+                            </div>
+                            <div className="card-body">
+                                <p className="card-text text-secondary">
+                                    Lorem Ipsum is simply dummy text of the printing and typesetting industry...
+                                </p>
+                            </div>
+                            <div className="card-footer d-flex justify-content-between">
+                                <div>
+                                    <i className="bi bi-chat me-2"></i> 8 ความคิดเห็น
+                                </div>
+                                <div>
+                                    <span className="badge bg-danger">งาน</span>
+                                </div>
+                            </div>
                         </div>
-                      </div>
                     </div>
-                    <div class="col">
-                    <div class="card" id="card-webboard">
-                        <div class="card-body">
-                          <h5 class="card-title">Card title</h5>
-                          <h6 class="card-subtitle mb-2 text-body-secondary">Card subtitle</h6>
-                          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                          <a href="#" class="card-link">Card link</a>
-                          <a href="#" class="card-link">Another link</a>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                </div>
+
+                <div className="text-center mt-4">
+                    <button className="btn btn-primary">ดูทั้งหมด</button>
                 </div>
             </div>
-           
+        </div>
+
             {/* ส่วนของบริจาค */}
             <div className="home-donate">
                 <h3 id="head-text">บริจาค</h3>
@@ -124,7 +179,7 @@ function Home(){
                   <div class="card mb-3">
                     <div class="row g-0">
                       <div class="col-md-4">
-                        <img src="/image/about_cp.jpg" class="img-fluid rounded-start" alt="..."/>
+                        <img src="/image/about_cp.jpg" class="img-fluid rounded-start" alt="ภาพสมาคม"/>
                       </div>
                       <div class="col-md-8">
                         <div class="card-body">
