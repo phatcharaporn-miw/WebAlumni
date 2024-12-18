@@ -1,6 +1,7 @@
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import './App.css';
 import React from 'react';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AppLayout from "./components/AppLayout";
 import Home from "./pages/home";
@@ -23,19 +24,18 @@ function App() {
     <Routes>
         <Route element={<AppLayout />}>
           <Route path="/" element={<Home />} />
-          <Route path="about" element={<About />} />
-          <Route path="news" element={<News />} />
-          <Route path="activity" element={<Activity />} />
-          <Route path="donate" element={<Donate />} />
-          <Route path="donateraise" element={<DonateRaise/>} />
-          <Route path="donatunlimit" element={<DonateUnlimit/>} />
-          <Route path="donaterequest" element={<DonateRequest/>} />
-          
-          <Route path="alumni" element={<Alumni />} />
-          <Route path="souvenir" element={<Souvenir />} />
-          <Route path="webboard" element={<Webboard />} />
-          <Route path="login" element={<Login />} />
-          <Route path="register" element={<Register />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/news" element={<News />} />
+          <Route path="/activity" element={<Activity />} />
+          <Route path="/donate" element={<Donate />} />
+          <Route path="/donateraise" element={<DonateRaise/>} />
+          <Route path="/donatunlimit" element={<DonateUnlimit/>} />
+          <Route path="/donaterequest" element={<DonateRequest/>} />
+          <Route path="/alumni" element={<Alumni />} />
+          <Route path="/souvenir" element={<Souvenir />} />
+          <Route path="/webboard" element={<Webboard />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
         </Route>
     </Routes>
   </BrowserRouter>

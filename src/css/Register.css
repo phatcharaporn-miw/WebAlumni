@@ -142,9 +142,14 @@ fieldset {
     align-items: center;
 }
 
-.row {
+/* .row {
+    display: contents;
+} */
+
+.education-row {
     display: contents;
 }
+
 
 .education-item {
     display: flex;

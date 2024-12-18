@@ -9,15 +9,19 @@
     padding: 20px;
   }
   
-  #card-news-home{
-    height: 500px;
-  }
+  /* #card-news-home{
+    height: 400px;
+  } */
 
   #head-text{
     text-align: center;
     margin: 40px;
     color: #0F75BC;
     font-weight: bold;
+  }
+
+  .card {
+    height: 100%;
   }
   
   .card-title{
@@ -31,3 +35,64 @@
   .home-about{
     margin: 0 100px ;
   }
+
+  .content {
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed; 
+    background-size: cover;
+    min-height: 100vh;
+}
+
+/* ส่วนหัว */
+.news-title {
+  font-weight: bold;
+  color: #0F75BC;
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+/* การจัดวางรายการข่าว */
+.news-item {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  padding: 15px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  align-items: center;
+}
+
+/* กล่องวันที่ */
+.news-date {
+  background-color: #0F75BC;
+  color: #fff;
+  /* text-align: center; */
+  padding: 10px 15px;
+  border-radius: 8px;
+  min-width: 80px;
+}
+
+.news-date .day {
+  font-size: 1.8rem;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.news-date .month-year {
+  font-size: 0.8rem;
+  line-height: 1.2;
+}
+
+.news-content h5 {
+  font-weight: bold;
+  color: #333;
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.news-content p {
+  color: #666;
+  margin-top: 5px;
+  font-size: 0.9rem;
+}
