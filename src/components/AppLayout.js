@@ -13,13 +13,13 @@ function AppLayout() {
   return (
     <div>
       {/* Header จะแสดงเหมือนกันทุกหน้า */}
-      {!shouldHideHeader && <Header />} 
+      { <Header />} 
 
         <main className="main-content">
           <Outlet />
         </main>
 
-        {!shouldHideFooter && <Footer />}
+        { <Footer />}
       </div>
 
      
