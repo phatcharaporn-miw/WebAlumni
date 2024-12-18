@@ -20,7 +20,7 @@ function AppLayout() {
           <Outlet />
         </main>
 
-        {!shouldHideFooter && <Footer />}
+        { <Footer />}
       </div>
 
      

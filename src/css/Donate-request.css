@@ -1,0 +1,137 @@
+/* ส่วนหัว */
+h3 {
+    text-align: center;
+    margin-top: 1%;
+    margin-bottom: 2%;
+}
+
+.request-form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 30px auto;
+    max-width: 700px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.data-requestDonate {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    text-align: left;
+    width: 100%;
+}
+
+.data-requestDonate p {
+    margin: 0;
+}
+
+.data-requestDonate label {
+    font-weight: bold;
+    color: #1A8DDD;
+    margin-bottom: 5px;
+}
+
+.data-requestDonate input,
+.data-requestDonate textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #1A8DDD;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.data-requestDonate textarea {
+    height: 100px;
+}
+
+.data-requestDonate input[type="radio"],
+.data-requestDonate input[type="checkbox"] {
+    width: auto;
+    margin-right: 10px;
+    font-weight: normal;
+}
+
+.cancle-button-request,
+.submit-button-request {
+    padding: 10px 20px;
+    font-size: 16px;
+    min-width: 260px;
+    text-align: center;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+.cancle-button-request {
+    background-color: #D9D9D9;
+    color: black;
+}
+
+.submit-button-request {
+    background-color: #1A8DDD;
+    color: white;
+}
+
+.submit-button-request:hover {
+    background-color: #3c9ade;
+}
+
+.group-donate-bt {
+    display: flex;
+    gap: 10px; 
+    justify-content: flex-start;
+}
+
+.group-donate-bt a {
+    display: inline-block;
+    text-decoration: none; 
+}
+
+.time {
+    margin: 10px 0;
+}
+
+.time-container {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.time-container span {
+    white-space: nowrap;
+    font-weight: bold;
+}
+
+.time-container input {
+    flex: 1;
+    padding: 5px;
+    border: 1px solid #1A8DDD;
+    border-radius: 5px;
+}
+
+.time-container .title-time {
+    color: #1A8DDD;
+    font-weight: normal;
+}
+
+input[type="file"] {
+    border: 1px solid #1A8DDD;
+    background: none;
+}
+
+label + input,
+label + textarea {
+    margin-top: 5px;
+}
+
+.data-requestDonate input:focus,
+.data-requestDonate textarea:focus {
+    outline: none;
+    border-color: #3c9ade;
+    box-shadow: 0 0 5px rgba(26, 141, 221, 0.5);
+}
