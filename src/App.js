@@ -9,6 +9,9 @@ import About from "./pages/about";
 import News from './pages/news';
 import Activity from './pages/activity';
 import Donate from './pages/donate';
+import DonateRaise from './pages/donate-raisefunds';
+import DonateUnlimit from './pages/donate-unlimited';
+import DonateRequest from './pages/donate-request';
 import Souvenir from './pages/souvenir';
 import Webboard from './pages/webboard';
 import Alumni from './pages/alumni';
@@ -25,6 +28,9 @@ function App() {
           <Route path="/news" element={<News />} />
           <Route path="/activity" element={<Activity />} />
           <Route path="/donate" element={<Donate />} />
+          <Route path="/donateraise" element={<DonateRaise/>} />
+          <Route path="/donatunlimit" element={<DonateUnlimit/>} />
+          <Route path="/donaterequest" element={<DonateRequest/>} />
           <Route path="/alumni" element={<Alumni />} />
           <Route path="/souvenir" element={<Souvenir />} />
           <Route path="/webboard" element={<Webboard />} />
