@@ -135,15 +135,11 @@ fieldset {
     border-radius: 5px;
 }
 
-.education-grid {
+/* .education-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 10px;
     align-items: center;
-}
-
-/* .row {
-    display: contents;
 } */
 
 .education-row {

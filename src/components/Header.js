@@ -1,12 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../css/Header.css";
 import 'bootstrap/dist/css/bootstrap.min.css'; 
 import { SlMagnifier } from "react-icons/sl";
 import { SlArrowDown } from "react-icons/sl";
 import {  NavLink } from "react-router-dom";
+import { IoMdNotificationsOutline } from "react-icons/io";
 
-function Header() {
+function Header({user, notifications}) {
   const [searchTerm, setSearchTerm] = useState("");
+
+
+  // console.log("User in Header:", user);
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
@@ -36,9 +40,25 @@ function Header() {
               <SlMagnifier className="search-icon" />
             </button>
           </div>
-        <NavLink to="/login">
-          <button className="login-btn m-2 ms-5">เข้าสู่ระบบ</button>
-        </NavLink>
+
+           {/* หากผู้ใช้เข้าสู่ระบบแล้วจะแสดงโปรไฟล์และแจ้งเตือน */}
+           {user ? (
+            <div className="user-profile">
+              <div className="notification-icon">
+              <IoMdNotificationsOutline />
+              </div>
+              
+              <NavLink to="/alumni-profile">
+                <img src={`${user.profilePicture}` || "/profile-picture.png"} alt="User Profile" className="profile-img" 
+                style={{ cursor: "pointer" }}/>
+              </NavLink>
+              
+            </div>
+          ) : (
+            <NavLink to="/login">
+              <button className="login-btn m-2 ms-5">เข้าสู่ระบบ</button>
+            </NavLink>
+          )}
 
         </div>
       </div>

@@ -17,6 +17,45 @@
     /* display: flex; */
 }
 
+
+.contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  background-color: #e3f2fd;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.contact-item .contact-icon {
+  font-size: 24px;
+  color: #0056b3;
+  margin-right: 10px;
+}
+
+.contact-item p {
+  margin: 0;
+  color: #2d3a3f;
+  font-size: 14px;
+}
+
+.contact-item p:first-child {
+  font-weight: bold;
+}
+
+.map-container iframe {
+  width: 600px;
+  height: 300px;
+  
+}
+
+
 @media (max-width: 768px) {
     .card-img-top {
       height: 200px;

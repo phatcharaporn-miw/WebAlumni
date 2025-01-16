@@ -9,20 +9,6 @@ function Home(){
 
   const [background, setBackground] = useState("/image/back-2.png");
 
-  // useState(() => {
-  //   const handleScroll = () => {
-  //     const scrollPosition = window.scrollY;
-  //     if (scrollPosition < 500) {
-  //       setBackground("/image/back-2.png");
-  //     }else{
-  //       setBackground("/image/2.jpeg");
-  //     }
-  //   };
-
-  //   window.addEventListener("scroll", handleScroll);
-
-  //   return() => window.removeEventListener("scroll", handleScroll);
-  // }, []);
 
     return(
         <div className="content"  style={{ backgroundImage: `url(${background})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>

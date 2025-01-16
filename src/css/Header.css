@@ -135,7 +135,6 @@
   color: #f8f9fa;
 }
   
-
   .dropdown:hover .dropdown-content {
     display: block;
   }
@@ -183,4 +182,17 @@
   .main-content {
     margin-top: 155px; 
   } 
+  
+  .profile-img {
+    width: 40px; 
+    height: 40px; 
+    border-radius: 50%; 
+    object-fit: cover; 
+  }
+  
+  .user-profile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
   
