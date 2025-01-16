@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 import React, { useState, useEffect } from "react";
 import "../css/Donate-detail.css";
 import { MdDateRange } from "react-icons/md";
@@ -119,18 +120,55 @@ function DonateDetail() {
                             : `ยอดบริจาค: ${projectData.current_amount.toLocaleString()} บาท`
                     }
                 </div>
+=======
+import React, { useState } from "react";
+import "../css/Donate-detail.css";
+import { MdDateRange } from "react-icons/md";
+import { ImUser } from "react-icons/im";
+
+function DonateDetail() {
+    const [showTaxForm, setShowTaxForm] = useState(false); // State สำหรับควบคุมการแสดงฟอร์มใบกำกับภาษี
+
+    const currentAmount = 3000;
+    const goalAmount = 10000;
+    const countDay = 23;
+    const dateStart = "12 สิงหาคม 2567";
+    const dateEnd = "12 ตุลาคม 2567";
+    const intendant = "สมาคมศิษย์เก่าวิทยาลัยการคอมพิวเตอร์";
+    const progress = (currentAmount / goalAmount) * 100;
+
+    const handleTaxOptionChange = (e) => {
+        setShowTaxForm(e.target.value === "yes"); // แสดงฟอร์มหากเลือก "ต้องการ"
+    };
+
+    return (
+        <div className="donate-detail-content">
+            <div className="donate-detail-content-item">
+                <h5>ยิ้มสู่ชุมชน</h5>
+                <img src="./image/activitie1.jpg" alt="กิจกรรม" />
+                {/* Progress Bar */}
+                <div className="donate-detail-progress">{`${progress}%`}</div>
+>>>>>>> Stashed changes
                 <div className="donate-detail-bar">
                     <div className="donate-detail-progress-bar-container">
                         <div
                             className="donate-detail-progress-bar"
+<<<<<<< Updated upstream
                             style={{ width: `${(projectData.current_amount / projectData.target_amount) * 100}%` }}
                         ></div>
                         <span className="donate-detail-progress-percent">
                             {`${((projectData.current_amount / projectData.target_amount) * 100).toFixed(0)}%`}
+=======
+                            style={{ width: `${progress}%` }}>
+                        </div>
+                        <span className="donate-detail-progress-percent">
+                            {`${progress.toFixed(0)}%`}
+>>>>>>> Stashed changes
                         </span>
                     </div>
                 </div>
 
+<<<<<<< Updated upstream
                 {/* ข้อมูลยอดเงินเป้าหมาย */}
                 <div className="donate-detail-details">
                     <span>
@@ -148,6 +186,21 @@ function DonateDetail() {
 
                 <div className="donate-detail-discription">
                     <p>{projectData.description}</p>
+=======
+                {/* ข้อมูลยอดบริจาค */}
+                <div className="donate-detail-details">
+                    <span>ยอดบริจาคปัจจุบัน: <span className="donate-detail-details-bold">{currentAmount.toLocaleString()}</span> บาท</span>
+                    <span>เป้าหมาย: <span className="donate-detail-details-bold">{goalAmount.toLocaleString()}</span> บาท</span>
+                </div>
+                {/* เวลาที่เหลือ */}
+                <div className="donate-detail-discription-day">
+                    <span>เหลืออีก {countDay.toLocaleString()} วัน</span>
+                </div>
+
+                {/* คำอธิบายโครงการ */}
+                <div className="donate-detail-discription">
+                    <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
+>>>>>>> Stashed changes
                 </div>
 
                 <div className="donate-detail-discription">
@@ -155,9 +208,13 @@ function DonateDetail() {
                         <MdDateRange className="custom-icon" />
                         <p>ระยะเวลาระดุมทุน</p>
                     </div>
+<<<<<<< Updated upstream
                     <p className="donate-detail-informations">
                         {formattedStartDate} - {formattedEndDate}
                     </p>
+=======
+                    <p className="donate-detail-informations">{dateStart} - {dateEnd}</p>
+>>>>>>> Stashed changes
                 </div>
 
                 <div className="donate-detail-discription">
@@ -165,6 +222,7 @@ function DonateDetail() {
                         <ImUser className="custom-icon" />
                         <p>ผู้รับผิดชอบโครงการ</p>
                     </div>
+<<<<<<< Updated upstream
                     <p className="donate-detail-informations">{projectData.intendant}</p>
                 </div>
             </div>
@@ -206,6 +264,37 @@ function DonateDetail() {
 
                     <div className="donate-detail-form-items">
                         <label>ใบกำกับภาษี</label>
+=======
+                    <p className="donate-detail-informations">{intendant}</p>
+                </div>
+            </div>
+
+            <div className="donate-detail-content-item">
+                <form>
+                    <div className="donate-detail-form-items">
+                        <label>ระบุจำนวนเงิน</label><br />
+                        <input
+                            type="text"
+                            onInput={(e) => {
+                                e.target.value = e.target.value.replace(/[^0-9]/g, '');
+                            }}
+                            placeholder="กรอกจำนวนเงิน"
+                        /><br />
+                    </div>
+
+                    <div className="donate-detail-form-items">
+                        <label>ช่องทางการชำระเงิน</label><br />
+                        <p>QR PromtPay</p>
+                        <div><img src="./" alt="QR Code" /> รูป QR Code</div>
+                    </div>
+
+                    <div className="donate-detail-form-items">
+                        <label>หลักฐานการชำระเงิน</label><br />
+                        <input type="file" className="file-slip" /><br />
+                    </div>
+                    <div className="donate-detail-form-items">
+                        <label>ใบกำกับภาษี</label><br />
+>>>>>>> Stashed changes
                         <div>
                             <input
                                 type="radio"
@@ -228,6 +317,7 @@ function DonateDetail() {
                         </div>
                     </div>
 
+<<<<<<< Updated upstream
                     {showTaxForm && (
                         <div className="donate-detail-tax-form">
                             <div className="form-group">
@@ -267,6 +357,30 @@ function DonateDetail() {
         </div>
 
 
+=======
+                    {/* ฟอร์มกรอกใบกำกับภาษี */}
+                    {showTaxForm && (
+                        <div className="donate-detail-tax-form">
+                            <div className="form-group">
+                                <label htmlFor="name">ชื่อ-นามสกุล/ชื่อบริษัท</label>
+                                <input type="text" id="name" name="name" placeholder="กรอกชื่อ-นามสกุล/บริษัท" />
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="address">ที่อยู่</label>
+                                <textarea id="address" name="address" rows="3" placeholder="กรอกที่อยู่"></textarea>
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="tax-id">เลขประจำตัวผู้เสียภาษี</label>
+                                <input type="text" id="tax-id" name="tax-id" placeholder="กรอกเลขประจำตัวผู้เสียภาษี" />
+                            </div>
+                        </div>
+                    )}
+                </form>
+
+                <button className="donate-detail-button">บริจาค</button>
+            </div>
+        </div>
+>>>>>>> Stashed changes
     );
 }
 

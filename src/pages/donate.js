@@ -41,6 +41,7 @@ function Donate() {
                 {/* รายการบริจาค */}
                 <h3>โครงการบริจาคทั้งหมด</h3>
                 <div className="donate-content">
+<<<<<<< Updated upstream
                     {projects.length === 0 ? (
                         <p>ขออภัย ไม่มีโครงการบริจาคในขณะนี้</p>
                     ) : (
@@ -85,6 +86,83 @@ function Donate() {
                             })}
                         </div>
                     )}
+=======
+                    <h3>โครงการบริจาคทั้งหมด</h3>
+                    <div className="donate-content-item">
+                        <div className="item-detail">
+                            <div className="image-frame">
+                                <img src="./image/activitie1.jpg" alt="Avatar" />
+                            </div>
+                            <div className="donate-discription">
+                                <h5><b>ยิ้มสู่ชุมชน</b></h5>
+                                <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry...</p>
+                            </div>
+                            {/* Progress Bar */}
+                            <div className="progress">{`${progress}%`}</div>
+                            <div className="bar">
+                                <div className="progress-bar-container">
+                                    <div className="progress-bar" style={{ width: `${progress}%` }}></div>
+                                    <span className="progress-percent">{`${progress.toFixed(0)}%`}</span>
+                                </div>
+                            </div>
+
+                            <div className="donate-details">
+                                <span>ยอดบริจาคปัจจุบัน: {currentAmount.toLocaleString()} บาท</span>
+                                <span>เป้าหมาย: {goalAmount.toLocaleString()} บาท</span>
+                            </div>
+                            <Link to="/donatedetail">
+                                <button className="donate-bt">บริจาค</button>
+                            </Link>
+                        </div>
+
+                        <div className="item-detail">
+                            <div className="image-frame">
+                                <img src="./image/activitie2.jpg" alt="Avatar" />
+                            </div>
+                            <div className="donate-discription">
+                                <h5><b>ยิ้มสู่ชุมชน</b></h5>
+                                <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry...</p>
+                            </div>
+                            {/* Progress Bar */}
+                            <div className="progress">{`${progress}%`}</div>
+                            <div className="bar">
+                                <div className="progress-bar-container">
+                                    <div className="progress-bar" style={{ width: `${progress}%` }}></div>
+                                    <span className="progress-percent">{`${progress.toFixed(0)}%`}</span>
+                                </div>
+                            </div>
+
+                            <div className="donate-details">
+                                <span>ยอดบริจาคปัจจุบัน: {currentAmount.toLocaleString()} บาท</span>
+                                <span>เป้าหมาย: {goalAmount.toLocaleString()} บาท</span>
+                            </div>
+                            <button className="donate-bt">บริจาค</button>
+                        </div>
+                        <div className="item-detail">
+                            <div className="image-frame">
+                                <img src="./image/กิจกรรม1.png" alt="Avatar" />
+                            </div>
+                            <div className="donate-discription">
+                                <h5><b>ยิ้มสู่ชุมชน</b></h5>
+                                <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry...</p>
+                            </div>
+                            {/* Progress Bar */}
+                            <div className="progress">{`${progress}%`}</div>
+                            <div className="bar">
+                                <div className="progress-bar-container">
+                                    <div className="progress-bar" style={{ width: `${progress}%` }}></div>
+                                    <span className="progress-percent">{`${progress.toFixed(0)}%`}</span>
+                                </div>
+                            </div>
+
+                            <div className="donate-details">
+                                <span>ยอดบริจาคปัจจุบัน: {currentAmount.toLocaleString()} บาท</span>
+                                <span>เป้าหมาย: {goalAmount.toLocaleString()} บาท</span>
+                            </div>
+                            <button className="donate-bt">บริจาค</button>
+                        </div>
+                    </div>
+>>>>>>> Stashed changes
                 </div>
             </div>
         </div>
