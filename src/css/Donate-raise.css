@@ -103,15 +103,15 @@ h3 {
     margin: 20px;
     color: #333;
 }
-
+/* 
 .donate-content-item {
     display: flex;
     justify-content: space-around;
     align-items: center;
     flex-wrap: wrap;
     margin: 4%;
-    gap: 20px; /* เพิ่มระยะห่าง */
-}
+    gap: 20px; 
+} */
 
 .item-detail {
     width: 280px;
@@ -121,7 +121,7 @@ h3 {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     transition: transform 0.3s ease;
     margin-bottom: 5%;
-    background-color: #fff;
+    /* background-color: #a02222; */
 }
 
 .item-detail:hover {
