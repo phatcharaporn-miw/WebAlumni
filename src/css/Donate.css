@@ -105,15 +105,15 @@ h3 {
 
 .donate-content-item {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
     margin: 4%;
-    gap: 20px; /* เพิ่มระยะห่าง */
+    gap: 10px; /* เพิ่มระยะห่าง */
 }
 
 .item-detail {
-    width: 280px;
+    width: 300px;
     height: 450px;
     border-radius: 5%;
     border: 1px solid #ddd;
@@ -153,7 +153,7 @@ h3 {
     -webkit-line-clamp: 3; /* จำนวนบรรทัดที่ต้องการแสดง */
     -webkit-box-orient: vertical;
     overflow: hidden;
-    text-overflow: ellipsis; /* เพิ่ม ... ต่อท้าย */
+    text-overflow: ellipsis; 
     font-size: 12px;
 }
 
@@ -200,7 +200,7 @@ h3 {
 /* รายละเอียดการบริจาค */
 .donate-details {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     font-size: 10px;
     color: #085A9C;
     margin: 0 ;

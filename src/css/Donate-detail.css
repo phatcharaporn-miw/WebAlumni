@@ -1,0 +1,134 @@
+.donate-detail-content{
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+.donate-detail-content img{
+    width: 460px;
+    height: 250px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+.donate-detail-content-item{
+    /* background-color: beige; */
+    display: grid;
+    grid-template-columns: auto;
+    justify-content: center;
+    width: 500px;
+    height: fit-content;
+    padding: 2%;
+}
+
+.donate-detail-content-item form{
+    border: 2px solid rgba(8, 90, 156, 0.6);
+    padding: 5%;
+    border-radius: 15px;
+    margin-top: 30px;
+}
+.donate-detail-bar{
+    display: flex;
+    justify-content: center;
+}
+.donate-detail-progress{
+    color: #0F75BC;
+    font-size: 14px;
+    text-align: end;
+    margin-top: 5px;
+}
+.donate-detail-progress-bar-container{
+    position: relative;
+    width: 100%;
+    height: 10px;
+    background-color: #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
+    margin:0;
+}
+
+.donate-detail-progress-bar {
+    height: 100%;
+    background-color: #0F75BC;
+    transition: width 0.5s ease-in-out;
+}
+
+.donate-detail-progress-percent {
+    position: absolute;
+    top: -20px;
+    right: 0;
+    font-size: 10px;
+    color: #333;
+}
+.donate-detail-details{
+        display: flex;
+        justify-content: space-between;
+        font-size: 14px;
+        color: #085A9C;
+        margin: 0 0 5px 0;
+}
+.donate-detail-discription {
+    display: grid; 
+    text-align: justify;
+    gap: 2px; 
+    font-size: 13px;
+    margin-bottom: 10px;
+}
+.donate-detail-discription p{
+    margin: 0;
+}
+.donate-detail-button{
+        margin-top: 5%;
+        height: 40px;
+        background-color: #0F75BC;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.donate-detail-button:hover {
+    background-color: #085A9C;
+    transform: scale(1.05);
+}
+
+.donate-detail-discription-day{
+    text-align: end;
+    font-size: 14px;
+    color: #085A9C;
+}
+
+.donate-detail-header {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 14px;
+    font-weight: bold;
+    margin: 0;
+}
+
+.custom-icon {
+    font-size: 20px;
+}
+.donate-detail-header p {
+    margin: 0;
+}
+
+p.donate-detail-informations{
+    margin-left: 1.5rem;
+}
+.donate-detail-details-bold{
+    font-weight: bold;
+}
+.tax-prefix {
+    margin-top: 10px;
+}
+.file-slip{
+    width: 100%;
+}
+.donate-detail-form-items{
+    /* border: 2px solid rgba(8, 90, 156, 0.6);  */
+    /* padding: 5%; */
+    border-radius: 10px;
+    margin-bottom: 5%;
+}
