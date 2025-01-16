@@ -1,0 +1,112 @@
+.act-title{
+    text-align: center;
+    padding: 30px;
+    color: #0F75BC;
+    font-weight: bold;
+  }
+
+.activity-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+   
+  }
+  
+  .activity-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+  }
+  
+  .image-container {
+    position: relative;
+    height: auto;
+    border-bottom: 4px solid #004F9F;     
+  }
+  
+  
+  .status-inprogress {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: #ffc107; 
+    color: white;
+    font-size: 0.8rem;
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  .status-done{
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: #3FA73F; 
+    color: white;
+    font-size: 0.8rem;
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  .status-coming{
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: #F89A16; 
+    color: white;
+    font-size: 0.8rem;
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+  
+  .card-text {
+    font-size: 0.95rem;
+    color: #555;
+    line-height: 1.5;
+  }
+  
+  .join-button {
+    background-color: #0F75BC;;
+    color: white;
+    border: none;
+    transition: background-color 0.3s, transform 0.2s;
+  }
+  
+  .join-button:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+  }
+  
+  /* dropdown-activity */
+.dropbtn-act {
+    color: #333;
+    cursor: pointer;
+    padding: 10px 20px;
+    border-radius: 5px;
+    background-color: #f8f9fa;
+    transition: background-color 0.3s;
+  }
+  
+  .dropbtn-act:hover {
+    background-color: #e2e6ea;
+    color: #007bff;
+  }
+  
+  .arrow-down {
+    margin-left: 10px;
+    font-size: 0.8rem;
+    transition: transform 0.3s;
+  }
+  
+  .dropdown:hover .arrow-down {
+    transform: rotate(180deg);
+  }
+  
+  
+  
