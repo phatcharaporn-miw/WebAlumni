@@ -21,7 +21,7 @@ function DonateDetail() {
     // ฟังก์ชันที่ใช้ในการสร้าง QR Code
     const generateQRCode = () => {
         if (!formData.amount) return;
-        axios.post('http://localhost:5000/generateQR', {
+        axios.post('http://localhost:3001/generateQR', {
             amount: parseFloat(formData.amount),
         })
             .then(response => {
@@ -35,7 +35,7 @@ function DonateDetail() {
     };
 
     useEffect(() => {
-        axios.get(`http://localhost:5000/donate/donatedetail/${projectId}`)
+        axios.get(`http://localhost:3001/donate/donatedetail/${projectId}`)
             .then(response => {
                 console.log("Project Data:", response.data);
                 setProjectData(response.data);
@@ -96,7 +96,7 @@ function DonateDetail() {
             <div className="donate-detail-content-item">
                 <h5>{projectData.project_name}</h5>
                 <img
-                    src={`http://localhost:5000/uploads/${projectData.image_path}`}
+                    src={`http://localhost:3001/uploads/${projectData.image_path}`}
                     alt="กิจกรรม"
                     onError={(e) => {
                         e.target.src = `${process.env.PUBLIC_URL}/image/default.png`;

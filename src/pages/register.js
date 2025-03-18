@@ -10,7 +10,6 @@ import 'react-toastify/dist/ReactToastify.css';
 
 function Register() {
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const navigate = useNavigate();
   const [major, setMajor] = useState([]);
   const [userData, setUserData] = useState({
@@ -60,24 +59,22 @@ function Register() {
     for (let [key, value] of data.entries()) {
         console.log(key, value); 
     } 
-
     
     if (!userData.username || !userData.password || !userData.role) {
         alert("กรุณากรอกข้อมูลให้ครบถ้วน");
         return;
     }
-
      // ทำการส่งข้อมูลไป Backend
      try {
         const response = await axios.post("http://localhost:3001/add/register", data, {
             headers: { "Content-Type": "multipart/form-data" },
         });
-        
-      if (response.data.success) {
-        alert('ลงทะเบียนสำเร็จ');
+         alert('ลงทะเบียนสำเร็จ!');
         navigate("/login");
+    //   if (response.data.success) {
+       
         
-      }
+    //   }
      } catch (error) {
       alert("เกิดข้อผิดพลาดในการลงทะเบียน");
      console.error("Register error:", error);
@@ -105,12 +102,12 @@ function Register() {
 
     if (type === 'checkbox' && name === 'degree') {
         const updatedDegrees = checked
-          ? [...userData.degree, parseInt(value)]  // ส่งค่า degree_id เป็นตัวเลข
-          : userData.degree.filter((item) => item !== parseInt(value)); // ลบค่า degree_id จาก array
+          ? [...userData.degree, parseInt(value)]  // true => ใช้การกระจายค่าเพื่อเพิ่ม degree_id ใหม่เข้าไปในอาร์เรย์ userData.degree และแปลงค่า string->int
+          : userData.degree.filter((item) => item !== parseInt(value)); // false =>  ลบค่า degree_id จาก array ที่ถูกคลิก
         
-        setUserData((prevState) => ({ ...prevState, degree: updatedDegrees }));
+        setUserData((prevState) => ({ ...prevState, degree: updatedDegrees })); //prevState ใช้เข้าถึงสถานะก่อนหน้า เก็บค่าของ prevState ไว้ทั้งหมด และอัปเดตค่าใหม่
       } else {
-        setUserData((prevState) => ({ ...prevState, [name]: value }));
+        setUserData((prevState) => ({ ...prevState, [name]: value })); //ถ้าเป็น input หรือฟอร์มชนิดอื่นจะอัปเดตค่าของ [name]: value
       }
     // setFormData({
     //   ...formData,[name]: value, 

@@ -10,7 +10,7 @@ function Souvenir() {
 
     useEffect(() => {
         axios
-            .get("http://localhost:5000/souvenir")
+            .get("http://localhost:3001/souvenir")
             .then((response) => {
                 setProducts(response.data);
                 setLoading(false);
@@ -39,7 +39,7 @@ function Souvenir() {
                                 <div  className="souvenir-item" key={product.id}>
                                     <img
                                         className="souvenir-item-img"
-                                        src={`http://localhost:5000/uploads/${product.image}`}
+                                        src={`http://localhost:3001/uploads/${product.image}`}
                                         alt={product.product_name}
                                     />
                                     <p>{product.product_name}</p>
@@ -60,7 +60,7 @@ function Souvenir() {
                                 <div className="souvenir-item" key={product.id}>
                                     <img
                                         className="souvenir-item-img"
-                                        src={`http://localhost:5000/uploads/${product.image}`}
+                                        src={`http://localhost:3001/uploads/${product.image}`}
                                         alt={product.product_name}
                                     />
                                     <p>{product.product_name}</p>

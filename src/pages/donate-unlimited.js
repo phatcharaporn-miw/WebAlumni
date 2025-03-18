@@ -10,7 +10,7 @@ function DonateUnlimit() {
 
     useEffect(() => {
         axios
-            .get("http://localhost:5000/donate") // เรียก API
+            .get("http://localhost:3001/donate") // เรียก API
             .then((response) => {
                 setProjects(response.data);
                 setLoading(false);
@@ -21,7 +21,7 @@ function DonateUnlimit() {
             });
     }, []);
 
-    const filteredProjects = projects.filter((project) => project.donation_type === "unlimited");
+    const filteredProjects = projects.filter((project) => project.donation_type === "บริจาคแบบไม่จำกัดจำนวน");
 
     if (loading) return <p>กำลังโหลดข้อมูล...</p>;
     if (error) return <p>{error}</p>;
@@ -56,7 +56,7 @@ function DonateUnlimit() {
                                 <div className="item-detail" key={project.project_id}>
                                     <div className="image-frame">
                                         <img
-                                            src={`http://localhost:5000/uploads/${project.image_path}`}
+                                            src={`http://localhost:3001/uploads/${project.image_path}`}
                                             alt={project.project_name}
                                             onError={(e) => {
                                                 e.target.src = "./image/default.jpg"; 

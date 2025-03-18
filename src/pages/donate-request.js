@@ -60,7 +60,7 @@ function DonateRequest() {
         }
     
         try {
-            const response = await axios.post('http://localhost:5000/donate/donateRequest', data, {
+            const response = await axios.post('http://localhost:3001/donate/donateRequest', data, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             // console.log('Success:', response.data);
@@ -113,22 +113,22 @@ function DonateRequest() {
                             <input
                                 type="radio"
                                 name="donationType"
-                                value="fundraising"
+                                value="บริจาคแบบระดมทุน"
                                 onChange={handleChange}
-                                checked={formData.donationType === "fundraising"}
+                                checked={formData.donationType === "บริจาคแบบระดมทุน"}
                                 required
                             /> บริจาคแบบระดมทุน
                             <br />
                             <input
                                 type="radio"
                                 name="donationType"
-                                value="unlimited"
+                                value="บริจาคแบบไม่จำกัดจำนวน"
                                 onChange={handleChange}
-                                checked={formData.donationType === "unlimited"}
+                                checked={formData.donationType === "บริจาคแบบไม่จำกัดจำนวน"}
                             /> บริจาคแบบไม่จำกัดจำนวน
                         </p>
 
-                        {formData.donationType === "fundraising" && (
+                        {formData.donationType === "บริจาคแบบระดมทุน" && (
                             <p>
                                 <label htmlFor="targetAmount">เป้าหมายยอดบริจาค<span className="important">*</span></label><br />
                                 <input

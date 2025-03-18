@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import './App.css';
-import axios from 'axios';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Navigate } from 'react-router-dom';
+// import { LanguageProvider } from './context/LanguageContext';
 import AppLayout from "./components/AppLayout";
 import Home from "./pages/home";
 import About from "./pages/about";
@@ -16,7 +15,7 @@ import DonateRaise from './pages/donate-raisefunds';
 import DonateUnlimit from './pages/donate-unlimited';
 import DonateRequest from './pages/donate-request';
 import DonateDetail from './pages/donate-detail';
-import AdminDonate from './pages/admin/donate';
+// import AdminDonate from './pages/admin/donate';
 import Souvenir from './pages/souvenir';
 import SouvenirDetail from './pages/souvenirDetail';
 import Webboard from './pages/webboard';
@@ -24,43 +23,26 @@ import Alumni from './pages/alumni';
 import Login from './pages/login';
 import Register from './pages/register';
 // import Register from './pages/test-regis';
-import HomeAdmin from './pages/admin/home-admin';
+import AdminHome from './pages/admin/admin-home';
 import PresidentHome from './pages/president/president-home';
-import ProtectedRoute from './components/ProtectedRoute';
+// import ProtectedRoute from './components/ProtectedRoute';
 import AlumniHome from './pages/alumni/alumni-home';
 import Profile from './pages/alumni/alumni-profile';
+import CreatePost from './pages/createPost';
+import WebboardFavorite from './pages/alumni/alumni-favorite';
+import CreateNews from './pages/admin/admin-create-news';
+import NewsDetail from './pages/newsDetail';
+import CreateActivity from './pages/admin/admin-create-activity';
+import Notifications from './components/Notification';
+import Category from './pages/category';
+import AlumniProfileWebboard from './pages/alumni/alumni-profile-webboard';
+import EditWebboard from './pages/alumni/editWebboard';
+import ActivityDetail from "./pages/activityDetail";
+import ForgotPassword from './pages/forgotPassword';
 
-
-function App() {
+function App() { 
 
   const clientId = '766363116725-8u97fa7f736i56p1vgm3l3261f0neud2.apps.googleusercontent.com';
-  // const [user, setUser] = useState(null);
-  // const [loading, setLoading] = useState(true);
-
-  // useEffect(() => {
-  //   const fetchUser = async () => {
-  //     try {
-  //       const response = await axios.get('http://localhost:3001/api/session');
-  //       setUser(response.data.user || null);
-  //     } catch (error) {
-  //       setUser(null);
-  //     } finally {
-  //       setLoading(false); // โหลดเสร็จสิ้น
-  //     }
-  //   };
-
-  //   fetchUser();
-  // }, []);
-
-
-  
-
-  // if (loading) {
-  //   return <div>Loading...</div>;
-  // }
-
-  // const isLoggedIn = !!user;
-  // console.log('isLoggedIn:', isLoggedIn, 'user:', user);
 
 
   return (
@@ -68,7 +50,7 @@ function App() {
   <GoogleOAuthProvider clientId={clientId}>  
     <BrowserRouter>
       <Routes>
-        <Route element={<AppLayout />}>
+        <Route  element={<AppLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/news" element={<News />} />
@@ -83,19 +65,28 @@ function App() {
           <Route path="/souvenir" element={<Souvenir />} />
           <Route path="/souvenir/souvenirDetail/:productId" element={<SouvenirDetail />} />
           <Route path="/webboard" element={<Webboard />} />
-          {/* <Route path="/login" element={
-          isLoggedIn ? <Navigate to={`/${user?.role === 1 ? 'admin-home' : user?.role === 2 ? 'president-home' :  user?.role === 3 ? 'alumni-home' : ''}`} replace /> : <Login />} /> */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/president-home" element={<PresidentHome />} />
           <Route path="/alumni-home" element={<AlumniHome />} />
           <Route path="/alumni-profile" element={<Profile/>} />
-          {/* <Route path="/test-regis" element={<Register />} /> */}
-          {/* <Route path="/admin-home" element={<ProtectedRoute  isLoggedIn={isLoggedIn} allowedRoles={[1]}  userRole={user?.role} ><HomeAdmin /></ProtectedRoute>}/>
-          <Route path="/president-home" element={<ProtectedRoute  isLoggedIn={isLoggedIn} allowedRoles={[2]}  userRole={user?.role} ><PresidentHome /></ProtectedRoute>}/>
-          <Route path="/alumni-home" element={<ProtectedRoute  isLoggedIn={isLoggedIn} allowedRoles={[3]}  userRole={user?.role} ><Profile /></ProtectedRoute>}/> */}
+          <Route path="/createPost" element={<CreatePost/>} />
+          <Route path="/alumni-favorite" element={<WebboardFavorite/>} />
+          <Route path="/news/:newsId" element={<NewsDetail/>} />
+          <Route path="/notification" element={<Notifications/>} />
+          <Route path="/webboard/:categoryId" element={<Category/>} />
+          <Route path="/alumni-profile-webboard" element={<AlumniProfileWebboard />} />
+          <Route path="/edit-webboard/:webboardId" element={<EditWebboard />} />
+          <Route path="/activity/:activityId" element={<ActivityDetail />} />
+          <Route path="/forgotPassword" element={<ForgotPassword />} />
+          
+          {/* for admin */}
+          <Route path="/admin-home" element={<AdminHome/>} />
+          <Route path="/admin-create-activity" element={<CreateActivity/>} />
+          <Route path="/admin-create-news" element={<CreateNews/>} />
         </Route>
       </Routes>
+     
     </BrowserRouter>
   </GoogleOAuthProvider>
   

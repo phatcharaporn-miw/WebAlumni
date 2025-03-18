@@ -6,23 +6,21 @@ import axios from "axios";
 function Donate() {
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
 
     useEffect(() => {
         axios
-            .get("http://localhost:5000/donate")
+            .get("http://localhost:3001/donate")
             .then((response) => {
                 setProjects(response.data);
                 setLoading(false);
             })
             .catch((err) => {
-                setError("เกิดข้อผิดพลาดในการโหลดข้อมูล");
+                // setError("เกิดข้อผิดพลาดในการโหลดข้อมูล");
                 setLoading(false);
             });
     }, []);
 
     if (loading) return <p>กำลังโหลดข้อมูล...</p>;
-    if (error) return <p>{error}</p>;
 
     return (
         <div>
@@ -53,7 +51,7 @@ function Donate() {
                                     <div className="item-detail" key={project.project_id}>
                                         <div className="image-frame">
                                             <img
-                                                src={`http://localhost:5000/uploads/${project.image_path}`}
+                                                src={`http://localhost:3001/uploads/${project.image_path}`}
                                                 alt={project.project_name}
                                                 onError={(e) => {
                                                     e.target.src = "./image/default.jpg";

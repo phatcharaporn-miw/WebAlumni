@@ -10,7 +10,7 @@ function DonateRaise() {
 
     useEffect(() => {
         axios
-            .get("http://localhost:5000/donate")
+            .get("http://localhost:3001/donate")
             .then((response) => {
                 console.log('Received projects:', response.data);
                 setProjects(response.data);
@@ -22,7 +22,7 @@ function DonateRaise() {
             });
     }, []);
 
-    const filteredProjects = projects.filter((project) => project.donation_type === "fundraising");
+    const filteredProjects = projects.filter((project) => project.donation_type === "บริจาคแบบระดมทุน");
 
     if (loading) return <p>กำลังโหลดข้อมูล...</p>;
     if (error) return <p>{error}</p>;
@@ -60,7 +60,7 @@ function DonateRaise() {
                                     <div className="item-detail" key={project.project_id}>
                                         <div className="image-frame">
                                             <img
-                                                src={`http://localhost:5000/uploads/${project.image_path}`}
+                                                src={`http://localhost:3001/uploads/${project.image_path}`}
                                                 alt={project.project_name}
                                                 onError={(e) => {
                                                     e.target.src = "./image/default.jpg"; 

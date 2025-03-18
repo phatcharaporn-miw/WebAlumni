@@ -14,7 +14,7 @@ function SouvenirDetail() {
     useEffect(() => {
         // ดึงข้อมูลสินค้าที่กำลังดูอยู่
         setLoading(true);
-        axios.get(`http://localhost:5000/souvenir/souvenirDetail/${productId}`)
+        axios.get(`http://localhost:3001/souvenir/souvenirDetail/${productId}`)
             .then(response => {
                 setProduct(response.data);
                 setLoading(false);
@@ -26,7 +26,7 @@ function SouvenirDetail() {
             });
 
         // ดึงข้อมูลสินค้าอื่นๆ ที่ไม่ใช่สินค้ารายละเอียด
-        axios.get('http://localhost:5000/souvenir')
+        axios.get('http://localhost:3001/souvenir')
             .then(response => {
                 setOtherProducts(response.data); // สมมติว่า response.data เป็นข้อมูลสินค้าที่จะนำมาแสดง
             })
@@ -53,7 +53,7 @@ function SouvenirDetail() {
                             <div className="souvenirDetail-item-img-container">
                                 <img
                                     className="souvenirDetail-item-img"
-                                    src={`http://localhost:5000/uploads/${product.image}`}
+                                    src={`http://localhost:3001/uploads/${product.image}`}
                                     alt={product.product_name}
                                 />
                             </div>
@@ -96,7 +96,7 @@ function SouvenirDetail() {
                                 <div className="souvenir-other-product">
                                     <img
                                         className="souvenir-other-product-img"
-                                        src={`http://localhost:5000/uploads/${product.image}`}
+                                        src={`http://localhost:3001/uploads/${product.image}`}
                                         alt={product.product_name}
                                     />
                                     <p>{product.product_name}</p>

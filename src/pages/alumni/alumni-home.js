@@ -7,6 +7,9 @@ import { SlHeart } from "react-icons/sl";
 function AlumniHome() {
   const [background, setBackground] = useState("/image/back-2.png");
  
+  const currentAmount = 3000;
+  const goalAmount = 10000;
+  const progress = (currentAmount / goalAmount) * 100;
  
      return(
          <div className="content"  style={{ backgroundImage: `url(${background})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
@@ -124,7 +127,7 @@ function AlumniHome() {
              {/* ส่วนของแดชบอร์ด */}
              <div className="home-dashboard">
                  <h3 id="head-text">ภาพรวมกิจกรรมและการบริจาค</h3>
-                 
+              
              </div>
              
              {/* ส่วนของเว็บบอร์ด */}
@@ -197,9 +200,33 @@ function AlumniHome() {
              {/* ส่วนของบริจาค */}
              <div className="home-donate">
                  <h3 id="head-text">บริจาค</h3>
-                
- 
-             </div>
+              <div className="donate-content-item">
+    
+                <div className="item-detail">
+                  <div className="image-frame">
+                    <img src="./image/activitie2.jpg" alt="Avatar" />
+                  </div>
+                  <div className="donate-discription">
+                    <h5><b>ยิ้มสู่ชุมชน</b></h5>
+                    <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry...</p>
+                  </div>
+                  {/* Progress Bar */}
+                  <div className="progress">{`${progress}%`}</div>
+                  <div className="bar">
+                    <div className="progress-bar-container">
+                      <div className="progress-bar" style={{ width: `${progress}%` }}></div>
+                      <span className="progress-percent">{`${progress.toFixed(0)}%`}</span>
+                    </div>
+                  </div>
+    
+                  <div className="donate-details">
+                    <span>ยอดบริจาคปัจจุบัน: {currentAmount.toLocaleString()} บาท</span>
+                    <span>เป้าหมาย: {goalAmount.toLocaleString()} บาท</span>
+                  </div>
+                  <button className="donate-bt">บริจาค</button>
+                </div>
+              </div>
+            </div>
  
              {/* ส่วนของสมาคม*/}
              <div className="home-about">

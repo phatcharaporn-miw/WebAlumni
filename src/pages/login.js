@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import '../css/Login.css';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { GoogleLogin } from '@react-oauth/google';
+// import { GoogleLogin } from '@react-oauth/google';
 import { useOutletContext } from "react-router-dom";
 
 
@@ -14,24 +14,6 @@ function Login() {
     const navigate = useNavigate();
     const { handleLogin } = useOutletContext();  // รับ handleLogin จาก Outlet context
 
-
-    const handleGoogleLogin = async (response) => {
-      const token = response.credential;
-
-      try {
-          // ส่ง token ไปยัง backend เพื่อสร้าง session 
-          const response = await axios.post('http://localhost:3001/auth/google', { token });
-
-          if (response.data.success) {
-              navigate('/admin-home');
-          } else {
-              setErrorMessage('Google login failed. Please try again.');
-          }
-      } catch (error) {
-          setErrorMessage('An error occurred during Google login.');
-          console.error(error);
-      }
-  };
 
     const handleSubmit = async (e) => {
       e.preventDefault();
@@ -81,9 +63,6 @@ function Login() {
       }
     };
 
-     
-
-
     const logo = <img className="form-login-logo" src="./image/สมาคม-logo.png" alt="Logo" />;
     return (
         <div className="all-form">
@@ -102,7 +81,7 @@ function Login() {
                         </p>
                         <div className="fn-login">
                             <Link to="/register"><p className="regist">สมัครสมาชิก</p></Link>
-                            <Link to="/"><p className="forget-pass">ลืมรหัสผ่าน?</p></Link>
+                            <Link to="/forgotPassword"><p className="forget-pass">ลืมรหัสผ่าน?</p></Link>
                         </div>
 
                         <div className="button-group">
@@ -117,16 +96,7 @@ function Login() {
                         </div>
 
                     </form>
-                      <div>
-                        <h6>เข้าสู่ระบบด้วย Google</h6>
-                        <GoogleLogin
-                         onSuccess={handleGoogleLogin}
-                         onError={(error) => {
-                             setErrorMessage('Google login failed. Please try again.');
-                             console.log(error);
-                         }}
-                        />
-                      </div>
+                     
                       {errorMessage && <p className="error-message">{errorMessage}</p>}
                 </div>
             </div>

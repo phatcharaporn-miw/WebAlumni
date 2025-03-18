@@ -4,6 +4,8 @@ import Footer from './Footer';
 import { Outlet, useLocation } from "react-router-dom";
 import axios from 'axios';
 import {  useNavigate} from "react-router-dom";
+import Breadcrumb from './ฺBreadcrumb';
+import Swal from "sweetalert2";
 
 function AppLayout() {
     const [user, setUser] = useState(null);
@@ -11,12 +13,27 @@ function AppLayout() {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const hideHeaderPaths = ["/login","/register",];
+    const hideHeaderPaths = ["/login","/register", "/forgotPassword"];
     const shouldHideHeader = hideHeaderPaths.includes(location.pathname);
     const shouldHideFooter = hideHeaderPaths.includes(location.pathname);
+
+    // เส้นทางที่ต้องการการเข้าสู่ระบบ
+    const protectedPaths = [
+      "/alumni-profile", 
+      "/editWebboard", 
+      "/alumni-profile-webboard", 
+      "alumni-home", 
+      "alumni-favorite"
+    ];
+
+    // เส้นทางที่ต้องการสิทธิ์เฉพาะ role
+    const roleCheckPaths = {
+      admin: ["/admin-home", "/admin-create-news", "/admin-create-activity"],
+      president: ["/president-home"],
+      students: ["/student-home"]
+    };
     
     useEffect(() => {
-      // เช็คข้อมูลจาก localStorage
       const userId = localStorage.getItem('userId');
       const role = localStorage.getItem('userRole');
       
@@ -42,6 +59,7 @@ function AppLayout() {
         })
           .then((response) => {
               if (response.status === 200) {
+                 
                  localStorage.removeItem('userId');
                  localStorage.removeItem('userRole');
 
@@ -56,8 +74,8 @@ function AppLayout() {
           });
   };
 
+  // ดึงโปรไฟล์ผู้ใช้งาน
   useEffect(() => {
-    // ดึงข้อมูลผู้ใช้จาก API 
     axios.get('http://localhost:3001/users/profile', { 
         withCredentials: true })
       .then((response) => {
@@ -71,12 +89,46 @@ function AppLayout() {
       });
   }, []);
 
+   // ตรวจสอบสิทธิ์การเข้าถึงเฉพาะเส้นทางที่ต้องการการเข้าสู่ระบบ
+   useEffect(() => {
+    const userId = localStorage.getItem("userId");
+    const role = localStorage.getItem("userRole");
+
+    if (protectedPaths.includes(location.pathname) && !userId) {
+        Swal.fire({
+            title: "กรุณาเข้าสู่ระบบ",
+            text: "คุณต้องเข้าสู่ระบบก่อนเข้าถึงหน้านี้",
+            icon: "warning",
+            confirmButtonColor: "#0F75BC",
+            confirmButtonText: "ตกลง",
+        }).then(() => {
+            navigate("/login");
+        });
+    }
+
+    //สร้างออบเจ็กต์ที่เก็บเส้นทางที่ต้องการสิทธิ์เฉพาะ role
+    Object.keys(roleCheckPaths).forEach((key) => {
+      if (roleCheckPaths[key].includes(location.pathname) && role !== key) {
+          Swal.fire({
+              title: "การเข้าถึงถูกปฏิเสธ",
+              text: "คุณไม่มีสิทธิ์เข้าถึงหน้านี้",
+              icon: "error",
+              confirmButtonColor: "#d33",
+              confirmButtonText: "ตกลง",
+          }).then(() => {
+              navigate("/");
+          });
+      }
+  });
+}, [location.pathname]);
+
   return (
     <div>
     
       {!shouldHideHeader && <Header user={user} setUser={setUser} notifications={notifications} handleLogin={handleLogin}/>} 
-     
+
         <main className="main-content">
+        <Breadcrumb />
           <Outlet context={{ user, setUser,  handleLogin, handleLogout}} />
         </main>
 
