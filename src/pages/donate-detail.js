@@ -21,22 +21,6 @@ function DonateDetail() {
         taxId: ""
     });
     const [qrCode, setQrCode] = useState(null);
-
-    // ฟังก์ชันที่ใช้ในการสร้าง QR Code
-    const generateQRCode = () => {
-        if (!formData.amount) return;
-        axios.post('http://localhost:3001/generateQR', {
-            amount: parseFloat(formData.amount),
-        })
-            .then(response => {
-                if (response.data.Result) {
-                    setQrCode(response.data.Result);
-                }
-            })
-            .catch(error => {
-                console.error('Error generating QR code:', error);
-            });
-    };
     const navigate = useNavigate();
 
 
@@ -160,7 +144,6 @@ function DonateDetail() {
             <div className="donate-detail-content-item">
                 <h5>{projectData.project_name}</h5>
                 <img
-                    src={`http://localhost:3001/uploads/${projectData.image_path}`}
                     src={`http://localhost:3001/uploads/${projectData.image_path}`}
                     alt="กิจกรรม"
                     onError={(e) => {

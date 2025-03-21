@@ -52,6 +52,22 @@ textarea{
   height: 150px;
 }
 
-/* IoMdMore {
+.password-container {
+  position: relative;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #007bff;
   cursor: pointer;
-} */
+  font-size: 14px;
+}
+
+.toggle-password:hover {
+  text-decoration: underline;
+}

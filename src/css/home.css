@@ -8,10 +8,6 @@
   .news-card .card-body {
     padding: 20px;
   }
-  
-  /* #card-news-home{
-    height: 400px;
-  } */
 
   .card-homeweb {
     max-height: 300px;
@@ -52,7 +48,7 @@
     min-height: 100vh;
 }
 
-/* ส่วนหัว */
+
 .news-title {
   font-weight: bold;
   color: #0F75BC;
@@ -60,7 +56,7 @@
   margin-bottom: 20px;
 }
 
-/* การจัดวางรายการข่าว */
+
 .news-item {
   background-color: #fff;
   border: 1px solid #ddd;
@@ -71,11 +67,10 @@
   align-items: center;
 }
 
-/* กล่องวันที่ */
+
 .news-date {
   background-color: #0F75BC;
   color: #fff;
-  /* text-align: center; */
   padding: 10px 15px;
   border-radius: 8px;
   min-width: 80px;

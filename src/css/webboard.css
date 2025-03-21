@@ -1,6 +1,5 @@
 .webboard-title, .category-title{
     text-align: center;
-    /* padding: 30px; */
     color: #0F75BC;
     font-weight: bold;
   }
@@ -9,7 +8,6 @@
     max-height: 300px; 
     overflow: hidden;
     margin-bottom: 5%;
-    /* background-color: aliceblue; */
     background-color: #fff;
   }
   .img-fluid {
@@ -56,38 +54,22 @@
   margin-bottom: 10%;
 }
 
-/* .form-control-comment{
-width: 63%;
-border-radius: 5px;
-height: 36px;
-border-color: #0F75BC;
-
-} */
-
-/* #comt-box{
-  height: 100px;
-} */
-
 /* categoryPage */
 #box-category{
   display: flex;
   justify-content: center;
   align-items: center;
-  /* min-height: 100vh; */
 }
 
-/* ความคิดเห็น */
+.form-control{
+  width: 80%;
+}
 .comment-item {
-  background-color: #ddf1fe;
-  border: 1px solid #0F75BC;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
   border-radius: 8px;
-  padding: 15px;
-  display: flex;
-  gap: 15px;
-}
-
-.comment-item img {
-  border: 2px solid #0F75BC;
+  padding: 10px;
+  margin-bottom: 10px;
 }
 
 .comment-content {
@@ -95,7 +77,6 @@ border-color: #0F75BC;
 }
 
 .comment-user {
-  font-size: 16px;
   font-weight: bold;
   color: #333;
 }
@@ -106,23 +87,38 @@ border-color: #0F75BC;
 }
 
 .comment-text {
-  font-size: 14px;
+  margin-top: 5px;
   color: #555;
-  line-height: 1.5;
 }
 
-.comment-form {
-  margin-top: 20px;
+.reply-form {
+  margin-top: 5px;
 }
 
-.comment-form input {
+.reply-item {
+  background-color: #f1f1f1;
+  border: 1px solid #ccc;
   border-radius: 8px;
-  padding: 10px;
-  font-size: 14px;
+  padding: 8px;
+  margin-top: 5px;
+  margin-left: 40px; /* เพิ่มระยะห่างจากความคิดเห็นหลัก */
 }
 
-.comment-form button {
-  padding: 10px 20px;
-  font-size: 14px;
-  border-radius: 8px;
+.reply-content {
+  flex: 1;
+}
+
+.reply-user {
+  font-weight: bold;
+  color: #333;
+}
+
+.reply-time {
+  font-size: 12px;
+  color: #888;
+}
+
+.reply-text {
+  margin-top: 5px;
+  color: #555;
 }

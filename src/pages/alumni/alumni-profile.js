@@ -7,8 +7,10 @@ import Swal from "sweetalert2";
 
 function Profile() {
   const [profile, setProfile] = useState({});
-  const [major, setMajor] = useState();
+  const [major, setMajor] = useState([]);
   const {handleLogout } = useOutletContext();
+  const [loginInfo, setLoginInfo] = useState({ username: '', password: '' });
+  const [showPassword, setShowPassword] = useState(false); // สำหรับซ่อน/แสดงรหัสผ่าน
   const navigate = useNavigate();
  //แก้ไขข้อมูลส่วนตัว
  const [editing, setEditing] = useState(false); //สลับโหมดการแก้ไข
@@ -27,21 +29,33 @@ function Profile() {
         console.error('เกิดข้อผิดพลาดในการดึงข้อมูลโปรไฟล์:', error.response ? error.response.data.message : error.message);
       });
 
-      // ดึงข้อมูลสาขามาแสดงใน dropdown 
-    axios.get('http://localhost:3001/add/major', {
-      withCredentials: true, 
+       // ดึงข้อมูล major ทั้งหมด
+    axios.get('http://localhost:3001/add/major', { 
+      withCredentials: true 
     })
-      .then((response) => {
+    .then((response) => {
         if (response.data.success) {
-          setMajor(response.data);
+            setMajor(response.data.major);
         }
-      })
-      .catch((error) => {
-        console.error('ไม่สามารถดึงข้อมูลสาขาได้:', error.response ? error.response.data.message : error.message);
-      });
+    })
+    .catch((error) => {
+        console.error('เกิดข้อผิดพลาดในการดึงข้อมูล major:', error.message);
+    });
+
+      // ดึงข้อมูล username และ password
+    axios.get('http://localhost:3001/users/login-info', { 
+      withCredentials: true 
+    })
+    .then((response) => {
+        if (response.data.success) {
+            setLoginInfo(response.data.loginInfo);
+        }
+    })
+    .catch((error) => {
+        console.error('เกิดข้อผิดพลาดในการดึงข้อมูล login:', error.message);
+    });
 
   }, []);
-
 
   if (!profile) {
     return <div>ไม่พบข้อมมูลผู้ใช้</div>;
@@ -82,8 +96,7 @@ function Profile() {
   };
 
   const handleSave = () => {
-    const updatedProfile = { ...profile, major: profile.major_id }; // รวม major
-
+    const updatedProfile = { ...profile };
     // console.log('ข้อมูลที่ส่งไป Backend:',  updatedProfile); // ตรวจสอบค่า
     axios.post('http://localhost:3001/users/edit-profile',  updatedProfile, {
       withCredentials: true, 
@@ -131,23 +144,38 @@ function Profile() {
                   <fieldset>
                   <legend className="legend-title mb-4">ข้อมูลส่วนตัว</legend>
 
-                                <div className="form-group">
-                                    <label>ชื่อผู้ใช้งาน<span className="importent">*</span></label>
-                                    <input type="text" className="form-control" id="" name="" placeholder
-                                     //onChange={handleChange} disabled={!editing}
-                                    
-                                    required
-                                    />
-                                </div>
+                  <div className="form-group">
+                      <label>ชื่อผู้ใช้งาน<span className="importent">*</span></label>
+                      <input
+                          type="text"
+                          className="form-control"
+                          id="username"
+                          name="username"
+                          value={loginInfo.username}
+                          disabled
+                      />
+                  </div>
 
-                                <div className="form-group">
-                                    <label>รหัสผ่าน<span className="importent">*</span></label>
-                                    <input type="text" className="form-control" id="full_name" name="full_name" placeholder='รหัสผ่าน'
-                                     //onChange={handleChange} disabled={!editing}
-                                    
-                                    required
-                                    />
-                                </div>
+                  <div className="form-group">
+                        <label>รหัสผ่าน<span className="importent">*</span></label>
+                        <div className="password-container">
+                            <input
+                                type={showPassword ? "text" : "password"}
+                                className="form-control"
+                                id="password"
+                                name="password"
+                                value={loginInfo.password}
+                                disabled
+                            />
+                            <button
+                                type="button"
+                                className="toggle-password"
+                                onClick={() => setShowPassword(!showPassword)}
+                            >
+                                {showPassword ? "ซ่อน" : "แสดง"}
+                            </button>
+                        </div>
+                    </div>
 
                                 <div className="form-group">
                                     <label>คำนำหน้า<span className="importent">*</span></label>
@@ -156,9 +184,7 @@ function Profile() {
                                         <option value="นาย">นาย</option>
                                         <option value="นาง">นาง</option>
                                         <option value="นางสาว">นางสาว</option>
-                                       
-                                    </select>
-                                    
+                                    </select>                                  
                                 </div>
 
                                 <div className="form-group">
@@ -233,29 +259,37 @@ function Profile() {
                         <fieldset>
                                 <legend className="legend-title mb-4">ระดับการศึกษาที่จบจาก CP</legend>
                                 <div className="education-grid">
-                                    <div className="form-group">
-                                        <label>ระดับการศึกษา<span className="importent">*</span></label>
-                                        <div className='education-row'>
-                                            <div className="education-item">
+                                  <div className="form-group">
+                                    <label>ระดับการศึกษา<span className="importent">*</span></label>
+                                    <div className="education-row">
+                                        {['ป.ตรี', 'ป.โท', 'ป.เอก'].map((degree, index) => (
+                                            <div className="education-item" key={index}>
                                                 <label>
-                                                <input type="checkbox" name="degree" value="1"  checked={profile.degrees?.includes(1) || false}/>
-                                                ป.ตรี
+                                                    <input
+                                                        type="checkbox"
+                                                        name="degrees"
+                                                        value={degree}
+                                                        checked={profile.degrees?.includes(degree) || false}
+                                                        disabled={!editing}
+                                                        onChange={(e) => {
+                                                            const selectedDegrees = [...profile.degrees];
+                                                            if (e.target.checked) {
+                                                                selectedDegrees.push(degree);
+                                                            } else {
+                                                                const degreeIndex = selectedDegrees.indexOf(degree);
+                                                                if (degreeIndex > -1) {
+                                                                    selectedDegrees.splice(degreeIndex, 1);
+                                                                }
+                                                            }
+                                                            setProfile({ ...profile, degrees: selectedDegrees });
+                                                        }}
+                                                    />
+                                                    {degree}
                                                 </label>
                                             </div>
-                                            <div className="education-item">
-                                                <label>
-                                                <input type="checkbox" name="degree" value="2"  checked={profile.degrees?.includes(2) || false}/>
-                                                ป.โท
-                                                </label>
-                                            </div>
-                                            <div className="education-item">
-                                                <label>
-                                                <input type="checkbox" name="degree" value="3"  checked={profile.degrees?.includes(3) || false}/>
-                                                ป.เอก
-                                                </label>
-                                            </div>
-                                        </div>
+                                        ))}
                                     </div>
+                                  </div>
 
                                     <div className="form-group">
                                         <label>รหัสนักศึกษา<span className="importent">*</span></label>
@@ -277,28 +311,23 @@ function Profile() {
 
                                     <div className="form-group">
                                         <label>สาขา<span className="importent">*</span></label>
-                                        {/* <input type="text" className="form-control" id="major" name="major" placeholder={profile.major}
-                                            value={profile.major}
-                                            
-                                            onChange={handleChange} disabled={!editing}
-                                        /> */}
                                         <select
-                                          name="major_id"
-                                          value={profile.major_id || ''}
-                                          onChange={handleChange}
-                                          disabled={!editing}
+                                            name="major_id"
+                                            value={profile.major_id || ''}
+                                            onChange={handleChange}
+                                            disabled={!editing}
                                         >
-                                          <option value="">เลือกสาขา</option>
-                                          {major?.map((m) => (
-                                            <option key={m.major_id} value={m.major_id}>
-                                              {m.major_name}
-                                            </option>
-                                          ))}
-                                      </select>
-                                    </div>                                
+                                            <option value="">เลือกสาขา</option>
+                                            {major.map((major) => (
+                                                <option key={major.major_id} value={major.major_id}>
+                                                    {major.major_name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>                              
                                 </div>
                             </fieldset>
-                  </div>
+                        </div>
                    
                   <div className='row justify-content-end'>
                         <div className='col-7 text-center '>

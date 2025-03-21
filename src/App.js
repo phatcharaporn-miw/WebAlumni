@@ -11,8 +11,6 @@ import About from "./pages/about";
 import News from './pages/news';
 import Activity from './pages/activity';
 import Donate from './pages/donate';
-import DonateRaise from './pages/donate-raisefunds';
-import DonateUnlimit from './pages/donate-unlimited';
 import DonateRequest from './pages/donate-request';
 import DonateDetail from './pages/donate-detail';
 import AdminDonate from './pages/admin/donate';
@@ -56,15 +54,9 @@ function App() {
           <Route path="/news" element={<News />} />
           <Route path="/activity" element={<Activity />} />
           <Route path="/donate" element={<Donate />} />
-          <Route path="/donateraise" element={<DonateRaise/>} />
-          <Route path="/donatunlimit" element={<DonateUnlimit/>} />
           <Route path="/donaterequest" element={<DonateRequest/>} />
-<<<<<<< Updated upstream
-          {/* <Route path="/donatedetail" element={<DonateDetail/>} /> */}
           <Route path="/donate/donatedetail/:projectId" element={<DonateDetail />} />
-=======
           <Route path="/donatedetail" element={<DonateDetail/>} />
->>>>>>> Stashed changes
           <Route path="/alumni" element={<Alumni />} />
           <Route path="/souvenir" element={<Souvenir />} />
           <Route path="/souvenir/souvenirDetail/:productId" element={<SouvenirDetail />} />
