@@ -1,112 +1,121 @@
 .act-title{
     text-align: center;
-    padding: 30px;
     color: #0F75BC;
     font-weight: bold;
   }
 
 .activity-card {
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    transition: transform 0.3s, box-shadow 0.3s;
-   
-  }
-  
-  .activity-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
-  }
-  
-  .image-container {
-    position: relative;
-    height: auto;
-    border-bottom: 4px solid #004F9F;     
-  }
-  
-  
-  .status-inprogress {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    background-color: #ffc107; 
-    color: white;
-    font-size: 0.8rem;
-    font-weight: bold;
-    padding: 5px 10px;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  }
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%; 
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
 
-  .status-done{
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    background-color: #3FA73F; 
-    color: white;
-    font-size: 0.8rem;
-    font-weight: bold;
-    padding: 5px 10px;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  }
+.activity-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
 
-  .status-coming{
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    background-color: #F89A16; 
-    color: white;
-    font-size: 0.8rem;
-    font-weight: bold;
-    padding: 5px 10px;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  }
-  
-  .card-text {
-    font-size: 0.95rem;
-    color: #555;
-    line-height: 1.5;
-  }
-  
-  .join-button {
-    background-color: #0F75BC;;
-    color: white;
-    border: none;
-    transition: background-color 0.3s, transform 0.2s;
-  }
-  
-  .join-button:hover {
-    background-color: #0056b3;
-    transform: scale(1.05);
-  }
-  
-  /* dropdown-activity */
-.dropbtn-act {
-    color: #333;
-    cursor: pointer;
-    padding: 10px 20px;
-    border-radius: 5px;
-    background-color: #f8f9fa;
-    transition: background-color 0.3s;
-  }
-  
-  .dropbtn-act:hover {
-    background-color: #e2e6ea;
-    color: #007bff;
-  }
-  
-  .arrow-down {
-    margin-left: 10px;
-    font-size: 0.8rem;
-    transition: transform 0.3s;
-  }
-  
-  .dropdown:hover .arrow-down {
-    transform: rotate(180deg);
-  }
-  
-  
-  
+/* รูปภาพในการ์ด */
+.image-container {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+}
+
+.image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-bottom: 4px solid #004F9F; 
+}
+
+.status-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 12px;
+}
+
+.กำลังดำเนินการ {
+  background-color: #007bff; 
+}
+
+.เสร็จสิ้นแล้ว {
+  background-color: #28a745; 
+}
+
+.กำลังจะจัดขึ้น {
+  background-color: #ffc107; 
+}
+
+.card-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex-grow: 1;
+  padding: 15px;
+  text-align: left; 
+}
+
+.card-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.card-text {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 15px;
+  line-height: 1.5;
+}
+
+.card-body .button-group {
+  display: flex;
+  justify-content: space-between; 
+  align-items: center;
+  margin-top: auto; 
+}
+
+.card-body .btn {
+  flex: 1; 
+  margin-right: 10px; 
+  text-align: center;
+}
+
+
+.card-body .btn:last-child {
+  margin-right: 0;
+}
+
+.join-button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+.join-button:hover {
+  background-color: #0056b3;
+  color: #fff;
+}
+
+.btn-info {
+  background-color: #17a2b8;
+  color: #fff;
+  border: none;
+}
+
+.btn-info:hover {
+  background-color: #138496;
+  color: #fff;
+}
