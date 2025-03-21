@@ -1,0 +1,110 @@
+.order-history-container {
+    padding: 30px;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+.order-history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.order-card {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    /* width: 900px; */
+}
+
+/* .order-card:hover {
+    transform: scale(1.01);
+} */
+
+.order-header {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #f1f1f1;
+    padding-bottom: 15px;
+}
+
+.order-header h4 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: bold;
+    color: #333;
+}
+
+.order-header p {
+    margin: 5px 0;
+    color: #555;
+}
+
+/* เพิ่มระยะห่างให้รายละเอียดสินค้า */
+.order-details {
+    margin-top: 20px;
+}
+
+.order-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.product-image {
+    width: 70px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.order-item p {
+    margin: 0;
+    font-size: 16px;
+    color: #666;
+}
+
+.order-item h5 {
+    font-size: 18px;
+    color: #333;
+    font-weight: bold;
+}
+
+.back-button {
+    padding: 12px 20px;
+    background-color: #0069d9;
+    color: #fff;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+    width: 200px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    transition: background-color 0.3s ease;
+}
+
+.back-button:hover {
+    background-color: #0056b3;
+}
+@media (max-width: 768px) {
+    .order-card {
+        padding: 15px;
+    }
+
+    .order-header h4 {
+        font-size: 20px;
+    }
+
+    .product-image {
+        width: 60px;
+        height: 60px;
+    }
+}
