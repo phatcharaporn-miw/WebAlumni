@@ -1,7 +1,7 @@
 .titlesouvenir {
     text-align: center;
     color: #085A9C;
-    margin-top: 12%;
+    /* margin-top: 12%; */
 }
 
 .titlesouvenir-type {
@@ -10,10 +10,15 @@
     margin-left: 5%;
 }
 
+.souvenir-top{
+    display: flex;
+    justify-content: end;
+}
 .souvenir-item-group {
-   
+    /* background-color: #085A9C; */
+    /* width: 320px; */
     display: grid;
-    grid-template-columns: auto auto auto;
+    grid-template-columns: auto auto auto auto auto;
     margin: 0 5%;
     gap: 2%;
     justify-content: left;
@@ -33,9 +38,9 @@
 
 .souvenir-item {
     background-color: white;
-    border-radius: 15px;
+    border-radius: 5px;
     width: 240px;
-    height: 280px;
+    height: 300px;
     padding: 10px;
     display: flex;
     flex-direction: column;
@@ -70,12 +75,10 @@
 }
 
 
-
-
 .titlesouvenirDetail {
     font-size: 25px;
     text-align: center;
-    margin-top: 12%;
+    /* margin-top: 12%; */
     color: #085A9C;
    
     text-transform: uppercase;
@@ -119,7 +122,7 @@
 .souvenirDetail-item-img {
     width: 400px;  
     height: 300px;  
-    object-fit: cover;
+    object-fit: fill;
     border-radius: 8px;
 }
 
@@ -263,18 +266,37 @@
     text-decoration: none;
 }
 
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .souvenir-checkout-content {
+        flex-direction: column;
+    }
+
+    .souvenir-checkout-items, .souvenir-checkout-form {
+        width: 100%;
+    }
+
+    .souvenir-cart-item-card {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .souvenir-cart-item-img img {
+        width: 80px;
+        height: 80px;
+    }
+}
+
 
 @media (max-width: 768px) {
-    .souvenirDetail-item {
-        grid-template-columns: 1fr;
+    .cart-items-title,
+    .cart-item-card {
+        grid-template-columns: 10% 30% 15% 15% 15% 15%;
+        font-size: 14px;
     }
 
-    .souvenirDetail-item-img-container {
-        max-width: 100%;
-        margin-bottom: 20px;
-    }
-
-    .souvenirDetail-item-info {
-        padding-left: 0;
+    .cart-item-img img {
+        width: 60px;
+        height: 60px;
     }
 }

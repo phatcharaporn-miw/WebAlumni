@@ -20,7 +20,6 @@ function Donate() {
     }, []);
 
     if (error) return <p>{error}</p>;
-
     const filteredProjects = projects.filter((project) => {
         if (filter === "all") return true;
         return project.donation_type === filter;
@@ -77,7 +76,7 @@ function Donate() {
                             const startDate = project?.start_date ? new Date(project.start_date) : null;
                             const endDate = project?.end_date ? new Date(project.end_date) : null;
                             const options = { year: 'numeric', month: 'long', day: 'numeric' };
-
+       
                             const formattedStartDate = startDate ? startDate.toLocaleDateString('th-TH', options) : "-";
                             const formattedEndDate = endDate ? endDate.toLocaleDateString('th-TH', options) : "-";
 
