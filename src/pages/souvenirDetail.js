@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "../css/Souvenir.css";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import { Link, useParams } from "react-router-dom";
 
 function SouvenirDetail() {
@@ -8,11 +9,15 @@ function SouvenirDetail() {
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [quantity, setQuantity] = useState(1); // สถานะจำนวนสินค้าเริ่มต้นที่ 1
+    const [quantity, setQuantity] = useState(1);
     const [otherProducts, setOtherProducts] = useState([]);
+    const user_id = localStorage.getItem('userId');
+    const [loadingAddToCart, setLoadingAddToCart] = useState(false);
+    const [selectedItems, setSelectedItems] = useState([]);
+    const navigate = useNavigate();
+
 
     useEffect(() => {
-        // ดึงข้อมูลสินค้าที่กำลังดูอยู่
         setLoading(true);
         axios.get(`http://localhost:3001/souvenir/souvenirDetail/${productId}`)
             .then(response => {
@@ -25,22 +30,54 @@ function SouvenirDetail() {
                 setLoading(false);
             });
 
-        // ดึงข้อมูลสินค้าอื่นๆ ที่ไม่ใช่สินค้ารายละเอียด
+        // ดึงข้อมูลสินค้าอื่นๆ
         axios.get('http://localhost:3001/souvenir')
             .then(response => {
-                setOtherProducts(response.data); // สมมติว่า response.data เป็นข้อมูลสินค้าที่จะนำมาแสดง
+                setOtherProducts(response.data);
             })
             .catch(error => {
                 console.error('Error fetching other products:', error);
             });
     }, [productId]);
 
+    const handleAddToCart = (productId, quantity) => {
+        if (product) {
+            const total = product.price * quantity;
+            setLoadingAddToCart(true);
+            axios.post("http://localhost:3001/souvenir/cart/add", {
+                product_id: productId,
+                quantity: quantity,
+                user_id: user_id,
+                total: total
+            })
+                .then(response => {
+                    console.log(response.data);
+                    setLoadingAddToCart(false);
+                })
+                .catch(error => {
+                    console.error("Error adding item to cart:", error);
+                    setLoadingAddToCart(false);
+                });
+        }
+    };
+
     const handleQuantityChange = (e) => {
         setQuantity(e.target.value);
     };
 
-    if (loading) return <p className="loading-message">กำลังโหลดข้อมูล...</p>;
-    if (error) return <p className="error-message">{error}</p>;
+    const getRandomProducts = (products, num = 4) => {
+        const filteredProducts = products.filter(product => product.product_id !== parseInt(productId));
+        const shuffled = [...filteredProducts].sort(() => 0.5 - Math.random());
+        return shuffled.slice(0, num);
+    };
+
+
+    const handleBuyNow = () => {
+        console.log("Navigating to checkout with selected items:", [{ product_id: product.product_id, quantity: quantity }]);
+        window.location.href = `/souvenir/checkout?product_id=${product.product_id}&quantity=${quantity}`;
+    };
+    
+    const randomProducts = getRandomProducts(otherProducts);
 
     return (
         <>
@@ -49,7 +86,6 @@ function SouvenirDetail() {
                 <div className="souvenirDetail-content-item">
                     {product && (
                         <div className="souvenirDetail-item" key={product.id}>
-                            {/* รูปภาพของสินค้า */}
                             <div className="souvenirDetail-item-img-container">
                                 <img
                                     className="souvenirDetail-item-img"
@@ -57,11 +93,9 @@ function SouvenirDetail() {
                                     alt={product.product_name}
                                 />
                             </div>
-                            {/* ข้อมูลรายละเอียดสินค้า */}
                             <div className="souvenirDetail-item-info">
                                 <h3 className="souvenir-item-name">{product.product_name}</h3>
                                 <p className="souvenir-item-price">฿{product.price}</p>
-                                {/* เพิ่มฟอร์มสำหรับเลือกจำนวน */}
                                 <div className="product-quantity">
                                     <p>
                                         จำนวน:
@@ -69,7 +103,7 @@ function SouvenirDetail() {
                                             type="number"
                                             value={quantity}
                                             onChange={handleQuantityChange}
-                                            min="1"
+                                            min='1'
                                             max={product.stock}
                                         />
                                     </p>
@@ -77,7 +111,21 @@ function SouvenirDetail() {
                                         สินค้าคงเหลือ {product.stock} ชิ้น
                                     </p>
                                 </div>
-                                <Link><button className="souvenir-buy_product">สั่งซื้อสินค้า</button></Link>
+                                <button
+                                    className="souvenir-buy_product"
+                                    onClick={() => handleAddToCart(product.product_id, quantity)} // ส่ง productId และ quantity
+                                    disabled={loadingAddToCart}
+                                >
+                                    {loadingAddToCart ? "กำลังโหลด..." : "เพิ่มลงตะกร้า"}
+                                </button>
+
+                                {/* <Link to={`/souvenir/souvenir_checkout`} state={{ selectedItems: [{ product_id: product.product_id, quantity: quantity }] }}>
+                                    <button className="souvenir-buy_product">สั่งซื้อสินค้า</button>
+                                </Link> */}
+
+                                <button className="souvenir-buy_product" onClick={handleBuyNow}>สั่งซื้อสินค้า</button>
+
+
                                 <div className="description-product">
                                     <p className="souvenir-item-title-description">รายละเอียด</p>
                                     <p className="souvenir-item-description">{product.description}</p>
@@ -91,8 +139,8 @@ function SouvenirDetail() {
                 <div className="souvenirDetail-content-item">
                     <p className="souvenirDetail-other-products-title">สินค้าอื่นๆ</p>
                     <div className="souvenirDetail-other-products">
-                        {otherProducts.map((product) => (
-                            <Link to={`/souvenir/souvenirDetail/${product.product_id}`} key={product.id}>
+                        {randomProducts.map((product) => (
+                            <Link to={`/souvenir/souvenirDetail/${product.product_id}`} key={product.product_id}>
                                 <div className="souvenir-other-product">
                                     <img
                                         className="souvenir-other-product-img"
