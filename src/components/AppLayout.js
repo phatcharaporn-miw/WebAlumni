@@ -28,7 +28,7 @@ function AppLayout() {
 
     // เส้นทางที่ต้องการสิทธิ์เฉพาะ role
     const roleCheckPaths = {
-      admin: ["/admin-home", "/admin-create-news", "/admin-create-activity"],
+      // admin: ["/admin-home", "/admin-create-news", "/admin-create-activity"],
       president: ["/president-home"],
       students: ["/student-home"]
     };

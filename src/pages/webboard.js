@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { FaEye } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 import moment from "moment";
-
+import Swal from "sweetalert2";
 
 
 Modal.setAppElement('#root');
@@ -28,7 +28,8 @@ function Webboard(){
     const [isLoggedin, setIsLoggedin] = useState(false);
     const [showFavorites, setShowFavorites] = useState(false);
     const [category, setCategory] = useState([]);
-    // const [categoryId, setCategoryId] = useState('');
+    const [showReplyForm, setShowReplyForm] = useState(null);
+    const [replyText, setReplyText] = useState(""); 
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -67,38 +68,42 @@ function Webboard(){
         return 0;
     });
 
-    
-    //ดึงข้อมูลการกดใจกระทู้
+    // ดึงข้อมูลกดใจกระทู้เมื่อผู้ใช้เข้าสู่ระบบ
     useEffect(() => {
       const userId = localStorage.getItem('userId');
 
       if (isLoggedin && userId) {
-        axios.get(`http://localhost:3001/web/webboard/favorite`,{
+        axios.get(`http://localhost:3001/web/favorite`, {
           params: { userId },
-          withCredentials: true, 
+          withCredentials: true,
         })
         .then((response) => {
           if (response.data.success) {
             // เก็บข้อมูล ID ของกระทู้ที่ถูกใจ
-          setLikedPosts(response.data.likedPosts.map(post => post.webboard_id));
-          // const likedPostsFromDB = response.data.likedPosts.map(post => post.webboard_id);
-          // setLikedPosts(likedPostsFromDB);
-
-        }
+            setLikedPosts(response.data.likedPosts.map(post => post.webboard_id));
+          } else {
+            console.error("ไม่พบกระทู้ที่ถูกใจ:", response.data.message);
+            setLikedPosts([]); // ตั้งค่าเป็น [] ถ้าไม่มีข้อมูล
+          }
         })
-        .catch((error) =>{
+        .catch((error) => {
           console.error("เกิดข้อผิดพลาดในการโหลดกระทู้ที่ถูกใจ:", error);
+          setLikedPosts([]);
         });
-      }else{
-        setLikedPosts([]);
-      }
+      } 
     }, [isLoggedin]);
-
 
     // ฟังก์ชัน Toggle หัวใจ
     const toggleLike = (postId) => {
-      
       if (!isLoggedin) {
+        Swal.fire({
+          title: "กรุณาเข้าสู่ระบบ",
+          text: "คุณต้องเข้าสู่ระบบก่อนกดใจ",
+          icon: "warning",
+          confirmButtonText: "เข้าสู่ระบบ"
+        }).then(() => {
+          navigate("/login");
+        });
         return; // ไม่บันทึกสถานะหากไม่ได้เข้าสู่ระบบ
       }
 
@@ -160,7 +165,14 @@ function Webboard(){
     // จัดการcomment
     const handleCommentSubmit = () => {
       if (!isLoggedin) {
-        alert("กรุณาเข้าสู่ระบบ");
+        Swal.fire({
+            title: "กรุณาเข้าสู่ระบบ",
+            text: "คุณต้องเข้าสู่ระบบก่อนเข้าร่วมกิจกรรม",
+            icon: "warning",
+            confirmButtonText: "เข้าสู่ระบบ"
+          }).then(() => {
+          navigate("/login");
+          });
         return;
     }
       if (!commentText.trim()) {
@@ -197,6 +209,79 @@ function Webboard(){
       });
     };
 
+    const toggleReplyForm = (commentId) => {
+      setShowReplyForm(showReplyForm === commentId ? null : commentId);
+    };
+
+    // ตอบกลับความคิดเห็น
+    const handleReplySubmit = (commentId, replyText) => {
+      if (!isLoggedin) {
+        Swal.fire({
+          title: "กรุณาเข้าสู่ระบบ",
+          text: "คุณต้องเข้าสู่ระบบก่อนเข้าร่วมกิจกรรม",
+          icon: "warning",
+          confirmButtonText: "เข้าสู่ระบบ"
+        }).then(() => {
+        navigate("/login");
+        });
+        return;
+      }
+      if (!replyText.trim()) {
+        alert("กรุณากรอกข้อความก่อนส่งความคิดเห็น");
+        return;
+      }
+    
+      axios.post(`http://localhost:3001/web/webboard/${selectedPost.webboard_id}/comment/${commentId}/reply`, {
+        reply_detail: replyText,
+      }, {
+        withCredentials: true
+      })
+      .then((response) => {
+        const newReply = response.data;
+        setSelectedPost((prev) => ({
+          ...prev,
+          comments: prev.comments.map((comment) =>
+            comment.comment_id === commentId
+              ? { ...comment, replies: [...(comment.replies || []), newReply] }
+              : comment
+          ),
+        }));
+        setReplyText("");
+        setShowReplyForm(null);
+      })
+      .catch((error) => {
+        console.error('เกิดข้อผิดพลาดในการตอบกลับความคิดเห็น:', error.message);
+      });
+    };
+
+    // ลบความคิดเห็น
+    const handleDeleteComment = (commentId) => {
+      if (!isLoggedin) {
+        Swal.fire({
+          title: "กรุณาเข้าสู่ระบบ",
+          text: "คุณต้องเข้าสู่ระบบก่อนเข้าร่วมกิจกรรม",
+          icon: "warning",
+          confirmButtonText: "เข้าสู่ระบบ"
+        }).then(() => {
+        navigate("/login");
+        });
+        return;
+      }
+    
+      axios.delete(`http://localhost:3001/web/webboard/${selectedPost.webboard_id}/comment/${commentId}`, {
+        withCredentials: true
+      })
+      .then(() => {
+        setSelectedPost((prev) => ({
+          ...prev,
+          comments: prev.comments.filter((comment) => comment.comment_id !== commentId),
+        }));
+      })
+      .catch((error) => {
+        console.error('เกิดข้อผิดพลาดในการลบความคิดเห็น:', error.message);
+      });
+    };
+
     const closeModal = () => {
       setModalIsOpen(false);
       setSelectedPost(null);
@@ -228,6 +313,7 @@ function Webboard(){
       return `hsl(${hue}, 70%, 60%)`;
   };
 
+
     return(
     <section className="container">
         <div className="webboard-page">
@@ -244,9 +330,8 @@ function Webboard(){
           <div className="col-md-7 mb-4">
                 {webboard.length > 0 ? (
                 sortedPosts
-                .filter(post => !showFavorites || likedPosts.includes(post.webboard_id))
+                .filter(post => !showFavorites || (Array.isArray(likedPosts) && likedPosts.includes(post.webboard_id))) 
                 .map(post => (
-                 
               <div key={post.webboard_id} className="card-web shadow-sm p-3 border rounded-4">
                 {/* ส่วนหัวของกระทู้ */}
                 <div className="d-flex justify-content-between">
@@ -310,7 +395,7 @@ function Webboard(){
                       </button>
                       <span 
                       key={selectedPost.category_id}
-                      className="badge px-3 py-2 me-4" style={{ backgroundColor: getCategoryColor(selectedPost?.category_id || 0), color: "white", padding: "5px 10px", borderRadius: "5px", cursor: "pointer" }}
+                      className="badge px-3 py-2 me-4" style={{ backgroundColor: getCategoryColor(selectedPost?.category_id || 0), color: "white", padding: "5px 10px", borderRadius: "6px", cursor: "pointer" }}
                        onClick={() => handleCategoryClick(selectedPost.category_id)}>
                         {selectedPost && selectedPost.category_name ? selectedPost.category_name : ''}
                       </span>
@@ -346,62 +431,98 @@ function Webboard(){
                       {/* รูปภาพประกอบ*/}
                       {selectedPost.image_path && (
                         <img src={selectedPost.image_path ? `http://localhost:3001/${selectedPost.image_path.replace(/^\/+/, '')}` : "/default-image.png"}  alt="Post" className="img-fluid rounded-3" onError={(e) => e.target.style.display = 'none'}/>
-
                       )}
             
-
                         {/* จำนวนผู้เข้าชม */}
                         <div className="d-flex align-items-center mt-4">
                           <FaEye className="me-2 ms-auto " /> {selectedPost.viewCount} ครั้ง
                         </div>
 
-                      <div className="mt-3">
-                          <h6 className="mb-4">ความคิดเห็นทั้งหมด ({selectedPost?.comments?.length || 0})</h6>
-                          {selectedPost.comments && selectedPost.comments.length > 0 ? (
+                        <div className="mt-3">
+                            <h6 className="mb-4">ความคิดเห็นทั้งหมด ({selectedPost?.comments?.length || 0})</h6>
+                            {selectedPost.comments && selectedPost.comments.length > 0 ? (
                               selectedPost.comments.map((comment, index) => (
-                                  <div key={index} className="comment-item border p-3 rounded mb-3">
-                                      <div className="d-flex align-items-start">
-                                          <img 
-                                              src={comment.profile_image ? `http://localhost:3001/${comment.profile_image}` : "/default-profile.png"} 
-                                              alt="User" 
-                                              className="rounded-circle me-3" 
-                                              width="50" 
-                                              height="50" 
+                                <div key={index} className="comment-item border p-2 rounded mb-2">
+                                  <div className="d-flex align-items-start">
+                                    <img 
+                                      src={comment.profile_image ? `http://localhost:3001/${comment.profile_image}` : "/default-profile.png"} 
+                                      alt="User" 
+                                      className="rounded-circle me-2" 
+                                      width="40" 
+                                      height="40" 
+                                    />
+                                    <div className="comment-content">
+                                      <p className="comment-user mb-1">{comment.full_name || "ไม่ระบุชื่อ"}</p>
+                                      <p className="comment-time text-muted small mb-1">{new Date(comment.created_at).toLocaleDateString()}</p>
+                                      <p className="comment-text">{comment.comment_detail}</p>
+                                      {comment.user_id === localStorage.getItem("userId") && (
+                                        <button className="btn btn-danger btn-sm" onClick={() => handleDeleteComment(comment.comment_id)}>ลบ</button>
+                                      )}
+                                      <button className="btn btn-link btn-sm" onClick={() => toggleReplyForm(comment.comment_id)}>ตอบกลับความคิดเห็น</button>
+                                      {showReplyForm === comment.comment_id && (
+                                        <div className="d-flex mt-2">
+                                          <input 
+                                            className="form-control me-3" 
+                                            rows="1" 
+                                            placeholder="ตอบกลับความคิดเห็นนี้..."
+                                            value={replyText}
+                                            onChange={(e) => setReplyText(e.target.value)}
                                           />
-                                          <div className="comment-content">
-                                              <p className="comment-user fw-bold mb-1">{comment.full_name || "ไม่ระบุชื่อ"}</p>
-                                              <p className="comment-time text-muted small mb-2">{new Date(comment.created_at).toLocaleDateString()}</p>
-                                              <p className="comment-text">{comment.comment_detail}</p>
-                                          </div>
-                                      </div>
+                                          <button className="btn btn-primary btn-sm" onClick={() => handleReplySubmit(comment.comment_id, replyText)}>ส่ง</button>
+                                        </div>
+                                      )}
+                                      {comment.replies && comment.replies.length > 0 && (
+                                        <div className="replies mt-2">
+                                          {comment.replies.map((reply, replyIndex) => (
+                                            <div key={replyIndex} className="reply-item border p-2 rounded mb-2">
+                                              <div className="d-flex align-items-start">
+                                                <img 
+                                                  src={reply.profile_image ? `http://localhost:3001/${reply.profile_image}` : "/default-profile.png"} 
+                                                  alt="User" 
+                                                  className="rounded-circle me-2" 
+                                                  width="30" 
+                                                  height="30" 
+                                                />
+                                                <div className="reply-content">
+                                                  <p className="reply-user fw-bold mb-1">{reply.full_name || "ไม่ระบุชื่อ"}</p>
+                                                  <p className="reply-time text-muted small mb-1">{new Date(reply.created_at).toLocaleDateString()}</p>
+                                                  <p className="reply-text">{reply.reply_detail}</p>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      )}
+                                    </div>
                                   </div>
+                                </div>
                               ))
-                          ) : (
+                            ) : (
                               <p className="text-muted">ยังไม่มีความคิดเห็น</p>
-                          )}
+                            )}
 
-                          <div className="comment-form mt-4">
+                            <div className="comment-form mt-4">
                               <h6 className="mb-3">แสดงความคิดเห็น:</h6>
                               {isLoggedin ? (
-                                  <div className="d-flex">
-                                      <input 
-                                          className="form-control me-3" 
-                                          rows="3" 
-                                          value={commentText} 
-                                          onChange={(e) => setCommentText(e.target.value)} 
-                                          placeholder="เขียนความคิดเห็นของคุณ..."
-                                      />
-                                      <button className="btn btn-primary" type="submit" onClick={handleCommentSubmit}>
-                                          ส่งความคิดเห็น
-                                      </button>
-                                  </div>
+                                <div className="d-flex">
+                                  <input 
+                                    className="form-control me-3" 
+                                    rows="1" 
+                                    value={commentText} 
+                                    onChange={(e) => setCommentText(e.target.value)} 
+                                    placeholder="เขียนความคิดเห็นของคุณ..."
+                                  />
+                                  <button className="btn btn-primary" type="submit" onClick={handleCommentSubmit}>
+                                    ส่งความคิดเห็น
+                                  </button>
+                                </div>
                               ) : (
-                                  <div className="alert alert-warning text-center">
-                                      <p>คุณต้องเข้าสู่ระบบก่อนจึงจะสามารถแสดงความคิดเห็นได้</p>
-                                  </div>
+                                <div className="alert text-center" style={{color: "red"}}>
+                                  <p>คุณต้องเข้าสู่ระบบก่อนจึงจะสามารถแสดงความคิดเห็นได้</p>
+                                </div>
                               )}
+                            </div>
                           </div>
-                      </div>
                     </div>
                 )}
             </Modal>    
@@ -440,7 +561,7 @@ function Webboard(){
                         className="badge px-3 py-2"
                         style={{
                           backgroundColor: getCategoryColor(category.category_id), 
-                          color: "white", padding: "5px 10px", borderRadius: "15px" , cursor: "pointer"
+                          color: "white", padding: "6px 10px", borderRadius: "6px" , cursor: "pointer"
                         }}
                         onClick={() => handleCategoryClick(category.category_id)}
                       >

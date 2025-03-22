@@ -21,7 +21,6 @@ function DonateDetail() {
         taxId: ""
     });
     const [qrCode, setQrCode] = useState(null);
-
     const navigate = useNavigate();
 
     useEffect(() => {

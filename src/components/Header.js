@@ -5,6 +5,7 @@ import { SlMagnifier } from "react-icons/sl";
 import { SlArrowDown } from "react-icons/sl";
 import {  NavLink } from "react-router-dom";
 import { IoMdNotificationsOutline } from "react-icons/io";
+import { FaTrash } from "react-icons/fa";
 import axios from "axios";
 
 
@@ -13,30 +14,45 @@ function Header({user}) {
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0); // สถานะเก็บจำนวนแจ้งเตือนที่ยังไม่ได้อ่าน
-  const isFetching = useRef(false);
-  // console.log("User in Header:", user);
 
   // ดึงแจ้งเตือนเมื่อผู้ใช้เข้าสู่ระบบ
-  const fetchNotifications = () => {
-    if (!user?.userId) return; // ถ้ายังไม่มี userId ไม่ต้องดึงข้อมูล
-
-    axios.get(`http://localhost:3001/notice/notification/${user.userId}`)
-        .then((response) => {
-            if (response.data.success) {
-              const data = response.data.data || []; //เป็น array
-                setNotifications(data);
-                const unreadNotifications = data.filter(n => n.status === 'ยังไม่อ่าน');
-                setUnreadCount(unreadNotifications.length); // คำนวณจำนวนแจ้งเตือนที่ยังไม่ได้อ่าน
-            }
-        })
-        .catch((error) => console.error("Error loading notifications:", error)); 
-  };
-
   useEffect(() => {
-    if (!user?.userId) return; // ถ้ายังไม่มี userId ไม่ต้องดึงข้อมูล
+    if (!user?.userId) return;
 
-     
-  }, []);
+    const fetchNotifications = () => {
+        axios.get(`http://localhost:3001/notice/notification/${user.userId}`)
+            .then((response) => {
+                if (response.data.success) {
+                    const data = response.data.data || [];
+                    setNotifications(data);
+                    const unreadNotifications = data.filter((n) => n.status === "ยังไม่อ่าน");
+                    setUnreadCount(unreadNotifications.length);
+                }
+            })
+            .catch((error) => console.error("Error loading notifications:", error));
+    };
+
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 30000); // รีเฟรชทุก 30 วินาที
+
+    return () => clearInterval(interval);
+  }, [user?.userId]);
+
+
+    const markAsRead = (notificationId) => {
+      axios.put(`http://localhost:3001/notice/read/${notificationId}`)
+          .then(() => {
+              setNotifications((prevNotifications) =>
+                  prevNotifications.map((n) =>
+                      n.notification_id === notificationId
+                          ? { ...n, read_status: "อ่านแล้ว" }
+                          : n
+                  )
+              );
+              setUnreadCount((prev) => Math.max(prev - 1, 0)); // ลดจำนวนแจ้งเตือนที่ยังไม่ได้อ่าน
+          })
+          .catch((error) => console.error("เกิดข้อผิดพลาดในการเปลี่ยนสถานะ:", error));
+    };
 
   //ลบแจ้งเตือน
   const deleteNotification = (notificationId) => {
@@ -45,7 +61,33 @@ function Header({user}) {
       setNotifications(notifications.filter((n) => n.notification_id !== notificationId));
       setUnreadCount((prev) => Math.max(prev - 1, 0)); // ลดตัวนับแจ้งเตือน
     })
-    .catch((error) => console.error("Error deleting notification:", error));
+    .catch((error) => console.error("เกิดข้อผิดพลาดในการลบแจ้งเตือน:", error));
+  };
+
+  // แจ้งเตือนเมื่อมีการกดใจกระทู้
+  const handleLikePost = (postId) => {
+    console.log("🛠 กดไลก์โพสต์", postId);
+
+    axios.post(`http://localhost:3001/webboard/${postId}/favorite`, {})
+        .then((response) => {
+            console.log("Response from Backend:", response.data);
+        })
+        .catch((error) => {
+            console.error("Error from Backend:", error.response?.data || error.message);
+        });
+  };
+
+  // แจ้งเตือนเมื่อมีการแสดงความคิดเห็น
+  const handleCommentPost = (postId, comment) => {
+    axios.post(`http://localhost:3001/webboard/${postId}/comment`, {
+        comment_detail: comment
+    })
+    .then((response) => {
+        console.log("Response from Backend:", response.data);
+    })
+    .catch((error) => {
+        console.error("Error commenting on post:", error.response?.data || error.message);
+    });
   };
 
   //ฟังก์ชันแสดง/ซ่อนแจ้งเตือน
@@ -105,31 +147,38 @@ function Header({user}) {
             <div className="user-profile">
               {/* ไอคอนแจ้งเตือน */}
               <div className="notification-container">
-                <div className="notification-icon" onClick={toggleNotifications}>
+              <div className="notification-icon" onClick={toggleNotifications}>
                   <IoMdNotificationsOutline />
                   {unreadCount > 0 && <span className="unread-count">{unreadCount}</span>}
-                </div>
+              </div>
 
                 {/* Dropdown แจ้งเตือน */}
                 {showNotifications && (
                   <div className="notification-dropdown" onClick={handleDropdownClick}>
-                    <h5 className="notification-title">การแจ้งเตือน</h5>
-                    {notifications.length > 0 ? (
-                      notifications.map((notification) => (
-                        <div key={notification.notification_id} className="notification-item">
-                          <p>{notification.message}</p>
-                          <small>{new Date(notification.send_date).toLocaleString()}</small>
-                          <button
-                            className="delete-btn"
-                            onClick={() => deleteNotification(notification.notification_id)}
-                          >
-                            🗑
-                          </button>
-                        </div>
-                      ))
-                    ) : (
-                      <p className="no-notifications">ไม่มีการแจ้งเตือน</p>
-                    )}
+                      <h5 className="notification-title">การแจ้งเตือน</h5>
+                      {notifications.length > 0 ? (
+                          notifications.map((notification) => (
+                              <div
+                                  key={notification.notification_id}
+                                  className={`notification-item ${notification.read_status === "ยังไม่อ่าน" ? "unread" : ""}`}
+                                  onClick={() => markAsRead(notification.notification_id)}
+                              >
+                                  <p className="message">{notification.message}</p>
+                                  <p className="notification-date ">{new Date(notification.send_date).toLocaleString()}</p>
+                                  <button
+                                      className="delete-btn"
+                                      onClick={(e) => {
+                                          e.stopPropagation(); // ป้องกันการเรียก `markAsRead` เมื่อคลิกปุ่มลบ
+                                          deleteNotification(notification.notification_id);
+                                      }}
+                                  >
+                                      <FaTrash />
+                                  </button>
+                              </div>
+                          ))
+                      ) : (
+                          <p className="no-notifications">ไม่มีการแจ้งเตือน</p>
+                      )}
                   </div>
                 )}
               </div>
