@@ -22,6 +22,7 @@ import Webboard from './pages/webboard';
 import Alumni from './pages/alumni';
 import Login from './pages/login';
 import Register from './pages/register';
+import Faq from './pages/faq';
 // import Register from './pages/test-regis';
 import AdminHome from './pages/admin/admin-home';
 import PresidentHome from './pages/president/president-home';
@@ -54,17 +55,13 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/news" element={<News />} />
+          <Route path="/faq" element={<Faq />} />
           <Route path="/activity" element={<Activity />} />
           <Route path="/donate" element={<Donate />} />
           <Route path="/donateraise" element={<DonateRaise/>} />
           <Route path="/donatunlimit" element={<DonateUnlimit/>} />
           <Route path="/donaterequest" element={<DonateRequest/>} />
-<<<<<<< Updated upstream
-          {/* <Route path="/donatedetail" element={<DonateDetail/>} /> */}
-          <Route path="/donate/donatedetail/:projectId" element={<DonateDetail />} />
-=======
           <Route path="/donatedetail" element={<DonateDetail/>} />
->>>>>>> Stashed changes
           <Route path="/alumni" element={<Alumni />} />
           <Route path="/souvenir" element={<Souvenir />} />
           <Route path="/souvenir/souvenirDetail/:productId" element={<SouvenirDetail />} />
