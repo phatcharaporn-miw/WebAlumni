@@ -20,6 +20,7 @@ import Webboard from './pages/webboard';
 import Alumni from './pages/alumni';
 import Login from './pages/login';
 import Register from './pages/register';
+import Faq from './pages/faq';
 // import Register from './pages/test-regis';
 import AdminHome from './pages/admin/admin-home';
 import PresidentHome from './pages/president/president-home';
@@ -52,6 +53,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/news" element={<News />} />
+          <Route path="/faq" element={<Faq />} />
           <Route path="/activity" element={<Activity />} />
           <Route path="/donate" element={<Donate />} />
           <Route path="/donaterequest" element={<DonateRequest/>} />

@@ -151,7 +151,15 @@
   .arrow-down:hover  {
     color: #0056b3;
   }
-
+  /* .breadcrumb {
+  display: flex;
+  list-style: none;
+  padding: 8px 0;
+  background: transparent;
+  margin: 0;
+  z-index: 10;
+  position: relative;
+}
   
   .main-content {
     margin-top: 155px; 
@@ -201,6 +209,14 @@
     color: #007bff;
   }
   
+  .breadcrumb-item a:hover {
+    text-decoration: underline;
+  } */
+   
+  .main-content {
+    margin-top: 140px; 
+  } 
+
   .user-major {
     font-size: 12px;
     color: #888;

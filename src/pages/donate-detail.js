@@ -23,10 +23,7 @@ function DonateDetail() {
     const [qrCode, setQrCode] = useState(null);
     const navigate = useNavigate();
 
-
     useEffect(() => {
-        axios.get(`http://localhost:3001/donate/donatedetail/${projectId}`)
-        window.scrollTo(0, 0);
         axios.get(`http://localhost:3001/donate/donatedetail/${projectId}`)
             .then(response => {
                 console.log("Project Data:", response.data);
