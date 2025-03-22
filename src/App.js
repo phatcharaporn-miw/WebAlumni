@@ -43,8 +43,13 @@ import ActivityDetail from "./pages/activityDetail";
 import ForgotPassword from './pages/forgotPassword';
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 import SouvenirCheckout from './pages/souvenir_checkout';
 import SouvenirHistory from './pages/souvenir_history';
+=======
+import AlumniProfileActivity from './pages/alumni/alumni-profile-activity';
+// import SearchResults from './pages/searchResults';
+>>>>>>> Stashed changes
 =======
 import AlumniProfileActivity from './pages/alumni/alumni-profile-activity';
 // import SearchResults from './pages/searchResults';
@@ -77,11 +82,17 @@ function App() {
           <Route path="/souvenir" element={<Souvenir />} />
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
           <Route path="/souvenir/souvenir_basket" element={<SouvenirBasket />} />
           <Route path="/souvenir/checkout" element={<SouvenirCheckout />} />
           <Route path="/souvenir/souvenir_history" element={<SouvenirHistory />} />
           
          
+=======
+          <Route path="/souvenir_request" element={<SouvenirRequest />} />
+          <Route path="/souvenir/souvenir_basket" element={<SouvenirBasket />} />
+          
+>>>>>>> Stashed changes
 =======
           <Route path="/souvenir_request" element={<SouvenirRequest />} />
           <Route path="/souvenir/souvenir_basket" element={<SouvenirBasket />} />
