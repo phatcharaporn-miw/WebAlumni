@@ -27,9 +27,17 @@ function SouvenirBasket() {
     }, [fetchCart]);
 
     const handleSelectItem = (productId) => {
-        setSelectedItems(prevState => prevState.includes(productId)
-            ? prevState.filter(item => item !== productId)
-            : [...prevState, productId]);
+        const selectedItem = cart.find(item => item.product_id === productId);
+
+        setSelectedItems(prevState => {
+            const isAlreadySelected = prevState.some(item => item.product_id === productId);
+
+            if (isAlreadySelected) {
+                return prevState.filter(item => item.product_id !== productId);
+            } else {
+                return [...prevState, { ...selectedItem, isSelected: true }];
+            }
+        });
     };
 
     const handleDeleteItem = (productId) => {
@@ -75,6 +83,8 @@ function SouvenirBasket() {
         });
     };
 
+
+
     return (
         <>
             <h3 className="titlesouvenirBasket">ตะกร้าสินค้า</h3>
@@ -92,10 +102,13 @@ function SouvenirBasket() {
                             <p>จัดการ</p>
                         </div>
                         {cart.map((item) => (
-                            <div className="cart-item-card" key={item.product_id}>
+                            <div
+                                key={item.product_id}
+                                className={`cart-item-card ${selectedItems.some(selectedItem => selectedItem.product_id === item.product_id) ? 'selected' : ''}`}
+                            >
                                 <input
                                     type="checkbox"
-                                    checked={selectedItems.includes(item.product_id)}
+                                    checked={selectedItems.some(selectedItem => selectedItem.product_id === item.product_id)}
                                     onChange={() => handleSelectItem(item.product_id)}
                                 />
                                 <div className="cart-item-img">

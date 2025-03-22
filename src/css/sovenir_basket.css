@@ -1,0 +1,8 @@
+.cart-item-card.selected {
+    background-color: #e0f7fa;
+    border: 2px solid #0097a7; 
+}
+
+.cart-item-card input[type="checkbox"]:checked {
+    background-color: #0097a7;
+}

@@ -20,7 +20,7 @@ function Login() {
 
       try {
         // ส่งคำขอไปยัง backend เพื่อตรวจสอบข้อมูล
-        const response = await axios.post('http://localhost:3001/api/login', {
+        const response = await axios.post('http://localhost:3001/login/login', {
           username:username,
           password:password,
         }, {withCredentials: true });
