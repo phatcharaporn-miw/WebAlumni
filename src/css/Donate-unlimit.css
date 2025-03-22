@@ -185,7 +185,6 @@ h3 {
     transform: scale(1.05);
 }
 
-/* สำหรับหน้าจอขนาดเล็ก */
 @media (max-width: 768px) {
     .donate-type {
         grid-template-columns: 1fr 1fr;

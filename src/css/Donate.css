@@ -2,11 +2,9 @@
 .head-donate {
     position: relative;
     width: 100%;
-    height: 350px;
     height: auto;
     object-fit: cover;
     overflow: hidden;
-    
 }
 
 #title-donate {
@@ -36,6 +34,7 @@
     object-fit: cover;
 }
 
+
 .donate-button{
     position: absolute;
     top: 52%;
@@ -45,15 +44,6 @@
     padding: 12px 20px;
     font-size: 18px;
     background-color: #0F75BC;
-}
-.donate-button {
-    padding: 12px 15px;
-    font-size: 15px;
-    background-color: #085A9C;
-    color: white;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
 }
 
 .donate-button:hover {
