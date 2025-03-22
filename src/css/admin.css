@@ -1,0 +1,267 @@
+/* .souvenir_content {
+    padding: 20px;
+} */
+
+/* .content_souvenir {
+    padding: 20px;
+    background-color: #f5f5f5;
+    border-radius: 10px;
+    margin-bottom: 20px;
+} */
+
+.souvenir-top {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+}
+
+.souvenir-bt-add {
+    background-color: #1A8DDD;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.souvenir-bt-add:hover {
+    background-color: #0F75BC;
+}
+
+.titlesouvenir {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.titlesouvenir-type {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+/* Tab Styles */
+.nav-tabs {
+    border-bottom: 2px solid #ddd;
+}
+
+.nav-link {
+    /* border: 1px solid #ddd; */
+    border-radius: 1px;
+    padding: 10px 15px;
+    color: #1A8DDD;
+}
+
+/* .nav-link:hover {
+    background-color: #0F75BC;  
+    border-radius: 5px;  
+    padding: 10px 15px; 
+    color: #ffffff;  
+    text-decoration: none; 
+} */
+
+/* .nav-link.active {
+    background-color: #1A8DDD;
+    color: white;
+} */
+
+.tab-content {
+    margin-top: 20px;
+}
+
+/* Table Styles */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #fff;
+}
+
+table th,
+table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: center;
+}
+
+table th {
+    background-color: #1A8DDD;
+    color: white;
+}
+
+table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+table tr:hover {
+    background-color: #f1f1f1;
+}
+
+table td button {
+    background-color: #0F75BC;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+table td button:hover {
+    background-color: #0B98FA;
+}
+
+/* Souvenir Item Styles */
+.souvenir-item-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.souvenir-item {
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.souvenir-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.souvenir-item-img {
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.souvenir-item-price {
+    font-size: 18px;
+    color: #1A8DDD;
+    font-weight: bold;
+}
+
+/* Message When No Products */
+.souvenir-item-group p {
+    font-size: 18px;
+    color: #888;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.status_product{
+    margin-bottom: 0;
+}
+
+.souvenir-bt-add {
+    background-color: #4CAF50; /* สีเขียว */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.souvenir-bt-add:hover {
+    background-color: #45a049; /* เปลี่ยนสีเมื่อ hover */
+}
+
+.souvenir-bt-approve {
+    background-color: #2196F3; /* สีฟ้า */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.souvenir-bt-approve:hover {
+    background-color: #0b7dda; /* เปลี่ยนสีเมื่อ hover */
+}
+
+.souvenir-bt-edit {
+    background-color: #FF9800; /* สีส้ม */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.souvenir-bt-edit:hover {
+    background-color: #e68900; /* เปลี่ยนสีเมื่อ hover */
+}
+
+.souvenir-bt-del {
+    background-color: #F44336; /* สีแดง */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.souvenir-bt-del:hover {
+    background-color: #d32f2f; /* เปลี่ยนสีเมื่อ hover */
+}
+
+.status-available {
+    color: green;
+}
+
+.status-unavailable {
+    color: red;
+}
+
+.souvenir-bt-approve-available {
+    background-color: green;
+    color: white;
+}
+
+.souvenir-bt-approve-unavailable {
+    background-color: red;
+    color: white;
+}
+
+
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .souvenir-item-group {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .souvenir-item {
+        padding: 10px;
+    }
+
+    .souvenir-bt-add {
+        font-size: 14px;
+        padding: 8px 15px;
+    }
+
+    .titlesouvenir {
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .souvenir-item-group {
+        grid-template-columns: 1fr;
+    }
+
+    .souvenir-bt-add {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+
+    .titlesouvenir {
+        font-size: 18px;
+    }
+}

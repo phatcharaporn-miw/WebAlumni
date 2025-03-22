@@ -17,6 +17,7 @@ import DonateRequest from './pages/donate-request';
 import DonateDetail from './pages/donate-detail';
 import AdminDonate from './pages/admin/donate';
 import Souvenir from './pages/souvenir';
+import SouvenirBasket from './pages/souvenir_basket';
 import SouvenirDetail from './pages/souvenirDetail';
 import Webboard from './pages/webboard';
 import Alumni from './pages/alumni';
@@ -40,6 +41,8 @@ import AlumniProfileWebboard from './pages/alumni/alumni-profile-webboard';
 import EditWebboard from './pages/alumni/editWebboard';
 import ActivityDetail from "./pages/activityDetail";
 import ForgotPassword from './pages/forgotPassword';
+import SouvenirCheckout from './pages/souvenir_checkout';
+import SouvenirHistory from './pages/souvenir_history';
 
 function App() { 
 
@@ -64,6 +67,11 @@ function App() {
           <Route path="/donatedetail" element={<DonateDetail/>} />
           <Route path="/alumni" element={<Alumni />} />
           <Route path="/souvenir" element={<Souvenir />} />
+          <Route path="/souvenir/souvenir_basket" element={<SouvenirBasket />} />
+          <Route path="/souvenir/checkout" element={<SouvenirCheckout />} />
+          <Route path="/souvenir/souvenir_history" element={<SouvenirHistory />} />
+          
+         
           <Route path="/souvenir/souvenirDetail/:productId" element={<SouvenirDetail />} />
           <Route path="/webboard" element={<Webboard />} />
           <Route path="/login" element={<Login />} />

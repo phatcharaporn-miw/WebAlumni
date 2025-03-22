@@ -12,7 +12,7 @@ function Header({user}) {
   const [searchTerm, setSearchTerm] = useState("");
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0); // สถานะเก็บจำนวนแจ้งเตือนที่ยังไม่ได้อ่าน
+  const [unreadCount, setUnreadCount] = useState(0); 
   const isFetching = useRef(false);
   // console.log("User in Header:", user);
 

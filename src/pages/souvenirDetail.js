@@ -40,27 +40,6 @@ function SouvenirDetail() {
             });
     }, [productId]);
 
-    const handleAddToCart = (productId, quantity) => {
-        if (product) {
-            const total = product.price * quantity;
-            setLoadingAddToCart(true);
-            axios.post("http://localhost:3001/souvenir/cart/add", {
-                product_id: productId,
-                quantity: quantity,
-                user_id: user_id,
-                total: total
-            })
-                .then(response => {
-                    console.log(response.data);
-                    setLoadingAddToCart(false);
-                })
-                .catch(error => {
-                    console.error("Error adding item to cart:", error);
-                    setLoadingAddToCart(false);
-                });
-        }
-    };
-
     const handleQuantityChange = (e) => {
         setQuantity(e.target.value);
     };
@@ -71,11 +50,46 @@ function SouvenirDetail() {
         return shuffled.slice(0, num);
     };
 
-
     const handleBuyNow = () => {
-        console.log("Navigating to checkout with selected items:", [{ product_id: product.product_id, quantity: quantity }]);
-        window.location.href = `/souvenir/checkout?product_id=${product.product_id}&quantity=${quantity}`;
+        const selectedItem = [
+            { 
+                product_id: product.product_id, 
+                quantity: quantity, 
+                product_name: product.product_name, 
+                price: product.price 
+            }
+        ];
+    
+        localStorage.setItem('selectedItemsซื้อเลย', JSON.stringify(selectedItem));
+    
+        navigate("/souvenir/checkout", { state: { selectedItems: selectedItem } });
     };
+    
+    const handleAddToCart = (productId, quantity) => {
+        if (product) {
+            const total = product.price * quantity;
+            setLoadingAddToCart(true);
+            axios.post("http://localhost:3001/souvenir/cart/add", {
+                product_id: productId,
+                quantity: quantity,
+                user_id: user_id,
+                total: total
+            })
+            .then(response => {
+                console.log(response.data);
+                setLoadingAddToCart(false);
+                // อัปเดต selectedItems เมื่อเพิ่มลงตะกร้า
+                const updatedItems = [...selectedItems, { product_id: productId, quantity: quantity }];
+                setSelectedItems(updatedItems);
+                localStorage.setItem('selectedItemsเพิ่มตะกร้า', JSON.stringify(updatedItems)); 
+            })
+            .catch(error => {
+                console.error("Error adding item to cart:", error);
+                setLoadingAddToCart(false);
+            });
+        }
+    };
+    
     
     const randomProducts = getRandomProducts(otherProducts);
 
