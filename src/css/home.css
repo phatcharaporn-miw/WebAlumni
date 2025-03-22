@@ -13,13 +13,21 @@
     height: 400px;
   } */
 
+  .card-homeweb {
+    max-height: 300px;
+    max-width: 80%; 
+    overflow: hidden;
+    margin-bottom: 5%;
+    background-color: #fff;
+  }
+
   #head-text{
     text-align: center;
     margin: 40px;
     color: #0F75BC;
     font-weight: bold;
   }
-
+  
   .card {
     height: 100%;
   }
