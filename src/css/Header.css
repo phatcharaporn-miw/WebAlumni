@@ -8,15 +8,13 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
   }
 
-  .header-top {
-    display: flex;
-  }
-
   .logo {
     max-width: 260px; 
     width: 100%;
   }
-  
+
+
+
   .search-and-login {
     display: flex;
     align-items: center;
@@ -52,7 +50,7 @@
   color: #0056b3;
 }
 
-  /* ปุ่มเข้าสู่ระบบ */
+  
   .login-btn {
     padding: 6px 12px;
     background-color: #0F75BC;
@@ -165,6 +163,7 @@
     margin-top: 155px; 
   } 
   
+<<<<<<< Updated upstream
   /* .profile-img {
     width: 40px; 
     height: 40px; 
@@ -222,6 +221,8 @@
     color: #888;
   } */
   
+=======
+>>>>>>> Stashed changes
   .notification-container {
     position: relative;
     display: inline-block;
@@ -321,3 +322,63 @@
     min-width: 20px;
     height: 20px;
 }
+<<<<<<< Updated upstream
+=======
+
+.search-container {
+  flex: 1;
+  margin: 0 20px;
+}
+
+.suggestions-dropdown {
+  position: absolute;
+  top: 100%; 
+  left: 0;
+  width: 100%;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  max-height: 200px; 
+  overflow-y: auto; 
+}
+
+
+.suggestion-item {
+  padding: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.suggestion-item:hover {
+  background-color: #f0f0f0;
+}
+
+.suggestion-text {
+  margin: 0;
+  font-size: 14px;
+  color: #333;
+}
+
+.cart-container {
+  position: relative;
+}
+
+.cart-icon {
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.cart-count {
+  position: absolute;
+  top: -5px;
+  right: -10px;
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 12px;
+  font-weight: bold;
+}
+>>>>>>> Stashed changes

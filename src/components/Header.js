@@ -1,11 +1,13 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect} from "react";
 import "../css/Header.css";
 import 'bootstrap/dist/css/bootstrap.min.css'; 
 import { SlMagnifier } from "react-icons/sl";
 import { SlArrowDown } from "react-icons/sl";
+import { SlBasket } from "react-icons/sl";
 import {  NavLink } from "react-router-dom";
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { FaTrash } from "react-icons/fa";
+
 import axios from "axios";
 
 
@@ -14,6 +16,15 @@ function Header({user}) {
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0); // สถานะเก็บจำนวนแจ้งเตือนที่ยังไม่ได้อ่าน
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [cartCount, setCartCount] = useState(0);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
 
   // ดึงแจ้งเตือนเมื่อผู้ใช้เข้าสู่ระบบ
   useEffect(() => {
@@ -66,7 +77,6 @@ function Header({user}) {
 
   // แจ้งเตือนเมื่อมีการกดใจกระทู้
   const handleLikePost = (postId) => {
-    console.log("🛠 กดไลก์โพสต์", postId);
 
     axios.post(`http://localhost:3001/webboard/${postId}/favorite`, {})
         .then((response) => {
@@ -113,12 +123,61 @@ function Header({user}) {
   event.stopPropagation(); 
   };
 
+  // การค้นหา
   const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
+      const value = e.target.value;
+      setSearchTerm(value);
+
+      if (value.trim() === "") {
+          setSuggestions([]);
+          setShowSuggestions(false);
+          return;
+      }
+
+      // เรียก API เพื่อดึงคำแนะนำ
+      axios.get(`http://localhost:3001/search/search-all?search=${value}`)
+          .then((response) => {
+              if (response.data.success) {
+                  setSuggestions(response.data.data);
+                  setShowSuggestions(true);
+              }
+          })
+          .catch((error) => {
+              console.error("เกิดข้อผิดพลาดในการดึงการค้นหา:", error.message);
+          });
   };
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest(".search-and-login")) {
+        setShowSuggestions(false);
+      }
+    };
+  
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, []);
+
+    // ฟังก์ชันค้นหาเมื่อกดปุ่มค้นหา
   const handleSearchClick = () => {
-    console.log("Search Term:", searchTerm);
+    if (searchTerm.trim() !== "") {
+        window.location.href = `/search?query=${searchTerm}`;
+    }
+  };
+
+  const handleSuggestionClick = (suggestion) => {
+    if (suggestion.type === "news") {
+        window.location.href = `/news/${suggestion.id}`;
+    } else if (suggestion.type === "webboard") {
+        window.location.href = `/webboard/${suggestion.id}`;
+    } else if (suggestion.type === "profile") {
+        window.location.href = `/profile/${suggestion.id}`;
+    }else if (suggestion.type === "donationproject") {
+        window.location.href = `/donate/donatedetail/${suggestion.id}`;
+    }else if (suggestion.type === "products") {
+      window.location.href = `/souvenirDetail/${suggestion.id}`;
+    }
+    setShowSuggestions(false);
   };
 
 
@@ -136,17 +195,54 @@ function Header({user}) {
               value={searchTerm}
               onChange={handleSearchChange}
               className="form-control"
+              placeholder="ค้นหา..."
             />
             <button onClick={handleSearchClick} className="search-icon-btn">
               <SlMagnifier className="search-icon" />
             </button>
           </div>
 
-          {/* หากผู้ใช้เข้าสู่ระบบแล้วจะแสดงโปรไฟล์และแจ้งเตือน */}
+          {/* แสดงคำแนะนำ */}
+            {showSuggestions && suggestions.length > 0 && (
+                <div className="suggestions-dropdown">
+                    {suggestions.map((suggestion, index) => (
+                        <div
+                            key={index}
+                            className="suggestion-item"
+                            onClick={() => handleSuggestionClick(suggestion)}
+                        >
+                            {suggestion.type === "news" && (
+                                <p className="suggestion-text">ข่าว: {suggestion.title}</p>
+                            )}
+                            {suggestion.type === "webboard" && (
+                                <p className="suggestion-text">กระทู้: {suggestion.title}</p>
+                            )}
+                            {suggestion.type === "profile" && (
+                                <p className="suggestion-text">โปรไฟล์: {suggestion.title}</p>
+                            )}
+                            {suggestion.type === "donationproject" && (
+                                <p className="suggestion-text">บริจาค: {suggestion.title}</p>
+                            )}
+                            {suggestion.type === "products" && (
+                                <p className="suggestion-text">ของที่ระลึก: {suggestion.title}</p>
+                            )}
+                        </div>
+                    ))}
+                </div>
+            )}
+            
+              <div className="cart-container me-4 mx-4">
+                  <NavLink to="/souvenir/souvenir_basket">
+                    <SlBasket className="cart-icon" />
+                    {cartCount > 0 && <span className="cart-count">{cartCount}</span>}
+                  </NavLink>
+              </div>  
+
+          {/*หากผู้ใช้เข้าสู่ระบบแล้วจะแสดงโปรไฟล์และแจ้งเตือน*/}
           {user ? (
             <div className="user-profile">
               {/* ไอคอนแจ้งเตือน */}
-              <div className="notification-container">
+              <div className="notification-container me-4">
               <div className="notification-icon" onClick={toggleNotifications}>
                   <IoMdNotificationsOutline />
                   {unreadCount > 0 && <span className="unread-count">{unreadCount}</span>}
@@ -183,7 +279,6 @@ function Header({user}) {
                 )}
               </div>
             
-                {/* <div className="user-profile"> */}
               {/* รูปโปรไฟล์ */}
               <NavLink to="/alumni-profile" className="profile-container">
                 <img
@@ -192,13 +287,11 @@ function Header({user}) {
                   className="profile-img"
                   style={{ cursor: "pointer" }}
                 />
+                {/* ข้อมูลผู้ใช้ */}
+                <div className="user-info mt-2 text-center">
+                  <p className="user-role mb-1" style={{ textDecoration: "none" }}>{user.role === 0 ? "แอดมิน" : "ศิษย์เก่า"}</p>
+                </div>
               </NavLink>
-
-              {/* ข้อมูลผู้ใช้ */}
-              <div className="user-info mt-2 text-center">
-                <p className="user-role mb-1">{user.role === 0 ? "แอดมิน" : "ศิษย์เก่า"}</p>
-                <p className="user-major text-muted small">{user.major || "ไม่ระบุสาขา"}</p>
-              </div>
             </div>
           ) : (
             <NavLink to="/login">

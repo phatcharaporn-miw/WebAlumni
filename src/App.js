@@ -13,10 +13,12 @@ import Activity from './pages/activity';
 import Donate from './pages/donate';
 import DonateRequest from './pages/donate-request';
 import DonateDetail from './pages/donate-detail';
-import AdminDonate from './pages/admin/donate';
+// import AdminDonate from './pages/admin/donate';
 import Souvenir from './pages/souvenir';
 import SouvenirBasket from './pages/souvenir_basket';
 import SouvenirDetail from './pages/souvenirDetail';
+import SouvenirRequest from './pages/souvenir_request';
+import SouvenirBasket from './pages/souvenir_basket';
 import Webboard from './pages/webboard';
 import Alumni from './pages/alumni';
 import Login from './pages/login';
@@ -39,13 +41,17 @@ import AlumniProfileWebboard from './pages/alumni/alumni-profile-webboard';
 import EditWebboard from './pages/alumni/editWebboard';
 import ActivityDetail from "./pages/activityDetail";
 import ForgotPassword from './pages/forgotPassword';
+<<<<<<< Updated upstream
 import SouvenirCheckout from './pages/souvenir_checkout';
 import SouvenirHistory from './pages/souvenir_history';
+=======
+import AlumniProfileActivity from './pages/alumni/alumni-profile-activity';
+// import SearchResults from './pages/searchResults';
+>>>>>>> Stashed changes
 
 function App() { 
 
   const clientId = '766363116725-8u97fa7f736i56p1vgm3l3261f0neud2.apps.googleusercontent.com';
-
 
   return (
 
@@ -64,11 +70,17 @@ function App() {
           <Route path="/donatedetail" element={<DonateDetail/>} />
           <Route path="/alumni" element={<Alumni />} />
           <Route path="/souvenir" element={<Souvenir />} />
+<<<<<<< Updated upstream
           <Route path="/souvenir/souvenir_basket" element={<SouvenirBasket />} />
           <Route path="/souvenir/checkout" element={<SouvenirCheckout />} />
           <Route path="/souvenir/souvenir_history" element={<SouvenirHistory />} />
           
          
+=======
+          <Route path="/souvenir_request" element={<SouvenirRequest />} />
+          <Route path="/souvenir/souvenir_basket" element={<SouvenirBasket />} />
+          
+>>>>>>> Stashed changes
           <Route path="/souvenir/souvenirDetail/:productId" element={<SouvenirDetail />} />
           <Route path="/webboard" element={<Webboard />} />
           <Route path="/login" element={<Login />} />
@@ -81,10 +93,12 @@ function App() {
           <Route path="/news/:newsId" element={<NewsDetail/>} />
           <Route path="/notification" element={<Notifications/>} />
           <Route path="/webboard/:categoryId" element={<Category/>} />
-          <Route path="/alumni-profile-webboard" element={<AlumniProfileWebboard />} />
+          <Route path="/alumni-profile/alumni-profile-webboard" element={<AlumniProfileWebboard />} />
           <Route path="/edit-webboard/:webboardId" element={<EditWebboard />} />
           <Route path="/activity/:activityId" element={<ActivityDetail />} />
           <Route path="/forgotPassword" element={<ForgotPassword />} />
+          <Route path="/alumni-profile/alumni-profile-activity" element={<AlumniProfileActivity />} />
+     
           
           {/* for admin */}
           <Route path="/admin-home" element={<AdminHome/>} />

@@ -12,9 +12,14 @@ function Souvenir() {
         axios
             .get("http://localhost:3001/souvenir")
             .then((response) => {
+                // console.log(response.data);
                 setProducts(response.data);
             })
+            .catch((error) => {
+                console.error("เกิดข้อผิดพลาดในการดึงข้อมูล:", error);
+            });
     }, []);
+    console.log("Products state:", products);
 
     return (
         <>
@@ -35,7 +40,7 @@ function Souvenir() {
                     <div className="souvenir-item-group">
                         {products && products.length > 0 ? (
                             products
-                                .filter((product) => product.role_id === 1 || product.role_id === 2)
+                                // .filter((product) => product.role_id === 1 || product.role_id === 2)
                                 .map((product) => (
                                     <Link to={`/souvenir/souvenirDetail/${product.product_id}`} key={product.product_id}>
                                         <div className="souvenir-item">
@@ -61,7 +66,7 @@ function Souvenir() {
                     <div className="souvenir-item-group">
                         {products && products.length > 0 ? (
                             products
-                                .filter((product) => product.role_id === 4 )
+                                // .filter((product) => product.role_id === 4 )
                                 .map((product) => (
                                     <Link to={`/souvenir/souvenirDetail/${product.product_id}`} key={product.product_id}>
                                         <div className="souvenir-item">

@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useOutletContext } from "react-router-dom";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation} from 'react-router-dom';
 import { SlHeart } from "react-icons/sl";
-import { MdFavorite } from "react-icons/md";
+import { MdDelete } from "react-icons/md";
 import { BiSolidComment } from "react-icons/bi";
 import { FaEye } from "react-icons/fa";
-import { IoMdMore } from "react-icons/io";
+import { IoMdCreate } from "react-icons/io";
 import Swal from "sweetalert2";
 // css
 import '../../css/profile.css';
@@ -19,10 +19,8 @@ function AlumniProfileWebboard() {
     const [profile, setProfile] = useState({});
     const { handleLogout } = useOutletContext();
     const [sortOrder, setSortOrder] = useState("latest");
-    const [likedPosts, setLikedPosts] = useState([]);
-    const [isLoggedin, setIsLoggedin] = useState(false);
-    const [showMenu, setShowMenu] = useState(null);
     const navigate = useNavigate();
+    const location = useLocation();
 
     // ดึงข้อมูลโปรไฟล์
     useEffect(() => {
@@ -93,12 +91,15 @@ function AlumniProfileWebboard() {
         });
     };
 
-     // กำหนดสีหมวดหมู่
-     const getCategoryColor = (categoryId) => {
-      const id = Number(categoryId);  // แปลงเป็นตัวเลข
-      const hue = (id * 137) % 360;
-      return `hsl(${hue}, 70%, 60%)`;
+    // กำหนดสีหมวดหมู่
+    const getCategoryColor = (categoryId) => {
+        const id = Number(categoryId); // แปลงเป็นตัวเลข
+        const hue = (id * 137) % 360;
+        return `hsl(${hue}, 70%, 60%)`;
     };
+
+     // ตรวจสอบว่าเมนูใดควรเป็น active
+     const isActive = (path) => location.pathname === path;
 
     return (
         <section className='container'>
@@ -113,29 +114,65 @@ function AlumniProfileWebboard() {
                         />
                         <p className="mt-3 fw-bold">{profile.fullName}</p>
                         <div className="menu mt-4">
-                            <div className="menu-item active py-2 mb-2 rounded">ข้อมูลส่วนตัว</div>
-                            <div className="menu-item py-2 mb-2 rounded">กระทู้ที่สร้าง</div>
-                            <div className="menu-item py-2 mb-2 rounded">ประวัติการบริจาค</div>
-                            <div className="menu-item py-2 mb-2 rounded">ประวัติการเข้าร่วมกิจกรรม</div>
-                            <div className="menu-item py-2 mb-2 rounded">ประวัติการสั่งซื้อ</div>
-                            <div className="menu-item py-2 rounded" onClick={handleLogout}>ออกจากระบบ</div>
+                        <div
+                                className={`menu-item py-2 mb-2 rounded ${isActive('/alumni-profile') ? 'active' : ''}`}
+                                onClick={() => navigate('/alumni-profile')}
+                            >
+                                ข้อมูลส่วนตัว
+                            </div>
+                            <div
+                                className={`menu-item py-2 mb-2 rounded ${isActive('/alumni-profile/alumni-profile-webboard') ? 'active' : ''}`}
+                                onClick={() => navigate('/alumni-profile/alumni-profile-webboard')}
+                            >
+                                กระทู้ที่สร้าง
+                            </div>
+                            <div
+                                className={`menu-item py-2 mb-2 rounded ${isActive('/profile/donations') ? 'active' : ''}`}
+                                onClick={() => navigate('/profile/donations')}
+                            >
+                                ประวัติการบริจาค
+                            </div>
+
+                            <div
+                                className={`menu-item py-2 mb-2 rounded ${isActive('/alumni-profile/alumni-profile-activity') ? 'active' : ''}`}
+                                onClick={() => navigate('/alumni-profile/alumni-profile-activity')}
+                            >
+                                ประวัติการเข้าร่วมกิจกรรม
+                            </div>
+                            <div
+                                className={`menu-item py-2 mb-2 rounded ${isActive('/profile/orders') ? 'active' : ''}`}
+                                onClick={() => navigate('/profile/orders')}
+                            >
+                                ประวัติการสั่งซื้อ
+                            </div>
+                            <div className="menu-item py-2 rounded" onClick={handleLogout}>
+                                ออกจากระบบ
+                            </div>
                         </div>
                     </div>
 
                     <div className="col-8">
-                        {/* <h3>กระทู้ที่สร้าง</h3> */}
                         <div className="row">
                             {webboard.length > 0 ? (
                                 sortedPosts.map(post => (
-                                    <div key={post.webboard_id} className="col-md-6 mb-4">
+                                    <div key={post.webboard_id} className="col-md-6 col-lg-6 mb-4">
                                         <div className="card shadow-sm p-3 border rounded-4">
                                             <div className="d-flex justify-content-between">
-                                                <span className="badge px-3 py-2" style={{ backgroundColor: getCategoryColor(post?.category_id || 0), color: "white", padding: "5px 10px", borderRadius: "6px" , cursor: "pointer"}} >
+                                                <span className="badge px-3 py-2" style={{ backgroundColor: getCategoryColor(post?.category_id || 0), color: "white" }}>
                                                     {post.category_name || "ไม่มีหมวดหมู่"}
                                                 </span>
-                                                <span onClick={() => handleDelete(post.webboard_id)} style={{ cursor: "pointer" }}>
-                                                    <MdFavorite className="fs-5 text-danger" />
-                                                </span>
+                                                <div>
+                                                    <IoMdCreate
+                                                        className="fs-5 text-primary me-2"
+                                                        style={{ cursor: "pointer" }}
+                                                        onClick={() => handleEdit(post.webboard_id)}
+                                                    />
+                                                    <MdDelete
+                                                        className="fs-5 text-danger"
+                                                        style={{ cursor: "pointer" }}
+                                                        onClick={() => handleDelete(post.webboard_id)}
+                                                    />
+                                                </div>
                                             </div>
                                             <div className="card-body">
                                                 <h5 className="card-title">{post.title}</h5>

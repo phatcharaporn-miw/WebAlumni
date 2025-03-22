@@ -69,8 +69,8 @@ function Profile() {
     }));
   };
   
-  const handleClick = () => {
-    navigate('/alumni-profile-webboard');
+  const handleClick = (path) => {
+    navigate(path);
   };
 
   //แปลงวันที่
@@ -128,15 +128,15 @@ function Profile() {
             style={{ width: '140px', height: '140px', borderRadius: '50%' }}
             />
             <p className="mt-3 fw-bold">{profile.fullName}</p>
-            <div className="menu mt-4">
-              <div className="menu-item active py-2 mb-2 rounded">ข้อมูลส่วนตัว</div>
-                    <div className="menu-item py-2 mb-2 rounded" onClick={handleClick}>กระทู้ที่สร้าง</div>
-                    <div className="menu-item py-2 mb-2 rounded">ประวัติการบริจาค</div>
-                    <div className="menu-item py-2 mb-2 rounded">ประวัติการเข้าร่วมกิจกรรม</div>
-                    <div className="menu-item py-2 mb-2 rounded">ประวัติการสั่งซื้อ</div>
-                  <div className="menu-item py-2 rounded" onClick={handleLogout}>ออกจากระบบ</div>      
+              <div className="menu mt-4">
+                <div className="menu-item active py-2 mb-2 rounded">ข้อมูลส่วนตัว</div>
+                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/alumni-profile-webboard')}>กระทู้ที่สร้าง</div>
+                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/donation-history')}>ประวัติการบริจาค</div>
+                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/alumni-profile-activity')}>ประวัติการเข้าร่วมกิจกรรม</div>
+                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/order-history')}>ประวัติการสั่งซื้อ</div>
+                <div className="menu-item py-2 rounded" onClick={handleLogout}>ออกจากระบบ</div>
               </div>
-            </div>
+          </div>
         
             <div className="col-7 bg-light rounded">
               <div className='form-profile'>

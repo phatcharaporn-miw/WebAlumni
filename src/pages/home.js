@@ -31,7 +31,8 @@ function Home() {
   const [isLoggedin, setIsLoggedin] = useState(false);
   const [showFavorites, setShowFavorites] = useState(false);
   const [category, setCategory] = useState([]);
-  // const [categoryId, setCategoryId] = useState('');
+  const [news, setNews] = useState([]);
+  const [activity, setActivity] = useState([]);
   const navigate = useNavigate();
 
 
@@ -44,6 +45,30 @@ function Home() {
         setIsLoggedin(false);
         console.log("ผู้ใช้ยังไม่ได้ล็อกอิน"); 
     }
+  }, []);
+
+  // ข่าวประชาสัมพันธ์
+  useEffect(() => {
+    // ดึงข้อมูลข่าวประชาสัมพันธ์
+    axios.get('http://localhost:3001/news/news-all')
+            .then((response) => {
+                // console.log("API Response:", response.data); 
+                if (response.data.success) {
+                    setNews(response.data.data || []);
+                }
+            })
+            .catch((error) => {
+                console.error("เกิดข้อผิดพลาดในการโหลดข่าว:", error);
+            });
+  
+    // ดึงข้อมูลกิจกรรมที่กำลังจะจัดขึ้น
+    axios.get('http://localhost:3001/activity/all-activity')
+    .then(response => {
+      setActivity(response.data);
+    })
+    .catch(error => {
+      console.error("Error fetching activities:", error);
+    });
   }, []);
 
   //ดึงข้อมูล webboard
@@ -264,78 +289,56 @@ function Home() {
    
              <section>
              <div className="news-card">
-                 <h3 id="head-text">ข่าวประชาสัมพันธ์</h3>
-                 
+                <h3 id="head-text">ข่าวประชาสัมพันธ์</h3>
                <div class="container">
                <div class="row">
                  <div class="col ">
-                   <div class="card" id="card-news-home">
-                     <img src="/image/กิจกรรม1.png" class="card-img-top" alt="..."/>
-                     <div class="card-body">
-                       <h5 class="card-title">กิจกรรมร่วมใจปลูกป่าพัฒนาสู่มหาวิทยาลัยสีเขียว</h5>
-                       <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                       <a href="#" class="btn btn-primary">เข้าร่วมกิจกรรม</a>
-                     </div>
-                   </div>
+                 {news.length > 0 ? (
+                    news.slice(0, 2).map((item) => ( // แสดงข่าว 3 ข่าวแรก
+                      <div key={item.news_id} className="col-md-4">
+                        <div className="card" id="card-news-home">
+                          <img src={`http://localhost:3001/uploads/${item.image}`} className="card-img-top" alt={item.news_title} />
+                          <div className="card-body">
+                            <h5 className="card-title">{item.news_title}</h5>
+                            <p className="card-text">
+                              {item.news_content ? item.news_content.substring(0, 100) + "..." : "ไม่มีเนื้อหา"}
+                            </p>
+                            <a href={`/news/${item.news_id}`} className="btn btn-primary">อ่านเพิ่มเติม</a>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p>ไม่มีข่าวประชาสัมพันธ์</p>
+                  )}
                  </div>
-   
-                 <div class="col">
-                   <div class="card" id="card-news-home">
-                   <img src="/image/กิจกรรม1.png" class="card-img-top" alt="..."/>
-                     <div class="card-body">
-                       <h5 class="card-title">Card title</h5>
-                       <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                       <a href="#" class="btn btn-primary">เข้าร่วมกิจกรรม</a>
-                     </div>
-                   </div>
-                 </div>
-   
-                 <div class="col">
-                 <h4 class="news-title">ปฏิทินกิจกรรม</h4>
-                 <div class="news-item d-flex">
-                     <div class="news-date">
-                         <span class="day">8</span>
-                         <span class="month-year">กันยายน 2567</span>
-                     </div>
-                     <div class="news-content ms-3">
-                         <h5>กิจกรรมที่ 3</h5>
-                         <p>Lorem Ipsum is simply dummy text of the printing.</p>
-                     </div>
-                 </div>
-   
-                 <div class="news-item d-flex">
-                     <div class="news-date">
-                         <span class="day">12</span>
-                         <span class="month-year">กันยายน 2567</span>
-                     </div>
-                     <div class="news-content ms-3">
-                         <h5>กิจกรรมที่ 4</h5>
-                         <p>Lorem Ipsum is simply dummy text of the printing.</p>
-                     </div>
-                 </div>
-   
-                 <div class="news-item d-flex">
-                     <div class="news-date">
-                         <span class="day">1</span>
-                         <span class="month-year">ตุลาคม 2567</span>
-                     </div>
-                     <div class="news-content ms-3">
-                         <h5>กิจกรรมที่ 5</h5>
-                         <p>Lorem Ipsum is simply dummy text of the printing.</p>
-                     </div>
-                 </div>
-   
-                 <div class="news-item d-flex">
-                     <div class="news-date">
-                         <span class="day">18</span>
-                         <span class="month-year">ตุลาคม 2567</span>
-                     </div>
-                     <div class="news-content ms-3">
-                         <h5>กิจกรรมที่ 6</h5>
-                         <p>Lorem Ipsum is simply dummy text of the printing.</p>
-                     </div>
-                 </div>
-                 </div>
+
+                 <div className="col">
+                      <h4 className="news-title">ปฏิทินกิจกรรม</h4>
+                      {activity.length > 0 ? (
+                        activity.map((item) => (
+                          <div key={item.activity_id} className="news-item d-flex">
+                            <div className="news-date">
+                              <span className="day">{new Date(item.activity_date).getDate()}</span>
+                              <span className="month-year">
+                                {new Date(item.activity_date).toLocaleDateString("th-TH", {
+                                  month: "long",
+                                  year: "numeric",
+                                })}
+                              </span>
+                            </div>
+                            <div className="news-content ms-3">
+                              <h5>{item.activity_title}</h5>
+                              <p className="card-text">
+                              {activity.activity_description ? activity.activity_description.substring(0, 100) + "..." : "ไม่มีเนื้อหา"}
+                            </p>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <p>ไม่มีข้อมูลกิจกรรม</p>
+                      )}
+                    </div>
                  </div>
                
                  </div>

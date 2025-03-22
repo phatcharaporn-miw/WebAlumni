@@ -17,9 +17,10 @@ export const breadcrumbMapping = {
     // ส่วนของผู้ใช้
     "/alumni-profile": "โปรไฟล์",
     "/alumni-home": "หน้าหลักศิษย์เก่า",
-    "/alumni-profile-webboard": "กระทู้ที่สร้าง",
+    "/alumni-profile/alumni-profile-webboard": "กระทู้ที่สร้าง",
     "/alumni-favorite": "กระทู้ที่กดใจ",
-    "/edit-webboard": "แก้ไขกระทู้ของคุณ",
+    "/edit-webboard": "แก้ไขกระทู้ที่สร้าง",
     "/createPost": "สร้างกระทู้ใหม่", 
+    "/alumni-profile/alumni-profile-activity": "ประวัติการเข้าร่วมกิจกรรม",
     
   };

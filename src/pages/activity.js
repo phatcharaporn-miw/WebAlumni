@@ -6,7 +6,7 @@ import axios from 'axios';
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { IoMdClose } from "react-icons/io";
-import { IoWarningOutline } from "react-icons/io5";
+
 
 
 function Activity(){

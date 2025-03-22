@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { useNavigate } from 'react-router-dom';
+import "../css/Souvenir.css";
 
 function SouvenirBasket() {
     const [cart, setCart] = useState([]);

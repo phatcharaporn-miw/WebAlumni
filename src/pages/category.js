@@ -29,6 +29,7 @@ function Category() {
     const [commentText, setCommentText] = useState(""); 
     const [selectedPost, setSelectedPost] = useState(null); 
     const [modalIsOpen, setModalIsOpen] = useState(false);
+    const [favoritePosts, setFavoritePosts] = useState([]);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -56,13 +57,27 @@ function Category() {
       return 0;
     });
 
+      // ดึงข้อมูลกระทู้ที่ถูกกดหัวใจ
+      useEffect(() => {
+        axios.get('http://localhost:3001/webboard/favorite', { 
+          withCredentials: true 
+        })
+            .then((response) => {
+                if (response.data.success) {
+                    setFavoritePosts(response.data.posts);
+                    setIsLoggedin(true);
+                }
+            })
+            .catch((error) => {
+                console.error('เกิดข้อผิดพลาดในการดึงข้อมูลกระทู้ที่ถูกกดหัวใจ:', error.message);
+            });
+    }, []);
+
     // ฟังก์ชัน Toggle หัวใจ
     const toggleLike = (postId) => {
       if (!isLoggedin) {
         return; // ไม่บันทึกสถานะหากไม่ได้เข้าสู่ระบบ
       }
-
-      const userId = localStorage.getItem('userId');
 
       axios.post(`http://localhost:3001/web/webboard/${postId}/favorite`, {}, {
         withCredentials: true, 
