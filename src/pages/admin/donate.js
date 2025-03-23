@@ -10,7 +10,7 @@ function AdminDonate() {
 
     useEffect(() => {
         axios
-            .get("http://localhost:5000/donate")
+            .get("http://localhost:3001/donate")
             .then((response) => {
                 setProjects(response.data);
                 setLoading(false);
@@ -29,7 +29,7 @@ function AdminDonate() {
         console.log('Trying to delete project with ID:', projectId); // ตรวจสอบค่าของ projectId
         if (window.confirm("คุณแน่ใจว่าจะลบโครงการนี้?")) {
             axios
-                .delete(`http://localhost:5000/donate/${projectId}`)
+                .delete(`http://localhost:3001/donate/${projectId}`)
                 .then((response) => {
                     console.log('Deleted successfully', response.data);
                     setProjects(projects.filter((project) => project.project_id !== projectId));
@@ -71,7 +71,7 @@ function AdminDonate() {
                                     <div className="item-detail" key={project.project_id}>
                                         <div className="image-frame">
                                             <img
-                                                src={`http://localhost:5000/uploads/${project.image_path}`}
+                                                src={`http://localhost:3001/uploads/${project.image_path}`}
                                                 alt={project.project_name}
                                                 onError={(e) => {
                                                     e.target.src = "./image/default.jpg";

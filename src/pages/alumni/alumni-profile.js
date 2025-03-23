@@ -69,8 +69,8 @@ function Profile() {
     }));
   };
   
-  const handleClick = () => {
-    navigate('/alumni-profile-webboard');
+  const handleClick = (path) => {
+    navigate(path);
   };
 
   //แปลงวันที่
@@ -133,7 +133,7 @@ function Profile() {
                     <div className="menu-item py-2 mb-2 rounded" onClick={handleClick}>กระทู้ที่สร้าง</div>
                     <div className="menu-item py-2 mb-2 rounded">ประวัติการบริจาค</div>
                     <div className="menu-item py-2 mb-2 rounded">ประวัติการเข้าร่วมกิจกรรม</div>
-                    <div className="menu-item py-2 mb-2 rounded">ประวัติการสั่งซื้อ</div>
+                    <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile-souvenir')}>ประวัติการสั่งซื้อ</div>
                   <div className="menu-item py-2 rounded" onClick={handleLogout}>ออกจากระบบ</div>      
               </div>
             </div>

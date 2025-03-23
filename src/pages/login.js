@@ -13,6 +13,7 @@ function Login() {
     const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
     const { handleLogin } = useOutletContext();  // รับ handleLogin จาก Outlet context
+    const [profilePic, setProfilePic] = useState(null);
 
 
     const handleSubmit = async (e) => {
@@ -26,11 +27,13 @@ function Login() {
         }, {withCredentials: true });
   
         if (response.data.success) {
-           const {role, userId} = response.data;
+           const {role, userId, username, image_path } = response.data;
 
            // เก็บข้อมูลใน localStorage
-          localStorage.setItem('userRole', role);
-          localStorage.setItem('userId', userId);
+           localStorage.setItem('userRole', role);
+            localStorage.setItem('userId', userId);
+            localStorage.setItem('username', username);
+            localStorage.setItem('image_path', image_path);
          
          //เรียกใช้ handleLogin เพื่ออัปเดตข้อมูลใน AppLayout
          handleLogin(userId, role);
@@ -45,7 +48,8 @@ function Login() {
         } else if (role === 3) {
             navigate('/alumni-home');
         } else if (role === 4) {
-            navigate('/student-home');
+            // navigate('/student-home');
+            navigate('/alumni-home');
         } else {
             setErrorMessage('Unknown role. Please contact support.');
         }

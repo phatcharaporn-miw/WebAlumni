@@ -23,7 +23,7 @@ import Login from './pages/login';
 import Register from './pages/register';
 import Faq from './pages/faq';
 // import Register from './pages/test-regis';
-import AdminHome from './pages/admin/admin-home';
+import AdminHome from './pages/admin/home';
 import PresidentHome from './pages/president/president-home';
 // import ProtectedRoute from './components/ProtectedRoute';
 import AlumniHome from './pages/alumni/alumni-home';
@@ -41,61 +41,70 @@ import ActivityDetail from "./pages/activityDetail";
 import ForgotPassword from './pages/forgotPassword';
 import SouvenirCheckout from './pages/souvenir_checkout';
 import SouvenirHistory from './pages/souvenir_history';
+import AlumniProfileSouvenir from './pages/alumni/alumni-profile-souvenir';
+import Admin from './components/Admin';
+import AdminSouvenir from './pages/admin/souvenir';
+import AdminActivity from './pages/admin/admin-home';
 
-function App() { 
+
+function App() {
 
   const clientId = '766363116725-8u97fa7f736i56p1vgm3l3261f0neud2.apps.googleusercontent.com';
 
-
   return (
 
-  <GoogleOAuthProvider clientId={clientId}>  
-    <BrowserRouter>
-      <Routes>
-        <Route  element={<AppLayout />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/news" element={<News />} />
-          <Route path="/faq" element={<Faq />} />
-          <Route path="/activity" element={<Activity />} />
-          <Route path="/donate" element={<Donate />} />
-          <Route path="/donaterequest" element={<DonateRequest/>} />
-          <Route path="/donate/donatedetail/:projectId" element={<DonateDetail />} />
-          <Route path="/donatedetail" element={<DonateDetail/>} />
-          <Route path="/alumni" element={<Alumni />} />
-          <Route path="/souvenir" element={<Souvenir />} />
-          <Route path="/souvenir/souvenir_basket" element={<SouvenirBasket />} />
-          <Route path="/souvenir/checkout" element={<SouvenirCheckout />} />
-          <Route path="/souvenir/souvenir_history" element={<SouvenirHistory />} />
+    <GoogleOAuthProvider clientId={clientId}>
+      <BrowserRouter>
+        <Routes>
+          <Route element={<AppLayout />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/news" element={<News />} />
+            <Route path="/faq" element={<Faq />} />
+            <Route path="/activity" element={<Activity />} />
+            <Route path="/donate" element={<Donate />} />
+            <Route path="/donaterequest" element={<DonateRequest />} />
+            <Route path="/donate/donatedetail/:projectId" element={<DonateDetail />} />
+            <Route path="/donatedetail" element={<DonateDetail />} />
+            <Route path="/alumni" element={<Alumni />} />
+            <Route path="/souvenir" element={<Souvenir />} />
+            <Route path="/souvenir/souvenir_basket" element={<SouvenirBasket />} />
+            <Route path="/souvenir/checkout" element={<SouvenirCheckout />} />
+            {/* <Route path="/souvenir/souvenir_history" element={<SouvenirHistory />} /> */}
+            <Route path="/souvenir/souvenirDetail/:productId" element={<SouvenirDetail />} />
+            <Route path="/webboard" element={<Webboard />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/president-home" element={<PresidentHome />} />
+            <Route path="/alumni-home" element={<AlumniHome />} />
+            <Route path="/alumni-profile" element={<Profile />} />
+            <Route path="/createPost" element={<CreatePost />} />
+            <Route path="/alumni-favorite" element={<WebboardFavorite />} />
+            <Route path="/news/:newsId" element={<NewsDetail />} />
+            <Route path="/notification" element={<Notifications />} />
+            <Route path="/webboard/:categoryId" element={<Category />} />
+            <Route path="/alumni-profile-webboard" element={<AlumniProfileWebboard />} />
+            <Route path="/alumni-profile-souvenir" element={<AlumniProfileSouvenir />} />
+            <Route path="/edit-webboard/:webboardId" element={<EditWebboard />} />
+            <Route path="/activity/:activityId" element={<ActivityDetail />} />
+            <Route path="/forgotPassword" element={<ForgotPassword />} />
+          </Route>
+
+          <Route element={<Admin />}>
+          {/* <Route path="/admin-home/" element={<AdminHome />} /> */}
           
-         
-          <Route path="/souvenir/souvenirDetail/:productId" element={<SouvenirDetail />} />
-          <Route path="/webboard" element={<Webboard />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/president-home" element={<PresidentHome />} />
-          <Route path="/alumni-home" element={<AlumniHome />} />
-          <Route path="/alumni-profile" element={<Profile/>} />
-          <Route path="/createPost" element={<CreatePost/>} />
-          <Route path="/alumni-favorite" element={<WebboardFavorite/>} />
-          <Route path="/news/:newsId" element={<NewsDetail/>} />
-          <Route path="/notification" element={<Notifications/>} />
-          <Route path="/webboard/:categoryId" element={<Category/>} />
-          <Route path="/alumni-profile-webboard" element={<AlumniProfileWebboard />} />
-          <Route path="/edit-webboard/:webboardId" element={<EditWebboard />} />
-          <Route path="/activity/:activityId" element={<ActivityDetail />} />
-          <Route path="/forgotPassword" element={<ForgotPassword />} />
-          
-          {/* for admin */}
-          <Route path="/admin-home" element={<AdminHome/>} />
-          <Route path="/admin-create-activity" element={<CreateActivity/>} />
-          <Route path="/admin-create-news" element={<CreateNews/>} />
-        </Route>
-      </Routes>
-     
-    </BrowserRouter>
-  </GoogleOAuthProvider>
-  
+            <Route path="/admin-home/" element={<AdminHome />} />
+            <Route path="/admin/souvenir" element={<AdminSouvenir />} />
+            <Route path="/admin/activities" element={<AdminActivity />} />
+            <Route path="/admin/activities/admin-create-news" element={<CreateNews />} />
+            <Route path="/admin/activities/admin-create-activity" element={<CreateActivity />} />
+            
+          </Route>
+        </Routes>
+
+      </BrowserRouter>
+    </GoogleOAuthProvider>
+
   );
 }
 
