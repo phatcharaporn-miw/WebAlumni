@@ -8,12 +8,10 @@ function EditWebboard() {
     const { webboardId } = useParams();
     const navigate = useNavigate();
     const [category, setCategory] = useState([]);
-    // const [formData, setFormData] = useState(null);
-    
     const [formData, setFormData] = useState({
         title: '',
         content: '',
-        image_path:'',
+        image_path: '',
         category_id: ''
     });
 
@@ -21,12 +19,11 @@ function EditWebboard() {
     useEffect(() => {
         axios.get(`http://localhost:3001/users/webboard/${webboardId}`)
             .then((response) => {
-                // console.log("🔹 Data from API:", response.data); 
                 if (response.data.success) {
                     setFormData(response.data.data);
-                }else {
-                    alert("ไม่พบกระทู้");
-                    navigate("/alumni-profile-webboard"); // ถ้าหาไม่เจอให้กลับไปหน้ากระทู้
+                } else {
+                    Swal.fire("ไม่พบกระทู้", "กรุณาลองใหม่อีกครั้ง", "error");
+                    navigate("/alumni-profile-webboard");
                 }
             })
             .catch((error) => {
@@ -44,7 +41,7 @@ function EditWebboard() {
     const handleFileChange = (e) => {
         setFormData((prevData) => ({ ...prevData, image_path: e.target.files[0] }));
     };
-    
+
     // ฟังก์ชันส่งข้อมูลแก้ไข
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -54,43 +51,43 @@ function EditWebboard() {
         formDataToSend.append("content", formData.content);
         formDataToSend.append("category_id", formData.category_id);
         if (formData.image_path instanceof File) {
-        formDataToSend.append("image_path", formData.image_path);
+            formDataToSend.append("image_path", formData.image_path);
         }
 
         axios.put(`http://localhost:3001/users/edit-webboard/${webboardId}`, formDataToSend, {
             headers: { "Content-Type": "multipart/form-data" },
         })
-        .then((response) => {
-            if (response.data.success) {
-              Swal.fire({
-                title: "สำเร็จ!",
-                text: "แก้ไขกระทู้สำเร็จ!",
-                icon: "success",
-                confirmButtonColor: "#0F75BC",
-                confirmButtonText: "ตกลง",
-              }).then(() => {
-                navigate("/alumni-profile-webboard"); // นำทางไปยังหน้าโปรไฟล์กระทู้
-              });
-            }
-          })
-          .catch((error) => {
-            Swal.fire({
-              title: "เกิดข้อผิดพลาด!",
-              text: "ไม่สามารถแก้ไขกระทู้ได้",
-              icon: "error",
-              confirmButtonColor: "#d33",
-              confirmButtonText: "ตกลง",
+            .then((response) => {
+                if (response.data.success) {
+                    Swal.fire({
+                        title: "สำเร็จ!",
+                        text: "แก้ไขกระทู้สำเร็จ!",
+                        icon: "success",
+                        confirmButtonColor: "#0F75BC",
+                        confirmButtonText: "ตกลง",
+                    }).then(() => {
+                        navigate("/alumni-profile-webboard");
+                    });
+                }
+            })
+            .catch((error) => {
+                Swal.fire({
+                    title: "เกิดข้อผิดพลาด!",
+                    text: "ไม่สามารถแก้ไขกระทู้ได้",
+                    icon: "error",
+                    confirmButtonColor: "#d33",
+                    confirmButtonText: "ตกลง",
+                });
+                console.error("เกิดข้อผิดพลาดในการแก้ไข:", error);
             });
-            console.error("เกิดข้อผิดพลาดในการแก้ไข:", error);
-          });
     };
 
-     // ดึงcategory
-          useEffect(() => {
-            axios.get(`http://localhost:3001/category/category-all`)
+    // ดึงหมวดหมู่
+    useEffect(() => {
+        axios.get(`http://localhost:3001/category/category-all`)
             .then(response => {
                 if (response.data.success) {
-                    setCategory(response.data.data); 
+                    setCategory(response.data.data);
                 } else {
                     console.error('เกิดข้อผิดพลาดในการดึงหมวดหมู่:', response.data.message);
                 }
@@ -98,74 +95,91 @@ function EditWebboard() {
             .catch(error => {
                 console.error('เกิดข้อผิดพลาดในการดึงหมวดหมู่:', error.message);
             });
-          }, []);
-                       
-        // ตรวจสอบว่าข้อมูลโหลดครบก่อน render form
-        if (!formData.title) {
-            return <p>กำลังโหลดข้อมูล...</p>;
-        }
+    }, []);
+
+    // ตรวจสอบว่าข้อมูลโหลดครบก่อน render form
+    if (!formData.title) {
+        return <p className="text-center mt-5">กำลังโหลดข้อมูล...</p>;
+    }
 
     return (
         <div className="container mt-5">
-            <h2 className='alumni-title text-center'>กระทู้ที่สร้าง</h2>
-            <div className="col-7 bg-light rounded">
-                <form onSubmit={handleSubmit}>
-                    <div className="mb-3">
-                        <label className="form-label">หัวข้อกระทู้</label>
-                        <input
-                            type="text"
-                            className="form-control"
-                            name="title"
-                            value={formData.title}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-                    <div className="mb-3">
-                        <label className="form-label">เนื้อหากระทู้</label>
-                        <textarea
-                            className="form-control"
-                            name="content"
-                            rows="5"
-                            value={formData.content}
-                            onChange={handleChange}
-                            required
-                        ></textarea>
-                    </div>
-                    <div className="mb-3">
-                        <label className="form-label">รูปภาพ</label>
-                        <input type="file" className="form-control" onChange={handleFileChange} />
-                        {formData.image_path && (
-                            <div className="mt-2">
-                            <img src={`http://localhost:3001/${formData.image_path.replace(/^\/+/, '')}` } alt="Webboard" width="200" />
-                            </div>
-                        )}
-                    </div>
-                    <div className="mb-3">
-                        <label>เลือกหมวดหมู่ <span className="important">*</span></label>
-                        <div className="d-flex align-items-center">
-                            <select className="form-control" name="category_id" value={formData.category_id} onChange={handleChange}>
-                            <option value="">เลือกหมวดหมู่</option>
+            <div className="row justify-content-center">
+                <div className="col-lg-8">
+                    <div className="card shadow-sm border-0 rounded-4">
+                        <div className="card-header bg-primary text-white text-center rounded-top-4">
+                            <h3 className="mb-0">แก้ไขกระทู้ที่สร้าง</h3>
+                        </div>
+                        <div className="card-body">
+                            <form onSubmit={handleSubmit}>
+                                <div className="mb-3">
+                                    <label className="form-label fw-bold">หัวข้อกระทู้</label>
+                                    <input
+                                        type="text"
+                                        className="form-control w-100"
+                                        name="title"
+                                        value={formData.title}
+                                        onChange={handleChange}
+                                        required
+                                    />
+                                </div>
+                                <div className="mb-3">
+                                    <label className="form-label fw-bold">เนื้อหากระทู้</label>
+                                    <textarea
+                                        className="form-control w-100"
+                                        name="content"
+                                        rows="5"
+                                        value={formData.content}
+                                        onChange={handleChange}
+                                        required
+                                    ></textarea>
+                                </div>
+                                <div className="mb-3">
+                                    <label className="form-label fw-bold">รูปภาพ</label>
+                                    <input type="file" className="form-control w-100" onChange={handleFileChange} />
+                                    {formData.image_path && (
+                                        <div className="mt-2">
+                                            <img
+                                                src={`http://localhost:3001/${formData.image_path.replace(/^\/+/, '')}`}
+                                                alt="Webboard"
+                                                className="img-fluid rounded"
+                                                width="200"
+                                            />
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="mb-3">
+                                    <label className="form-label fw-bold">เลือกหมวดหมู่ </label>
+                                    <select
+                                        className="form-control w-100"
+                                        name="category_id"
+                                        value={formData.category_id}
+                                        onChange={handleChange}
+                                        required
+                                    >
+                                        <option value="">เลือกหมวดหมู่</option>
                                         {Array.isArray(category) && category.length > 0 ? (
-                                        category.map(category => (
-                                    <option key={category.category_id} value={category.category_id} >
-                                        {category.category_name}
-                                    </option>
-                                    ))                                  
-                                ) : (
-                                <option value="" disabled>ไม่มีหมวดหมู่</option>
-                                )}
-                                {/* <option value="add_new"><IoIosAdd/> เพิ่มหมวดหมู่...</option> */}
-                            </select>
+                                            category.map(category => (
+                                                <option key={category.category_id} value={category.category_id}>
+                                                    {category.category_name}
+                                                </option>
+                                            ))
+                                        ) : (
+                                            <option value="" disabled>ไม่มีหมวดหมู่</option>
+                                        )}
+                                    </select>
+                                </div>
+                                <div className="d-flex justify-content-end">
+                                    <button type="submit" className="btn btn-primary me-2">บันทึกการแก้ไข</button>
+                                    <button type="button" className="btn btn-secondary" onClick={() => navigate('/alumni-profile-webboard')}>
+                                        ยกเลิก
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
-                    <button type="submit" className="btn btn-primary" onClick={() => navigate('/alumni-profile-webboard')}>บันทึกการแก้ไข</button>
-                    <button type="button" className="btn btn-secondary ms-2" onClick={() => navigate('/alumni-profile-webboard')}>
-                        ยกเลิก
-                    </button>
-                </form> 
+                </div>
             </div>
-            
         </div>
     );
 }
