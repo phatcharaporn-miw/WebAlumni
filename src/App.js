@@ -48,8 +48,12 @@ import Admin from './components/Admin';
 import AdminSouvenir from './pages/admin/souvenir';
 import AdminActivity from './pages/admin/admin-home';
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 import AlumniProfileActivity from './pages/alumni/alumni-profile-activity';
 
+=======
+import SouvenirRequest from './pages/souvenir_request';
+>>>>>>> Stashed changes
 
 =======
 import SouvenirRequest from './pages/souvenir_request';

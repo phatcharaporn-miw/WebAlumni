@@ -532,7 +532,11 @@
 }
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 .souvenir-checkout-button {
+=======
+.souvenir-checkout-button{
+>>>>>>> Stashed changes
 =======
 .souvenir-checkout-button{
 >>>>>>> Stashed changes
@@ -547,7 +551,10 @@
     transition: background-color 0.3s;
 }
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
 .souvenir-checkout-button_basket{
     background-color: #f1f1f1;
     color: #0056b3;
@@ -557,6 +564,9 @@
     display: flex;
     gap: 10px;
 }
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 
 .souvenir-checkout-button:hover {
