@@ -133,7 +133,7 @@ function Profile() {
                 <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/alumni-profile-webboard')}>กระทู้ที่สร้าง</div>
                 <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/donation-history')}>ประวัติการบริจาค</div>
                 <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/alumni-profile-activity')}>ประวัติการเข้าร่วมกิจกรรม</div>
-                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/order-history')}>ประวัติการสั่งซื้อ</div>
+                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/alumni-profile-souvenir')}>ประวัติการสั่งซื้อ</div>
                 <div className="menu-item py-2 rounded" onClick={handleLogout}>ออกจากระบบ</div>
               </div>
           </div>

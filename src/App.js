@@ -25,7 +25,7 @@ import Login from './pages/login';
 import Register from './pages/register';
 import Faq from './pages/faq';
 // import Register from './pages/test-regis';
-import AdminHome from './pages/admin/admin-home';
+import AdminHome from './pages/admin/home';
 import PresidentHome from './pages/president/president-home';
 // import ProtectedRoute from './components/ProtectedRoute';
 import AlumniHome from './pages/alumni/alumni-home';
@@ -43,10 +43,15 @@ import ActivityDetail from "./pages/activityDetail";
 import ForgotPassword from './pages/forgotPassword';
 import SouvenirCheckout from './pages/souvenir_checkout';
 import SouvenirHistory from './pages/souvenir_history';
+import AlumniProfileSouvenir from './pages/alumni/alumni-profile-souvenir';
+import Admin from './components/Admin';
+import AdminSouvenir from './pages/admin/souvenir';
+import AdminActivity from './pages/admin/admin-home';
 import AlumniProfileActivity from './pages/alumni/alumni-profile-activity';
 
 
-function App() { 
+
+function App() {
 
   const clientId = '766363116725-8u97fa7f736i56p1vgm3l3261f0neud2.apps.googleusercontent.com';
 
@@ -88,12 +93,19 @@ function App() {
           <Route path="/activity/:activityId" element={<ActivityDetail />} />
           <Route path="/forgotPassword" element={<ForgotPassword />} />
           <Route path="/alumni-profile/alumni-profile-activity" element={<AlumniProfileActivity />} />
+          <Route path="/alumni-profile-souvenir" element={<AlumniProfileSouvenir />} />
      
           
-          {/* for admin */}
-          <Route path="/admin-home" element={<AdminHome/>} />
-          <Route path="/admin-create-activity" element={<CreateActivity/>} />
-          <Route path="/admin-create-news" element={<CreateNews/>} />
+          <Route element={<Admin />}>
+          {/* <Route path="/admin-home/" element={<AdminHome />} /> */}
+          
+            <Route path="/admin-home/" element={<AdminHome />} />
+            <Route path="/admin/souvenir" element={<AdminSouvenir />} />
+            <Route path="/admin/activities" element={<AdminActivity />} />
+            <Route path="/admin/activities/admin-create-news" element={<CreateNews />} />
+            <Route path="/admin/activities/admin-create-activity" element={<CreateActivity />} />
+            
+          </Route>
       </Routes>
     </BrowserRouter>
   </GoogleOAuthProvider>
