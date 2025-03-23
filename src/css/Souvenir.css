@@ -152,7 +152,7 @@
     font-weight: 600;
 }
 
-.souvenir-buy_product {
+.souvenir-buy_product,.souvenir-buy_product_basket {
     background-color: #0F75BC;
     color: #F4F7FB;
     width: 100%;
@@ -162,6 +162,12 @@
     margin: 15px 0 15px 0;
     font-size: 16px;
     transition: background-color 0.3s ease;
+}
+
+.souvenir-buy_product_basket{
+    background-color: #ffffff;
+    border: #0056b3 solid 1px;
+    color: #0056b3;
 }
 
 .souvenir-buy_product:hover {
@@ -196,6 +202,10 @@
     display: flex;
     gap: 10px;
     align-items: center;
+}
+
+.souvenir-item-name{
+    color: black;
 }
 
 .product-quantity p {
@@ -521,7 +531,7 @@
     color: #333;
 }
 
-.souvenir-checkout-button {
+.souvenir-checkout-button{
     width: 100%;
     padding: 12px;
     background-color: #007BFF;
@@ -531,6 +541,16 @@
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s;
+}
+
+.souvenir-checkout-button_basket{
+    background-color: #f1f1f1;
+    color: #0056b3;
+}
+
+.souvenir-buy_product_button{
+    display: flex;
+    gap: 10px;
 }
 
 .souvenir-checkout-button:hover {

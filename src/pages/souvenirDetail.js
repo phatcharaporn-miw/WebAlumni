@@ -42,8 +42,15 @@ function SouvenirDetail() {
     }, [productId]);
 
     const handleQuantityChange = (e) => {
-        setQuantity(e.target.value);
+        const value = e.target.value;
+        if (/^\d+$/.test(value)) {
+            let newValue = Number(value);
+            if (newValue < 1) newValue = 1;
+            if (newValue > product.stock) newValue = product.stock;
+            setQuantity(newValue);
+        }
     };
+
 
     const getRandomProducts = (products, num = 4) => {
         const filteredProducts = products.filter(product => product.product_id !== parseInt(productId));
@@ -68,19 +75,20 @@ function SouvenirDetail() {
     }
 
         const selectedItem = [
-            { 
-                product_id: product.product_id, 
-                quantity: quantity, 
-                product_name: product.product_name, 
-                price: product.price 
+            {
+                product_id: product.product_id,
+                quantity: quantity,
+                product_name: product.product_name,
+                price: product.price,
+                image:product.image
             }
         ];
-    
+
         localStorage.setItem('selectedItemsซื้อเลย', JSON.stringify(selectedItem));
-    
+
         navigate("/souvenir/checkout", { state: { selectedItems: selectedItem } });
     };
-    
+
     const handleAddToCart = (productId, quantity) => {
         if (!user_id) {
               Swal.fire({
@@ -103,22 +111,22 @@ function SouvenirDetail() {
                 user_id: user_id,
                 total: total
             })
-            .then(response => {
-                console.log(response.data);
-                setLoadingAddToCart(false);
-                // อัปเดต selectedItems เมื่อเพิ่มลงตะกร้า
-                const updatedItems = [...selectedItems, { product_id: productId, quantity: quantity }];
-                setSelectedItems(updatedItems);
-                localStorage.setItem('selectedItemsเพิ่มตะกร้า', JSON.stringify(updatedItems)); 
-            })
-            .catch(error => {
-                console.error("Error adding item to cart:", error);
-                setLoadingAddToCart(false);
-            });
+                .then(response => {
+                    console.log(response.data);
+                    setLoadingAddToCart(false);
+                    // อัปเดต selectedItems เมื่อเพิ่มลงตะกร้า
+                    const updatedItems = [...selectedItems, { product_id: productId, quantity: quantity }];
+                    setSelectedItems(updatedItems);
+                    localStorage.setItem('selectedItemsเพิ่มตะกร้า', JSON.stringify(updatedItems));
+                })
+                .catch(error => {
+                    console.error("Error adding item to cart:", error);
+                    setLoadingAddToCart(false);
+                });
         }
     };
-    
-    
+
+
     const randomProducts = getRandomProducts(otherProducts);
 
     return (
@@ -153,20 +161,16 @@ function SouvenirDetail() {
                                         สินค้าคงเหลือ {product.stock} ชิ้น
                                     </p>
                                 </div>
-                                <button
-                                    className="souvenir-buy_product"
-                                    onClick={() => handleAddToCart(product.product_id, quantity)} // ส่ง productId และ quantity
-                                    disabled={loadingAddToCart}
-                                >
-                                    {loadingAddToCart ? "กำลังโหลด..." : "เพิ่มลงตะกร้า"}
-                                </button>
-
-                                {/* <Link to={`/souvenir/souvenir_checkout`} state={{ selectedItems: [{ product_id: product.product_id, quantity: quantity }] }}>
-                                    <button className="souvenir-buy_product">สั่งซื้อสินค้า</button>
-                                </Link> */}
-
-                                <button className="souvenir-buy_product" onClick={handleBuyNow}>สั่งซื้อสินค้า</button>
-
+                                <div className="souvenir-buy_product_button">
+                                    <button
+                                        className="souvenir-buy_product_basket"
+                                        onClick={() => handleAddToCart(product.product_id, quantity)}
+                                        disabled={loadingAddToCart}
+                                    >
+                                        {loadingAddToCart ? "กำลังโหลด..." : "เพิ่มลงตะกร้า"}
+                                    </button>
+                                    <button className="souvenir-buy_product" onClick={handleBuyNow}>สั่งซื้อสินค้า</button>
+                                </div>
 
                                 <div className="description-product">
                                     <p className="souvenir-item-title-description">รายละเอียด</p>

@@ -11,7 +11,7 @@ function NavAdmin() {
 
     const handleLogout = async () => {
         const isConfirmed = window.confirm('คุณแน่ใจว่าจะออกจากระบบ?');
-        
+
         if (isConfirmed) {
             try {
                 await axios.get('http://localhost:3001/login/logout', { withCredentials: true });
@@ -33,11 +33,11 @@ function NavAdmin() {
         const userId = localStorage.getItem('userId');
         const role = localStorage.getItem('userRole');
         const username = localStorage.getItem('username');
-        const imagePath = localStorage.getItem('image_path');
+        const imagePath = localStorage.getItem('image_path');  // ดึงค่าจาก localStorage
 
         const profilePic = imagePath
-            ? `http://localhost:3001/img/${imagePath}`
-            : '/default-profile-pic.jpg';
+            ? `http://localhost:3001/img/${imagePath}` // เชื่อมต่อ URL ของรูปภาพ
+            : '/default-profile-pic.jpg'; // ถ้าไม่มีให้ใช้รูป default
 
         if (role === '1') {
             setUserInfo({
@@ -45,35 +45,32 @@ function NavAdmin() {
                 profilePic: profilePic,
             });
         } else {
-            navigate('/login'); // ถ้าไม่ใช่ admin ให้นำทางไปหน้า login
+            navigate('/login'); // ถ้าไม่ใช่ Admin ให้กลับไปที่หน้า login
         }
     }, [navigate]);
 
     return (
         <div style={navAdminStyles}>
-            <div className="card-body text-center">
+            <div className="card-body text-center" style={profileContainer}>
                 <img
-                    src={userInfo.profilePic}  // แสดงผลรูปโปรไฟล์ที่ได้จาก userInfo
+                    src={userInfo.profilePic}
                     alt="avatar"
                     className="rounded-circle img-fluid"
-                    style={{
-                        width: "150px",
-                        height: "150px",
-                        objectFit: "cover",
-                        borderRadius: "50%",
-                        border: "1px solid #fff",
-                        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-                        marginTop: "25px"
-                    }}
+                    style={profilePicStyle}
                 />
-                <h5 className="my-3">สวัสดี! {userInfo.fullName}</h5>
+                <h5 className="my-3" style={{ fontSize: '18px', fontWeight: '500' }}>
+                    สวัสดี! {userInfo.fullName}
+                </h5>
             </div>
 
             <div className="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
                 <NavLink
-                    to="/admin/dashboard"
+                    to="/admin-home"
                     className="nav-link"
-                    style={({ isActive }) => (isActive ? { ...active } : { color: "#FFFFFF" })}
+                    style={({ isActive }) => ({
+                        ...(isActive ? active : {}),
+                        color: "#FFFFFF",
+                    })}
                 >
                     Dashboard
                 </NavLink>
@@ -81,63 +78,87 @@ function NavAdmin() {
                 <NavLink
                     to="/admin/calendar"
                     className="nav-link"
-                    style={({ isActive }) => (isActive ? { ...active } : { color: "#FFFFFF" })}
+                    style={({ isActive }) => ({
+                        ...(isActive ? active : {}),
+                        color: "#FFFFFF",
+                    })}
                 >
                     ปฏิทินกิจกรรม
                 </NavLink>
                 <NavLink
                     to="/admin/activities"
                     className="nav-link"
-                    style={({ isActive }) => (isActive ? { ...active } : { color: "#FFFFFF" })}
+                    style={({ isActive }) => ({
+                        ...(isActive ? active : {}),
+                        color: "#FFFFFF",
+                    })}
                 >
                     กิจกรรมและการเข้าร่วม
                 </NavLink>
                 <NavLink
                     to="/admin/donations"
                     className="nav-link"
-                    style={({ isActive }) => (isActive ? { ...active } : { color: "#FFFFFF" })}
+                    style={({ isActive }) => ({
+                        ...(isActive ? active : {}),
+                        color: "#FFFFFF",
+                    })}
                 >
                     การบริจาคและโครงการ
                 </NavLink>
                 <NavLink
                     to="/admin/forum"
                     className="nav-link"
-                    style={({ isActive }) => (isActive ? { ...active } : { color: "#FFFFFF" })}
+                    style={({ isActive }) => ({
+                        ...(isActive ? active : {}),
+                        color: "#FFFFFF",
+                    })}
                 >
                     การจัดการเว็บบอร์ด
                 </NavLink>
                 <NavLink
                     to="/admin/news"
                     className="nav-link"
-                    style={({ isActive }) => (isActive ? { ...active } : { color: "#FFFFFF" })}
+                    style={({ isActive }) => ({
+                        ...(isActive ? active : {}),
+                        color: "#FFFFFF",
+                    })}
                 >
                     ข่าวสารและประชาสัมพันธ์
                 </NavLink>
                 <NavLink
                     to="/admin/souvenir"
                     className="nav-link"
-                    style={({ isActive }) => (isActive ? { ...active } : { color: "#FFFFFF" })}
+                    style={({ isActive }) => ({
+                        ...(isActive ? active : {}),
+                        color: "#FFFFFF",
+                    })}
                 >
                     ของที่ระลึก
                 </NavLink>
                 <NavLink
                     to="/admin/users"
                     className="nav-link"
-                    style={({ isActive }) => (isActive ? { ...active } : { color: "#FFFFFF" })}
+                    style={({ isActive }) => ({
+                        ...(isActive ? active : {}),
+                        color: "#FFFFFF",
+                    })}
                 >
                     จัดการผู้ใช้
                 </NavLink>
                 <NavLink
                     to="/admin/settings"
                     className="nav-link"
-                    style={({ isActive }) => (isActive ? { ...active } : { color: "#FFFFFF" })}
+                    style={({ isActive }) => ({
+                        ...(isActive ? active : {}),
+                        color: "#FFFFFF",
+                    })}
                 >
                     การตั้งค่า
                 </NavLink>
                 <NavLink
                     onClick={handleLogout}
                     className="nav-link"
-                    style={{ color: "#FFFFFF" }}
+                    style={navAdminButtonStyles}
                 >
                     ออกจากระบบ
                 </NavLink>
@@ -151,10 +172,50 @@ const navAdminStyles = {
     backgroundColor: "#1A8DDD",
     color: "#FFFFFF",
     padding: "15px",
+    boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
 };
 
+const profileContainer = {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: "10px"
+};
+
+const profilePicStyle = {
+    width: "120px",
+    height: "120px",
+    objectFit: "cover",
+    borderRadius: "50%",
+    border: "2px solid #fff",
+    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+    marginTop: "10px"
+};
+
+// สไตล์สำหรับการ hover และ active
 const active = {
     backgroundColor: "#0F75BC",
+    color: "#FFFFFF",
+    borderRadius: "5px",
+    fontWeight: "500",
+};
+
+const navAdminButtonStyles = {
+    color: "#FFFFFF", 
+    backgroundColor: "#FF3B30", 
+};
+
+const navLinkStyles = {
+    color: "#FFFFFF",
+    padding: "10px 20px",
+    textDecoration: "none",
+    fontWeight: "500",
+    transition: "background-color 0.3s ease, color 0.3s ease",
+};
+
+const navLinkHover = {
+    backgroundColor: "#D32F2F",
     color: "#FFFFFF",
 };
 
