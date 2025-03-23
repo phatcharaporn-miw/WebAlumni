@@ -18,7 +18,6 @@ import Souvenir from './pages/souvenir';
 import SouvenirBasket from './pages/souvenir_basket';
 import SouvenirDetail from './pages/souvenirDetail';
 import SouvenirRequest from './pages/souvenir_request';
-import SouvenirBasket from './pages/souvenir_basket';
 import Webboard from './pages/webboard';
 import Alumni from './pages/alumni';
 import Login from './pages/login';
@@ -47,17 +46,8 @@ import AlumniProfileSouvenir from './pages/alumni/alumni-profile-souvenir';
 import Admin from './components/Admin';
 import AdminSouvenir from './pages/admin/souvenir';
 import AdminActivity from './pages/admin/admin-home';
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
 import AlumniProfileActivity from './pages/alumni/alumni-profile-activity';
 
-=======
-import SouvenirRequest from './pages/souvenir_request';
->>>>>>> Stashed changes
-
-=======
-import SouvenirRequest from './pages/souvenir_request';
->>>>>>> Stashed changes
 
 function App() {
 
