@@ -3,6 +3,7 @@ import "../css/Souvenir.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Link, useParams } from "react-router-dom";
+import Swal from "sweetalert2";
 
 function SouvenirDetail() {
     const { productId } = useParams();
@@ -51,6 +52,21 @@ function SouvenirDetail() {
     };
 
     const handleBuyNow = () => {
+        
+        // const userId = localStorage.getItem('userId'); 
+        
+       if (!user_id) {
+        Swal.fire({
+                title: "กรุณาเข้าสู่ระบบ",
+                text: "คุณต้องเข้าสู่ระบบก่อนเพิ่มสินค้า",
+                icon: "warning",
+                confirmButtonText: "เข้าสู่ระบบ"
+              }).then(() => {
+                navigate("/login");
+              });
+      return;
+    }
+
         const selectedItem = [
             { 
                 product_id: product.product_id, 
@@ -66,6 +82,18 @@ function SouvenirDetail() {
     };
     
     const handleAddToCart = (productId, quantity) => {
+        if (!user_id) {
+              Swal.fire({
+                        title: "กรุณาเข้าสู่ระบบ",
+                        text: "คุณต้องเข้าสู่ระบบก่อนสั่งซื้อสินค้า",
+                        icon: "warning",
+                        confirmButtonText: "เข้าสู่ระบบ"
+                      }).then(() => {
+                        navigate("/login");
+                      });
+              return;
+        }
+
         if (product) {
             const total = product.price * quantity;
             setLoadingAddToCart(true);

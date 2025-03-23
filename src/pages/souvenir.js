@@ -12,20 +12,18 @@ function Souvenir() {
         axios
             .get("http://localhost:3001/souvenir")
             .then((response) => {
-                // console.log(response.data);
                 setProducts(response.data);
             })
             .catch((error) => {
                 console.error("เกิดข้อผิดพลาดในการดึงข้อมูล:", error);
             });
     }, []);
-    console.log("Products state:", products);
 
     return (
         <>
             <div className="souvenir-top">
                 <div className="souvenir-bt">
-                    <Link to={`/souvenir_request`}>
+                    <Link to={`/souvenir/souvenir_request`}>
                         <button className="souvenir-bt-add"><IoIosAddCircleOutline />เพิ่มของที่ระลึก</button>
                     </Link>
                 </div>

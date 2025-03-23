@@ -360,24 +360,25 @@
   color: #333;
 }
 
+
 .cart-container {
   position: relative;
+  display: inline-block;
 }
 
 .cart-icon {
   font-size: 24px;
-  cursor: pointer;
+  color: #333;
 }
 
 .cart-count {
   position: absolute;
-  top: -5px;
+  top: -8px;
   right: -10px;
   background-color: red;
   color: white;
-  border-radius: 50%;
-  padding: 2px 6px;
   font-size: 12px;
   font-weight: bold;
+  padding: 4px 7px;
+  border-radius: 50%;
 }
-

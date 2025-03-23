@@ -418,7 +418,7 @@ function Home() {
           </div>
             
             <div className="text">
-              <button className="btn btn-primary">ดูทั้งหมด</button>
+              <a href={`/webboard`} className="btn btn-primary">ดูทั้งหมด</a>
             </div>                             
           </div>        
         </div>

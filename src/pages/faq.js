@@ -72,7 +72,7 @@ function FAQ() {
 
     return (
         <div className="faq_content">
-            <h2 className="title-faq">FAQ’s</h2>
+            <h3 className="faq-title">คำถามที่พบบ่อย</h3>
             {faqCategories.map((category, catIndex) => (
                 <div className="faq_content_item_div" key={catIndex}>
                     <p className="faq_content_item_title">{category.title}</p>

@@ -15,10 +15,8 @@ import DonateRequest from './pages/donate-request';
 import DonateDetail from './pages/donate-detail';
 // import AdminDonate from './pages/admin/donate';
 import Souvenir from './pages/souvenir';
-import SouvenirBasket from './pages/souvenir_basket';
 import SouvenirDetail from './pages/souvenirDetail';
 import SouvenirRequest from './pages/souvenir_request';
-import SouvenirBasket from './pages/souvenir_basket';
 import Webboard from './pages/webboard';
 import Alumni from './pages/alumni';
 import Login from './pages/login';
@@ -44,6 +42,7 @@ import ForgotPassword from './pages/forgotPassword';
 import SouvenirCheckout from './pages/souvenir_checkout';
 import SouvenirHistory from './pages/souvenir_history';
 import AlumniProfileActivity from './pages/alumni/alumni-profile-activity';
+import SouvenirBasket from './pages/souvenir_basket';
 
 
 function App() { 
@@ -55,7 +54,7 @@ function App() {
   <GoogleOAuthProvider clientId={clientId}>  
     <BrowserRouter>
       <Routes>
-        <Route  element={<AppLayout />} />
+        <Route  element={<AppLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/news" element={<News />} />
@@ -70,7 +69,7 @@ function App() {
           <Route path="/souvenir/souvenir_basket" element={<SouvenirBasket />} />
           <Route path="/souvenir/checkout" element={<SouvenirCheckout />} />
           <Route path="/souvenir/souvenir_history" element={<SouvenirHistory />} />
-          <Route path="/souvenir_request" element={<SouvenirRequest />} />
+          <Route path="/souvenir/souvenir_request" element={<SouvenirRequest />} />
           <Route path="/souvenir/souvenirDetail/:productId" element={<SouvenirDetail />} />
           <Route path="/webboard" element={<Webboard />} />
           <Route path="/login" element={<Login />} />
@@ -84,16 +83,17 @@ function App() {
           <Route path="/notification" element={<Notifications/>} />
           <Route path="/webboard/:categoryId" element={<Category/>} />
           <Route path="/alumni-profile/alumni-profile-webboard" element={<AlumniProfileWebboard />} />
-          <Route path="/edit-webboard/:webboardId" element={<EditWebboard />} />
+          <Route path="/alumni-profile/alumni-profile-webboard/edit-webboard/:webboardId" element={<EditWebboard />} />
           <Route path="/activity/:activityId" element={<ActivityDetail />} />
           <Route path="/forgotPassword" element={<ForgotPassword />} />
           <Route path="/alumni-profile/alumni-profile-activity" element={<AlumniProfileActivity />} />
      
           
           {/* for admin */}
-          <Route path="/admin-home" element={<AdminHome/>} />
+          {/* <Route path="/admin-home" element={<AdminHome/>} />
           <Route path="/admin-create-activity" element={<CreateActivity/>} />
-          <Route path="/admin-create-news" element={<CreateNews/>} />
+          <Route path="/admin-create-news" element={<CreateNews/>} /> */}
+        </Route>
       </Routes>
     </BrowserRouter>
   </GoogleOAuthProvider>

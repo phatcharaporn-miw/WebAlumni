@@ -154,6 +154,7 @@ function Webboard(){
                   : "ไม่ระบุวันที่"
               }))
               });
+              
               setModalIsOpen(true);
             } else {
               console.error("ไม่สามารถโหลดกระทู้ได้");

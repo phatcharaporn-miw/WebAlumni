@@ -7,8 +7,8 @@
   display: flex;
   flex-wrap: wrap;
   padding: 10px 15px;
+  margin-top: 15px;
   list-style: none;
-  /* background-color: #f8f9fa; */
 }
 
 .breadcrumb-item {
@@ -17,7 +17,6 @@
 }
 
 .breadcrumb-item + .breadcrumb-item::before {
-  /* content: ">"; */
   color: #6c757d; 
   padding: 0 5px;
 }

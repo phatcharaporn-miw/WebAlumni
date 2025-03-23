@@ -140,13 +140,13 @@
     color: #9c9b9b;
 }
 
-.content {
+/* .content {
     padding: 10px;
     height: 40%;
     display: flex;
     flex-direction: column;
     justify-content: center;
-}
+} */
 
 .item-detail:hover {
     transform: translateY(-5px);

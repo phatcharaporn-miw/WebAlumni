@@ -60,7 +60,7 @@ function AlumniProfileWebboard() {
     });
 
     const handleEdit = (webboardId) => {
-        navigate(`/edit-webboard/${webboardId}`);
+        navigate(`/alumni-profile/alumni-profile-webboard/edit-webboard/${webboardId}`);
     };
 
     const handleDelete = (webboardId) => {

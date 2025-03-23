@@ -1,4 +1,5 @@
 import React, { useState, useEffect} from "react";
+import { useNavigate } from 'react-router-dom';
 import "../css/Header.css";
 import 'bootstrap/dist/css/bootstrap.min.css'; 
 import { SlMagnifier } from "react-icons/sl";
@@ -7,6 +8,7 @@ import { SlBasket } from "react-icons/sl";
 import {  NavLink } from "react-router-dom";
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { FaTrash } from "react-icons/fa";
+import Swal from "sweetalert2";
 
 import axios from "axios";
 
@@ -20,7 +22,8 @@ function Header({user}) {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
+  const userId = localStorage.getItem('userId');
+  const navigate = useNavigate();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -77,7 +80,6 @@ function Header({user}) {
 
   // แจ้งเตือนเมื่อมีการกดใจกระทู้
   const handleLikePost = (postId) => {
-
     axios.post(`http://localhost:3001/webboard/${postId}/favorite`, {})
         .then((response) => {
             console.log("Response from Backend:", response.data);
@@ -122,6 +124,58 @@ function Header({user}) {
   const handleDropdownClick = (event) => {
   event.stopPropagation(); 
   };
+
+  //เพิ่มสินค้าลงในตะกร้า
+  const addToCart = (productId, quantity, total) => {
+    if (!userId) {
+      Swal.fire({
+                title: "กรุณาเข้าสู่ระบบ",
+                text: "คุณต้องเข้าสู่ระบบก่อนเพิ่มสินค้า",
+                icon: "warning",
+                confirmButtonText: "เข้าสู่ระบบ"
+              }).then(() => {
+                navigate("/login");
+              });
+      return;
+    }
+  
+    axios.post("http://localhost:3001/souvenir/cart/add", { 
+      user_id: userId,
+      product_id: productId,
+      quantity: quantity,
+      total: total
+    })
+    .then((response) => {
+      alert(response.data.message);
+      if (response.data.updateCart) {
+        // อัปเดตข้อมูลตะกร้า
+        getCartCount(userId); 
+      }
+    })
+    .catch((error) => {
+      console.error("เกิดข้อผิดพลาดในการเพิ่มสินค้าลงในตะกร้า:", error);
+    });
+  };
+
+  //ดึงข้อมูลสินค้าในตะกร้า
+  const getCartCount = (userId) => {
+    if (!userId) return; 
+
+    axios.get(`http://localhost:3001/souvenir/cart/count?user_id=${userId}`, {
+      headers: { "Cache-Control": "no-cache" }
+    })
+    .then(response => {
+        setCartCount(response.data.cartCount || 0);
+    })
+    .catch(error => console.error("Error fetching cart count:", error));
+  };
+
+  // ดึงข้อมูลจำนวนสินค้าตะกร้า
+  useEffect(() => {
+    if (userId) {
+      getCartCount(userId);
+    }
+  }, [userId]);
 
   // การค้นหา
   const handleSearchChange = (e) => {
