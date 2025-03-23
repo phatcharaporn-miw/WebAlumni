@@ -238,7 +238,7 @@ function Souvenir() {
                         <div id="modal-description">
                             <form>
                                 <div>
-                                    <label>ชื่อสินค้า</label><br />
+                                    <label className="name_product">ชื่อสินค้า</label><br />
                                     <input
                                         type="text"
                                         value={selectedProduct.product_name}

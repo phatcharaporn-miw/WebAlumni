@@ -47,9 +47,13 @@ import AlumniProfileSouvenir from './pages/alumni/alumni-profile-souvenir';
 import Admin from './components/Admin';
 import AdminSouvenir from './pages/admin/souvenir';
 import AdminActivity from './pages/admin/admin-home';
+<<<<<<< Updated upstream
 import AlumniProfileActivity from './pages/alumni/alumni-profile-activity';
 
 
+=======
+import SouvenirRequest from './pages/souvenir_request';
+>>>>>>> Stashed changes
 
 function App() {
 
@@ -104,7 +108,7 @@ function App() {
             <Route path="/admin/activities" element={<AdminActivity />} />
             <Route path="/admin/activities/admin-create-news" element={<CreateNews />} />
             <Route path="/admin/activities/admin-create-activity" element={<CreateActivity />} />
-            
+            <Route path="/admin/souvenir/souvenir_request" element={<SouvenirRequest />} />
           </Route>
       </Routes>
     </BrowserRouter>
