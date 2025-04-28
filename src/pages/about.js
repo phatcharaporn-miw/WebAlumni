@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import "../css/about.css"
@@ -8,64 +8,43 @@ import { IoMdCall } from "react-icons/io";
 import { MdEmail } from "react-icons/md";
 
 function About(){
-    // const [profile, setProfile] = useState([]);
-
-    // useEffect(()=>{
-    //     const fetchProfile = async () => {
-    //         try {
-    //             const response = await axios.get("http://localhost:3001/show/about");
-    //             if (response.data.success) {
-    //               setProfile(response.data.data);
-    //             }else{
-    //                 console.error("fial to fetch user:", response.data.message);
-    //             }
-    //         } catch (error) {
-    //             console.error("Error fetching users:", error);
-    //         }
-    //     };
-    //     fetchProfile();
-    // }, []);
-
-    // return(
-    //   <section className="container">
-    //     <div className="about-page">
-    //     <h3 className="about-title">ประวัติความเป็นมา</h3>
-    //   <ul>
-    //     {profile.map((profile) => (
-    //       <li key={profile.id}>
-    //         {profile.title},
-    //         {profile.full_name},
-    //         {profile.address},
-    //         {profile.email},
-           
-    //       </li>
-    //     ))}
-    //   </ul>
-    // </div>
-    //   </section>
-        
-    // );
+    
     return(
         <section className="container">
           <div className="about-page">
-            <h3 className="about-title">ประวัติความเป็นมา</h3>
-            <div class="card mb-3">
-                <div class="row g-0">
-                    <div class="col-md-4">
-                    <img src="/image/about_cp.jpg" class="img-fluid rounded-start" alt="..."/>
-                    </div>
-                    <div class="col">
-                        <div class="card-body">
-                          <h5 class="card-title">สมาคมศิษย์เก่ามหาวิทยาลัยขอนแก่น</h5>
-                          <p class="card-text">   Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-                             Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer
-                              took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, 
-                              but also the leap into electronic typesetting, remaining essentially unchanged</p>
-                              <button className="login-btn">ประวัติความเป็นมา</button>
-                        </div>
-                      </div>
-                </div>
-            </div>
+          <h3 id="head-text" className="text-center mb-4">เกี่ยวกับสมาคม</h3>
+        <div className="card shadow-lg border-0 text-center">
+          <img
+            src="/image/about_cp.jpg"
+            className="img-fluid rounded-top w-100"
+            alt="ภาพสมาคม"
+            style={{ maxHeight: "400px", objectFit: "cover" }}
+          />
+          <div className="card-body">
+            <h4 className="card-title fw-bold text-primary">
+              สมาคมศิษย์เก่าวิทยาลัยการคอมพิวเตอร์ มหาวิทยาลัยขอนแก่น
+            </h4>
+            <p className="card-text text-muted">
+              สมาคมศิษย์เก่ามหาวิทยาลัยขอนแก่นก่อตั้งขึ้นเพื่อเสริมสร้างเครือข่ายและความร่วมมือระหว่างศิษย์เก่า
+              ศิษย์ปัจจุบัน และคณาจารย์ รวมถึงสนับสนุนการพัฒนาด้านเทคโนโลยีสารสนเทศ
+              ส่งเสริมโอกาสทางอาชีพ และให้การสนับสนุนแก่ศิษย์ปัจจุบันในการศึกษาวิจัยและนวัตกรรม
+            </p>
+
+            <h5 className="mt-4 text-dark fw-bold">วิสัยทัศน์</h5>
+            <p className="text-secondary">
+              <b>"เชื่อมโยงศิษย์เก่า ก้าวทันเทคโนโลยี สนับสนุนสังคมดิจิทัล"</b>
+            </p>
+
+            <h5 className="mt-4 text-dark fw-bold">พันธกิจของสมาคม</h5>
+            <ul className="list-group list-group-flush text-start">
+              <li className="list-group-item">สร้างเครือข่ายศิษย์เก่าเพื่อส่งเสริมความร่วมมือด้านอาชีพ</li>
+              <li className="list-group-item">สนับสนุนกิจกรรมวิชาการและการวิจัยทางคอมพิวเตอร์</li>
+              <li className="list-group-item">ส่งเสริมโอกาสด้านอาชีพและการประกอบธุรกิจของศิษย์เก่า</li>
+              <li className="list-group-item">ให้ทุนสนับสนุนการศึกษาและพัฒนาศิษย์ปัจจุบัน</li>
+              <li className="list-group-item">จัดกิจกรรมพิเศษ เช่น งานคืนสู่เหย้า และ Tech Talk</li>
+            </ul>
+          </div>
+        </div>
 
             {/* ส่วนของบุคลกรที่เกี่ยวข้อง */}
             <h3 className="about-title">บุคลากรที่เกี่ยวข้อง</h3>
@@ -73,7 +52,7 @@ function About(){
                 <div className="row" id="person-card">
                     <div className="col-sm-6 col-md-4 col-lg-3 mb-4">
                         <div className="card">
-                            <img src="" className="card-img-top" alt="บุคลากร" />
+                            <img src="/image/profile-picture.png" className="card-img-top" alt="บุคลากร" />
                             <div className="card-body">
                                 <h5 className="card-title">นางสาวพัชราพร นิลพงษ์</h5>
                                 <p className="card-text">นายกสมาคมศิษย์เก่าวิทยาลัยการคอมพิวเตอร์</p>
@@ -85,7 +64,7 @@ function About(){
                 <div className="row" id="person-card">
                     <div className="col-sm-6 col-md-4 col-lg-3 mb-4">
                     <div className="card">
-                            <img src="" className="card-img-top" alt="บุคลากร" />
+                            <img src="/image/profile-picture.png" className="card-img-top" alt="บุคลากร" />
                             <div className="card-body">
                                 <h5 className="card-title">ชื่อ</h5>
                                 <p className="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
@@ -94,7 +73,7 @@ function About(){
                     </div>
                     <div className="col-sm-6 col-md-4 col-lg-3 mb-4">
                     <div className="card">
-                            <img src="" className="card-img-top" alt="บุคลากร" />
+                            <img src="/image/profile-picture.png" className="card-img-top" alt="บุคลากร" />
                             <div className="card-body">
                                 <h5 className="card-title">ชื่อ</h5>
                                 <p className="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
@@ -103,7 +82,7 @@ function About(){
                     </div>
                     <div className="col-sm-6 col-md-4 col-lg-3 mb-4">
                     <div className="card">
-                            <img src="" className="card-img-top" alt="บุคลากร" />
+                            <img src="/image/profile-picture.png" className="card-img-top" alt="บุคลากร" />
                             <div className="card-body">
                                 <h5 className="card-title">ชื่อ</h5>
                                 <p className="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>

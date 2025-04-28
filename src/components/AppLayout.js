@@ -10,10 +10,12 @@ import Swal from "sweetalert2";
 function AppLayout() {
     const [user, setUser] = useState(null);
     const [notifications, setNotifications] = useState(0);
+    const image_path = localStorage.getItem("image_path");
+    const username = localStorage.getItem("username");
     const location = useLocation();
     const navigate = useNavigate();
 
-    const hideHeaderPaths = ["/login","/register", "/forgotPassword"];
+    const hideHeaderPaths = ["/login","/register", "/forgotPassword",];
     const shouldHideHeader = hideHeaderPaths.includes(location.pathname);
     const shouldHideFooter = hideHeaderPaths.includes(location.pathname);
 
@@ -33,24 +35,46 @@ function AppLayout() {
       students: ["/student-home"]
     };
     
-    useEffect(() => {
-      const userId = localStorage.getItem('userId');
-      const role = localStorage.getItem('userRole');
+    // useEffect(() => {
+    //   const userId = localStorage.getItem('userId');
+    //   const role = localStorage.getItem('userRole');
       
-      if (userId && role) {
-        setUser({userId, role});
-        setNotifications(3); 
-      }else {
-        setUser(null); // รีเซ็ต user เมื่อ logout
-      }
+    //   if (userId && role) {
+    //     setUser({ userId, role });
+    //     navigate('/alumni-home');
+    //   } else {
+    //       setUser(null);
+    //   }
+    // }, []);
+
+    useEffect(() => {
+      const updateUser = () => {
+        const userId = localStorage.getItem("userId");
+        const role = localStorage.getItem("userRole");
+    
+        if (userId && role) {
+          setUser({ userId, role });
+          navigate('/alumni-home');
+        } else {
+          setUser(null);
+        }
+      };
+    
+      updateUser(); // อัปเดตเมื่อโหลดหน้า
+      window.addEventListener("storage", updateUser); // ตรวจจับการเปลี่ยนแปลงของ localStorage
+    
+      return () => {
+        window.removeEventListener("storage", updateUser);
+      };
     }, []);
+    
   
     // เช็คเมื่อมีการล็อกอินและเปลี่ยนข้อมูลใน localStorage
   const handleLogin = (userId, role) => {
     localStorage.setItem('userId', userId);
     localStorage.setItem('userRole', role);
     setUser({ userId, role});
-    setNotifications(3);  
+    // setNotifications(3);  
   };
 
   const handleLogout = () => {
@@ -62,6 +86,8 @@ function AppLayout() {
                  
                  localStorage.removeItem('userId');
                  localStorage.removeItem('userRole');
+                 localStorage.removeItem('image_path');
+                 localStorage.removeItem('username');
 
                 setUser(null); // รีเซ็ต user เป็น null
                 navigate('/')

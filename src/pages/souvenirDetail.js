@@ -65,7 +65,7 @@ function SouvenirDetail() {
        if (!user_id) {
         Swal.fire({
                 title: "กรุณาเข้าสู่ระบบ",
-                text: "คุณต้องเข้าสู่ระบบก่อนเพิ่มสินค้า",
+                text: "คุณต้องเข้าสู่ระบบก่อนสั่งซื้อสินค้า",
                 icon: "warning",
                 confirmButtonText: "เข้าสู่ระบบ"
               }).then(() => {
@@ -93,7 +93,7 @@ function SouvenirDetail() {
         if (!user_id) {
               Swal.fire({
                         title: "กรุณาเข้าสู่ระบบ",
-                        text: "คุณต้องเข้าสู่ระบบก่อนสั่งซื้อสินค้า",
+                        text: "คุณต้องเข้าสู่ระบบก่อนเพิ่มสินค้า",
                         icon: "warning",
                         confirmButtonText: "เข้าสู่ระบบ"
                       }).then(() => {

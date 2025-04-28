@@ -10,8 +10,7 @@
   }
 
   .card-homeweb {
-    max-height: 300px;
-    max-width: 80%; 
+    height: 270px; 
     overflow: hidden;
     margin-bottom: 5%;
     background-color: #fff;
@@ -22,6 +21,10 @@
     margin: 40px;
     color: #0F75BC;
     font-weight: bold;
+  }
+
+  .activity-title{
+    color: #0F75BC;
   }
   
   .card {
@@ -56,46 +59,62 @@
   margin-bottom: 20px;
 }
 
-
-.news-item {
-  background-color: #fff;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  padding: 15px;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  align-items: center;
+.news-text ,.web-text{
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 15px;
+  line-height: 1.5;
 }
 
 
-.news-date {
+.act-home-item {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.act-name{
+ font-size: 15px;
+}
+
+.act-text {
+  font-size: 13px;
+}
+
+.act-date {
   background-color: #0F75BC;
   color: #fff;
   padding: 10px 15px;
   border-radius: 8px;
-  min-width: 80px;
-}
-
-.news-date .day {
-  font-size: 1.8rem;
+  width: 120px;
   font-weight: bold;
-  line-height: 1;
 }
 
-.news-date .month-year {
-  font-size: 0.8rem;
-  line-height: 1.2;
+/* ตกแต่งปุ่ม "อ่านเพิ่มเติม" */
+.btn-news-home {
+  background-color: #007bff; /* สีพื้นหลังของปุ่ม */
+  color: white; /* สีข้อความของปุ่ม */
+  padding: 10px 20px; /* เพิ่มระยะห่างภายในปุ่ม */
+  border: none; /* เอาขอบปุ่มออก */
+  border-radius: 5px; /* ทำให้มุมปุ่มโค้ง */
+  font-size: 16px; /* ขนาดตัวอักษร */
+  font-weight: 600; /* ทำให้ข้อความหนา */
+  transition: background-color 0.3s ease, transform 0.2s ease; /* เพิ่มการเปลี่ยนสีและ effect เมื่อ hover */
+  cursor: pointer; /* แสดง cursor เป็น pointer เมื่อ hover */
 }
 
-.news-content h5 {
-  font-weight: bold;
-  color: #333;
-  margin: 0;
-  font-size: 1.2rem;
+.btn-news-home:hover {
+  background-color: #0056b3; /* เปลี่ยนสีพื้นหลังเมื่อ hover */
+  transform: translateY(-2px); /* ทำให้ปุ่มยกขึ้นเมื่อ hover */
 }
 
-.news-content p {
-  color: #666;
-  margin-top: 5px;
-  font-size: 0.9rem;
+.btn-news-home:active {
+  background-color: #004085; /* เปลี่ยนสีพื้นหลังเมื่อคลิก */
+  transform: translateY(1px); /* ให้ปุ่มดูเหมือนกดลงไป */
 }
+
+.btn-news-home:focus {
+  outline: none; /* เอาขอบ focus ออก */
+}
+

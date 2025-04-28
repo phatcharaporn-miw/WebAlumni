@@ -1,14 +1,19 @@
 .request-souvenir-form {
-    width: 80%;
+    max-width: 850px;
     margin: 0 auto;
+    margin-bottom: 4%;
     padding: 20px;
     background-color: #f9f9f9;
     border-radius: 8px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* สไตล์ของ input และ textarea */
-/* input[type="text"], textarea, input[type="file"] {
+.data-requestSouvenir-title{
+    color: #085A9C;
+    font-size: 20px;
+    font-weight: bold;
+}
+.data-requestSouvenir-input {
     width: 100%;
     padding: 10px;
     margin: 10px 0;
@@ -16,59 +21,49 @@
     border-radius: 4px;
     font-size: 16px;
     box-sizing: border-box;
-} */
-
-textarea {
-    resize: vertical;
 }
 
-h3 {
-    text-align: center;
-    margin-bottom: 20px;
-}
 
 .data-requestSouvenir, .payment-info {
     margin-bottom: 30px;
 }
 
-/* ส่วนที่ใช้สำหรับการจัดกลุ่มและแยกข้อมูล */
 .data-requestSouvenirdiv, .payment-info div {
     margin-bottom: 15px;
 }
 
-/* ป้ายชื่อ (label) */
 label {
     font-weight: bold;
     margin-bottom: 5px;
-    display: block;
 }
 
-/* เพิ่มสไตล์สำหรับปุ่ม */
 .group-souvenir-bt {
     display: flex;
-    justify-content: space-between;
+    gap: 10px;
+    /* justify-content: space-between; */
     margin-top: 20px;
 }
 
 .button-souvenirRequest, .cancle-button-souvenirRequest {
     padding: 10px 20px;
+    width: 400px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     font-size: 16px;
 }
 
+
 .button-souvenirRequest {
-    background-color: #4CAF50;
+    background-color: #085A9C;
     color: white;
 }
 
 .cancle-button-souvenirRequest {
-    background-color: #f44336;
-    color: white;
+    border: #085A9C solid 1px ;
+    color: #085A9C;
 }
 
-/* สไตล์สำหรับ modal */
 .MuiModal-root {
     display: flex;
     align-items: center;
@@ -83,7 +78,6 @@ label {
     box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
 }
 
-/* ปรับขนาดของปุ่มใน modal */
 .MuiButton-root {
     margin-top: 15px;
 }

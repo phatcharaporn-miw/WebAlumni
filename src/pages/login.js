@@ -11,10 +11,25 @@ function Login() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
+    const [passwordError, setPasswordError] = useState('');
     const navigate = useNavigate();
     const { handleLogin } = useOutletContext();  // รับ handleLogin จาก Outlet context
-    const [profilePic, setProfilePic] = useState(null);
 
+    const validatePassword = (password) => {
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]+$/;
+      return passwordRegex.test(password);
+    };
+  
+    const handlePasswordChange = (e) => {
+      const value = e.target.value;
+      setPassword(value);
+  
+      if (!validatePassword(value)) {
+        setPasswordError('รหัสผ่านต้องมีอักขระพิมพ์ใหญ่ พิมพ์เล็ก และตัวเลข และห้ามใช้อักขระพิเศษ');
+      } else {
+        setPasswordError('');
+      }
+    };
 
     const handleSubmit = async (e) => {
       e.preventDefault();
@@ -82,6 +97,7 @@ function Login() {
                         <p>
                             <label>รหัสผ่าน<span className="important">*</span></label><br />
                             <input placeholder="รหัสผ่าน" type="password" value={password} onChange={(e)=>setPassword(e.target.value)} required/>
+                            {passwordError && <span className="error-message">{passwordError}</span>}
                         </p>
                         <div className="fn-login">
                             <Link to="/register"><p className="regist">สมัครสมาชิก</p></Link>

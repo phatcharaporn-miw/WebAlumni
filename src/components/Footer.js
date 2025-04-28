@@ -14,8 +14,10 @@ function Footer(){
             <div className="row">
                 <div className="col-md-3">
                 <img className="footer-logo" src="/image/logoCP1.png" alt="College of Computing Logo"/>
-                <p id="foot-text"> Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem 
-                    Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type  </p>
+                <p id="foot-text" className="text-start "> 
+                สมาคมศิษย์เก่ามหาวิทยาลัยขอนแก่นก่อตั้งขึ้นเพื่อเสริมสร้างเครือข่ายและความร่วมมือระหว่างศิษย์เก่า ศิษย์ปัจจุบัน และคณาจารย์ 
+                รวมถึงสนับสนุนการพัฒนาด้านเทคโนโลยีสารสนเทศ ส่งเสริมโอกาสทางอาชีพ และให้การสนับสนุนแก่ศิษย์ปัจจุบันในการศึกษาวิจัยและนวัตกรรม
+                </p>
                 </div>
                 <div className="col-md-3">
                     <h4>ข่าวสาร</h4>

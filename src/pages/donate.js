@@ -44,7 +44,7 @@ function Donate() {
             {/* <button className="donate-button">บริจาค</button> */}
             <div className="content-donate">
                 <div className="donate-request">
-                    <Link to={`/donaterequest`}>
+                    <Link to={`/donate/donaterequest`}>
                         <button className="donate-bt">สร้างการบริจาค</button>
                     </Link>
                 </div>

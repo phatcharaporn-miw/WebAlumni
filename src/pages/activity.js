@@ -15,6 +15,7 @@ function Activity(){
     const [sortOrder, setSortOrder] = useState("latest");
     const [selectedStatus, setSelectedStatus] = useState('activity');
     const [showForm, setShowForm] = useState(false);
+    const userRole = localStorage.getItem("userRole");  
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         full_name: "",
@@ -22,6 +23,8 @@ function Activity(){
         phone: "",
         batch_year: "",
         department: "",
+        education_level: "",
+        year_level: " ",
         activity_id: null,
     });
 
@@ -35,15 +38,20 @@ function Activity(){
     useEffect(() => {
         axios.get('http://localhost:3001/activity/all-activity')
           .then(response => {
-            setActivity(response.data);
+            setActivity(response.data.data);
           })
           .catch(error => {
             console.error("Error fetching activities:", error);
           });
+
       }, []);
 
     const handleStatusChange = (e) => {
     setSelectedStatus(e.target.value);
+    };
+
+    const handleViewDetails = (activityId) => {
+        navigate(`/activity/${activityId}`); // เปลี่ยนเส้นทางไปยังหน้า activity detail
     };
 
     const filteredActivity = activity.filter(activity => {
@@ -82,6 +90,7 @@ function Activity(){
             });
             return;
         }
+
 
         // console.log("Form Data:", formData); 
 
@@ -133,7 +142,7 @@ function Activity(){
     
 
     const formatDate = (dateStr) => {
-        if (!dateStr || dateStr === "0000-00-00") return "ไม่ระบุวันที่"; // กรณีไม่มีวันที่
+        if (!dateStr || dateStr === "0000-00-00") return "ไม่ระบุวันที่";
         const date = new Date(dateStr);
         const day = date.getDate();
         const month = date.toLocaleString('default', { month: 'long' });
@@ -169,24 +178,28 @@ function Activity(){
 
             <div className="container">
                 <div className="row">
-                    {filteredActivity.map(activity => (
-                    <div className="col-md-4 mb-5" key={activity.activity_id}>
+                    {filteredActivity.length > 0 ? (
+                    filteredActivity.map(activity => (
+                        <div className="col-md-4 mb-5" key={activity.activity_id}>
                         <div className="card activity-card">
-                        <div className="image-container">
-                        <img src={activity.image_path ? `http://localhost:3001${activity.image_path}` : "/default-image.png"} className="card-img-top" alt="กิจกรรม" />
-                        <div className={`status-badge ${getStatusClass(activity.status)}`}>
-                        {activity?.status === 0 ? "กำลังจะจัดขึ้น" :
-                        activity?.status === 1 ? "เสร็จสิ้นแล้ว" :
-                        activity?.status === 2 ? "กำลังดำเนินการ" : "ไม่ทราบสถานะ"}
-                        </div>
-                         
-                        </div>
-                        <div className="card-body">
+                            <div className="image-container">
+                            <img 
+                                src={activity.image_path ? `http://localhost:3001${activity.image_path}` : "/default-image.png"} 
+                                className="card-img-top" 
+                                alt="กิจกรรม" 
+                            />
+                            <div className={`status-badge ${getStatusClass(activity.status)}`}>
+                                {activity?.status === 0 ? "กำลังจะจัดขึ้น" :
+                                activity?.status === 1 ? "เสร็จสิ้นแล้ว" :
+                                activity?.status === 2 ? "กำลังดำเนินการ" : "ไม่ทราบสถานะ"}
+                            </div>
+                            </div>
+                            <div className="card-body">
                             <h5 className="card-title">{activity.activity_name}</h5>
                             {activity.check_alumni === 1 && (
                                 <div className="alert alert-warning d-flex align-items-center" role="alert">
-                                    <i className="me-2 bi bi-exclamation-circle-fill"></i>
-                                    กิจกรรมนี้สำหรับศิษย์เก่า
+                                <i className="me-2 bi bi-exclamation-circle-fill"></i>
+                                กิจกรรมนี้สำหรับศิษย์เก่า
                                 </div>
                             )}
                             <h6>
@@ -194,29 +207,32 @@ function Activity(){
                                 ? `${formatDate(activity.activity_date)} - ${formatDate(activity.end_date)}`
                                 : `${formatDate(activity.activity_date)}`}
                             </h6>
-                            <p className="card-text">{activity.description}</p>
+                            <p className="activity-text">{activity.description}</p>
                             <p className="text-muted">
                                 ผู้เข้าร่วม: {activity.current_participants}/{activity.max_participants || "ไม่จำกัด"}
                             </p>
                             <div className="button-group">
                                 {activity.status === 0 ? (
-                                    <a
-                                        className="btn join-button"
-                                        onClick={() => handleJoinClick(activity.activity_id)}
-                                    >
-                                        เข้าร่วมกิจกรรม
-                                    </a>
-                                ) : null }
-                                <a href={`/activity/${activity.activity_id}`} className="btn btn-info">
-                                ดูรายละเอียด
+                                <a className="btn join-button" onClick={() => handleJoinClick(activity.activity_id)}>
+                                    เข้าร่วมกิจกรรม
                                 </a>
+                                ) : null }
+                                <button onClick={() => handleViewDetails(activity.activity_id)} className="btn btn-info">
+                                    ดูรายละเอียด
+                                </button>
                             </div>
                             </div>
                         </div>
+                        </div>
+                    ))
+                    ) : (
+                    <div className="text-center my-5 text-muted">
+                        <p className="fs-5">ไม่มีกิจกรรมที่ตรงกับสถานะในขณะนี้</p>
                     </div>
-                    ))}
+                    )}
                 </div>
             </div>
+
 
             {showForm && (
                 <div className="form-overlay">
@@ -266,17 +282,61 @@ function Activity(){
                                 required
                             />
                         </div>
-                        <div className="mb-3">
-                            <label htmlFor="batch_year" className="form-label">ปีที่จบการศึกษา</label>
-                            <input
-                                type="text"
-                                className="form-control w-100"
-                                id="batch_year"
-                                value={formData.batch_year}
-                                onChange={(e) => setFormData({ ...formData, batch_year: e.target.value })}
-                                required
-                            />
-                        </div>
+                        {/* แสดงปีการศึกษา/ระดับการศึกษา */}
+                        {userRole === '4' ? ( // ถ้าเป็นศิษย์ปัจจุบัน
+                            <>
+                                {/* ระดับการศึกษา */}
+                                <div className="mb-3">
+                                    <label htmlFor="education_level" className="form-label">ระดับการศึกษา</label>
+                                    <select
+                                        className="form-control w-100"
+                                        id="education_level"
+                                        value={formData.education_level}
+                                        onChange={(e) => setFormData({ ...formData, education_level: e.target.value })}
+                                        required
+                                    >
+                                        <option value="">เลือกระดับการศึกษา</option>
+                                        <option value="undergraduate">ป.ตรี</option>
+                                        <option value="graduate">ป.โท</option>
+                                        <option value="doctorate">ป.เอก</option>
+                                    </select>
+                                </div>
+
+                                {/* ถ้าเลือก ป.ตรี จะแสดงช่องเลือกปีการศึกษา */}
+                                {formData.education_level === 'undergraduate' && (
+                                    <div className="mb-3">
+                                        <label htmlFor="year_level" className="form-label">ชั้นปีการศึกษา</label>
+                                        <select
+                                            className="form-control w-100"
+                                            id="year_level"
+                                            value={formData.year_level}
+                                            onChange={(e) => setFormData({ ...formData, year_level: e.target.value })}
+                                            required
+                                        >
+                                            <option value="">เลือกชั้นปี</option>
+                                            <option value="1">ปี 1</option>
+                                            <option value="2">ปี 2</option>
+                                            <option value="3">ปี 3</option>
+                                            <option value="4">ปี 4</option>
+                                        </select>
+                                    </div>
+                                )}
+                            </>
+                        ) : (
+                            // ถ้าเป็นศิษย์เก่าจะแสดงฟิลด์ปีที่จบการศึกษา
+                            <div className="mb-3">
+                                <label htmlFor="batch_year" className="form-label">ปีที่จบการศึกษา</label>
+                                <input
+                                    type="text"
+                                    className="form-control w-100"
+                                    id="batch_year"
+                                    value={formData.batch_year}
+                                    onChange={(e) => setFormData({ ...formData, batch_year: e.target.value })}
+                                    required
+                                />
+                            </div>
+                        )}
+
                         <div className="mb-3">
                             <label htmlFor="department" className="form-label">สาขา</label>
                             <input
@@ -289,11 +349,8 @@ function Activity(){
                             />
                         </div>
                         <div className="d-flex justify-content-between">
-                            {/* <button type="button" className="btn btn-secondary" onClick={() => setShowForm(false)}>ยกเลิก</button> */}
                             <button type="submit" className="btn btn-success">ยืนยัน</button>
                         </div>
-
-                        
     
                     </form>
                 </div>

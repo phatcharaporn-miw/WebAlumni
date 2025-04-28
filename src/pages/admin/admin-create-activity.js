@@ -17,12 +17,13 @@ function CreateActivity() {
     max_participants: '',
     batch_restriction: '',
     department_restriction: '',
-    image: null,
+    images: [],
   });
   const [isLoggedin, setIsLoggedin] = useState(false);
+  const [minDate, setMinDate] = useState(''); 
   const navigate = useNavigate();
 
-   useEffect(() => {
+    useEffect(() => {
         const userSession = localStorage.getItem("userId");  
         if (userSession) {
             setIsLoggedin(true);
@@ -31,7 +32,13 @@ function CreateActivity() {
             setIsLoggedin(false);
             console.log("ผู้ใช้ยังไม่ได้ล็อกอิน"); 
         }
-      }, []);
+    }, []);
+
+    useEffect(() => {
+        // กำหนดวันที่ปัจจุบันในรูปแบบ YYYY-MM-DD
+        const today = new Date().toISOString().split("T")[0];
+        setMinDate(today);
+    }, []);
 
   // ฟังก์ชันจัดการการเปลี่ยนแปลงของฟอร์ม
   const handleChange = (e) => {
@@ -51,11 +58,14 @@ function CreateActivity() {
 
   // ฟังก์ชันจัดการการอัพโหลดไฟล์
   const handleFileChange = (e) => {
+    const files = Array.from(e.target.files); // ต้องแปลงก่อนใช้
+    console.log("อัปโหลดรูป:", files);
     setFormData((prevState) => ({
       ...prevState,
-      image: e.target.files[0],
+      images: files,
     }));
   };
+  
 
   const formatTimeRange = (start, end) => {
     return `${start} - ${end}`;
@@ -65,19 +75,12 @@ function CreateActivity() {
     e.preventDefault();
 
     const formattedTimeRange = formatTimeRange(formData.start_time, formData.end_time);
-    console.log('ช่วงเวลา: ', formattedTimeRange);
 
     const userSession = localStorage.getItem("userId");
     if (!userSession) {
       alert("กรุณาล็อกอินเพื่อดำเนินการนี้");
       navigate("/login");  
       return;
-    }
-    
-    // ตรวจสอบว่า start_time และ end_time ถูกกรอกหรือไม่
-    if (!formData.start_time || !formData.end_time) {
-        alert("กรุณากรอกเวลาเริ่มและเวลาสิ้นสุดกิจกรรม");
-        return;
     }
 
     const data = new FormData();
@@ -93,9 +96,10 @@ function CreateActivity() {
     data.append('batch_restriction', formData.batch_restriction);
     data.append('department_restriction', formData.department_restriction);
     data.append('check_alumni', formData.check_alumni ? 1 : 0);
-    if (formData.image) {
-      data.append('image', formData.image);
-    }
+    //แนบรูปหลายรูป
+    formData.images.forEach((img, index) => {
+      data.append('images', img); // ใช้ชื่อเดียวกันทั้งหมด
+    });
 
     try {
       const response = await axios.post('http://localhost:3001/activity/post-activity', data, {
@@ -105,7 +109,7 @@ function CreateActivity() {
       console.log("API Response:", response.data);
       if (response.status === 200) {
         alert('เพิ่มกิจกรรมเรียบร้อยแล้ว!');
-        navigate("/activity"); 
+        navigate("/admin/activities"); 
       } else {
         alert('เกิดข้อผิดพลาดในการโพสต์กิจกรรม');
       }
@@ -152,6 +156,7 @@ function CreateActivity() {
                             id="activity_date"
                             name="activity_date"
                             value={formData.activity_date}
+                            min={minDate}
                             onChange={handleChange}
                             required
                           />
@@ -179,6 +184,7 @@ function CreateActivity() {
                             name="end_date"
                             value={formData.end_date}
                             onChange={handleChange}
+                            min={formData.activity_date || minDate}
                           />
                         </div>
 
@@ -292,8 +298,10 @@ function CreateActivity() {
                           <input
                             type="file"
                             className="form-control"
-                            id="image"
-                            name="image"
+                            id="images"
+                            name="images"
+                            multiple
+                            accept="image/*"
                             onChange={handleFileChange}
                           />
                         </div>

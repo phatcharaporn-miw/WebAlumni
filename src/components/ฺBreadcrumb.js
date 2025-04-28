@@ -51,7 +51,10 @@ function Breadcrumb() {
   }, [activityId, newsId, categoryId, webboardId]);
 
   // แยก path ตาม '/'
-  const pathnames = location.pathname.split('/').filter((item) => item);
+  // const pathnames = location.pathname.split('/').filter((item) => item);
+  const pathnames = location.pathname
+  .split('/')
+  .filter((item) => item && item !== 'alumni-home'); // ซ่อน alumni-home
 
    
   // ซ่อน breadcrumb ในหน้า Login และ Register

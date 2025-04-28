@@ -304,7 +304,7 @@ function DonateRequest() {
                             <Link to="/donate">
                                 <button className="cancle-button-request" type="button">ยกเลิก</button>
                             </Link>
-                            <button className="button-request" onClick={handleOpen}>เพิ่มโครงการ</button>
+                            <button className="submit-button-request" onClick={handleOpen}>เพิ่มโครงการ</button>
                         </div>
                     </div>
                 </form>

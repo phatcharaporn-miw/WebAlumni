@@ -1,0 +1,17 @@
+.card-webboard {
+    border-radius: 10px;
+    transition: transform 0.2s ease-in-out;
+}
+
+.card-webboard:hover {
+    transform: scale(1.02);
+}
+
+/* .card-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+} */
+
+.btn-sm {
+    font-size: 0.9rem;
+}

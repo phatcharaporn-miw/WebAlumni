@@ -9,8 +9,8 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
     min-height: 100vh;
+    width: 100%;
 }
 
 .content-register {
@@ -38,6 +38,7 @@
     box-sizing: border-box;
     overflow: hidden;
     margin-bottom: 10%;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
 }
 
 .form-regis {
@@ -45,6 +46,7 @@
     flex-direction: column;
     gap: 20px;
     align-items: stretch;
+    
 }
 
 .form-regis h2 {
@@ -147,29 +149,29 @@ fieldset {
 }
 
 
-.education-item {
+/* .education-item {
     display: flex;
     align-items: center;
     gap: 10px;
-}
+} */
 
-.education-item label {
+/* .education-item label {
     display: flex;
     align-items: center;
     justify-content: center;
     color: #333;
-}
+} */
 
-.education-item input[type="checkbox"] {
+/* .education-item input[type="checkbox"] {
     background-color: #0F75BC;
     width: 25px;
     height: 20px;
     border-radius: 5px;
     margin-right: 10px;
     accent-color: #0F75BC;
-}
+} */
 
-.education-item span {
+/* .education-item span {
     font-size: 14px;
     display: inline-block;
     width: 100%;
@@ -190,7 +192,7 @@ fieldset {
 .education-grid input[type="text"] {
     height: 45px;
     margin-bottom: 5px;
-}
+} */
 
 .cancel-button {
     background-color: #e0e0e0;
@@ -358,5 +360,9 @@ button:hover {
 
     button {
         width: 100%;
+    }
+
+    .form-regis fieldset {
+        grid-template-columns: 1fr;
     }
 }

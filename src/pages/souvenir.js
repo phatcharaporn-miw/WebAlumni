@@ -38,7 +38,7 @@ function Souvenir() {
                     <div className="souvenir-item-group">
                         {products && products.length > 0 ? (
                             products
-                                // .filter((product) => product.role_id === 1 || product.role_id === 2)
+                                .filter((product) => product.role_id === 1 || product.role_id === 2)
                                 .map((product) => (
                                     <Link to={`/souvenir/souvenirDetail/${product.product_id}`} key={product.product_id}>
                                         <div className="souvenir-item">
@@ -53,7 +53,9 @@ function Souvenir() {
                                     </Link>
                                 ))
                         ) : (
-                            <p>ขออภัย ไม่มีสินค้าในขณะนี้</p>
+                            <div className="text-center my-5 text-muted">
+                                <p className="fs-5">ขออภัย ไม่มีสินค้าในขณะนี้</p>
+                            </div>
                         )}
                     </div>
                 </div>
@@ -64,7 +66,7 @@ function Souvenir() {
                     <div className="souvenir-item-group">
                         {products && products.length > 0 ? (
                             products
-                                // .filter((product) => product.role_id === 4 )
+                                .filter((product) => product.role_id === 4 )
                                 .map((product) => (
                                     <Link to={`/souvenir/souvenirDetail/${product.product_id}`} key={product.product_id}>
                                         <div className="souvenir-item">
@@ -79,7 +81,9 @@ function Souvenir() {
                                     </Link>
                                 ))
                         ) : (
-                            <p>ขออภัย ไม่มีสินค้าในขณะนี้</p>
+                            <div className="text-center my-5 text-muted">
+                                <p className="fs-5">ขออภัย ไม่มีสินค้าในขณะนี้</p>
+                            </div>
                         )}
                     </div>
                 </div>

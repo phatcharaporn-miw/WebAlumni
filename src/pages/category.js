@@ -9,6 +9,7 @@ import moment from "moment";
 import { IoMdClose } from "react-icons/io";
 import Modal from "react-modal";
 import Swal from "sweetalert2";
+
 // css
 import '../css/webboard.css';
 // bootstrap
@@ -235,12 +236,12 @@ function Category() {
 
 
                     <div className="card-body px-0">
-                      <p className="card-text mb-3">
+                      <p className="card-text mb-3 text-muted">
                       {post.content ? (post.content.length > 100 ? post.content.substring(0, 100) + "..." : post.content) : ""}
                       </p>
                     </div>
 
-                    <div className="d-flex align-items-center mt-4 px-2">
+                    <div className="d-flex align-items-center mt-4 px-2 text-muted">
                       {/* ความคิดเห็น */}
                         <BiSolidComment className="me-2" /> 
                         {post.comments_count ?? 0} ความคิดเห็น
@@ -252,12 +253,13 @@ function Category() {
                   </div>
                   ))
                 ) : (
-                  <p>ยังไม่มีกระทู้ที่อยู่ในหมวดหมู่นี้</p>
+                  <div className="d-flex flex-column align-items-center justify-content-center my-5">
+                    <p className="text-center text-muted fs-5">ยังไม่มีกระทู้ที่อยู่ในหมวดหมู่นี้</p>
+                  </div>
                 )}
               </div>
             </div>
             
-
           <Modal isOpen={modalIsOpen} onRequestClose={closeModal} className="custom-modal" style={{ overlay: { backgroundColor: 'rgba(0, 0, 0, 0.75)' } }}>
                 {selectedPost && (
                     <div className="modal-content mt-2">
@@ -293,8 +295,8 @@ function Category() {
                           </div>
                       </div>
 
-                      <div className="card-body px-0">
-                        <p className="card-text mb-3">
+                      <div className="card-body px-0 text-muted">
+                        <p className="card-text mb-3 small">
                         {selectedPost.content}                  
                         </p>
                       </div>
@@ -302,10 +304,8 @@ function Category() {
                       {/* รูปภาพประกอบ*/}
                       {selectedPost.image_path && (
                         <img src={selectedPost.image_path ? `http://localhost:3001/${selectedPost.image_path.replace(/^\/+/, '')}` : "/default-image.png"}  alt="Post" className="img-fluid rounded-3" onError={(e) => e.target.style.display = 'none'}/>
-
                       )}
             
-
                         {/* จำนวนผู้เข้าชม */}
                         <div className="d-flex align-items-center mt-4">
                           <FaEye className="me-2 ms-auto " /> {selectedPost.viewCount} ครั้ง

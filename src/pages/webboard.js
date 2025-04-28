@@ -30,6 +30,7 @@ function Webboard(){
     const [category, setCategory] = useState([]);
     const [showReplyForm, setShowReplyForm] = useState(null);
     const [replyText, setReplyText] = useState(""); 
+    const [recommendedPosts, setRecommendedPosts] = useState([]); 
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -59,6 +60,21 @@ function Webboard(){
           .catch((error) => {
             console.error('เกิดข้อผิดพลาดในการดึงข้อมูลกระทู้:', error.message);
           });
+    }, []);
+
+    // แนะนำกระทู้
+    useEffect(() => {
+      axios.get('http://localhost:3001/web/webboard/recommended-posts', {
+        withCredentials: true,
+      })
+        .then((response) => {
+          if (response.data.success) {
+            setRecommendedPosts(response.data.recommendedPosts);
+          }
+        })
+        .catch((error) => {
+          console.error('เกิดข้อผิดพลาดในการดึงข้อมูลกระทู้ที่แนะนำ:', error.message);
+        });
     }, []);
 
         //เรียงลำดับโพสต์ตามวันที่
@@ -148,11 +164,11 @@ function Webboard(){
               setSelectedPost({
                 ...response.data.data,
                 comments: response.data.data.comments.map(comment => ({
-                  ...comment,
-                  created_at: comment.created_at 
-                  ? moment(comment.created_at).locale("th").format("DD/MM/YYYY HH:mm:ss") 
-                  : "ไม่ระบุวันที่"
-              }))
+                    ...comment,
+                    created_at: comment.created_at 
+                        ? moment(comment.created_at).locale("th").format("DD/MM/YYYY HH:mm:ss") 
+                        : "ไม่ระบุวันที่"
+                }))
               });
               
               setModalIsOpen(true);
@@ -165,49 +181,57 @@ function Webboard(){
 
     // จัดการcomment
     const handleCommentSubmit = () => {
-      if (!isLoggedin) {
-        Swal.fire({
-            title: "กรุณาเข้าสู่ระบบ",
-            text: "คุณต้องเข้าสู่ระบบก่อนเข้าร่วมกิจกรรม",
-            icon: "warning",
-            confirmButtonText: "เข้าสู่ระบบ"
-          }).then(() => {
-          navigate("/login");
-          });
-        return;
-    }
-      if (!commentText.trim()) {
-        alert("กรุณากรอกข้อความก่อนส่งความคิดเห็น");
-        return;
-    }
+        if (!isLoggedin) {
+            Swal.fire({
+                title: "กรุณาเข้าสู่ระบบ",
+                text: "คุณต้องเข้าสู่ระบบก่อนแสดงความคิดเห็น",
+                icon: "warning",
+                confirmButtonText: "เข้าสู่ระบบ"
+            }).then(() => {
+                navigate("/login");
+            });
+            return;
+        }
 
-      axios.post(`http://localhost:3001/web/webboard/${selectedPost.webboard_id}/comment`, {
-        comment_detail: commentText,
-      },{
-        withCredentials: true
-      })
-      .then((response) => {
-        const newComment = response.data; 
-        setSelectedPost((prev) => ({
-          ...prev,
-          comments: [...(prev.comments || []), newComment],
-          comments_count: (prev.comments_count ?? 0) + 1
-        }));
+        if (!commentText.trim()) {
+            Swal.fire({
+                title: "ข้อผิดพลาด",
+                text: "กรุณากรอกข้อความก่อนส่งความคิดเห็น",
+                icon: "error",
+                confirmButtonText: "ตกลง"
+            });
+            return;
+        }
 
-      // อัปเดต state `webboard` เพื่อให้จำนวนเมนต์อัปเดตที่หน้าแรก
-      setWebboard((prevWebboard) => 
-        prevWebboard.map((post) =>
-          post.webboard_id === selectedPost.webboard_id
-            ? { ...post, comments_count: (post.comments_count ?? 0) + 1 }
-            : post
-        )
-      );
+        axios.post(`http://localhost:3001/web/webboard/${selectedPost.webboard_id}/comment`, {
+            comment_detail: commentText,
+        }, {
+            withCredentials: true
+        })
+        .then((response) => {
+            const newComment = response.data; // คอมเมนต์ใหม่ที่ได้จาก Backend
 
-      setCommentText("");
-      })
-      .catch((error) => {
-      console.error('เกิดข้อผิดพลาดในการแสดงความคิดเห็น:', error.message);
-      });
+            // อัปเดต State ของ selectedPost
+            setSelectedPost((prev) => ({
+                ...prev,
+                comments: [...(prev.comments || []), newComment],
+                comments_count: (prev.comments_count ?? 0) + 1
+            }));
+
+            // อัปเดต State ของ webboard เพื่อให้จำนวนคอมเมนต์อัปเดตในหน้าแรก
+            setWebboard((prevWebboard) => 
+                prevWebboard.map((post) =>
+                    post.webboard_id === selectedPost.webboard_id
+                        ? { ...post, comments_count: (post.comments_count ?? 0) + 1 }
+                        : post
+                )
+            );
+
+            setCommentText(""); // ล้างข้อความในช่องคอมเมนต์
+        })
+        .catch((error) => {
+            console.error('เกิดข้อผิดพลาดในการแสดงความคิดเห็น:', error.message);
+        });
     };
 
     const toggleReplyForm = (commentId) => {
@@ -308,7 +332,7 @@ function Webboard(){
   };
 
     // กำหนดสีหมวดหมู่
-    const getCategoryColor = (categoryId) => {
+  const getCategoryColor = (categoryId) => {
       const id = Number(categoryId);  // แปลงเป็นตัวเลข
       const hue = (id * 137) % 360;
       return `hsl(${hue}, 70%, 60%)`;
@@ -319,7 +343,6 @@ function Webboard(){
     <section className="container">
         <div className="webboard-page">
             <h3 className="webboard-title">{showFavorites ? "กระทู้ที่กดใจ" : "กระทู้ทั้งหมด"}</h3>
-            
         </div>
          
           <select className="border rounded p-2 mb-3" value={sortOrder} onChange={(e) => setSortOrder(e.target.value)}>
@@ -365,12 +388,12 @@ function Webboard(){
 
 
                 <div className="card-body px-0">
-                  <p className="card-text mb-3">
+                  <p className="card-text mb-3 text-muted">
                   {post.content ? (post.content.length > 100 ? post.content.substring(0, 100) + "..." : post.content) : ""}
                   </p>
                 </div>
 
-                <div className="d-flex align-items-center mt-4 px-2">
+                <div className="d-flex align-items-center mt-4 px-2 text-muted">
                   {/* ความคิดเห็น */}
                     <BiSolidComment className="me-2" /> 
                     {post.comments_count ?? 0} ความคิดเห็น
@@ -382,7 +405,9 @@ function Webboard(){
               </div>
               ))
             ) : (
-              <p>ไม่มีโพสต์</p>
+              <div className="d-flex flex-column align-items-center justify-content-center my-5">
+                    <p className="text-center text-muted fs-5">ยังไม่มีกระทู้ในขณะนี้</p>
+              </div>
             )}
           </div>
 
@@ -423,8 +448,8 @@ function Webboard(){
                           </div>
                       </div>
 
-                      <div className="card-body px-0">
-                        <p className="card-text mb-3">
+                      <div className="card-body px-0 small">
+                        <p className="card-text mb-3 text-muted">
                         {selectedPost.content}                  
                         </p>
                       </div>
@@ -570,11 +595,41 @@ function Webboard(){
                       </span>
                     ))
                   ) : (
-                    <p className="text-muted">ไม่มีหมวดหมู่</p>
+                    <div className="d-flex flex-column align-items-center justify-content-center my-5">
+                      <p className="text-center text-muted fs-5">ยังไม่มีหมวดหมู่ในขณะนี้</p>
+                    </div>
                   )}
                   </div>
                 </div>
             </div>
+
+            {/* <div className="mt-5">
+              <h5 className="fw-bold mb-3">เว็บบอร์ดที่แนะนำ</h5>
+              {recommendedPosts.length > 0 ? (
+                <ul className="list-group">
+                  {recommendedPosts.map((post) => (
+                    <li
+                      key={post.webboard_id}
+                      className="list-group-item d-flex justify-content-between align-items-center"
+                      style={{ cursor: "pointer" }}
+                      onClick={() => handlePostClick(post)}
+                    >
+                      <div>
+                        <h6 className="mb-1">{post.title}</h6>
+                        <p className="mb-0 text-muted small">
+                          {post.comments_count} ความคิดเห็น • {post.likes_count} ถูกใจ
+                        </p>
+                      </div>
+                      <span className="badge bg-primary rounded-pill">
+                        {post.category_name}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-muted">ยังไม่มีเว็บบอร์ดที่แนะนำ</p>
+              )}
+            </div> */}
     </section>  
     )
 }

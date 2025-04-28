@@ -14,7 +14,7 @@ function NavAdmin() {
 
         if (isConfirmed) {
             try {
-                await axios.get('http://localhost:3001/login/logout', { withCredentials: true });
+                await axios.get('http://localhost:3001/api/logout', { withCredentials: true });
 
                 // ลบข้อมูลใน localStorage
                 localStorage.removeItem('userId');
@@ -32,16 +32,16 @@ function NavAdmin() {
     useEffect(() => {
         const userId = localStorage.getItem('userId');
         const role = localStorage.getItem('userRole');
-        const username = localStorage.getItem('username');
-        const imagePath = localStorage.getItem('image_path');  // ดึงค่าจาก localStorage
+        const username = localStorage.getItem('username') || 'Admin'; 
+        const imagePath = localStorage.getItem('image_path');  
 
         const profilePic = imagePath
-            ? `http://localhost:3001/img/${imagePath}` // เชื่อมต่อ URL ของรูปภาพ
+            ? `http://localhost:3001/${imagePath}` // เชื่อมต่อ URL ของรูปภาพ
             : '/default-profile-pic.jpg'; // ถ้าไม่มีให้ใช้รูป default
 
         if (role === '1') {
             setUserInfo({
-                fullName: username || 'Admin',
+                fullName: username,
                 profilePic: profilePic,
             });
         } else {
@@ -106,7 +106,7 @@ function NavAdmin() {
                     การบริจาคและโครงการ
                 </NavLink>
                 <NavLink
-                    to="/admin/forum"
+                    to="/admin/webboard"
                     className="nav-link"
                     style={({ isActive }) => ({
                         ...(isActive ? active : {}),
@@ -173,6 +173,8 @@ const navAdminStyles = {
     color: "#FFFFFF",
     padding: "15px",
     boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
+    height: "100vh",
+    position: "fixed",
 };
 
 const profileContainer = {
@@ -180,7 +182,7 @@ const profileContainer = {
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
-    padding: "10px"
+    padding: "10px",
 };
 
 const profilePicStyle = {
@@ -190,20 +192,14 @@ const profilePicStyle = {
     borderRadius: "50%",
     border: "2px solid #fff",
     boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-    marginTop: "10px"
+    marginTop: "10px",
 };
 
-// สไตล์สำหรับการ hover และ active
 const active = {
     backgroundColor: "#0F75BC",
     color: "#FFFFFF",
-    borderRadius: "5px",
-    fontWeight: "500",
-};
-
-const navAdminButtonStyles = {
-    color: "#FFFFFF", 
-    backgroundColor: "#FF3B30", 
+    borderRadius: "8px",
+    fontWeight: "600",
 };
 
 const navLinkStyles = {
@@ -211,12 +207,16 @@ const navLinkStyles = {
     padding: "10px 20px",
     textDecoration: "none",
     fontWeight: "500",
-    transition: "background-color 0.3s ease, color 0.3s ease",
+    margin: "6px 0",
+    borderRadius: "8px",
+    transition: "all 0.2s ease-in-out",
 };
 
-const navLinkHover = {
-    backgroundColor: "#D32F2F",
-    color: "#FFFFFF",
+const navAdminButtonStyles = {
+    backgroundColor: "#FF3B30",
+    marginTop: "20px",
+    fontWeight: "600",
 };
+
 
 export default NavAdmin;

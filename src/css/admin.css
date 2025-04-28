@@ -113,21 +113,20 @@ table td button:hover {
     background-color: #0B98FA;
 }
 
-/* Souvenir Item Styles */
-.souvenir-item-group {
+/* .souvenir-item-group {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 20px;
-}
+} */
 
-.souvenir-item {
+/* .souvenir-item {
     background-color: #fff;
     padding: 15px;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     text-align: center;
     transition: transform 0.3s ease;
-}
+} */
 
 .souvenir-item:hover {
     transform: translateY(-5px);
@@ -160,7 +159,7 @@ table td button:hover {
 }
 
 .souvenir-bt-add {
-    background-color: #4CAF50; /* สีเขียว */
+    background-color: #4CAF50; 
     color: white;
     border: none;
     padding: 10px 20px;
@@ -169,11 +168,11 @@ table td button:hover {
 }
 
 .souvenir-bt-add:hover {
-    background-color: #45a049; /* เปลี่ยนสีเมื่อ hover */
+    background-color: #45a049; 
 }
 
 .souvenir-bt-approve {
-    background-color: #2196F3; /* สีฟ้า */
+    background-color: #2196F3; 
     color: white;
     border: none;
     padding: 10px 20px;

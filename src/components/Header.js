@@ -10,6 +10,7 @@ import { IoMdNotificationsOutline } from "react-icons/io";
 import { FaTrash } from "react-icons/fa";
 import Swal from "sweetalert2";
 
+
 import axios from "axios";
 
 
@@ -23,7 +24,11 @@ function Header({user}) {
   const [cartCount, setCartCount] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const userId = localStorage.getItem('userId');
+  // const userId = user?.userId;
+
   const navigate = useNavigate();
+
+  
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -119,63 +124,63 @@ function Header({user}) {
     return () => document.removeEventListener("click", handleClickOutside);
   }, [showNotifications]);
 
-
   // ป้องกันการปิด Dropdown เมื่อคลิกภายใน
   const handleDropdownClick = (event) => {
   event.stopPropagation(); 
   };
 
-  //เพิ่มสินค้าลงในตะกร้า
-  const addToCart = (productId, quantity, total) => {
-    if (!userId) {
-      Swal.fire({
-                title: "กรุณาเข้าสู่ระบบ",
-                text: "คุณต้องเข้าสู่ระบบก่อนเพิ่มสินค้า",
-                icon: "warning",
-                confirmButtonText: "เข้าสู่ระบบ"
-              }).then(() => {
-                navigate("/login");
-              });
-      return;
-    }
+  // เพิ่มสินค้าลงในตะกร้า
+const addToCart = (productId, quantity, total) => {
+  const userId = localStorage.getItem('userId'); // 🔥 ดึงค่า userId ตรงนี้กัน null
   
-    axios.post("http://localhost:3001/souvenir/cart/add", { 
-      user_id: userId,
-      product_id: productId,
-      quantity: quantity,
-      total: total
-    })
-    .then((response) => {
-      alert(response.data.message);
-      if (response.data.updateCart) {
-        // อัปเดตข้อมูลตะกร้า
-        getCartCount(userId); 
-      }
-    })
-    .catch((error) => {
-      console.error("เกิดข้อผิดพลาดในการเพิ่มสินค้าลงในตะกร้า:", error);
+  if (!userId) {
+    Swal.fire({
+      title: "กรุณาเข้าสู่ระบบ",
+      text: "คุณต้องเข้าสู่ระบบก่อนเพิ่มสินค้า",
+      icon: "warning",
+      confirmButtonText: "เข้าสู่ระบบ"
+    }).then(() => {
+      navigate("/login");
     });
-  };
+    return;
+  }
 
-  //ดึงข้อมูลสินค้าในตะกร้า
+  axios.post("http://localhost:3001/souvenir/cart/add", { 
+    user_id: userId,
+    product_id: productId,
+    quantity: quantity,
+    total: total
+  })
+  .then((response) => {
+    alert(response.data.message);
+    getCartCount(userId); // เรียกอัปเดตจำนวนสินค้าในตะกร้าทันที
+  })
+  .catch((error) => {
+    console.error("เกิดข้อผิดพลาดในการเพิ่มสินค้าลงในตะกร้า:", error);
+  });
+};
+
+  // ดึงข้อมูลสินค้าในตะกร้า
   const getCartCount = (userId) => {
-    if (!userId) return; 
+    if (!userId) return;
 
     axios.get(`http://localhost:3001/souvenir/cart/count?user_id=${userId}`, {
       headers: { "Cache-Control": "no-cache" }
     })
     .then(response => {
-        setCartCount(response.data.cartCount || 0);
+      setCartCount(response.data.cartCount || 0);
     })
     .catch(error => console.error("Error fetching cart count:", error));
   };
 
-  // ดึงข้อมูลจำนวนสินค้าตะกร้า
+  // ดึงข้อมูลจำนวนสินค้าตะกร้าเมื่อโหลดหน้า
   useEffect(() => {
+    const userId = localStorage.getItem('userId'); // ดึง userId อีกครั้ง กันค่า null
     if (userId) {
       getCartCount(userId);
     }
-  }, [userId]);
+  }, []);
+
 
   // การค้นหา
   const handleSearchChange = (e) => {
@@ -213,27 +218,29 @@ function Header({user}) {
   }, []);
 
     // ฟังก์ชันค้นหาเมื่อกดปุ่มค้นหา
-  const handleSearchClick = () => {
-    if (searchTerm.trim() !== "") {
-        window.location.href = `/search?query=${searchTerm}`;
-    }
+    const handleSearchClick = () => {
+      if (searchTerm.trim() !== "") {
+          navigate(`/search?query=${searchTerm}`);
+      }
   };
-
+  
   const handleSuggestionClick = (suggestion) => {
-    if (suggestion.type === "news") {
-        window.location.href = `/news/${suggestion.id}`;
-    } else if (suggestion.type === "webboard") {
-        window.location.href = `/webboard/${suggestion.id}`;
-    } else if (suggestion.type === "profile") {
-        window.location.href = `/profile/${suggestion.id}`;
-    }else if (suggestion.type === "donationproject") {
-        window.location.href = `/donate/donatedetail/${suggestion.id}`;
-    }else if (suggestion.type === "products") {
-      window.location.href = `/souvenirDetail/${suggestion.id}`;
-    }
-    setShowSuggestions(false);
+      let path = "/";
+      if (suggestion.type === "news") {
+          path = `/news/${suggestion.id}`;
+      } else if (suggestion.type === "webboard") {
+          path = `/webboard/${suggestion.id}`;
+      } else if (suggestion.type === "profile") {
+          path = `/profile/${suggestion.id}`;
+      } else if (suggestion.type === "donationproject") {
+          path = `/donate/donatedetail/${suggestion.id}`;
+      } else if (suggestion.type === "products") {
+          path = `/souvenir/souvenirDetail/${suggestion.id}`;
+      }
+      
+      navigate(path);
+      setShowSuggestions(false);
   };
-
 
   return (
     <header className="header">
@@ -327,7 +334,7 @@ function Header({user}) {
                               </div>
                           ))
                       ) : (
-                          <p className="no-notifications">ไม่มีการแจ้งเตือน</p>
+                          <p className="no-notifications text-center small">ไม่มีการแจ้งเตือน</p>
                       )}
                   </div>
                 )}
@@ -343,7 +350,12 @@ function Header({user}) {
                 />
                 {/* ข้อมูลผู้ใช้ */}
                 <div className="user-info mt-2 text-center">
-                  <p className="user-role mb-1" style={{ textDecoration: "none" }}>{user.role === 0 ? "แอดมิน" : "ศิษย์เก่า"}</p>
+                <p className="user-role mb-1" style={{ textDecoration: "none" }}>
+                  {user.role === 1 ? "แอดมิน" : 
+                  user.role === 2 ? "นายกสมาคม" : 
+                  user.role === 3 ? "ศิษย์เก่า" : 
+                  user.role === 4 ? "ศิษย์ปัจจุบัน" : "ไม่ทราบบทบาท"}
+                </p>
                 </div>
               </NavLink>
             </div>

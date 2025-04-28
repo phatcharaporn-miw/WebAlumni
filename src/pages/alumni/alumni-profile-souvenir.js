@@ -69,15 +69,15 @@ function AlumniProfileSouvenir() {
                         <p className="mt-3 fw-bold">{profile.fullName}</p>
                         <div className="menu mt-4">
                             <div className="menu-item py-2 mb-2 rounded"onClick={() => handleClick('/alumni-profile')}>ข้อมูลส่วนตัว</div>
-                            <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/my-posts')}>กระทู้ที่สร้าง</div>
+                            <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/alumni-profile-webboard')}>กระทู้ที่สร้าง</div>
                             <div className="menu-item py-2 mb-2 rounded">ประวัติการบริจาค</div>
-                            <div className="menu-item py-2 mb-2 rounded">ประวัติการเข้าร่วมกิจกรรม</div>
+                            <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/alumni-profile-souvenir')}>ประวัติการเข้าร่วมกิจกรรม</div>
                             <div className="menu-item py-2 mb-2 rounded active">ประวัติการสั่งซื้อ</div>
                             <div className="menu-item py-2 rounded" onClick={handleLogout}>ออกจากระบบ</div>
                         </div>
                     </div>
 
-                    <div className="col-7">
+                    {/* <div className="col-7">
                         <h4 className="alumni-title text-center">ประวัติการสั่งซื้อ</h4>
                         {orderHistory.length === 0 ? (
                             <div className="no-orders text-center">ยังไม่มีการสั่งซื้อ</div>
@@ -115,7 +115,7 @@ function AlumniProfileSouvenir() {
                             </div>
                         )}
                         <button className="back-button mt-3" onClick={() => navigate("/souvenir")}>ย้อนกลับ</button>
-                    </div>
+                    </div> */}
                 </div>
             </div>
         </section>
