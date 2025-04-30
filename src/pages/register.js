@@ -26,10 +26,10 @@ function Register() {
     line: '',
     education: [
         {
-            degree: '', // ระดับการศึกษา (ป.ตรี, ป.โท, ป.เอก)
-            major: '',  // สาขา
-            studentId: '', // รหัสนักศึกษา
-            graduation_year: '', // ปีที่จบการศึกษา
+            degree: '', 
+            major: '',  
+            studentId: '', 
+            graduation_year: '', 
         },
     ],
     
@@ -48,8 +48,8 @@ function Register() {
     e.preventDefault();
 
     const data = new FormData();
-      // ตรวจสอบว่า educations มีข้อมูลและแปลงเป็น JSON string
-      if (Array.isArray(userData.education)) {
+       // เงื่อนไขเพิ่ม : ส่ง education เฉพาะ role === 3 เท่านั้น
+    if (userData.role === '3' && Array.isArray(userData.education)) {
         data.append("education", JSON.stringify(userData.education));
     }
 
@@ -64,17 +64,21 @@ function Register() {
         data.append("image_path", selectedFile);
       }    
 
+    // 🐛 Debug formData ทุก field
+    for (let [key, value] of data.entries()) {
+        console.log(key, value);
+    }
+
       try {
         const response = await axios.post("http://localhost:3001/add/register", data, {
-            headers: { "Content-Type": "multipart/form-data" },
         });
-
         Swal.fire({
             icon: "success",
             title: "ลงทะเบียนสำเร็จ!",
             text: "คุณได้ลงทะเบียนสำเร็จแล้ว",
             confirmButtonText: "ตกลง",
         }).then(() => {
+            console.log(response.data);
             navigate("/login"); 
         });
 
@@ -172,7 +176,6 @@ function Register() {
                     </div>
                 </div>
 
-
                 <div className="form-regis-bg ">
                     <div className="form-regis">
                         <form onSubmit={handleSubmit}>
@@ -181,7 +184,7 @@ function Register() {
                             <label className="form-label">เลือกประเภทผู้ใช้:</label>
                                 <select  name="role" value={userData.role} onChange={(e) => handleInputChange({ target: { name: 'role', value: e.target.value } })} className="form-control">
                                     <option value="">เลือกบทบาท</option>
-                                    <option value="1">แอดมิน</option>
+                                    <option value="2">นายกสมาคม</option>
                                     <option value="3">ศิษย์เก่า</option>
                                     <option value="4">ศิษย์ปัจจุบัน</option>
                                 </select>
@@ -435,23 +438,37 @@ function Register() {
                             </>
                         )}
 
-{userData.role === "1" && (
+{userData.role === "2" && (
     <>
         <fieldset>
             <legend className="legend-title">ข้อมูลเพิ่มเติม</legend>
             <div className="form-group">
-                <label>ชื่อจริง<span className="importent">*</span></label>
+                <label>ชื่อ-สกุล<span className="importent">*</span></label>
                 <input
                     type="text"
                     className="form-control"
-                    id="first_name"
-                    name="first_name"
-                    placeholder="ชื่อจริง"
-                    value={userData.first_name || ''}
+                    id="full_name"
+                    name="full_name"
+                    placeholder="ชื่อ-สกุล"
+                    value={userData.full_name || ''}
                     onChange={handleInputChange}
                     required
                 />
             </div>
+
+            <div className="form-group">
+    <label>อีเมล<span className="importent">*</span></label>
+    <input
+        type="email"
+        className="form-control"
+        id="email"
+        name="email"
+        placeholder="example@email.com"
+        value={userData.email}
+        onChange={handleInputChange}
+        required // <<< เพิ่ม required ด้วย
+    />
+</div>
         </fieldset>
     </>
 )}
@@ -471,7 +488,6 @@ function Register() {
                     </div>
                 </div>
             </div>
-
         </div>
     );
 }

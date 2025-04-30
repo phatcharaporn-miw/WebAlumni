@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import "../css/Donate.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 function Donate() {
     const [projects, setProjects] = useState([]);
     const [filter, setFilter] = useState("all"); // สถานะการกรอง
     const [error] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         axios
@@ -19,7 +21,25 @@ function Donate() {
             });
     }, []);
 
-    if (error) return <p>{error}</p>;
+    const handleCreateDonation = () => {
+        const isLoggedIn = localStorage.getItem("userId"); // ตรวจสอบว่าผู้ใช้เข้าสู่ระบบหรือไม่
+        if (!isLoggedIn) {
+            Swal.fire({
+                title: "กรุณาเข้าสู่ระบบ",
+                text: "คุณต้องเข้าสู่ระบบก่อนสร้างการบริจาค",
+                icon: "warning",
+                confirmButtonText: "เข้าสู่ระบบ",
+                confirmButtonColor: "#3085d6",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    navigate("/login"); 
+                }
+            });
+        } else {
+            navigate("/donate/donaterequest"); 
+        }
+    };
+
     const filteredProjects = projects.filter((project) => {
         if (filter === "all") return true;
         return project.donation_type === filter;
@@ -41,12 +61,11 @@ function Donate() {
     return (
         <div>
             <img src="./image/donation (1).jpg" className="head-donate" alt="donation-image" />
-            {/* <button className="donate-button">บริจาค</button> */}
             <div className="content-donate">
                 <div className="donate-request">
-                    <Link to={`/donate/donaterequest`}>
-                        <button className="donate-bt">สร้างการบริจาค</button>
-                    </Link>
+                    <button className="donate-bt" onClick={handleCreateDonation}>
+                        สร้างการบริจาค
+                    </button>
                 </div>
                 <div className="donate-filter">
                     <label htmlFor="donation-type">เลือกประเภทการบริจาค:</label>
@@ -72,13 +91,16 @@ function Donate() {
                 ) : (
                     <div className="donate-content-item">
                         {filteredProjects.map((project) => {
-
                             const startDate = project?.start_date ? new Date(project.start_date) : null;
                             const endDate = project?.end_date ? new Date(project.end_date) : null;
-                            const options = { year: 'numeric', month: 'long', day: 'numeric' };
-       
-                            const formattedStartDate = startDate ? startDate.toLocaleDateString('th-TH', options) : "-";
-                            const formattedEndDate = endDate ? endDate.toLocaleDateString('th-TH', options) : "-";
+                            const options = { year: "numeric", month: "long", day: "numeric" };
+
+                            const formattedStartDate = startDate
+                                ? startDate.toLocaleDateString("th-TH", options)
+                                : "-";
+                            const formattedEndDate = endDate
+                                ? endDate.toLocaleDateString("th-TH", options)
+                                : "-";
 
                             const progress = project.target_amount
                                 ? (project.current_amount / project.target_amount) * 100
@@ -98,36 +120,67 @@ function Donate() {
                                         <p className={`tag ${project.donation_type || "default"}`}>
                                             {getFilterTitle(project.donation_type)}
                                         </p>
-                                        <p className="donate-discription-date">{formattedStartDate} - {formattedEndDate}</p>
-                                        <h5><b>{project.project_name}</b></h5>
+                                        <p className="donate-discription-date">
+                                            {formattedStartDate} - {formattedEndDate}
+                                        </p>
+                                        <h5>
+                                            <b>{project.project_name}</b>
+                                        </h5>
                                         <p>{project.description}</p>
                                         <div id="description_">
-                                            {(project.donation_type !== "unlimited" && project.donation_type !== "things") && (
-                                                <div className="progress">{`${progress.toFixed(2)}%`}</div>
-                                            )}
-                                            <div className="bar">
-                                                {(project.donation_type !== "unlimited" && project.donation_type !== "things") && (
-                                                    <div className="progress-bar-container">
-                                                        <div
-                                                            className="progress-bar"
-                                                            style={{ width: `${progress ? progress.toFixed(0) : 0}%` }}
-                                                        >
-                                                            <span className="progress-percent">
-                                                                {`${progress ? progress.toFixed(0) : 0}%`}
-                                                            </span>
-                                                        </div>
-                                                    </div>
+                                            {project.donation_type !== "unlimited" &&
+                                                project.donation_type !== "things" && (
+                                                    <div className="progress">{`${progress.toFixed(
+                                                        2
+                                                    )}%`}</div>
                                                 )}
+                                            <div className="bar">
+                                                {project.donation_type !== "unlimited" &&
+                                                    project.donation_type !== "things" && (
+                                                        <div className="progress-bar-container">
+                                                            <div
+                                                                className="progress-bar"
+                                                                style={{
+                                                                    width: `${progress ? progress.toFixed(0) : 0}%`,
+                                                                }}
+                                                            >
+                                                                <span className="progress-percent">
+                                                                    {`${progress ? progress.toFixed(0) : 0}%`}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    )}
                                             </div>
                                         </div>
                                         <div className="donate-details">
                                             <div className="details-amount1">
-                                                <p>ยอดบริจาคปัจจุบัน:<br /><span className="details-amount-title" >{project.current_amount ? project.current_amount.toLocaleString() : "0"} </span>บาท</p><br />
+                                                <p>
+                                                    ยอดบริจาคปัจจุบัน:
+                                                    <br />
+                                                    <span className="details-amount-title">
+                                                        {project.current_amount
+                                                            ? project.current_amount.toLocaleString()
+                                                            : "0"}{" "}
+                                                    </span>
+                                                    บาท
+                                                </p>
+                                                <br />
                                             </div>
                                             <div className="details-amount2">
-                                                {project.donation_type !== "unlimited" && project.donation_type !== "things" && project.target_amount > 0 && (
-                                                    <p>เป้าหมาย:<br /><span className="details-amount-title">{project.target_amount ? project.target_amount.toLocaleString() : "0"} </span>บาท</p>
-                                                )}
+                                                {project.donation_type !== "unlimited" &&
+                                                    project.donation_type !== "things" &&
+                                                    project.target_amount > 0 && (
+                                                        <p>
+                                                            เป้าหมาย:
+                                                            <br />
+                                                            <span className="details-amount-title">
+                                                                {project.target_amount
+                                                                    ? project.target_amount.toLocaleString()
+                                                                    : "0"}{" "}
+                                                            </span>
+                                                            บาท
+                                                        </p>
+                                                    )}
                                             </div>
                                         </div>
                                     </div>

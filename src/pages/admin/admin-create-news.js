@@ -7,21 +7,35 @@ import { useNavigate } from "react-router-dom";
 
 function CreateNews() {
     const [title, setTitle] = useState('');
-    const [image, setImage] = useState(null);
+    // const [image, setImage] = useState(null);
     const [content, setContent] = useState('');
     const navigate = useNavigate();
+    const [formData, setFormData] = useState({
+        title: '',
+        content: '',
+        images: [],
+      });
 
-    const handleFileChange = (event) => {
-        setImage(event.target.files[0]); // อัปโหลดไฟล์ภาพ
-    };
+    // ฟังก์ชันจัดการการอัพโหลดไฟล์
+  const handleFileChange = (e) => {
+    const files = Array.from(e.target.files); // ต้องแปลงก่อนใช้
+    console.log("อัปโหลดรูป:", files);
+    setFormData((prevState) => ({
+      ...prevState,
+      images: files,
+    }));
+  };
 
     const handleSubmit = async (event) => {
         event.preventDefault();
 
         const formData = new FormData();
-        formData.append('title', title);
-        formData.append('content', content);
-        formData.append('image', image);
+        formData.append('title', formData.title);
+        formData.append('content', formData.content);
+        //แนบรูปหลายรูป
+        formData.images.forEach((img, index) => {
+            formData.append('images', img); // ใช้ชื่อเดียวกันทั้งหมด
+        });
 
         axios.post('http://localhost:3001/news/create-news', formData, {
             withCredentials: true,
@@ -39,6 +53,8 @@ function CreateNews() {
                 console.error('เกิดข้อผิดพลาดในการโพสต์ข่าวประชาสัมพันธ์:', error.message);
             });
     };
+
+    
 
     return (
         <div className="container mt-5">
@@ -77,12 +93,13 @@ function CreateNews() {
                                     ></textarea>
                                 </div>
                                 <div className="mb-3">
-                                    <label htmlFor="image_path" className="form-label">อัปโหลดรูปภาพประกอบ (ถ้ามี)</label>
+                                    <label htmlFor="images" className="form-label">อัปโหลดรูปภาพประกอบ (ถ้ามี)</label>
                                     <input
                                         type="file"
                                         className="form-control w-100"
-                                        id="image_path"
-                                        name="image_path"
+                                        id="images"
+                                        name="images"
+                                        multiple
                                         onChange={handleFileChange}
                                     />
                                 </div>

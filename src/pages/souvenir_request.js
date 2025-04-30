@@ -3,6 +3,7 @@ import { Button, Modal, Box, Typography } from '@mui/material';
 import "../css/Souvenir_request.css";
 import { Link, useNavigate } from "react-router-dom";
 import axios from 'axios';
+import Swal from "sweetalert2";
 
 function SouvenirRequest() {
     const navigate = useNavigate();
@@ -59,15 +60,30 @@ function SouvenirRequest() {
 
     const validateForm = () => {
         if (!formData.productName || !formData.description || !formData.price || !formData.stock || !formData.image || !formData.paymentMethod || !formData.bankName || !formData.accountNumber) {
-            alert("กรุณากรอกข้อมูลให้ครบถ้วน!");
+            Swal.fire({
+                title: "ข้อผิดพลาด",
+                text: "กรุณากรอกข้อมูลให้ครบถ้วน!",
+                icon: "error",
+                confirmButtonText: "ตกลง"
+            });
             return false;
         }
         if (isNaN(formData.price) || formData.price <= 0) {
-            alert("กรุณากรอกราคาที่ถูกต้อง");
+            Swal.fire({
+                title: "ข้อผิดพลาด",
+                text: "กรุณากรอกราคาที่ถูกต้อง",
+                icon: "error",
+                confirmButtonText: "ตกลง"
+            });
             return false;
         }
         if (isNaN(formData.stock) || formData.stock <= 0) {
-            alert("กรุณากรอกจำนวนสินค้าเป็นตัวเลขที่ถูกต้อง");
+            Swal.fire({
+                title: "ข้อผิดพลาด",
+                text: "กรุณากรอกจำนวนสินค้าเป็นตัวเลขที่ถูกต้อง",
+                icon: "error",
+                confirmButtonText: "ตกลง"
+            });
             return false;
         }
         return true;
@@ -109,10 +125,15 @@ function SouvenirRequest() {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
 
-             alert("สินค้าของคุณถูกส่งแล้ว กรุณารอการอนุมัติจากแอดมิน");
-             
-            // นำทางไปยังหน้าสินค้า
-            navigate("/souvenir");
+            Swal.fire({
+                title: "เพิ่มสินค้าสำเร็จ!",
+                text: "สินค้าของคุณถูกส่งแล้ว กรุณารอการอนุมัติจากแอดมิน",
+                icon: "success",
+                confirmButtonText: "ตกลง"
+            }).then(() => {
+                // นำทางไปยังหน้าสินค้า
+                navigate("/souvenir");
+            });
         } catch (error) {
             console.error("Error:", error);
             alert(error.response?.data?.error || "เกิดข้อผิดพลาด");
@@ -306,34 +327,63 @@ function SouvenirRequest() {
                 aria-labelledby="modal-title"
                 aria-describedby="modal-description"
             >
-                <Box sx={style}>
-                    <Typography id="modal-title" variant="h6">ตรวจสอบข้อมูลสินค้า</Typography>
-                    <Typography id="modal-description" sx={{ mt: 2 }}>
-                        <div>
-                            <strong>ชื่อสินค้าของที่ระลึก:</strong> {formData.productName} <br />
-                            <strong>รายละเอียดของสินค้า:</strong> {formData.description} <br />
-                            <strong>ราคาต่อชิ้น:</strong> {formData.price} บาท<br />
-                            <strong>จำนวนสินค้า:</strong> {formData.stock} ชิ้น<br />
-                            <strong>ช่องทางการชำระเงิน:</strong> {formData.paymentMethod} <br />
-                            <strong>ชื่อธนาคาร:</strong> {formData.bankName} <br />
-                            <strong>หมายเลขบัญชี:</strong> {formData.accountNumber} <br />
-                            {formData.image && (
-                                <div>
-                                    <strong>รูปภาพของสินค้า:</strong>
-                                    <br />
-                                    <img
-                                        src={URL.createObjectURL(formData.image)}
-                                        alt="สินค้าของที่ระลึก"
-                                        style={{ maxWidth: "100%", height: "200px", marginTop: "10px" }}
-                                    />
-                                </div>
-                            )}
-                        </div>
+                <Box sx={{ ...style, width: 500 }}>
+                    <Typography id="modal-title" variant="h6" sx={{ mb: 2, textAlign: "center" }}>
+                        ตรวจสอบข้อมูลสินค้า
                     </Typography>
+                    <div style={{ marginBottom: "20px" }}>
+                        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                            <tbody>
+                                <tr>
+                                    <td style={{ fontWeight: "bold", padding: "8px", borderBottom: "1px solid #ddd" }}>ชื่อสินค้า:</td>
+                                    <td style={{ padding: "8px", borderBottom: "1px solid #ddd" }}>{formData.productName}</td>
+                                </tr>
+                                <tr>
+                                    <td style={{ fontWeight: "bold", padding: "8px", borderBottom: "1px solid #ddd" }}>รายละเอียด:</td>
+                                    <td style={{ padding: "8px", borderBottom: "1px solid #ddd" }}>{formData.description}</td>
+                                </tr>
+                                <tr>
+                                    <td style={{ fontWeight: "bold", padding: "8px", borderBottom: "1px solid #ddd" }}>ราคาต่อชิ้น:</td>
+                                    <td style={{ padding: "8px", borderBottom: "1px solid #ddd" }}>{formData.price} บาท</td>
+                                </tr>
+                                <tr>
+                                    <td style={{ fontWeight: "bold", padding: "8px", borderBottom: "1px solid #ddd" }}>จำนวนสินค้า:</td>
+                                    <td style={{ padding: "8px", borderBottom: "1px solid #ddd" }}>{formData.stock} ชิ้น</td>
+                                </tr>
+                                <tr>
+                                    <td style={{ fontWeight: "bold", padding: "8px", borderBottom: "1px solid #ddd" }}>ช่องทางการชำระเงิน:</td>
+                                    <td style={{ padding: "8px", borderBottom: "1px solid #ddd" }}>{formData.paymentMethod}</td>
+                                </tr>
+                                <tr>
+                                    <td style={{ fontWeight: "bold", padding: "8px", borderBottom: "1px solid #ddd" }}>ชื่อธนาคาร:</td>
+                                    <td style={{ padding: "8px", borderBottom: "1px solid #ddd" }}>{formData.bankName}</td>
+                                </tr>
+                                <tr>
+                                    <td style={{ fontWeight: "bold", padding: "8px", borderBottom: "1px solid #ddd" }}>หมายเลขบัญชี:</td>
+                                    <td style={{ padding: "8px", borderBottom: "1px solid #ddd" }}>{formData.accountNumber}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
 
-                    <div style={{ marginTop: '20px', textAlign: 'right' }}>
-                        <Button onClick={handleClose} color="secondary">แก้ไข</Button>
-                        <Button onClick={handleSubmit} color="primary">
+                    {formData.image && (
+                        <div style={{ textAlign: "center", marginBottom: "20px" }}>
+                            <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
+                                รูปภาพของสินค้า
+                            </Typography>
+                            <img
+                                src={URL.createObjectURL(formData.image)}
+                                alt="สินค้าของที่ระลึก"
+                                style={{ maxWidth: "100%", height: "200px", objectFit: "cover", borderRadius: "8px" }}
+                            />
+                        </div>
+                    )}
+
+                    <div style={{ display: "flex", justifyContent: "space-between", marginTop: "20px" }}>
+                        <Button onClick={handleClose} variant="outlined" color="secondary">
+                            แก้ไข
+                        </Button>
+                        <Button onClick={handleSubmit} variant="contained" color="primary">
                             ยืนยันเพิ่มสินค้า
                         </Button>
                     </div>

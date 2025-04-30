@@ -12,6 +12,7 @@ function Souvenir() {
         axios
             .get("http://localhost:3001/souvenir")
             .then((response) => {
+                console.log(response.data);
                 setProducts(response.data);
             })
             .catch((error) => {
@@ -38,7 +39,7 @@ function Souvenir() {
                     <div className="souvenir-item-group">
                         {products && products.length > 0 ? (
                             products
-                                .filter((product) => product.role_id === 1 || product.role_id === 2)
+                                .filter((product) => product.role_id === 1 || product.role_id === 2 || product.role_id === 3 )
                                 .map((product) => (
                                     <Link to={`/souvenir/souvenirDetail/${product.product_id}`} key={product.product_id}>
                                         <div className="souvenir-item">

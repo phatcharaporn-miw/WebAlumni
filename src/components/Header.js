@@ -219,10 +219,35 @@ const addToCart = (productId, quantity, total) => {
 
     // ฟังก์ชันค้นหาเมื่อกดปุ่มค้นหา
     const handleSearchClick = () => {
-      if (searchTerm.trim() !== "") {
-          navigate(`/search?query=${searchTerm}`);
-      }
-  };
+        if (searchTerm.trim() === "") {
+            Swal.fire({
+                title: "ข้อผิดพลาด",
+                text: "กรุณากรอกคำค้นหา",
+                icon: "warning",
+                confirmButtonText: "ตกลง",
+            });
+            return;
+        }
+
+        // ตรวจสอบว่ามีผลการค้นหาหรือไม่
+        axios.get(`http://localhost:3001/search/search-all?search=${searchTerm}`)
+            .then((response) => {
+                if (response.data.success && response.data.data.length > 0) {
+                    navigate(`/search?query=${searchTerm}`); // มีผลการค้นหา
+                } else {
+                    navigate(`/searchResult`, { state: { message: "ไม่มีผลการค้นหานี้" } }); // ไม่มีผลการค้นหา
+                }
+            })
+            .catch((error) => {
+                console.error("เกิดข้อผิดพลาดในการค้นหา:", error.message);
+                Swal.fire({
+                    title: "ข้อผิดพลาด",
+                    text: "ไม่สามารถค้นหาได้ในขณะนี้",
+                    icon: "error",
+                    confirmButtonText: "ตกลง",
+                });
+            });
+    };
   
   const handleSuggestionClick = (suggestion) => {
       let path = "/";

@@ -4,10 +4,11 @@ import axios from "axios";
 import { breadcrumbMapping } from '../components/breadcrumbMapping';
 // css
 import '../css/breadcrumb.css';
+import DonateDetail from "../pages/donate-detail";
 
 function Breadcrumb() {
   const location = useLocation();
-  const { activityId, newsId, categoryId, webboardId } = useParams(); 
+  const { activityId, newsId, categoryId, webboardId, projectId, productId } = useParams(); 
   const [breadcrumb, setBreadcrumb] = useState({}); 
 
   // ดึงข้อมูล breadcrumb หากมี activityId, newsId หรือ categoryId
@@ -48,10 +49,27 @@ function Breadcrumb() {
           console.error("Error fetching category breadcrumb:", error);
         });
     }
-  }, [activityId, newsId, categoryId, webboardId]);
+    if (projectId) {
+      axios.get(`http://localhost:3001/donate/donatedetail/${projectId}`)
+        .then(response => {
+          setBreadcrumb(prev => ({ ...prev, DonateDetail: response.data.project_name }));
+        })
+        .catch(error => {
+          console.error("Error fetching category breadcrumb:", error);
+        });
+    }
+    if (productId) {
+      axios.get(`http://localhost:3001/souvenir/souvenirDetail/${productId}`)
+        .then(response => {
+          setBreadcrumb(prev => ({ ...prev, souvenirDetail: response.data.product_name }));
+        })
+        .catch(error => {
+          console.error("Error fetching category breadcrumb:", error);
+        });
+    }
+  }, [activityId, newsId, categoryId, webboardId, projectId, productId]);
 
   // แยก path ตาม '/'
-  // const pathnames = location.pathname.split('/').filter((item) => item);
   const pathnames = location.pathname
   .split('/')
   .filter((item) => item && item !== 'alumni-home'); // ซ่อน alumni-home
@@ -82,6 +100,10 @@ function Breadcrumb() {
             translatedText = breadcrumb.category;
           } else if (value === webboardId?.toString() && breadcrumb.webboard) {
             translatedText = breadcrumb.webboard;
+          }else if (value === projectId?.toString() && breadcrumb.DonateDetail) {
+            translatedText = breadcrumb.DonateDetail;
+          }else if (value === productId?.toString() && breadcrumb.souvenirDetail) {
+            translatedText = breadcrumb.souvenirDetail;
           }
 
           return (

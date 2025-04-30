@@ -26,7 +26,7 @@ function DonateDetail() {
     useEffect(() => {
         axios.get(`http://localhost:3001/donate/donatedetail/${projectId}`)
             .then(response => {
-                console.log("Project Data:", response.data);
+                // console.log("Project Data:", response.data);
                 setProjectData(response.data);
             })
             .catch(error => {
@@ -189,10 +189,10 @@ function DonateDetail() {
                         <IoInformationCircleOutline className="custom-icon" />
                         <p>รายละเอียดโครงการ</p>
                     </div>
-                    <p className="donate-detail-informations">
+                    <div className ="donate-detail-informations">
                         {/* {formattedStartDate} - {formattedEndDate} */}
                         <p>{projectData.description}</p>
-                    </p>
+                    </div>
                 </div>
 
                 <div className="donate-detail-discription">

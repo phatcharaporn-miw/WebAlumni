@@ -16,6 +16,7 @@ function EditActivity() {
         end_time: "",
         description: "",
         status: 0,
+        images: [],
     });
 
     // ดึงข้อมูลกิจกรรม
@@ -32,6 +33,7 @@ function EditActivity() {
                         end_time: response.data.data.end_time,
                         description: response.data.data.description,
                         status: response.data.data.status,
+                        // image:response.data.data.image || null,
                     });
                 } else {
                     console.error("เกิดข้อผิดพลาดในการดึงข้อมูลกิจกรรม:", response.data.message);
@@ -44,18 +46,37 @@ function EditActivity() {
             });
     }, [activityId]);
 
-    // ฟังก์ชันจัดการการเปลี่ยนแปลงในฟอร์ม
+    // ฟังก์ชันจัดการการเปลี่ยนแปลง
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
+        const { name, value, type, files } = e.target;
+        if (type === "file") {
+            setFormData({ ...formData, [name]: files[0] }); // สำหรับไฟล์เดียว
+        } else {
+            setFormData({ ...formData, [name]: value });
+        }
     };
 
     // ฟังก์ชันบันทึกการแก้ไขกิจกรรม
     const handleSubmit = (e) => {
         e.preventDefault();
-        axios.put(`http://localhost:3001/activity/edit-activity/${activityId}`, formData, {
-            withCredentials: true,
-            headers: { "Content-Type": "multipart/form-data" } 
+
+        const data = new FormData();
+        data.append("activity_name", formData.activity_name);
+        data.append("activity_date", formData.activity_date);
+        data.append("end_date", formData.end_date);
+        data.append("start_time", formData.start_time);
+        data.append("end_time", formData.end_time);
+        data.append("description", formData.description);
+        data.append("status", formData.status);
+
+        if (formData.images) {
+            data.append("images", formData.images); // เพิ่มไฟล์รูปภาพ
+        }
+
+        axios
+            .put(`http://localhost:3001/activity/edit-activity/${activityId}`, data, {
+                withCredentials: true,
+                headers: { "Content-Type": "multipart/form-data" },
             })
             .then((response) => {
                 if (response.data.success) {
@@ -71,13 +92,19 @@ function EditActivity() {
                     Swal.fire({
                         icon: "error",
                         title: "เกิดข้อผิดพลาด",
-                        text: "ไม่สามารถแก้ไขกิจกรรมได้",
+                        text: response.data.message || "ไม่สามารถแก้ไขกิจกรรมได้",
                         confirmButtonText: "ตกลง",
                     });
                 }
             })
             .catch((error) => {
                 console.error("เกิดข้อผิดพลาดในการแก้ไขกิจกรรม:", error.message);
+                Swal.fire({
+                    icon: "error",
+                    title: "เกิดข้อผิดพลาด",
+                    text: "ไม่สามารถแก้ไขกิจกรรมได้",
+                    confirmButtonText: "ตกลง",
+                });
             });
     };
 
@@ -166,6 +193,17 @@ function EditActivity() {
                                 onChange={handleChange}
                                 required
                             ></textarea>
+                        </div>
+                        <div className="mb-3">
+                            <label htmlFor="images" className="form-label">รูปภาพกิจกรรม</label>
+                            <input
+                                type="file"
+                                className="form-control"
+                                id="images"
+                                name="images"
+                                multiple
+                                onChange={handleChange}
+                            />
                         </div>
                         <div className="mb-3">
                             <label htmlFor="status" className="form-label">สถานะ</label>

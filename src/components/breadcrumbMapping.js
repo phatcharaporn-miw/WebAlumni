@@ -19,8 +19,8 @@ export const breadcrumbMapping = {
     "/souvenir/souvenir_request" : "เพิ่มสินค้าของที่ระลึก",
     "/donate/donaterequest": "เพิ่มโครงการบริจาค",
     "/alumni-profile/alumni-profile-souvenir" : "ประวัติการสั่งซื้อ",
-    // "/alumni/major-detail" : "รายชื่อศิษย์เก่า",
-    "/alumni/major-detail/:major" : "รายชื่อศิษย์เก่า",
+    "/alumni/major-detail" : "รายชื่อศิษย์เก่า",
+    // "/alumni/major-detail/:major" : "รายชื่อศิษย์เก่า",
 
     // ส่วนของผู้ใช้
     "/alumni-profile": "โปรไฟล์",

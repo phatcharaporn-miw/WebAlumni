@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Header from './Header';
 import Footer from './Footer';
+import "../css/appLayout.css";
 import { Outlet, useLocation } from "react-router-dom";
 import axios from 'axios';
 import {  useNavigate} from "react-router-dom";
@@ -31,21 +32,9 @@ function AppLayout() {
     // เส้นทางที่ต้องการสิทธิ์เฉพาะ role
     const roleCheckPaths = {
       // admin: ["/admin-home", "/admin-create-news", "/admin-create-activity"],
-      president: ["/president-home"],
-      students: ["/student-home"]
+      // president: ["/president-home"],
+      // students: ["/student-home"]
     };
-    
-    // useEffect(() => {
-    //   const userId = localStorage.getItem('userId');
-    //   const role = localStorage.getItem('userRole');
-      
-    //   if (userId && role) {
-    //     setUser({ userId, role });
-    //     navigate('/alumni-home');
-    //   } else {
-    //       setUser(null);
-    //   }
-    // }, []);
 
     useEffect(() => {
       const updateUser = () => {
@@ -149,17 +138,23 @@ function AppLayout() {
 }, [location.pathname]);
 
   return (
-    <div>
-    
-      {!shouldHideHeader && <Header user={user} setUser={setUser} notifications={notifications} handleLogin={handleLogin}/>} 
+    <div id="root">
+        {!shouldHideHeader && (
+            <Header
+                user={user}
+                setUser={setUser}
+                notifications={notifications}
+                handleLogin={handleLogin}
+            />
+        )}
 
         <main className="main-content">
-        <Breadcrumb />
-          <Outlet context={{ user, setUser,  handleLogin, handleLogout}} />
+            <Breadcrumb />
+            <Outlet context={{ user, setUser, handleLogin, handleLogout }} />
         </main>
 
-      {!shouldHideFooter && <Footer />} 
-      </div>   
+        {!shouldHideFooter && <Footer />}
+    </div>   
   );
 }
 

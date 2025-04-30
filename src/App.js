@@ -17,6 +17,7 @@ import DonateDetail from './pages/donate-detail';
 import Souvenir from './pages/souvenir';
 import SouvenirDetail from './pages/souvenirDetail';
 import SouvenirRequest from './pages/souvenir_request';
+import SearchResult from './pages/searchResults';
 import Webboard from './pages/webboard';
 import Alumni from './pages/alumni';
 import Login from './pages/login';
@@ -55,6 +56,8 @@ import AdminActivityDetail from './pages/admin/activity-detail';
 import EditActivity from './pages/admin/edit-activity';
 import AdminNews from './pages/admin/admin-news';
 import EditNews from './pages/admin/edit-news';
+
+//route ของนายกสมาคม
 import ParticipantsPage from './pages/admin/participants';
 
 function App() {
@@ -86,7 +89,6 @@ function App() {
           <Route path="/webboard" element={<Webboard />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/president-home" element={<PresidentHome />} />
           <Route path="/alumni-home" element={<AlumniHome />} />
           <Route path="/alumni-profile" element={<Profile/>} />
           <Route path="/createPost" element={<CreatePost/>} />
@@ -101,6 +103,10 @@ function App() {
           <Route path="/alumni-profile/alumni-profile-activity" element={<AlumniProfileActivity />} />
           <Route path="/alumni-profile/alumni-profile-souvenir" element={<AlumniProfileSouvenir />} />
           <Route path="/alumni/major-detail/:major" element={<AlumniMajor />} />
+          <Route path="/searchResult" element={<SearchResult />} />
+
+          {/* route ของนายกสมาคม */}
+          <Route path="/president-home" element={<PresidentHome />} />
         </Route>
 
         <Route element={<Admin />}>

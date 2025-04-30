@@ -34,7 +34,9 @@ function AdminActivityDetail() {
     // ฟังก์ชันลบกิจกรรม
     const handleDeleteActivity = () => {
         if (window.confirm("คุณต้องการลบกิจกรรมนี้หรือไม่?")) {
-            axios.delete(`http://localhost:3001/activity/${activityId}`, { withCredentials: true })
+            axios.delete(`http://localhost:3001/activity/delete-activity/${activityId}`, { 
+                withCredentials: true 
+            })
                 .then((response) => {
                     if (response.data.success) {
                         alert("ลบกิจกรรมสำเร็จ!");
@@ -72,7 +74,7 @@ function AdminActivityDetail() {
 
     return (
         <div className="container mt-4">
-            <button className="btn btn-secondary mb-3" onClick={() => navigate(-1)}>ย้อนกลับ</button>
+            {/* <button className="btn btn-secondary mb-3" onClick={() => navigate(-1)}>ย้อนกลับ</button> */}
             <div className="card shadow-lg">
                 <div className="card-header bg-primary text-white text-center">
                     <h2 className="card-title">{activity.activity_name}</h2>
@@ -121,6 +123,7 @@ function AdminActivityDetail() {
                         onClick={() => navigate(`/admin/activities/edit/${activityId}`)}
                     >
                         <MdEdit className="me-2" /> แก้ไขกิจกรรม
+
                     </button>
                     <button
                         className="btn btn-danger"

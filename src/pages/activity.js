@@ -6,7 +6,7 @@ import axios from 'axios';
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { IoMdClose } from "react-icons/io";
-
+import { MdEdit, MdDelete } from "react-icons/md";
 
 
 function Activity(){
@@ -27,7 +27,8 @@ function Activity(){
         year_level: " ",
         activity_id: null,
     });
-
+    const [searchTerm, setSearchTerm] = useState("");
+    const [joinedActivities, setJoinedActivities] = useState([]);
     //เรียงลำดับโพสต์ตามวันที่
     // const sortedActivity = [...activity].sort((a, b) => {
     //     if (sortOrder === "latest") return new Date(b.created_at) - new Date(a.created_at);
@@ -46,6 +47,7 @@ function Activity(){
 
       }, []);
 
+
     const handleStatusChange = (e) => {
     setSelectedStatus(e.target.value);
     };
@@ -54,9 +56,12 @@ function Activity(){
         navigate(`/activity/${activityId}`); // เปลี่ยนเส้นทางไปยังหน้า activity detail
     };
 
-    const filteredActivity = activity.filter(activity => {
-    if (selectedStatus === 'activity') return true;
-    return activity.status == selectedStatus;
+    const filteredActivity = activity.filter((activity) => {
+        const matchesSearch = activity.activity_name
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase());
+        if (selectedStatus === "activity") return matchesSearch;
+        return matchesSearch && activity.status == selectedStatus;
     });
 
     const handleJoinClick = (activityId) => {
@@ -90,8 +95,6 @@ function Activity(){
             });
             return;
         }
-
-
         // console.log("Form Data:", formData); 
 
         axios.post('http://localhost:3001/activity/activity-form', formData, {
@@ -124,6 +127,47 @@ function Activity(){
                     });
                 }
             });
+    };
+
+    //ดึงข้อมูลกิจกรรมที่เข้าร่วม
+    useEffect(() => {
+        axios.get('http://localhost:3001/activity/joined-activity')
+          .then(res => {
+            if (res.data.success) {
+              console.log('กิจกรรมที่เข้าร่วม:', res.data.joinedActivities); 
+              setJoinedActivities(res.data.joinedActivities);
+            }
+          });
+    }, []); 
+
+    const handleDeleteActivity = (activityId) => {
+        Swal.fire({
+            title: "ยืนยันการลบกิจกรรม?",
+            text: "คุณต้องการลบกิจกรรมนี้หรือไม่?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "ลบ",
+            cancelButtonText: "ยกเลิก",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axios
+                    .delete(`http://localhost:3001/activity/${activityId}`, {
+                        withCredentials: true,
+                    })
+                    .then(() => {
+                        Swal.fire("ลบสำเร็จ!", "กิจกรรมถูกลบเรียบร้อยแล้ว", "success");
+                        setActivity((prev) =>
+                            prev.filter((activity) => activity.activity_id !== activityId)
+                        );
+                    })
+                    .catch((error) => {
+                        console.error("Error deleting activity:", error);
+                        Swal.fire("เกิดข้อผิดพลาด!", "ไม่สามารถลบกิจกรรมได้", "error");
+                    });
+            }
+        });
     };
        
     // ฟังก์ชันช่วยสำหรับจัดการคลาสสถานะ
@@ -176,6 +220,25 @@ function Activity(){
                 <option value="0">กำลังจะจัดขึ้น</option>
             </select>
 
+            <div className="activity-management">
+    {userRole === "2" && (
+        <div className="d-flex justify-content-between mb-4">
+            <button
+                className="btn btn-primary"
+                onClick={() => navigate("/activity/add")}
+            >
+                เพิ่มกิจกรรม
+            </button>
+            <input
+                type="text"
+                className="form-control w-50"
+                placeholder="ค้นหากิจกรรม..."
+                onChange={(e) => setSearchTerm(e.target.value)}
+            />
+        </div>
+    )}
+</div>
+
             <div className="container">
                 <div className="row">
                     {filteredActivity.length > 0 ? (
@@ -196,35 +259,51 @@ function Activity(){
                             </div>
                             <div className="card-body">
                             <h5 className="card-title">{activity.activity_name}</h5>
-                            {activity.check_alumni === 1 && (
-                                <div className="alert alert-warning d-flex align-items-center" role="alert">
-                                <i className="me-2 bi bi-exclamation-circle-fill"></i>
-                                กิจกรรมนี้สำหรับศิษย์เก่า
-                                </div>
-                            )}
-                            <h6>
-                                {activity.end_date && activity.end_date !== "0000-00-00" && activity.end_date !== activity.activity_date
-                                ? `${formatDate(activity.activity_date)} - ${formatDate(activity.end_date)}`
-                                : `${formatDate(activity.activity_date)}`}
-                            </h6>
                             <p className="activity-text">{activity.description}</p>
                             <p className="text-muted">
                                 ผู้เข้าร่วม: {activity.current_participants}/{activity.max_participants || "ไม่จำกัด"}
                             </p>
                             <div className="button-group">
-                                {activity.status === 0 ? (
-                                <a className="btn join-button" onClick={() => handleJoinClick(activity.activity_id)}>
-                                    เข้าร่วมกิจกรรม
-                                </a>
-                                ) : null }
+                                {activity.status === 0 && (
+                                    joinedActivities.includes(activity.activity_id) ? (
+                                    <button className="btn btn-secondary" disabled>
+                                        เข้าร่วมแล้ว
+                                    </button>
+                                    ) : (
+                                    <button
+                                        className="btn join-button"
+                                        onClick={() => handleJoinClick(activity.activity_id)}
+                                    >
+                                        เข้าร่วมกิจกรรม
+                                    </button>
+                                    )
+                                )}
                                 <button onClick={() => handleViewDetails(activity.activity_id)} className="btn btn-info">
                                     ดูรายละเอียด
                                 </button>
                             </div>
+                            {userRole === "2" && (
+                                <div className="d-flex justify-content-end mt-3">
+                                    <button
+                                        className="btn btn-warning me-2"
+                                        onClick={() => navigate(`/activity/edit/${activity.activity_id}`)}
+                                    >
+                                        <MdEdit className="me-1" size={18} />
+                                        แก้ไข
+                                    </button>
+                                    <button
+                                        className="btn btn-danger"
+                                        onClick={() => handleDeleteActivity(activity.activity_id)}
+                                    >
+                                        <MdDelete className="me-1" size={18} />
+                                        ลบ
+                                    </button>
+                                </div>
+                            )}
                             </div>
                         </div>
                         </div>
-                    ))
+                        ))
                     ) : (
                     <div className="text-center my-5 text-muted">
                         <p className="fs-5">ไม่มีกิจกรรมที่ตรงกับสถานะในขณะนี้</p>
