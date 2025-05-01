@@ -24,7 +24,6 @@ import Login from './pages/login';
 import Register from './pages/register';
 import Faq from './pages/faq';
 // import Register from './pages/test-regis';
-import AdminHome from './pages/admin/home';
 import PresidentHome from './pages/president/president-home';
 // import ProtectedRoute from './components/ProtectedRoute';
 import AlumniHome from './pages/alumni/alumni-home';
@@ -43,22 +42,32 @@ import ForgotPassword from './pages/forgotPassword';
 import SouvenirCheckout from './pages/souvenir_checkout';
 // import SouvenirHistory from '../src/pages/alumni/alumni-profile-souvenir';
 import AlumniProfileSouvenir from './pages/alumni/alumni-profile-souvenir';
-import Admin from './components/Admin';
-import AdminSouvenir from './pages/admin/souvenir';
-import AdminActivity from './pages/admin/admin-home';
 import AlumniProfileActivity from './pages/alumni/alumni-profile-activity';
 import SouvenirBasket from './pages/souvenir_basket';
 import AlumniMajor from './pages/major-detail';
+
+
+// route ของแอดมิน
+import AdminHome from './pages/admin/home';
+import AdminEditWebboard from './pages/admin/admin-edit-webboard';
+import EditActivity from './pages/admin/edit-activity';
+import AdminNews from './pages/admin/admin-news';
+import EditNews from './pages/admin/edit-news';
 import Calendar from './pages/admin/calendar';
 import AdminWebboard from './pages/admin/webboard';
 import WebboardDetail from './pages/admin/webboard-detail';
 import AdminActivityDetail from './pages/admin/activity-detail';
-import EditActivity from './pages/admin/edit-activity';
-import AdminNews from './pages/admin/admin-news';
-import EditNews from './pages/admin/edit-news';
+import Admin from './components/Admin';
+import AdminSouvenir from './pages/admin/souvenir';
+import AdminActivity from './pages/admin/admin-home';
+import UserManagement from './pages/admin/manage-users';
+import UserProfile from './pages/admin/manage-users-profile';
+
+
 
 //route ของนายกสมาคม
 import ParticipantsPage from './pages/admin/participants';
+import PreCreateActivity from './pages/president/president-create-activity';
 
 function App() {
 
@@ -107,6 +116,7 @@ function App() {
 
           {/* route ของนายกสมาคม */}
           <Route path="/president-home" element={<PresidentHome />} />
+          <Route path="/activity/president-create-activity" element={<PreCreateActivity />} />
         </Route>
 
         <Route element={<Admin />}>
@@ -122,13 +132,15 @@ function App() {
             <Route path="/admin/webboard" element={<AdminWebboard />} />
             <Route path="/admin/webboard/createPost" element={<CreatePost />} />
             <Route path="/admin/webboard/:webboardId" element={<WebboardDetail />} />
-            <Route path="/admin/webboard/edit/:webboardId" element={<EditWebboard />} />
+            <Route path="/admin/webboard/edit/:webboardId" element={<AdminEditWebboard />} />
             <Route path="/admin/activities/edit/:activityId" element={<EditActivity />} />
             <Route path="/admin/news" element={<AdminNews />} />
             <Route path="/admin/news/:newsId" element={<NewsDetail />} />
             <Route path="/admin/news/admin-create-news" element={<CreateNews />} />
             <Route path="/admin/news/edit/:newsId" element={<EditNews />} />
             <Route path="/admin/activities/:activityId/participants" element={<ParticipantsPage />} />
+            <Route path="/admin/users" element={<UserManagement />} />
+            <Route path="/admin/users/user-profile/:userId" element={<UserProfile />} />
 
 
         </Route>

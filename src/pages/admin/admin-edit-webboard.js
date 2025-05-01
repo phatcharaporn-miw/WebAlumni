@@ -4,7 +4,7 @@ import axios from 'axios';
 import { IoIosAdd } from "react-icons/io";
 import Swal from "sweetalert2";
 
-function EditWebboard() {
+function AdminEditWebboard() {
     const { webboardId } = useParams();
     const navigate = useNavigate();
     const [category, setCategory] = useState([]);
@@ -15,6 +15,19 @@ function EditWebboard() {
         category_id: ''
     });
 
+    const [isLoggedin, setIsLoggedin] = useState(false); 
+    
+    useEffect(() => {
+          const userSession = localStorage.getItem("userId");  
+          if (userSession) {
+              setIsLoggedin(true);
+              console.log("ผู้ใช้ล็อกอินแล้ว");
+          } else {
+              setIsLoggedin(false);
+              console.log("ผู้ใช้ยังไม่ได้ล็อกอิน"); 
+          }
+    }, []);
+
     // ดึงข้อมูลกระทู้ที่ต้องการแก้ไข
     useEffect(() => {
         axios.get(`http://localhost:3001/users/webboard/${webboardId}`)
@@ -23,7 +36,7 @@ function EditWebboard() {
                     setFormData(response.data.data);
                 } else {
                     Swal.fire("ไม่พบกระทู้", "กรุณาลองใหม่อีกครั้ง", "error");
-                    navigate("/alumni-profile-webboard");
+                    // navigate("/alumni-profile-webboard");
                 }
             })
             .catch((error) => {
@@ -66,7 +79,7 @@ function EditWebboard() {
                         confirmButtonColor: "#0F75BC",
                         confirmButtonText: "ตกลง",
                     }).then(() => {                     
-                        navigate("/alumni-profile-webboard");                       
+                        navigate("/admin/webboard");                       
                     });
                 }
             })
@@ -171,7 +184,7 @@ function EditWebboard() {
                                 </div>
                                 <div className="d-flex justify-content-end">
                                     <button type="submit" className="btn btn-primary me-2">บันทึกการแก้ไข</button>
-                                    <button type="button" className="btn btn-secondary" onClick={() => navigate('/alumni-profile-webboard')}>
+                                    <button type="button" className="btn btn-secondary" onClick={() => navigate('/admin/webboard')}>
                                         ยกเลิก
                                     </button>
                                 </div>
@@ -184,4 +197,4 @@ function EditWebboard() {
     );
 }
 
-export default EditWebboard;
+export default AdminEditWebboard;

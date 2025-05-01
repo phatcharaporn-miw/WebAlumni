@@ -14,37 +14,36 @@ function CreateNews() {
         title: '',
         content: '',
         images: [],
-      });
-
-    // ฟังก์ชันจัดการการอัพโหลดไฟล์
-  const handleFileChange = (e) => {
-    const files = Array.from(e.target.files); // ต้องแปลงก่อนใช้
-    console.log("อัปโหลดรูป:", files);
-    setFormData((prevState) => ({
-      ...prevState,
-      images: files,
-    }));
-  };
-
+    });
+    
+    const handleFileChange = (e) => {
+        const files = Array.from(e.target.files);
+        console.log("อัปโหลดรูป:", files);
+        setFormData((prevState) => ({
+            ...prevState,
+            images: files,
+        }));
+    };
+    
     const handleSubmit = async (event) => {
         event.preventDefault();
-
-        const formData = new FormData();
-        formData.append('title', formData.title);
-        formData.append('content', formData.content);
-        //แนบรูปหลายรูป
-        formData.images.forEach((img, index) => {
-            formData.append('images', img); // ใช้ชื่อเดียวกันทั้งหมด
+    
+        const formDataToSend = new FormData();
+        formDataToSend.append('title', formData.title);
+        formDataToSend.append('content', formData.content);
+    
+        formData.images.forEach((img) => {
+            formDataToSend.append('images', img);
         });
-
-        axios.post('http://localhost:3001/news/create-news', formData, {
+    
+        axios.post('http://localhost:3001/news/create-news', formDataToSend, {
             withCredentials: true,
             headers: { "Content-Type": "multipart/form-data" }
         })
             .then((response) => {
                 if (response.status === 200) {
                     alert('โพสต์ข่าวประชาสัมพันธ์เรียบร้อยแล้ว!');
-                    navigate("/news");
+                    navigate("/admin/news");
                 } else {
                     alert('เกิดข้อผิดพลาดในการโพสต์ข่าวประชาสัมพันธ์');
                 }
@@ -53,6 +52,7 @@ function CreateNews() {
                 console.error('เกิดข้อผิดพลาดในการโพสต์ข่าวประชาสัมพันธ์:', error.message);
             });
     };
+    
 
     
 
@@ -74,8 +74,8 @@ function CreateNews() {
                                         id="title"
                                         name="title"
                                         placeholder="หัวข้อข่าว"
-                                        value={title}
-                                        onChange={(e) => setTitle(e.target.value)}
+                                        value={formData.title}
+                                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                                         required
                                     />
                                 </div>
@@ -87,8 +87,8 @@ function CreateNews() {
                                         name="content"
                                         rows="5"
                                         placeholder="เนื้อหาข่าวประชาสัมพันธ์"
-                                        value={content}
-                                        onChange={(e) => setContent(e.target.value)}
+                                        value={formData.content}
+                                        onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                                         required
                                     ></textarea>
                                 </div>
@@ -99,6 +99,7 @@ function CreateNews() {
                                         className="form-control w-100"
                                         id="images"
                                         name="images"
+                                        accept="image/*"
                                         multiple
                                         onChange={handleFileChange}
                                     />

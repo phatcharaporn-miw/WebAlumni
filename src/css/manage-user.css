@@ -1,0 +1,24 @@
+/* เพิ่มในไฟล์ CSS */
+body {
+    background-color: #f9fafb; /* สีพื้นหลัง */
+  }
+  
+  img {
+    border: 2px solid #e5e7eb; /* เส้นขอบรูป */
+  }
+  
+  button {
+    transition: all 0.3s ease; /* เพิ่มเอฟเฟกต์เมื่อ hover */
+  }
+  
+  button:hover {
+    color: #1d4ed8; /* เปลี่ยนสีเมื่อ hover */
+  }
+  
+  .shadow-lg {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* เพิ่มเงา */
+  }
+  
+  .rounded-lg {
+    border-radius: 12px; /* มุมโค้งมน */
+  }

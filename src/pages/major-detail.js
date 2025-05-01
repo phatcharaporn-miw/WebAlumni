@@ -91,7 +91,7 @@ function MajorDetail() {
                 <div className="search-box mb-4">
                     <input
                         type="text"
-                        className="form-control"
+                        className="form-control w-25"
                         placeholder="ค้นหารายชื่อ..."
                         value={searchTerm}
                         onChange={(e) => handleSearch(e.target.value)}

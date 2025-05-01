@@ -158,16 +158,17 @@ function Souvenir() {
                     {notification.message}
                 </Alert>
             </Snackbar>
-
+    
             <IconButton
                 color="inherit"
                 onClick={() => setNotificationCount(0)} // เคลียร์แจ้งเตือนเมื่อกด
+                size="small" 
             >
                 <Badge badgeContent={notificationCount} color="error">
-                    <MdNotifications size={24} />
+                    <MdNotifications size={20} /> 
                 </Badge>
             </IconButton>
-
+    
             <div className="souvenir-top">
                 <div className="souvenir-bt">
                     <Link to={`/admin/souvenir/souvenir_request`}>
@@ -175,9 +176,9 @@ function Souvenir() {
                     </Link>
                 </div>
             </div>
-
+    
             <h2 className="titlesouvenir">ของที่ระลึก (สำหรับผู้ดูแล)</h2>
-
+    
             <div className="souvenir-content">
                 <div className="souvenir-content-item">
                     <table>
@@ -209,15 +210,27 @@ function Souvenir() {
                                         </td>
                                         <td>
                                             {product.status === "0" && (
-                                                <button className="souvenir-bt-approve" onClick={() => handleApprove(product.product_id)}>
+                                                <button
+                                                    className="souvenir-bt-approve"
+                                                    onClick={() => handleApprove(product.product_id)}
+                                                    style={{ fontSize: "12px", marginRight: "8px" }} 
+                                                >
                                                     อนุมัติ
                                                 </button>
                                             )}
-
-                                            <button className="souvenir-bt-edit" onClick={() => handleOpen(product)}>
+    
+                                            <button
+                                                className="souvenir-bt-edit"
+                                                onClick={() => handleOpen(product)}
+                                                style={{ fontSize: "12px", marginRight: "8px" }}
+                                            >
                                                 <FaRegEdit />แก้ไข
                                             </button>
-                                            <button className="souvenir-bt-del" onClick={() => handleDelete(product.product_id)}>
+                                            <button
+                                                className="souvenir-bt-del"
+                                                onClick={() => handleDelete(product.product_id)}
+                                                style={{ fontSize: "12px" }} 
+                                            >
                                                 <MdDelete />ลบ
                                             </button>
                                         </td>
@@ -230,15 +243,18 @@ function Souvenir() {
                     </table>
                 </div>
             </div>
-
+    
             <Modal open={open} onClose={handleClose} aria-labelledby="modal-title" aria-describedby="modal-description">
                 <Box sx={style}>
-                    <Typography id="modal-title" variant="h5">แก้ไขข้อมูลสินค้า</Typography>
+                    <Typography id="modal-title" variant="h5" sx={{ fontWeight: 'bold', mb: 2, textAlign: 'center' }}>
+                        แก้ไขข้อมูลสินค้า
+                    </Typography>
+
                     {selectedProduct && (
                         <div id="modal-description">
                             <form>
-                                <div>
-                                    <label className="name_product">ชื่อสินค้า</label><br />
+                                <div style={{ marginBottom: '16px' }}>
+                                    <label className="name_product" style={{ fontWeight: 'bold', display: 'block' }}>ชื่อสินค้า</label>
                                     <input
                                         type="text"
                                         value={selectedProduct.product_name}
@@ -246,10 +262,18 @@ function Souvenir() {
                                             ...selectedProduct,
                                             product_name: e.target.value,
                                         })}
+                                        style={{
+                                            width: '100%',
+                                            padding: '8px',
+                                            fontSize: '14px',
+                                            borderRadius: '4px',
+                                            border: '1px solid #ccc',
+                                        }}
                                     />
                                 </div>
-                                <div>
-                                    <label>ราคา</label><br />
+
+                                <div style={{ marginBottom: '16px' }}>
+                                    <label style={{ fontWeight: 'bold', display: 'block' }}>ราคา</label>
                                     <input
                                         type="number"
                                         value={selectedProduct.price}
@@ -257,16 +281,31 @@ function Souvenir() {
                                             ...selectedProduct,
                                             price: e.target.value,
                                         })}
+                                        style={{
+                                            width: '100%',
+                                            padding: '8px',
+                                            fontSize: '14px',
+                                            borderRadius: '4px',
+                                            border: '1px solid #ccc',
+                                        }}
                                     />
                                 </div>
-                                <div>
-                                    <label>สถานะ</label><br />
+
+                                <div style={{ marginBottom: '16px' }}>
+                                    <label style={{ fontWeight: 'bold', display: 'block' }}>สถานะ</label>
                                     <select
                                         value={selectedProduct.status}
                                         onChange={(e) => setSelectedProduct({
                                             ...selectedProduct,
                                             status: e.target.value,
                                         })}
+                                        style={{
+                                            width: '100%',
+                                            padding: '8px',
+                                            fontSize: '14px',
+                                            borderRadius: '4px',
+                                            border: '1px solid #ccc',
+                                        }}
                                     >
                                         <option value="1">กำลังจำหน่าย</option>
                                         <option value="0">ยังไม่จำหน่าย</option>
@@ -275,37 +314,67 @@ function Souvenir() {
                             </form>
                         </div>
                     )}
-                    <div style={{ marginTop: "20px", textAlign: "right" }}>
-                        <Button onClick={handleClose} color="secondary">ปิด</Button>
-                        <Button
-                            onClick={() => {
-                                axios.put(`http://localhost:3001/admin/editSouvenir/${selectedProduct.product_id}`, selectedProduct)
-                                    .then(response => {
-                                        console.log("บันทึกข้อมูลสินค้าสำเร็จ:", response.data);
 
-                                        setProducts(prevProducts =>
-                                            prevProducts.map(product =>
-                                                product.product_id === selectedProduct.product_id
-                                                    ? { ...product, ...selectedProduct }
-                                                    : product
-                                            )
-                                        );
+                <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+                    <Button
+                        onClick={handleClose}
+                        variant="outlined"
+                        color="secondary"
+                        size="small"
+                        sx={{
+                            paddingX: 2,
+                            paddingY: 1,
+                            fontSize: '14px',
+                            borderRadius: '8px',
+                            textTransform: 'none',
+                            '&:hover': {
+                                backgroundColor: '#f0f0f0',
+                                borderColor: '#999',
+                            }
+                        }}
+                    >
+                        ปิด
+                    </Button>
+                    <Button
+                        onClick={() => {
+                            axios.put(`http://localhost:3001/admin/editSouvenir/${selectedProduct.product_id}`, selectedProduct)
+                                .then(response => {
+                                    console.log("บันทึกข้อมูลสินค้าสำเร็จ:", response.data);
+                                    setProducts(prevProducts =>
+                                        prevProducts.map(product =>
+                                            product.product_id === selectedProduct.product_id
+                                                ? { ...product, ...selectedProduct }
+                                                : product
+                                        )
+                                    );
+                                    handleClose();
+                                })
+                                .catch(error => {
+                                    console.error("เกิดข้อผิดพลาดในการบันทึก:", error);
+                                });
+                        }}
+                        variant="contained"
+                        color="primary"
+                        size="small"
+                        sx={{
+                            paddingX: 2.5,
+                            paddingY: 1,
+                            fontSize: '14px',
+                            borderRadius: '8px',
+                            textTransform: 'none',
+                            '&:hover': {
+                                backgroundColor: '#2c6ad4',
+                            }
+                        }}
+                    >
+                        บันทึก
+                    </Button>
+                </div>
 
-                                        handleClose();
-                                    })
-                                    .catch(error => {
-                                        console.error("เกิดข้อผิดพลาดในการบันทึก:", error);
-                                    });
-                            }}
-                            color="primary"
-                        >
-                            บันทึก
-                        </Button>
-                    </div>
                 </Box>
             </Modal>
         </>
-    );
+    );    
 }
 
 export default Souvenir;

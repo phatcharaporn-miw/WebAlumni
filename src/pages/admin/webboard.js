@@ -13,6 +13,7 @@ function AdminWebboard() {
     const [webboard, setWebboard] = useState([]);
     const [sortOrder, setSortOrder] = useState("latest");
     const [selectedPost, setSelectedPost] = useState(null);
+    const userRole = localStorage.getItem("role");
 
     // ดึงข้อมูล webboard
     useEffect(() => {
@@ -39,11 +40,17 @@ function AdminWebboard() {
     // ฟังก์ชันลบกระทู้
     const handleDeletePost = (postId) => {
         if (window.confirm("คุณต้องการลบกระทู้นี้หรือไม่?")) {
-            axios.delete(`http://localhost:3001/web/webboard/${postId}`, { withCredentials: true })
+            axios.delete(`http://localhost:3001/web/webboard/${postId}`, { 
+                withCredentials: true
+            })
                 .then((response) => {
                     if (response.data.success) {
                         setWebboard(webboard.filter(post => post.webboard_id !== postId));
                         alert("ลบกระทู้สำเร็จ!");
+
+                        if (userRole === "1") {
+                            navigate("/admin/webboard");
+                        }
                     } else {
                         alert("เกิดข้อผิดพลาดในการลบกระทู้");
                     }

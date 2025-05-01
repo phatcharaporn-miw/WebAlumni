@@ -12,7 +12,7 @@ import { MdEdit, MdDelete } from "react-icons/md";
 function Activity(){
     const [activityId, setActivityId] = useState(null);
     const [activity, setActivity] = useState([]);
-    const [sortOrder, setSortOrder] = useState("latest");
+    // const [sortOrder, setSortOrder] = useState("latest");
     const [selectedStatus, setSelectedStatus] = useState('activity');
     const [showForm, setShowForm] = useState(false);
     const userRole = localStorage.getItem("userRole");  
@@ -29,40 +29,8 @@ function Activity(){
     });
     const [searchTerm, setSearchTerm] = useState("");
     const [joinedActivities, setJoinedActivities] = useState([]);
-    //เรียงลำดับโพสต์ตามวันที่
-    // const sortedActivity = [...activity].sort((a, b) => {
-    //     if (sortOrder === "latest") return new Date(b.created_at) - new Date(a.created_at);
-    //     if (sortOrder === "oldest") return new Date(a.created_at) - new Date(b.created_at);
-    //     return 0;
-    // });
-
-    useEffect(() => {
-        axios.get('http://localhost:3001/activity/all-activity')
-          .then(response => {
-            setActivity(response.data.data);
-          })
-          .catch(error => {
-            console.error("Error fetching activities:", error);
-          });
-
-      }, []);
-
-
-    const handleStatusChange = (e) => {
-    setSelectedStatus(e.target.value);
-    };
-
-    const handleViewDetails = (activityId) => {
-        navigate(`/activity/${activityId}`); // เปลี่ยนเส้นทางไปยังหน้า activity detail
-    };
-
-    const filteredActivity = activity.filter((activity) => {
-        const matchesSearch = activity.activity_name
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase());
-        if (selectedStatus === "activity") return matchesSearch;
-        return matchesSearch && activity.status == selectedStatus;
-    });
+    const [loading, setLoading] = useState(true);
+   
 
     const handleJoinClick = (activityId) => {
         const userId = localStorage.getItem('userId'); 
@@ -81,6 +49,34 @@ function Activity(){
         setShowForm(true);
         setFormData({ ...formData, activity_id: activityId });
     };    
+
+    useEffect(() => {
+        // ดึงข้อมูลกิจกรรมที่กำลังจะจัดขึ้น
+        axios.get('http://localhost:3001/activity/all-activity')
+        .then(response => {
+        setActivity(response.data.data);
+        })
+        .catch(error => {
+        console.error("Error fetching activities:", error);
+        });
+    }, []);
+
+
+    const handleStatusChange = (e) => {
+    setSelectedStatus(e.target.value);
+    };
+
+    const handleViewDetails = (activityId) => {
+        navigate(`/activity/${activityId}`); 
+    };
+
+    const filteredActivity = activity.filter((activity) => {
+        const matchesSearch = activity.activity_name
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase());
+        if (selectedStatus === "activity") return matchesSearch;
+        return matchesSearch && activity.status == selectedStatus;
+    });
 
     const handleFormSubmit = (e) => {
         e.preventDefault();
@@ -108,6 +104,8 @@ function Activity(){
                     confirmButtonText: "ตกลง",
                     timer: 3000
                 });
+                // อัปเดตสถานะ joinedActivities
+                setJoinedActivities((prev) => [...prev, formData.activity_id]);
                 setShowForm(false);
             })
             .catch(error => {
@@ -128,17 +126,23 @@ function Activity(){
                 }
             });
     };
-
+ 
     //ดึงข้อมูลกิจกรรมที่เข้าร่วม
     useEffect(() => {
-        axios.get('http://localhost:3001/activity/joined-activity')
-          .then(res => {
-            if (res.data.success) {
-              console.log('กิจกรรมที่เข้าร่วม:', res.data.joinedActivities); 
-              setJoinedActivities(res.data.joinedActivities);
-            }
-          });
-    }, []); 
+        const userId = localStorage.getItem('userId');
+        if (userId) {
+            axios.get(`http://localhost:3001/activity/joined-activities?user_id=${userId}`)
+                .then(response => {
+                    if (response.data.success) {
+                        setJoinedActivities(response.data.joinedActivities.map(activity => activity.activity_id));
+                        setLoading(false);
+                    } else {
+                        console.log("ไม่พบกิจกรรม");
+                    }
+                })
+                .catch(err => console.error("Error fetching joined activities:", err));
+        }
+    }, []);
 
     const handleDeleteActivity = (activityId) => {
         Swal.fire({
@@ -207,6 +211,8 @@ function Activity(){
         return `${startHours}:${startMinutes} - ${endHours}:${endMinutes} น.`;
       };
 
+    //   if (loading) return <p>กำลังโหลด...</p>;
+
     return(
         <section className="container">
             {/* <img src="./image/donation.jpg" className="head-activity" alt="donation-image" /> */}
@@ -221,23 +227,23 @@ function Activity(){
             </select>
 
             <div className="activity-management">
-    {userRole === "2" && (
-        <div className="d-flex justify-content-between mb-4">
-            <button
-                className="btn btn-primary"
-                onClick={() => navigate("/activity/add")}
-            >
-                เพิ่มกิจกรรม
-            </button>
-            <input
-                type="text"
-                className="form-control w-50"
-                placeholder="ค้นหากิจกรรม..."
-                onChange={(e) => setSearchTerm(e.target.value)}
-            />
-        </div>
-    )}
-</div>
+                {userRole === "2" && (
+                    <div className="d-flex justify-content-between mb-4">
+                        <button
+                            className="btn btn-primary"
+                            onClick={() => navigate("/activity/president-create-activity")}
+                        >
+                            เพิ่มกิจกรรม
+                        </button>
+                        <input
+                            type="text"
+                            className="form-control w-50"
+                            placeholder="ค้นหากิจกรรม..."
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+                )}
+            </div>
 
             <div className="container">
                 <div className="row">

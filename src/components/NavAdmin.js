@@ -36,16 +36,16 @@ function NavAdmin() {
         const imagePath = localStorage.getItem('image_path');  
 
         const profilePic = imagePath
-            ? `http://localhost:3001/${imagePath}` // เชื่อมต่อ URL ของรูปภาพ
-            : '/default-profile-pic.jpg'; // ถ้าไม่มีให้ใช้รูป default
+            ? `http://localhost:3001/${imagePath.replace(/^\/+/, '')}`
+            : '/default-profile-pic.jpg';
 
         if (role === '1') {
-            setUserInfo({
+            setUserInfo({              
                 fullName: username,
                 profilePic: profilePic,
             });
         } else {
-            navigate('/login'); // ถ้าไม่ใช่ Admin ให้กลับไปที่หน้า login
+            navigate('/login'); 
         }
     }, [navigate]);
 
@@ -59,7 +59,7 @@ function NavAdmin() {
                     style={profilePicStyle}
                 />
                 <h5 className="my-3" style={{ fontSize: '18px', fontWeight: '500' }}>
-                    สวัสดี! {userInfo.fullName}
+                    ยินดีต้อนรับ {userInfo.fullName}
                 </h5>
             </div>
 

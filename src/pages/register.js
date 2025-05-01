@@ -184,6 +184,7 @@ function Register() {
                             <label className="form-label">เลือกประเภทผู้ใช้:</label>
                                 <select  name="role" value={userData.role} onChange={(e) => handleInputChange({ target: { name: 'role', value: e.target.value } })} className="form-control">
                                     <option value="">เลือกบทบาท</option>
+                                    <option value="1">แอดมิน</option>
                                     <option value="2">นายกสมาคม</option>
                                     <option value="3">ศิษย์เก่า</option>
                                     <option value="4">ศิษย์ปัจจุบัน</option>
@@ -437,6 +438,40 @@ function Register() {
                                 </fieldset>
                             </>
                         )}
+                        {userData.role === "1" && (
+    <>
+        <fieldset>
+            <legend className="legend-title">ข้อมูลเพิ่มเติม</legend>
+            <div className="form-group">
+                <label>ชื่อ-สกุล<span className="importent">*</span></label>
+                <input
+                    type="text"
+                    className="form-control"
+                    id="full_name"
+                    name="full_name"
+                    placeholder="ชื่อ-สกุล"
+                    value={userData.full_name || ''}
+                    onChange={handleInputChange}
+                    required
+                />
+            </div>
+
+            <div className="form-group">
+    <label>อีเมล<span className="importent">*</span></label>
+    <input
+        type="email"
+        className="form-control"
+        id="email"
+        name="email"
+        placeholder="example@email.com"
+        value={userData.email}
+        onChange={handleInputChange}
+        required // <<< เพิ่ม required ด้วย
+    />
+</div>
+        </fieldset>
+    </>
+)}
 
 {userData.role === "2" && (
     <>

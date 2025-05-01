@@ -26,7 +26,9 @@ function AdminNews() {
     // ฟังก์ชันลบข่าว
     const handleDeleteNews = (newsId) => {
         if (window.confirm("คุณต้องการลบข่าวนี้หรือไม่?")) {
-            axios.delete(`http://localhost:3001/news/news-id/${newsId}`, { withCredentials: true })
+            axios.delete(`http://localhost:3001/news/delete-news/${newsId}`, { 
+                withCredentials: true 
+            })
                 .then((response) => {
                     if (response.data.success) {
                         alert("ลบข่าวสำเร็จ!");
