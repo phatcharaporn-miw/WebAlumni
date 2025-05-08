@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 
 function NavAdmin() {
     const [userInfo, setUserInfo] = useState({
@@ -10,23 +11,34 @@ function NavAdmin() {
     const navigate = useNavigate();
 
     const handleLogout = async () => {
-        const isConfirmed = window.confirm('คุณแน่ใจว่าจะออกจากระบบ?');
-
-        if (isConfirmed) {
-            try {
-                await axios.get('http://localhost:3001/api/logout', { withCredentials: true });
-
-                // ลบข้อมูลใน localStorage
-                localStorage.removeItem('userId');
-                localStorage.removeItem('userRole');
-                localStorage.removeItem('username');
-                localStorage.removeItem('image_path');
-
-                navigate('/login');
-            } catch (error) {
-                console.error('Logout Error:', error);
+        Swal.fire({
+            title: 'คุณแน่ใจหรือไม่?',
+            text: 'คุณต้องการออกจากระบบหรือไม่?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'ใช่, ออกจากระบบ!',
+            cancelButtonText: 'ยกเลิก',
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    await axios.get('http://localhost:3001/api/logout', { withCredentials: true });
+    
+                    // ลบข้อมูลใน localStorage
+                    localStorage.removeItem('userId');
+                    localStorage.removeItem('userRole');
+                    localStorage.removeItem('username');
+                    localStorage.removeItem('image_path');
+    
+                    Swal.fire('ออกจากระบบสำเร็จ!', 'คุณได้ออกจากระบบเรียบร้อยแล้ว', 'success');
+                    navigate('/'); // เปลี่ยนเส้นทางไปยังหน้าแรกหลังจากออกจากระบบ
+                } catch (error) {
+                    console.error('Logout Error:', error);
+                    Swal.fire('เกิดข้อผิดพลาด!', 'ไม่สามารถออกจากระบบได้', 'error');
+                }
             }
-        }
+        });
     };
 
     useEffect(() => {

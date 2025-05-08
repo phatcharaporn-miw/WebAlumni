@@ -118,7 +118,7 @@ function EditActivity() {
 
     return (
         <div className="container mt-4">
-            <button className="btn btn-secondary mb-3" onClick={() => navigate(-1)}>ย้อนกลับ</button>
+            {/* <button className="btn btn-secondary mb-3" onClick={() => navigate(-1)}>ย้อนกลับ</button> */}
             <h3 className="mb-4 text-center">แก้ไขกิจกรรม</h3>
             <div className="row justify-content-center">
                 <div className="col-lg-7 col-md-10">             

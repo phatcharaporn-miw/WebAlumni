@@ -441,6 +441,7 @@ function Home() {
                 <h4 className="activity-title fw-bold">ปฏิทินกิจกรรม</h4>
                 {activity.length > 0 ? (
                   activity
+                    .slice(0, 3) // แสดงกิจกรรม 3 รายการแรก
                     .sort((a, b) => new Date(a.activity_date) - new Date(b.activity_date))
                     .map((item) => (
                       <Link

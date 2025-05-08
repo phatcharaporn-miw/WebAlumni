@@ -5,6 +5,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { useNavigate } from "react-router-dom";
 import '../../css/admin-news.css';
 import { MdDateRange, MdEdit, MdDelete } from "react-icons/md";
+import Swal from "sweetalert2";
 
 function AdminNews() {
     const navigate = useNavigate();
@@ -25,30 +26,42 @@ function AdminNews() {
 
     // ฟังก์ชันลบข่าว
     const handleDeleteNews = (newsId) => {
-        if (window.confirm("คุณต้องการลบข่าวนี้หรือไม่?")) {
-            axios.delete(`http://localhost:3001/news/delete-news/${newsId}`, { 
-                withCredentials: true 
-            })
-                .then((response) => {
-                    if (response.data.success) {
-                        alert("ลบข่าวสำเร็จ!");
-                        setNews(news.filter(item => item.news_id !== newsId));
-                    } else {
-                        alert("เกิดข้อผิดพลาดในการลบข่าว");
-                    }
+        Swal.fire({
+            title: "คุณแน่ใจหรือไม่?",
+            text: "คุณต้องการลบข่าวนี้หรือไม่? การกระทำนี้ไม่สามารถย้อนกลับได้!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "ลบ",
+            cancelButtonText: "ยกเลิก",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axios.delete(`http://localhost:3001/news/delete-news/${newsId}`, { 
+                    withCredentials: true 
                 })
-                .catch((error) => {
-                    console.error("เกิดข้อผิดพลาดในการลบข่าว:", error.message);
-                });
-        }
+                    .then((response) => {
+                        if (response.data.success) {
+                            setNews(news.filter(item => item.news_id !== newsId));
+                            Swal.fire("ลบสำเร็จ!", "ข่าวถูกลบเรียบร้อยแล้ว", "success");
+                        } else {
+                            Swal.fire("เกิดข้อผิดพลาด!", "ไม่สามารถลบข่าวได้", "error");
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("เกิดข้อผิดพลาดในการลบข่าว:", error.message);
+                        Swal.fire("เกิดข้อผิดพลาด!", "ไม่สามารถลบข่าวได้", "error");
+                    });
+            }
+        });
     };
 
     return (
         <div className="container mt-4">
-            <h3 className="mb-4">ข่าวสารและประชาสัมพันธ์</h3>
+            <h3 className="mb-4 admin-title">ข่าวสารและประชาสัมพันธ์</h3>
             <div className="row mb-4">
                 <div className="col-md-12 text-end">
-                    <button className="btn btn-primary" onClick={() => navigate("/admin/news/admin-create-news")}>
+                    <button className="btn btn-success" onClick={() => navigate("/admin/news/admin-create-news")}>
                         เพิ่มข่าวประชาสัมพันธ์
                     </button>
                 </div>

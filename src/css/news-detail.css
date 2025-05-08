@@ -1,0 +1,70 @@
+.newsd-main {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+}
+
+.newsd-title {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #1d3557;
+}
+
+.newsd-image {
+    width: 100%;
+    max-height: 450px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.newsd-content {
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: #343a40;
+}
+
+.newsd-meta p {
+    color: #6c757d;
+    font-size: 0.95rem;
+    margin-bottom: 0.3rem;
+}
+
+.newsd-related h3 {
+    font-size: 1.5rem;
+    color: #1d3557;
+    font-weight: 500;
+}
+
+.newsd-card {
+    background-color: #ffffff;
+    border: 1px solid #e6e6e6;
+    transition: transform 0.3s ease;
+}
+
+.newsd-card:hover {
+    transform: translateY(-5px);
+}
+
+.newsd-card-img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.newsd-card-title {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #212529;
+    min-height: 48px;
+}
+
+@media (max-width: 768px) {
+    .newsd-title {
+        font-size: 1.5rem;
+    }
+
+    .newsd-card-img {
+        height: 160px;
+    }
+}

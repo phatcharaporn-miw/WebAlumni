@@ -13,7 +13,7 @@ import { FaEye } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 import moment from "moment";
 import Swal from "sweetalert2";
-
+import { MdDelete } from "react-icons/md";
 
 Modal.setAppElement('#root');
 
@@ -159,19 +159,25 @@ function Webboard(){
         })
           .then((response) => {
             if (response.data.success) {
-              console.log("Comments Data:", response.data.data.comments);
+              // แปลงวันที่ในคอมเมนต์ให้ถูกต้อง
+            const commentsWithFormattedDate = response.data.data.comments.map(comment => ({
+              ...comment,
+              created_at: comment.created_at 
+                  ? moment(comment.created_at).locale("th").format("DD/MM/YYYY HH:mm:ss") 
+                  : "ไม่ระบุวันที่",
+              replies: comment.replies?.map(reply => ({
+                  ...reply,
+                  created_at: reply.created_at ? reply.created_at : "",
+                  user_id: reply.user_id 
+              })) || [] // ป้องกันกรณีไม่มี replies
+            }));
+            
+            setSelectedPost({
+              ...response.data.data,
+              comments: commentsWithFormattedDate
+            });
 
-              setSelectedPost({
-                ...response.data.data,
-                comments: response.data.data.comments.map(comment => ({
-                    ...comment,
-                    created_at: comment.created_at 
-                        ? moment(comment.created_at).locale("th").format("DD/MM/YYYY HH:mm:ss") 
-                        : "ไม่ระบุวันที่"
-                }))
-              });
-              
-              setModalIsOpen(true);
+            setModalIsOpen(true);
             } else {
               console.error("ไม่สามารถโหลดกระทู้ได้");
             }
@@ -204,34 +210,42 @@ function Webboard(){
         }
 
         axios.post(`http://localhost:3001/web/webboard/${selectedPost.webboard_id}/comment`, {
-            comment_detail: commentText,
+          comment_detail: commentText,
         }, {
-            withCredentials: true
+          withCredentials: true
         })
         .then((response) => {
-            const newComment = response.data; // คอมเมนต์ใหม่ที่ได้จาก Backend
-
-            // อัปเดต State ของ selectedPost
-            setSelectedPost((prev) => ({
-                ...prev,
-                comments: [...(prev.comments || []), newComment],
-                comments_count: (prev.comments_count ?? 0) + 1
-            }));
-
-            // อัปเดต State ของ webboard เพื่อให้จำนวนคอมเมนต์อัปเดตในหน้าแรก
-            setWebboard((prevWebboard) => 
-                prevWebboard.map((post) =>
-                    post.webboard_id === selectedPost.webboard_id
-                        ? { ...post, comments_count: (post.comments_count ?? 0) + 1 }
-                        : post
-                )
-            );
-
-            setCommentText(""); // ล้างข้อความในช่องคอมเมนต์
+          const newComment = response.data; // คอมเมนต์ใหม่ที่ได้จาก Backend
+        
+          // แปลงวันที่ให้ถูกต้องก่อน
+          const formattedNewComment = {
+            ...newComment,
+            created_at: newComment.created_at
+              ? moment(newComment.created_at).locale("th").format("DD/MM/YYYY HH:mm:ss")
+              : "ไม่ระบุวันที่"
+          };
+        
+          // อัปเดต State ของ selectedPost
+          setSelectedPost((prev) => ({
+            ...prev,
+            comments: [...(prev.comments || []), formattedNewComment],
+            comments_count: (prev.comments_count ?? 0) + 1
+          }));
+        
+          // อัปเดต State ของ webboard เพื่อให้จำนวนคอมเมนต์อัปเดตในหน้าแรก
+          setWebboard((prevWebboard) => 
+            prevWebboard.map((post) =>
+              post.webboard_id === selectedPost.webboard_id
+                ? { ...post, comments_count: (post.comments_count ?? 0) + 1 }
+                : post
+            )
+          );
+        
+          setCommentText(""); // ล้างข้อความในช่องคอมเมนต์
         })
         .catch((error) => {
-            console.error('เกิดข้อผิดพลาดในการแสดงความคิดเห็น:', error.message);
-        });
+          console.error('เกิดข้อผิดพลาดในการแสดงความคิดเห็น:', error.message);
+        });        
     };
 
     const toggleReplyForm = (commentId) => {
@@ -279,33 +293,59 @@ function Webboard(){
       });
     };
 
-    // ลบความคิดเห็น
-    const handleDeleteComment = (commentId) => {
-      if (!isLoggedin) {
-        Swal.fire({
-          title: "กรุณาเข้าสู่ระบบ",
-          text: "คุณต้องเข้าสู่ระบบก่อนเข้าร่วมกิจกรรม",
-          icon: "warning",
-          confirmButtonText: "เข้าสู่ระบบ"
-        }).then(() => {
-        navigate("/login");
+     // ฟังก์ชันลบความคิดเห็น
+     const handleDeleteComment = (commentId) => {
+      if (window.confirm("คุณต้องการลบความคิดเห็นนี้หรือไม่?")) {
+        axios.delete(`http://localhost:3001/web/webboard/${selectedPost.webboard_id}/comment/${commentId}`, {
+          withCredentials: true
+        })
+        .then((response) => {
+          
+          if (response.data.success) {
+            setSelectedPost((prev) => ({
+              ...prev,
+              comments: prev.comments.filter(comment => comment.comment_id !== commentId)
+            }));
+            Swal.fire("สำเร็จ", "ลบความคิดเห็นสำเร็จแล้ว", "success");
+          } else {
+            Swal.fire("ผิดพลาด", "ไม่สามารถลบความคิดเห็นได้", "error");
+          }
+        })
+        .catch((error) => {
+          console.error("เกิดข้อผิดพลาดในการลบความคิดเห็น:", error.message);
+          Swal.fire("ผิดพลาด", "เกิดข้อผิดพลาดในการลบ", "error");
         });
-        return;
       }
-    
-      axios.delete(`http://localhost:3001/web/webboard/${selectedPost.webboard_id}/comment/${commentId}`, {
+    };
+
+    // ลบการตอบกลับความคิดเห็น
+    const handleDeleteReply = (replyId, commentId) => {
+      axios.delete(`http://localhost:3001/web/webboard/${selectedPost.webboard_id}/comment/${commentId}/reply/${replyId}`, {
         withCredentials: true
       })
-      .then(() => {
-        setSelectedPost((prev) => ({
-          ...prev,
-          comments: prev.comments.filter((comment) => comment.comment_id !== commentId),
-        }));
+      .then(response => {
+        if (response.data.success) {
+          console.log('ลบการตอบกลับสำเร็จ');
+          // ลบ reply ออกจาก state ของ comment ที่เกี่ยวข้อง
+          setSelectedPost(prevPost => ({
+            ...prevPost,
+            comments: prevPost.comments.map(comment =>
+              comment.comment_id === commentId
+                ? {
+                    ...comment,
+                    replies: comment.replies.filter(reply => reply.reply_id !== replyId)
+                  }
+                : comment
+            )
+          }));
+        }
       })
-      .catch((error) => {
-        console.error('เกิดข้อผิดพลาดในการลบความคิดเห็น:', error.message);
+      .catch(error => {
+        console.error('เกิดข้อผิดพลาดในการลบการตอบกลับ:', error);
       });
     };
+    
+    
 
     const closeModal = () => {
       setModalIsOpen(false);
@@ -411,7 +451,7 @@ function Webboard(){
             )}
           </div>
 
-              <Modal isOpen={modalIsOpen} onRequestClose={closeModal} className="custom-modal" style={{ overlay: { backgroundColor: 'rgba(0, 0, 0, 0.75)' } }}>
+          <Modal isOpen={modalIsOpen} onRequestClose={closeModal} className="custom-modal" style={{ overlay: { backgroundColor: 'rgba(0, 0, 0, 0.75)' } }}>
                 {selectedPost && (
                     <div className="modal-content mt-2">
                       {/* ส่วนหัวของกระทู้ */}
@@ -464,6 +504,7 @@ function Webboard(){
                           <FaEye className="me-2 ms-auto " /> {selectedPost.viewCount} ครั้ง
                         </div>
 
+                        {/* comment */}
                         <div className="mt-3">
                             <h6 className="mb-4">ความคิดเห็นทั้งหมด ({selectedPost?.comments?.length || 0})</h6>
                             {selectedPost.comments && selectedPost.comments.length > 0 ? (
@@ -480,10 +521,20 @@ function Webboard(){
                                     <div className="comment-content">
                                       <p className="comment-user mb-1">{comment.full_name || "ไม่ระบุชื่อ"}</p>
                                       <p className="comment-time text-muted small mb-1">{new Date(comment.created_at).toLocaleDateString()}</p>
-                                      <p className="comment-text">{comment.comment_detail}</p>
-                                      {comment.user_id === localStorage.getItem("userId") && (
-                                        <button className="btn btn-danger btn-sm" onClick={() => handleDeleteComment(comment.comment_id)}>ลบ</button>
+                                      {Number(comment.user_id) === Number(localStorage.getItem("userId")) && (
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                          <span>{comment.comment_detail}</span> 
+                                          <button
+                                            className="btn btn-sm"
+                                            onClick={() => handleDeleteComment(comment.comment_id)}
+                                            style={{ marginLeft: 'auto', border: 'none', background: 'none' }} 
+                                          >
+                                            <MdDelete size={20} color="red"/>
+                                          </button>
+                                        </div>
                                       )}
+                                      
+                                      {/* การตอบกลับ comment */}
                                       <button className="btn btn-link btn-sm" onClick={() => toggleReplyForm(comment.comment_id)}>ตอบกลับความคิดเห็น</button>
                                       {showReplyForm === comment.comment_id && (
                                         <div className="d-flex mt-2">
@@ -497,7 +548,7 @@ function Webboard(){
                                           <button className="btn btn-primary btn-sm" onClick={() => handleReplySubmit(comment.comment_id, replyText)}>ส่ง</button>
                                         </div>
                                       )}
-                                      {comment.replies && comment.replies.length > 0 && (
+                                      {comment?.replies && comment.replies.length > 0 &&  (
                                         <div className="replies mt-2">
                                           {comment.replies.map((reply, replyIndex) => (
                                             <div key={replyIndex} className="reply-item border p-2 rounded mb-2">
@@ -512,7 +563,18 @@ function Webboard(){
                                                 <div className="reply-content">
                                                   <p className="reply-user fw-bold mb-1">{reply.full_name || "ไม่ระบุชื่อ"}</p>
                                                   <p className="reply-time text-muted small mb-1">{new Date(reply.created_at).toLocaleDateString()}</p>
-                                                  <p className="reply-text">{reply.reply_detail}</p>
+                                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                    <span>{reply.reply_detail}</span> 
+                                                    {Number(reply.user_id) === Number(localStorage.getItem("userId")) && (
+                                                      <button
+                                                        className="btn btn-sm"
+                                                        onClick={() => handleDeleteReply(reply.reply_id, comment.comment_id)}
+                                                        style={{ marginLeft: 'auto', border: 'none', background: 'none' }} 
+                                                      >
+                                                        <MdDelete size={20} color="red"/>
+                                                      </button>
+                                                    )}
+                                                  </div>
                                                 </div>
                                               </div>
                                             </div>
@@ -551,8 +613,7 @@ function Webboard(){
                           </div>
                     </div>
                 )}
-            </Modal>    
-
+          </Modal>    
                 <div class="col-4">
                     <button 
                     className="btn btn-primary w-100 mb-3" 

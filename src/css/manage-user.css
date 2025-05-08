@@ -22,3 +22,9 @@ body {
   .rounded-lg {
     border-radius: 12px; /* มุมโค้งมน */
   }
+
+  .admin-title{
+    /* text-align: center; */
+    color: #0F75BC;
+    font-weight: bold;
+  }

@@ -131,18 +131,18 @@ function Activity(){
     useEffect(() => {
         const userId = localStorage.getItem('userId');
         if (userId) {
-            axios.get(`http://localhost:3001/activity/joined-activities?user_id=${userId}`)
+            axios.get(`http://localhost:3001/activity/joined-activities?userId=${userId}`)
                 .then(response => {
+                    console.log("Joined Activities:", response.data.joinedActivities);
                     if (response.data.success) {
-                        setJoinedActivities(response.data.joinedActivities.map(activity => activity.activity_id));
-                        setLoading(false);
-                    } else {
-                        console.log("ไม่พบกิจกรรม");
+                        const joined = response.data.joinedActivities.map(item => item.activity_id);
+                        setJoinedActivities(joined); // เก็บ activity_id ที่ผู้ใช้เข้าร่วมไว้
                     }
                 })
                 .catch(err => console.error("Error fetching joined activities:", err));
         }
     }, []);
+    
 
     const handleDeleteActivity = (activityId) => {
         Swal.fire({
@@ -277,7 +277,7 @@ function Activity(){
                                     </button>
                                     ) : (
                                     <button
-                                        className="btn join-button"
+                                        className="btn btn-primary"
                                         onClick={() => handleJoinClick(activity.activity_id)}
                                     >
                                         เข้าร่วมกิจกรรม

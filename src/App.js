@@ -59,7 +59,7 @@ import WebboardDetail from './pages/admin/webboard-detail';
 import AdminActivityDetail from './pages/admin/activity-detail';
 import Admin from './components/Admin';
 import AdminSouvenir from './pages/admin/souvenir';
-import AdminActivity from './pages/admin/admin-home';
+import AdminActivity from './pages/admin/admin-activity';
 import UserManagement from './pages/admin/manage-users';
 import UserProfile from './pages/admin/manage-users-profile';
 
@@ -68,6 +68,7 @@ import UserProfile from './pages/admin/manage-users-profile';
 //route ของนายกสมาคม
 import ParticipantsPage from './pages/admin/participants';
 import PreCreateActivity from './pages/president/president-create-activity';
+import PresidentCreateNews from './pages/president/president-create-news';
 
 function App() {
 
@@ -117,12 +118,13 @@ function App() {
           {/* route ของนายกสมาคม */}
           <Route path="/president-home" element={<PresidentHome />} />
           <Route path="/activity/president-create-activity" element={<PreCreateActivity />} />
+          <Route path="/news/president-create-news" element={<PresidentCreateNews />} />
         </Route>
 
         <Route element={<Admin />}>
           {/* <Route path="/admin-home/" element={<AdminHome />} /> */}
           
-            <Route path="/admin-home/" element={<AdminHome />} />
+            <Route path="/admin-home" element={<AdminHome />} />
             <Route path="/admin/souvenir" element={<AdminSouvenir />} />
             <Route path="/admin/activities" element={<AdminActivity />} />
             <Route path="/admin/activities/admin-create-activity" element={<CreateActivity />} />

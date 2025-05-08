@@ -3,6 +3,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
+
 
 function CreateActivity() {
   const [formData, setFormData] = useState({
@@ -78,7 +80,7 @@ function CreateActivity() {
 
     const userSession = localStorage.getItem("userId");
     if (!userSession) {
-      alert("กรุณาล็อกอินเพื่อดำเนินการนี้");
+      Swal.fire("กรุณาเข้าสู่ระบบ", "คุณต้องเข้าสู่ระบบก่อนที่จะเพิ่มกิจกรรม", "warning");
       navigate("/login");  
       return;
     }
@@ -108,7 +110,7 @@ function CreateActivity() {
       });
       console.log("API Response:", response.data);
       if (response.status === 200) {
-        alert('เพิ่มกิจกรรมเรียบร้อยแล้ว!');
+        Swal.fire("สำเร็จ!", "เพิ่มกิจกรรมเรียบร้อยแล้ว", "success");
         navigate("/admin/activities"); 
       } else {
         alert('เกิดข้อผิดพลาดในการโพสต์กิจกรรม');

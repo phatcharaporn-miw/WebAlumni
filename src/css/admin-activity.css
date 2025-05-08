@@ -21,3 +21,8 @@
     border-color: #bd2130;
 }
 
+.admin-title{
+    /* text-align: center; */
+    color: #0F75BC;
+    font-weight: bold;
+  }

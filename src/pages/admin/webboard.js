@@ -3,21 +3,34 @@ import axios from "axios";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { useNavigate } from "react-router-dom";
-import { MdEdit, MdDelete } from "react-icons/md";
 import { BiSolidComment } from "react-icons/bi";
 import { FaEye } from "react-icons/fa";
 import "../../css/admin-webboard.css";
+import Swal from "sweetalert2";
+import Modal from 'react-modal';
+import moment from "moment";
+
+Modal.setAppElement('#root');
 
 function AdminWebboard() {
     const navigate = useNavigate();
     const [webboard, setWebboard] = useState([]);
     const [sortOrder, setSortOrder] = useState("latest");
-    const [selectedPost, setSelectedPost] = useState(null);
     const userRole = localStorage.getItem("role");
+    const [modalIsOpen, setModalIsOpen] = useState(false);
+    const [likedUsers, setLikedUsers] = useState([]);
+    const [modalPostTitle, setModalPostTitle] = useState("");
 
-    // ดึงข้อมูล webboard
+    // Function to close the modal
+    const closeModal = () => {
+        setModalIsOpen(false);
+    };
+
+    // Fetching webboard data
     useEffect(() => {
-        axios.get('http://localhost:3001/web/webboard', { withCredentials: true })
+        axios.get('http://localhost:3001/web/webboard', { 
+            withCredentials: true 
+        })
             .then((response) => {
                 if (response.data.success) {
                     setWebboard(response.data.data);
@@ -30,44 +43,57 @@ function AdminWebboard() {
             });
     }, []);
 
-    // เรียงลำดับโพสต์ตามวันที่
+    // Sorting posts by created date
     const sortedPosts = [...webboard].sort((a, b) => {
         if (sortOrder === "latest") return new Date(b.created_at) - new Date(a.created_at);
         if (sortOrder === "oldest") return new Date(a.created_at) - new Date(b.created_at);
         return 0;
     });
 
-    // ฟังก์ชันลบกระทู้
+    // Function to delete post
     const handleDeletePost = (postId) => {
-        if (window.confirm("คุณต้องการลบกระทู้นี้หรือไม่?")) {
-            axios.delete(`http://localhost:3001/web/webboard/${postId}`, { 
-                withCredentials: true
-            })
-                .then((response) => {
-                    if (response.data.success) {
-                        setWebboard(webboard.filter(post => post.webboard_id !== postId));
-                        alert("ลบกระทู้สำเร็จ!");
+        Swal.fire({
+            title: "คุณแน่ใจหรือไม่?",
+            text: "คุณต้องการลบกระทู้นี้หรือไม่? การกระทำนี้ไม่สามารถย้อนกลับได้!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "ลบ",
+            cancelButtonText: "ยกเลิก",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axios
+                    .delete(`http://localhost:3001/web/webboard/${postId}`, {
+                        withCredentials: true,
+                    })
+                    .then((response) => {
+                        if (response.data.success) {
+                            setWebboard(webboard.filter((post) => post.webboard_id !== postId));
+                            Swal.fire("ลบสำเร็จ!", "กระทู้ถูกลบเรียบร้อยแล้ว", "success");
 
-                        if (userRole === "1") {
-                            navigate("/admin/webboard");
+                            if (userRole === "1") {
+                                navigate("/admin/webboard");
+                            }
+                        } else {
+                            Swal.fire("เกิดข้อผิดพลาด!", "ไม่สามารถลบกระทู้ได้", "error");
                         }
-                    } else {
-                        alert("เกิดข้อผิดพลาดในการลบกระทู้");
-                    }
-                })
-                .catch((error) => {
-                    console.error("เกิดข้อผิดพลาดในการลบกระทู้:", error.message);
-                });
-        }
+                    })
+                    .catch((error) => {
+                        console.error("เกิดข้อผิดพลาดในการลบกระทู้:", error.message);
+                        Swal.fire("เกิดข้อผิดพลาด!", "ไม่สามารถลบกระทู้ได้", "error");
+                    });
+            }
+        });
     };
 
     return (
         <div className="container mt-4">
-            <h3 className="mb-4">การจัดการเว็บบอร์ด</h3>
+            <h3 className="mb-4 admin-title">การจัดการเว็บบอร์ด</h3>
             <div className="row mb-4">
                 <div className="col-md-12">
                     <button className="btn btn-primary" onClick={() => navigate('/admin/webboard/createPost')}>
-                        <MdEdit /> สร้างกระทู้ใหม่
+                        สร้างกระทู้ใหม่
                     </button>
                 </div>
             </div>
@@ -94,6 +120,25 @@ function AdminWebboard() {
                                             {post.viewCount} ครั้ง
                                         </span>
                                     </div>
+
+                                    <div className="d-flex justify-content-between align-items-center mt-3">
+                                        <span>
+                                            ❤️ {post.like_count ?? 0}
+                                        </span>
+                                        {post.liked_users && (
+                                            <button
+                                                className="btn btn-link btn-sm text-decoration-none ms-2"
+                                                onClick={() => {
+                                                    setLikedUsers(post.liked_users.split(', '));
+                                                    setModalPostTitle(post.title);
+                                                    setModalIsOpen(true);
+                                                }}
+                                            >
+                                                ดูรายชื่อ
+                                            </button>
+                                        )}
+                                    </div>
+                                    
                                     <div className="mt-3 d-flex justify-content-between">
                                         <button
                                             className="btn btn-outline-primary btn-sm"
@@ -111,7 +156,7 @@ function AdminWebboard() {
                                             className="btn btn-outline-danger btn-sm"
                                             onClick={() => handleDeletePost(post.webboard_id)}
                                         >
-                                            <MdDelete /> ลบ
+                                            ลบ
                                         </button>
                                     </div>
                                 </div>
@@ -124,6 +169,32 @@ function AdminWebboard() {
                     </div>
                 )}
             </div>
+
+            {/* Modal สำหรับแสดงรายชื่อผู้กดใจ */}
+            <Modal isOpen={modalIsOpen} onRequestClose={closeModal} className="custom-modal" style={{ overlay: { backgroundColor: 'rgba(0, 0, 0, 0.75)' } }}>
+                <div className="modal-header">
+                    <h5 className="modal-title">รายชื่อผู้กดใจในกระทู้: {modalPostTitle}</h5>
+                    <button type="button" className="btn-close" onClick={closeModal}></button>
+                </div>
+                <div className="modal-body">
+                    <ul className="list-group">
+                        {likedUsers.length > 0 ? (
+                            likedUsers.map((name, index) => (
+                                <li key={index} className="list-group-item">
+                                    {name}
+                                </li>
+                            ))
+                        ) : (
+                            <li className="list-group-item">ไม่มีผู้กดใจ</li>
+                        )}
+                    </ul>
+                </div>
+                <div className="modal-footer">
+                    <button type="button" className="btn btn-secondary" onClick={closeModal}>
+                        ปิด
+                    </button>
+                </div>
+            </Modal> 
         </div>
     );
 }

@@ -4,6 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { useParams, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import '../../css/admin-news.css';
 
 function EditNews() {
     const { newsId } = useParams(); // ดึง ID ของกิจกรรมจาก URL
@@ -13,7 +14,7 @@ function EditNews() {
     const [formData, setFormData] = useState({
         title: "",
         content: "",
-        image: null,
+        images: [],
     });
 
     useEffect(() => {
@@ -47,7 +48,7 @@ function EditNews() {
     }
 
     const handleFileChange = (event) => {
-        setFormData({ ...formData, image: event.target.files[0] }); // อัปโหลดไฟล์ภาพ
+        setFormData({ ...formData, images: event.target.files }); 
     };
 
     const handleSubmit = async (event) => {
@@ -56,9 +57,12 @@ function EditNews() {
         const updatedFormData = new FormData();
         updatedFormData.append('title', formData.title);
         updatedFormData.append('content', formData.content);
-        if (formData.image) {
-            updatedFormData.append('image', formData.image); // อัปโหลดไฟล์ภาพใหม่
+        if (formData.images && formData.images.length > 0) {
+            for (let i = 0; i < formData.images.length; i++) {
+                updatedFormData.append("images", formData.images[i]); // เพิ่มแต่ละไฟล์แยกกัน
+            }
         }
+        
 
         axios.put(`http://localhost:3001/news/edit-news/${newsId}`, updatedFormData, {
             withCredentials: true,
@@ -72,7 +76,7 @@ function EditNews() {
                         text: "แก้ไขข่าวประชาสัมพันธ์สำเร็จ!",
                         confirmButtonText: "ตกลง",
                     }).then(() => {
-                        navigate("/admin/news/:newsId");
+                        navigate("/admin/news");
                     });
                 } else {
                     Swal.fire({
@@ -90,7 +94,7 @@ function EditNews() {
 
     return(
         <div className="container mt-4">
-            <h3 className="mb-4">แก้ไขข่าวประชาสัมพันธ์</h3>
+            <h3 className="mb-4 admin-title">แก้ไขข่าวประชาสัมพันธ์</h3>
             {loading ? (
                 <p className="text-center mt-5">กำลังโหลดข้อมูล...</p>
             ) : news ? (
@@ -124,13 +128,14 @@ function EditNews() {
                                 ></textarea>
                             </div>
                             <div className="mb-3">
-                                <label htmlFor="image" className="form-label">อัปโหลดภาพ (ถ้ามี)</label>
+                                <label htmlFor="images" className="form-label">อัปโหลดภาพ (ถ้ามี)</label>
                                 <input
                                     type="file"
                                     className="form-control w-100"
-                                    id="image"
-                                    name="image"
-                                    accept=".jpg, .jpeg, .png, .gif"
+                                    id="images"
+                                    name="images"
+                                    multiple
+                                    accept="image/*"
                                     onChange={handleFileChange}
                                 />
                             </div>

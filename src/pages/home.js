@@ -15,14 +15,41 @@ import { IoMdClose } from "react-icons/io";
 import { Link } from "react-router-dom";
 import moment from "moment";
 import Swal from "sweetalert2";
+import CountUp from "react-countup";
+import { Bar, Pie } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  Tooltip,
+  Legend,
+  ArcElement,
+} from 'chart.js';
 
+ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend, ArcElement);
 
 function Home() {
   const [background, setBackground] = useState("/image/back-2.png");
   const currentAmount = 3000;
   const goalAmount = 10000;
   const progress = (currentAmount / goalAmount) * 100;
-
+  // กราฟ
+  const [alumniCount, setAlumniCount] = useState(0);
+  const [stats, setStats] = useState({
+          totalParticipants: 0,
+          ongoingActivity: 0,
+          ongoingProject: 0,
+          totalDonations: 0,
+  });
+  const [barData, setBarData] = useState({
+          labels: [],
+          datasets: [],
+  });
+  // const [pieData, setPieData] = useState({
+  //         labels: [],
+  //         datasets: [],
+  // });
   // webboard
   const [webboard, setWebboard] = useState([]);
   const [sortOrder, setSortOrder] = useState("latest");
@@ -94,6 +121,130 @@ function Home() {
         console.error("Error fetching activities:", error);
       });
   }, []);
+
+  // ดึงข้อมูลสถิติหลัก
+  useEffect(() => {
+          // ดึงข้อมูลสถิติหลัก
+          axios.get("http://localhost:3001/admin/dashboard-stats")
+          .then((res) => {
+              setStats(res.data);
+              })
+              .catch((err) => {
+              console.error("Error fetching dashboard stats:", err);
+          });
+  
+          // ดึงข้อมูลกราฟแท่ง
+          axios.get('http://localhost:3001/admin/activity-per-year')
+          .then(res => {
+              // console.log("กิจกรรมต่อปี", res.data);
+              if (Array.isArray(res.data)) {
+              const labels = res.data.map(item => `ปี ${item.year + 543}`);
+              const data = res.data.map(item => item.total_activities);
+              setBarData({
+                  labels,
+                  datasets: [{ label: 'จำนวนผู้เข้าร่วม (คน)', data, backgroundColor: '#0d6efd' }],
+              });
+              }
+          });
+  
+      
+          // ดึงข้อมูลกราฟวงกลม
+          // axios.get('http://localhost:3001/admin/donation-stats')
+          // .then(res => {
+          //     if (res.data && Array.isArray(res.data)) {
+          //     const labels = res.data.map(item => `ไตรมาส ${item.quarter}`);
+          //     const data = res.data.map(item => item.total);
+          //     setPieData({
+          //         labels,
+          //         datasets: [{
+          //         data,
+          //         backgroundColor: ['#d63384', '#198754', '#fd7e14', '#0dcaf0'],
+          //         }],
+          //     });
+          //     } else {
+          //     console.warn("donation-stats: unexpected data format", res.data);
+          //     }
+          // });
+      
+          // ดึงจำนวนศิษย์เก่า
+          axios.get('http://localhost:3001/admin/total-alumni')
+            .then(res => setAlumniCount(res.data.totalAlumni));
+  }, []);
+
+  const CardInfo = ({ title, value, center = false, animated = false }) => (
+    <div className="col-md-3 mb-3">
+      <div className={`card p-4 shadow-sm ${center ? 'mx-auto' : ''}`} style={{ maxWidth: center ? 400 : "100%" }}>
+        <h6 className="text-secondary">{title}</h6>
+        <h3 className="text-primary">
+          {animated ? <CountUp end={parseInt(value)} duration={2} separator="," /> : value}
+          {typeof value === "string" && value.includes("คน") && " คน"}
+          {typeof value === "string" && value.includes("บาท") && " บาท"}
+        </h3>
+      </div>
+    </div>
+  );
+
+  // กราฟวงกลม: สถิติการบริจาครายไตรมาส
+  const pieData = {
+    labels: ['ไตรมาสที่ 1', 'ไตรมาสที่ 2', 'ไตรมาสที่ 3', 'ไตรมาสที่ 4'],
+    datasets: [
+      {
+        data: [10, 45, 30, 15],
+        backgroundColor: ['#d63384', '#198754', '#fd7e14', '#0dcaf0'],
+        borderColor: '#fff',
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const barOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        display: false,
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          stepSize: 50,
+          callback: value => `${value} คน`,
+        },
+        grid: {
+          color: '#e0e0e0',
+        },
+      },
+      x: {
+        grid: {
+          display: false,
+        },
+      },
+    },
+  };
+  
+  const pieOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'left',
+        labels: {
+          usePointStyle: true,
+          padding: 20,
+        },
+      },
+      tooltip: {
+        callbacks: {
+          label: function (tooltipItem) {
+            const value = tooltipItem.raw;
+            const total = tooltipItem.dataset.data.reduce((a, b) => a + b, 0);
+            const percent = ((value / total) * 100).toFixed(1);
+            return `${tooltipItem.label} (${percent}%)`;
+          },
+        },
+      },
+    },
+  };
 
   //ดึงข้อมูล webboard
   useEffect(() => {
@@ -441,6 +592,8 @@ function Home() {
                 <h4 className="activity-title fw-bold">ปฏิทินกิจกรรม</h4>
                 {activity.length > 0 ? (
                   activity
+                    .slice(0, 3) // แสดงกิจกรรม 3 รายการแรก
+                    // .filter((item) => new Date(item.activity_date) >= new Date()) // กรองกิจกรรมที่ยังไม่เกิดขึ้น
                     .sort((a, b) => new Date(a.activity_date) - new Date(b.activity_date))
                     .map((item) => (
                       <Link
@@ -476,10 +629,71 @@ function Home() {
 
 
         {/* ส่วนของแดชบอร์ด */}
-        {/* <div className="home-dashboard">
-                   <h3 id="head-text">ภาพรวมกิจกรรมและการบริจาค</h3>
-              
-               </div> */}
+        <div className="home-dashboard">
+          <h3 id="head-text">ภาพรวมกิจกรรมและการบริจาค</h3> 
+          <div className="container mt-4">
+            <div className="row mb-3">
+              <CardInfo title="จำนวนผู้เข้าร่วมกิจกรรมทั้งหมด" value={`${stats.totalParticipants} คน`} />
+              <CardInfo title="กิจกรรมที่กำลังดำเนินการ" value={`${stats.ongoingActivity} กิจกรรม`} />
+              <CardInfo title="ยอดบริจาครวมทั้งหมด" value={`${stats.totalDonations} บาท`} />
+              <CardInfo title="โครงการที่เปิดรับบริจาค" value={`${stats.ongoingProject} โครงการ`} />
+            </div>
+
+            {/* กราฟแท่ง */}
+            <div className="row mb-4">
+              <div className="col-md-8">
+                <div className="card p-3 shadow-sm">
+                  <h5 className="mb-3">จำนวนการเข้าร่วมกิจกรรมในแต่ละปี</h5>
+                  {barData.labels.length ? (
+                    <Bar data={barData} options={barOptions} />
+                  ) : (
+                    <div>Loading...</div>
+                  )}
+                </div>
+              </div>
+
+              {/* กราฟวงกลม */}
+              <div className="col-md-4">
+                <div className="card p-3 shadow-sm">
+                  <h5 className="mb-3">สถิติการบริจาค</h5>
+                  {pieData.labels.length ? (
+                    <Pie data={pieData} options={pieOptions} />
+                  ) : (
+                    <div>Loading...</div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+           
+           
+
+              {/* <div className="col-md-8">
+                <div className="row">
+                  <div className="col-md-6">
+                    <CardInfo title="จำนวนผู้เข้าร่วมกิจกรรมทั้งหมด" value={stats.totalParticipants} animated />
+                  </div>
+                  <div className="col-md-6">
+                    <CardInfo title="กิจกรรมที่กำลังดำเนินการ" value={stats.ongoingActivity} animated />
+                  </div>
+                  <div className="col-md-6">
+                    <CardInfo title="ยอดบริจาครวมทั้งหมด" value={stats.totalDonations} animated />
+                  </div>
+                  <div className="col-md-6">
+                    <CardInfo title="โครงการที่เปิดรับบริจาค" value={stats.openProjects} animated />
+                  </div>
+                </div>
+              </div> */}
+            
+
+            {/* การ์ดศิษย์เก่าแสดงอนิเมชัน */}
+            <div className="row">
+              <div className="col-12">
+                <CardInfo title="จำนวนศิษย์เก่าทั้งหมด" value={alumniCount} center animated />
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* ส่วนของเว็บบอร์ด */}
         <div className="home-webboard">
@@ -824,8 +1038,6 @@ function Home() {
         </div>
       </div>
     </div>
-
-
       </section>
     </div>
   )

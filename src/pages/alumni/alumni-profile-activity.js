@@ -152,7 +152,7 @@ function AlumniProfileActivity() {
                 </div>
               </div>
               
-              <div className="col-md-8">
+              <div className="col-md-7">
                 {filteredActivity.map(activity => (
                   <div className="col-md-6 col-lg-6 mb-4" key={activity.activity_id}>
                     <div className="card activity-card">

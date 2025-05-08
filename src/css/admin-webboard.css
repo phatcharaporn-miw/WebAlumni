@@ -7,10 +7,11 @@
     transform: scale(1.02);
 }
 
-/* .card-title {
-    font-size: 1.2rem;
+.admin-title{
+    /* text-align: center; */
+    color: #0F75BC;
     font-weight: bold;
-} */
+  }
 
 .btn-sm {
     font-size: 0.9rem;

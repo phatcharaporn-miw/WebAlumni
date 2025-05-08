@@ -28,6 +28,7 @@ function UserManagement() {
       await axios.put(`http://localhost:3001/admin/${userId}/role`, {
         role: newRole,
       });
+      Swal.fire("สำเร็จ!", "เปลี่ยนบทบาทผู้ใช้เรียบร้อยแล้ว", "success");
       fetchUsers(); // รีเฟรชข้อมูล
     } catch (error) {
       console.error("Error updating role:", error);
@@ -83,7 +84,7 @@ function UserManagement() {
 
   return (
     <div className="container mt-5">
-          <h3 className="text-center">จัดการผู้ใช้งาน</h3>     
+          <h3 className="text-center admin-title">จัดการผู้ใช้งาน</h3>     
         <div className="card-body">
           <div className="mb-3 d-flex justify-content-end">
             <input
@@ -121,7 +122,7 @@ function UserManagement() {
                       >
                         <option value="2">นายกสมาคม</option>
                         <option value="3">ศิษย์เก่า</option>
-                        <option value="4">ศิษย์ปัจจุบัน</option>
+                        {/* <option value="4">ศิษย์ปัจจุบัน</option> */}
                       </select>
                     </td>
                     <td className="text-center">
