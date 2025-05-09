@@ -62,13 +62,14 @@ import AdminSouvenir from './pages/admin/souvenir';
 import AdminActivity from './pages/admin/admin-activity';
 import UserManagement from './pages/admin/manage-users';
 import UserProfile from './pages/admin/manage-users-profile';
-
+import EditUserProfile from './pages/admin/edit-user-profile';
 
 
 //route ของนายกสมาคม
 import ParticipantsPage from './pages/admin/participants';
 import PreCreateActivity from './pages/president/president-create-activity';
 import PresidentCreateNews from './pages/president/president-create-news';
+import PresidentEditActivity from './pages/president/president-edit-activity';
 
 function App() {
 
@@ -97,6 +98,7 @@ function App() {
           <Route path="/souvenir/souvenir_request" element={<SouvenirRequest />} />
           <Route path="/souvenir/souvenirDetail/:productId" element={<SouvenirDetail />} />
           <Route path="/webboard" element={<Webboard />} />
+          <Route path="/webboard/:id" element={<Webboard />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/alumni-home" element={<AlumniHome />} />
@@ -119,6 +121,7 @@ function App() {
           <Route path="/president-home" element={<PresidentHome />} />
           <Route path="/activity/president-create-activity" element={<PreCreateActivity />} />
           <Route path="/news/president-create-news" element={<PresidentCreateNews />} />
+          <Route path="/activity/edit/:activityId" element={<PresidentEditActivity />} />
         </Route>
 
         <Route element={<Admin />}>
@@ -143,6 +146,7 @@ function App() {
             <Route path="/admin/activities/:activityId/participants" element={<ParticipantsPage />} />
             <Route path="/admin/users" element={<UserManagement />} />
             <Route path="/admin/users/user-profile/:userId" element={<UserProfile />} />
+            <Route path="/admin/users/edit-user-profile/:userId" element={<EditUserProfile />} />
 
 
         </Route>

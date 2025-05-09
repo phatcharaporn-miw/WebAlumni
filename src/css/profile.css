@@ -19,13 +19,42 @@
     align-items: center;
     justify-content: center;
   }
-
+  
   .menu {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .menu-item {
+    font-size: 1rem;
+    color: #333;
+    background-color: #f8f9fa;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 10px;
+  }
+  
+  .menu-item:hover {
+    background-color: #0F75BC;
+    color: white;
+  }
+  
+  .menu-item.active {
+    background-color: #0F75BC;
+    color: white;
+  }
+  
+  .menu-item:active {
+    transform: scale(0.98);
+  }
+  
+
+  /* .menu {
     text-align: left;
   }
   
   .menu-item {
-    /* background-color: #f8f9fa; */
     font-size: 14px;
     color: #333;
     padding: 10px;
@@ -40,12 +69,12 @@
   .menu-item.active {
     background-color: #0F75BC;
     color: #fff;
-  }
+  } */
   
-  .submit-button {
+  /* .submit-button {
     width: 100%;
     cursor: pointer;
-}
+} */
 
 textarea{
   /* width: 50%; */

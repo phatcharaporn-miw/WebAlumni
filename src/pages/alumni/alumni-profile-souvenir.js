@@ -60,20 +60,37 @@ function AlumniProfileSouvenir() {
             <div className='alumni-profile-page'>
                 <h3 className="alumni-title text-center">โปรไฟล์ของฉัน</h3>
                 <div className="row justify-content-between">
-                    <div className="col-4 bg-light rounded text-center">
-                        <img
-                            src={profile.profilePicture || "/default-profile.png"}
-                            alt="Profile"
+                    <div className="col-12 col-md-4 bg-light rounded text-center p-4 my-4">
+                        <div className="profile-pic-container mb-3">
+                            <img 
+                            src={`${profile.profilePicture}`} 
+                            alt="Profile" 
                             style={{ width: '140px', height: '140px', borderRadius: '50%' }}
-                        />
-                        <p className="mt-3 fw-bold">{profile.fullName}</p>
-                        <div className="menu mt-4">
-                            <div className="menu-item py-2 mb-2 rounded"onClick={() => handleClick('/alumni-profile')}>ข้อมูลส่วนตัว</div>
-                            <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/alumni-profile-webboard')}>กระทู้ที่สร้าง</div>
-                            <div className="menu-item py-2 mb-2 rounded">ประวัติการบริจาค</div>
-                            <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/alumni-profile-souvenir')}>ประวัติการเข้าร่วมกิจกรรม</div>
-                            <div className="menu-item py-2 mb-2 rounded active">ประวัติการสั่งซื้อ</div>
-                            <div className="menu-item py-2 rounded" onClick={handleLogout}>ออกจากระบบ</div>
+                            className="img-fluid"
+                            />
+                        </div>
+
+                        <p className="fw-bold mb-3">{profile.fullName}</p>
+                        
+                        <div className="menu">
+                            <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile')}>
+                            ข้อมูลส่วนตัว
+                            </div>
+                            <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/alumni-profile-webboard')}>
+                            กระทู้ที่สร้าง
+                            </div>
+                            <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/donation-history')}>
+                            ประวัติการบริจาค
+                            </div>
+                            <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/alumni-profile-activity')}>
+                            ประวัติการเข้าร่วมกิจกรรม
+                            </div>
+                            <div className="menu-item active py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/alumni-profile-souvenir')}>
+                            ประวัติการสั่งซื้อ
+                            </div>
+                            <div className="menu-item py-2 rounded" onClick={handleLogout}>
+                            ออกจากระบบ
+                            </div>
                         </div>
                     </div>
 

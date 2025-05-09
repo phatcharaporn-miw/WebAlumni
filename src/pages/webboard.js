@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useLocation, useParams } from 'react-router-dom';
 import Modal from 'react-modal';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
@@ -19,6 +20,8 @@ Modal.setAppElement('#root');
 
 
 function Webboard(){
+    const { id } = useParams(); // ถ้าคุณใช้ route แบบ /webboard/:id
+    const location = useLocation();
     const [webboard, setWebboard] = useState([]);
     const [sortOrder, setSortOrder] = useState("latest");
     const [likedPosts, setLikedPosts] = useState([]); 
@@ -345,12 +348,29 @@ function Webboard(){
       });
     };
     
-    
-
-    const closeModal = () => {
-      setModalIsOpen(false);
-      setSelectedPost(null);
+    // เปิด modal ถ้ามี id
+  useEffect(() => {
+    if (id) {
+      axios.get(`http://localhost:3001/web/webboard/${id}`)
+        .then((res) => {
+          if (res.data.success) {
+            setSelectedPost(res.data.data); // ใส่ข้อมูล post
+            setModalIsOpen(true); // เปิด modal
+          } else {
+            console.error("ไม่พบกระทู้");
+          }
+        })
+        .catch((err) => {
+          console.error("โหลดกระทู้ผิดพลาด:", err);
+        });
     }
+  }, [id]);
+
+  const closeModal = () => {
+    setModalIsOpen(false);
+    setSelectedPost(null);
+    navigate("/webboard"); // ปิดแล้วกลับหน้า list
+  };
 
     // ดึงcategory
     useEffect(() => {

@@ -56,8 +56,9 @@ function AlumniProfileActivity() {
           return <div>ไม่พบข้อมมูลผู้ใช้</div>;
         }
     
-     // ตรวจสอบว่าเมนูใดควรเป็น active
-     const isActive = (path) => location.pathname === path;
+        const handleClick = (path) => {
+          navigate(path);
+        };
 
      const filteredActivity = activity.filter(activity => {
         if (selectedStatus === 'activity') return true;
@@ -107,43 +108,33 @@ function AlumniProfileActivity() {
         <section className='container'>
           <div className='alumni-profile-page'>
             <h3 className="alumni-title text-center">ประวัติการเข้าร่วมกิจกรรม</h3>
-            <div className="row justify-content-between">
-              <div className="col-md-4 bg-light rounded text-center">
-                <img
-                  src={`${profile.profilePicture}`}
-                  alt="Profile"
-                  style={{ width: '140px', height: '140px', borderRadius: '50%' }}
-                />
-                <p className="mt-3 fw-bold">{profile.fullName}</p>
-                <div className="menu mt-4">
-                  <div
-                    className={`menu-item py-2 mb-2 rounded ${isActive('/alumni-profile') ? 'active' : ''}`}
-                    onClick={() => navigate('/alumni-profile')}
-                  >
+            <div className="row justify-content-between ">
+              <div className="col-12 col-md-4 bg-light rounded text-center p-4 my-4">
+                <div className="profile-pic-container mb-3">
+                  <img 
+                    src={`${profile.profilePicture}`} 
+                    alt="Profile" 
+                    style={{ width: '140px', height: '140px', borderRadius: '50%' }}
+                    className="img-fluid"
+                  />
+                </div>
+
+                <p className="fw-bold mb-3">{profile.fullName}</p>
+                
+                <div className="menu">
+                  <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile')}>
                     ข้อมูลส่วนตัว
                   </div>
-                  <div
-                    className={`menu-item py-2 mb-2 rounded ${isActive('/alumni-profile/alumni-profile-webboard') ? 'active' : ''}`}
-                    onClick={() => navigate('/alumni-profile/alumni-profile-webboard')}
-                  >
+                  <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/alumni-profile-webboard')}>
                     กระทู้ที่สร้าง
                   </div>
-                  <div
-                    className={`menu-item py-2 mb-2 rounded ${isActive('/profile/donations') ? 'active' : ''}`}
-                    onClick={() => navigate('/profile/donations')}
-                  >
+                  <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/donation-history')}>
                     ประวัติการบริจาค
                   </div>
-                  <div
-                    className={`menu-item py-2 mb-2 rounded ${isActive('/alumni-profile/alumni-profile-activity') ? 'active' : ''}`}
-                    onClick={() => navigate('/alumni-profile/alumni-profile-activity')}
-                  >
+                  <div className="menu-item active py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/alumni-profile-activity')}>
                     ประวัติการเข้าร่วมกิจกรรม
                   </div>
-                  <div
-                    className={`menu-item py-2 mb-2 rounded ${isActive('/alumni-profile/alumni-profile-souvenir') ? 'active' : ''}`}
-                    onClick={() => navigate('/alumni-profile/alumni-profile-souvenir')}
-                  >
+                  <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/alumni-profile-souvenir')}>
                     ประวัติการสั่งซื้อ
                   </div>
                   <div className="menu-item py-2 rounded" onClick={handleLogout}>
@@ -152,44 +143,55 @@ function AlumniProfileActivity() {
                 </div>
               </div>
               
-              <div className="col-md-7">
-                {filteredActivity.map(activity => (
-                  <div className="col-md-6 col-lg-6 mb-4" key={activity.activity_id}>
-                    <div className="card activity-card">
-                      <div className="image-container">
-                        <img src={activity.image_path ? `http://localhost:3001${activity.image_path}` : "/default-image.png"} className="card-img-top" alt="กิจกรรม" />
-                        <div className={`status-badge ${getStatusClass(activity.status)}`}>
-                          {activity?.status === 0 ? "กำลังจะจัดขึ้น" :
-                          activity?.status === 1 ? "เสร็จสิ้นแล้ว" :
-                          activity?.status === 2 ? "กำลังดำเนินการ" : "ไม่ทราบสถานะ"}
-                        </div>
-                      </div>
-                      <div className="card-body">
-                        <h5 className="card-title">{activity.activity_name}</h5>
-                        {activity.check_alumni === 1 && (
-                          <div className="alert alert-warning d-flex align-items-center" role="alert">
-                            <i className="me-2 bi bi-exclamation-circle-fill"></i>
-                            กิจกรรมนี้สำหรับศิษย์เก่า
+              <div className="col-md-7 mt-4">
+                {filteredActivity.length > 0 ? (
+                  filteredActivity.map(activity => (
+                    <div className="col-md-6 col-lg-6 mb-4" key={activity.activity_id}>
+                      <div className="card activity-card">
+                        <div className="image-container">
+                          <img 
+                            src={activity.image_path ? `http://localhost:3001${activity.image_path}` : "/default-image.png"} 
+                            className="card-img-top" 
+                            alt="กิจกรรม" 
+                          />
+                          <div className={`status-badge ${getStatusClass(activity.status)}`}>
+                            {activity?.status === 0 ? "กำลังจะจัดขึ้น" :
+                            activity?.status === 1 ? "เสร็จสิ้นแล้ว" :
+                            activity?.status === 2 ? "กำลังดำเนินการ" : "ไม่ทราบสถานะ"}
                           </div>
-                        )}
-                        <h6>
-                          {activity.end_date && activity.end_date !== "0000-00-00" && activity.end_date !== activity.activity_date
-                            ? `${formatDate(activity.activity_date)} - ${formatDate(activity.end_date)}`
-                            : `${formatDate(activity.activity_date)}`}
-                        </h6>
-                        <p className="card-text small text-muted">{activity.description}</p>
-                        <div className="button-group">
-                        <button 
-                          className="btn btn-info" 
-                          onClick={() => navigate(`/activity/${activity.activity_id}`)}
-                        >
-                          ดูรายละเอียด
-                        </button>
+                        </div>
+                        <div className="card-body">
+                          <h5 className="card-title">{activity.activity_name}</h5>
+                          {activity.check_alumni === 1 && (
+                            <div className="alert alert-warning d-flex align-items-center" role="alert">
+                              <i className="me-2 bi bi-exclamation-circle-fill"></i>
+                              กิจกรรมนี้สำหรับศิษย์เก่า
+                            </div>
+                          )}
+                          <h6>
+                            {activity.end_date && activity.end_date !== "0000-00-00" && activity.end_date !== activity.activity_date
+                              ? `${formatDate(activity.activity_date)} - ${formatDate(activity.end_date)}`
+                              : `${formatDate(activity.activity_date)}`}
+                          </h6>
+                          <p className="card-text small text-muted">{activity.description}</p>
+                          <div className="button-group">
+                            <button 
+                              className="btn btn-info" 
+                              onClick={() => navigate(`/activity/${activity.activity_id}`)}
+                            >
+                              ดูรายละเอียด
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
+                  ))
+                ) : (
+                  <div className="text-center w-100 py-5">
+                    <h5 className="mt-3 text-muted">ยังไม่มีกิจกรรมในขณะนี้</h5>
+                    <p className="text-secondary">กรุณาตรวจสอบอีกครั้งในภายหลัง</p>
                   </div>
-                ))}
+                )}
               </div>
             </div>
           </div>

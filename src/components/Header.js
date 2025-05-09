@@ -9,10 +9,7 @@ import {  NavLink } from "react-router-dom";
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { FaTrash } from "react-icons/fa";
 import Swal from "sweetalert2";
-
-
 import axios from "axios";
-
 
 function Header({user}) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -28,8 +25,6 @@ function Header({user}) {
 
   const navigate = useNavigate();
 
-  
-
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
@@ -37,8 +32,7 @@ function Header({user}) {
   // ดึงแจ้งเตือนเมื่อผู้ใช้เข้าสู่ระบบ
   useEffect(() => {
     if (!user?.userId) return;
-
-    const fetchNotifications = () => {
+      const fetchNotifications = () => {
         axios.get(`http://localhost:3001/notice/notification/${user.userId}`)
             .then((response) => {
                 if (response.data.success) {
@@ -53,7 +47,6 @@ function Header({user}) {
 
     fetchNotifications();
     const interval = setInterval(fetchNotifications, 30000); // รีเฟรชทุก 30 วินาที
-
     return () => clearInterval(interval);
   }, [user?.userId]);
 
@@ -235,7 +228,12 @@ const addToCart = (productId, quantity, total) => {
                 if (response.data.success && response.data.data.length > 0) {
                     navigate(`/search?query=${searchTerm}`); // มีผลการค้นหา
                 } else {
-                    navigate(`/searchResult`, { state: { message: "ไม่มีผลการค้นหานี้" } }); // ไม่มีผลการค้นหา
+                  Swal.fire({
+                    title: "ไม่พบผลการค้นหาที่คุณต้องการ",
+                    text: "กรุณาลองค้นหาด้วยคำอื่น",
+                    icon: "warning",
+                    confirmButtonText: "ตกลง",
+                });
                 }
             })
             .catch((error) => {

@@ -148,30 +148,47 @@ const removeEducation = (index) => {
       <div className='alumni-profile-page'>
       <h3 className="alumni-title text-center">โปรไฟล์ของฉัน</h3>
         <div className="row justify-content-between" >
-          <div className="col-4  bg-light  rounded text-center">
-            <img 
-            src={`${profile.profilePicture}`} 
-            alt="Profile" 
-            style={{ width: '140px', height: '140px', borderRadius: '50%' }}
-            />
-            <p className="mt-3 fw-bold">{profile.fullName}</p>
-              <div className="menu mt-4">
-                <div className="menu-item active py-2 mb-2 rounded">ข้อมูลส่วนตัว</div>
-                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/alumni-profile-webboard')}>กระทู้ที่สร้าง</div>
-                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/donation-history')}>ประวัติการบริจาค</div>
-                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/alumni-profile-activity')}>ประวัติการเข้าร่วมกิจกรรม</div>
-                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/alumni-profile-souvenir')}>ประวัติการสั่งซื้อ</div>
-                <div className="menu-item py-2 rounded" onClick={handleLogout}>ออกจากระบบ</div>
+            <div className="col-12 col-md-4 bg-light rounded text-center p-4">
+              <div className="profile-pic-container mb-3">
+                <img 
+                  src={`${profile.profilePicture}`} 
+                  alt="Profile" 
+                  style={{ width: '140px', height: '140px', borderRadius: '50%' }}
+                  className="img-fluid"
+                />
               </div>
-          </div>
-        
+
+              <p className="fw-bold mb-3">{profile.fullName}</p>
+
+              <div className="menu">
+                <div className="menu-item active py-2 mb-2 rounded">
+                  ข้อมูลส่วนตัว
+                </div>
+                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/alumni-profile-webboard')}>
+                  กระทู้ที่สร้าง
+                </div>
+                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/donation-history')}>
+                  ประวัติการบริจาค
+                </div>
+                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/alumni-profile-activity')}>
+                  ประวัติการเข้าร่วมกิจกรรม
+                </div>
+                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/alumni-profile-souvenir')}>
+                  ประวัติการสั่งซื้อ
+                </div>
+                <div className="menu-item py-2 rounded" onClick={handleLogout}>
+                  ออกจากระบบ
+                </div>
+              </div>
+            </div>
+
             <div className="col-7 bg-light rounded">
               <div className='form-profile'>
                 <form>
                   <fieldset>
                   <legend className="legend-title mb-4">ข้อมูลส่วนตัว</legend>
 
-                  <div className="form-group">
+                  {/* <div className="form-group">
                       <label>ชื่อผู้ใช้งาน<span className="importent">*</span></label>
                       <input
                           type="text"
@@ -202,7 +219,7 @@ const removeEducation = (index) => {
                                 {showPassword ? "ซ่อน" : "แสดง"}
                             </button>
                         </div>
-                    </div>
+                    </div> */}
 
                                 <div className="form-group">
                                     <label>คำนำหน้า<span className="importent">*</span></label>
@@ -428,11 +445,14 @@ const removeEducation = (index) => {
                    
                         <div className='row justify-content-end'>
                               <div className='col-7 text-center '>
-                              {editing ? (
-                                <button className="submit-button" type="submit" onClick={handleSave}>บันทึก</button>
-                              ) : (
-                                <button className="submit-button" type="submit" onClick={handleEdit}>แก้ไขข้อมูลส่วนตัว</button>
-                              )}
+                                {editing ? (
+                                  <>
+                                    <button className="btn btn-secondary me-5" type="button" onClick={() => setEditing(false)} style={{ width: '300px' }}>ยกเลิก</button>
+                                    <button className="btn btn-primary " type="submit" onClick={handleSave} style={{ width: '300px' }}>บันทึก</button>
+                                  </>                                  
+                                ) : (
+                                  <button className="submit-button" type="submit" onClick={handleEdit}>แก้ไขข้อมูลส่วนตัว</button>
+                                )}
                               </div>
                         </div>             
                     </div>  

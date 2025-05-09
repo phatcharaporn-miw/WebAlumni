@@ -98,60 +98,49 @@ function AlumniProfileWebboard() {
         return `hsl(${hue}, 70%, 60%)`;
     };
 
-     // ตรวจสอบว่าเมนูใดควรเป็น active
-     const isActive = (path) => location.pathname === path;
+    const handleClick = (path) => {
+        navigate(path);
+    };
 
     return (
         <section className='container'>
             <div className='alumni-profile-page'>
-                <h3 className="alumni-title text-center">กระทู้ที่สร้าง</h3>
+                {/* <h3 className="alumni-title text-center mb-4">กระทู้ที่สร้าง</h3> */}
                 <div className="row justify-content-between">
-                    <div className="col-4 bg-light rounded text-center">
-                        <img
-                            src={`${profile.profilePicture}`}
-                            alt="Profile"
+                    <div className="col-12 col-md-4 bg-light rounded text-center p-4 my-4">
+                        <div className="profile-pic-container mb-3">
+                            <img 
+                            src={`${profile.profilePicture}`} 
+                            alt="Profile" 
                             style={{ width: '140px', height: '140px', borderRadius: '50%' }}
-                        />
-                        <p className="mt-3 fw-bold">{profile.fullName}</p>
-                        <div className="menu mt-4">
-                        <div
-                                className={`menu-item py-2 mb-2 rounded ${isActive('/alumni-profile') ? 'active' : ''}`}
-                                onClick={() => navigate('/alumni-profile')}
-                            >
-                                ข้อมูลส่วนตัว
-                            </div>
-                            <div
-                                className={`menu-item py-2 mb-2 rounded ${isActive('/alumni-profile/alumni-profile-webboard') ? 'active' : ''}`}
-                                onClick={() => navigate('/alumni-profile/alumni-profile-webboard')}
-                            >
-                                กระทู้ที่สร้าง
-                            </div>
-                            <div
-                                className={`menu-item py-2 mb-2 rounded ${isActive('/profile/donations') ? 'active' : ''}`}
-                                onClick={() => navigate('/profile/donations')}
-                            >
-                                ประวัติการบริจาค
-                            </div>
+                            className="img-fluid"
+                            />
+                        </div>
 
-                            <div
-                                className={`menu-item py-2 mb-2 rounded ${isActive('/alumni-profile/alumni-profile-activity') ? 'active' : ''}`}
-                                onClick={() => navigate('/alumni-profile/alumni-profile-activity')}
-                            >
-                                ประวัติการเข้าร่วมกิจกรรม
+                        <p className="fw-bold mb-3">{profile.fullName}</p>
+                        
+                        <div className="menu">
+                            <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile')}>
+                            ข้อมูลส่วนตัว
                             </div>
-                            <div
-                                className={`menu-item py-2 mb-2 rounded ${isActive('/profile/orders') ? 'active' : ''}`}
-                                onClick={() => navigate('/profile/orders')}
-                            >
-                                ประวัติการสั่งซื้อ
+                            <div className="menu-item active py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/alumni-profile-webboard')}>
+                            กระทู้ที่สร้าง
+                            </div>
+                            <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/donation-history')}>
+                            ประวัติการบริจาค
+                            </div>
+                            <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/alumni-profile-activity')}>
+                            ประวัติการเข้าร่วมกิจกรรม
+                            </div>
+                            <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/alumni-profile-souvenir')}>
+                            ประวัติการสั่งซื้อ
                             </div>
                             <div className="menu-item py-2 rounded" onClick={handleLogout}>
-                                ออกจากระบบ
+                            ออกจากระบบ
                             </div>
                         </div>
                     </div>
-
-                    <div className="col-8">
+                    <div className="col-8 mt-4">
                         <div className="row">
                             {webboard.length > 0 ? (
                                 sortedPosts.map(post => (
@@ -188,7 +177,10 @@ function AlumniProfileWebboard() {
                                     </div>
                                 ))
                             ) : (
-                                <p>ไม่มีโพสต์</p>
+                                <div className="text-center w-100 py-5">
+                                    <h5 className="mt-3 text-muted">ยังไม่มีกระทู้ที่คุณสร้าง</h5>
+                                    <p className="text-secondary">เริ่มต้นสร้างกระทู้แรกของคุณได้เลย!</p>
+                                </div>
                             )}
                         </div>
                     </div>

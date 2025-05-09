@@ -24,13 +24,11 @@ function Activity(){
         batch_year: "",
         department: "",
         education_level: "",
-        year_level: " ",
+        year_level: "",
         activity_id: null,
     });
     const [searchTerm, setSearchTerm] = useState("");
-    const [joinedActivities, setJoinedActivities] = useState([]);
-    const [loading, setLoading] = useState(true);
-   
+    const [hasJoined, setHasJoined] = useState(false);   
 
     const handleJoinClick = (activityId) => {
         const userId = localStorage.getItem('userId'); 
@@ -45,9 +43,9 @@ function Activity(){
             });
             return;
         }
-    
-        setShowForm(true);
+        setActivityId(activityId);
         setFormData({ ...formData, activity_id: activityId });
+        setShowForm(true); 
     };    
 
     useEffect(() => {
@@ -78,10 +76,21 @@ function Activity(){
         return matchesSearch && activity.status == selectedStatus;
     });
 
+    // const activityId = formData.activity_id;
+
     const handleFormSubmit = (e) => {
         e.preventDefault();
-
-        // ตรวจสอบข้อมูลในฟอร์ม
+    
+        if (hasJoined) {
+            Swal.fire({
+                title: "แจ้งเตือน",
+                text: "คุณได้เข้าร่วมกิจกรรมนี้แล้ว",
+                icon: "info",
+                confirmButtonText: "ตกลง"
+            });
+            return;
+        }
+    
         if (!/^\d{10}$/.test(formData.phone)) {
             Swal.fire({
                 title: "ข้อผิดพลาด!",
@@ -91,57 +100,56 @@ function Activity(){
             });
             return;
         }
-        // console.log("Form Data:", formData); 
-
+    
         axios.post('http://localhost:3001/activity/activity-form', formData, {
             withCredentials: true,
         })
-            .then(response => {
-                Swal.fire({
-                    title: "สำเร็จ!",
-                    text: "คุณได้เข้าร่วมกิจกรรมเรียบร้อยแล้ว",
-                    icon: "success",
-                    confirmButtonText: "ตกลง",
-                    timer: 3000
-                });
-                // อัปเดตสถานะ joinedActivities
-                setJoinedActivities((prev) => [...prev, formData.activity_id]);
-                setShowForm(false);
-            })
-            .catch(error => {
-                if (error.response && error.response.status === 400) {
-                    Swal.fire({
-                        title: "แจ้งเตือน!",
-                        text: error.response.data.message,
-                        icon: "warning",
-                        confirmButtonText: "ตกลง"
-                    });
-                } else {
-                    Swal.fire({
-                        title: "เกิดข้อผิดพลาด!",
-                        text: "ไม่สามารถเข้าร่วมกิจกรรมได้ กรุณาลองใหม่",
-                        icon: "error",
-                        confirmButtonText: "ตกลง"
-                    });
-                }
+        .then(response => {
+            Swal.fire({
+                title: "สำเร็จ!",
+                text: "คุณได้เข้าร่วมกิจกรรมเรียบร้อยแล้ว",
+                icon: "success",
+                confirmButtonText: "ตกลง",
+                timer: 3000
             });
+            setHasJoined(true);
+            setShowForm(false);
+        })
+        .catch(error => {
+            if (error.response?.status === 400) {
+                Swal.fire({
+                    title: "แจ้งเตือน!",
+                    text: error.response.data.message,
+                    icon: "warning",
+                    confirmButtonText: "ตกลง"
+                });
+            } else {
+                Swal.fire({
+                    title: "เกิดข้อผิดพลาด!",
+                    text: "ไม่สามารถเข้าร่วมกิจกรรมได้ กรุณาลองใหม่",
+                    icon: "error",
+                    confirmButtonText: "ตกลง"
+                });
+            }
+        });
     };
- 
-    //ดึงข้อมูลกิจกรรมที่เข้าร่วม
+    
     useEffect(() => {
-        const userId = localStorage.getItem('userId');
-        if (userId) {
-            axios.get(`http://localhost:3001/activity/joined-activities?userId=${userId}`)
-                .then(response => {
-                    console.log("Joined Activities:", response.data.joinedActivities);
-                    if (response.data.success) {
-                        const joined = response.data.joinedActivities.map(item => item.activity_id);
-                        setJoinedActivities(joined); // เก็บ activity_id ที่ผู้ใช้เข้าร่วมไว้
-                    }
-                })
-                .catch(err => console.error("Error fetching joined activities:", err));
+        if (activityId) {
+            setHasJoined(false);
+            axios.get(`http://localhost:3001/activity/check-join/${activityId}`, {
+                withCredentials: true,
+            })
+            .then((res) => {
+                if (res.data.success) {
+                    setHasJoined(res.data.joined);
+                }
+            })
+            .catch((err) => {
+                console.error("เกิดข้อผิดพลาดในการตรวจสอบกิจกรรม:", err);
+            });
         }
-    }, []);
+    }, [activityId]);
     
 
     const handleDeleteActivity = (activityId) => {
@@ -270,18 +278,18 @@ function Activity(){
                                 ผู้เข้าร่วม: {activity.current_participants}/{activity.max_participants || "ไม่จำกัด"}
                             </p>
                             <div className="button-group">
-                                {activity.status === 0 && (
-                                    joinedActivities.includes(activity.activity_id) ? (
-                                    <button className="btn btn-secondary" disabled>
-                                        เข้าร่วมแล้ว
-                                    </button>
+                                {activity.status === 0 && (  // ตรวจสอบกิจกรรมที่ยังไม่เสร็จสิ้น
+                                    hasJoined ? (
+                                        <button className="btn btn-secondary" disabled>
+                                            เข้าร่วมแล้ว
+                                        </button>
                                     ) : (
-                                    <button
-                                        className="btn btn-primary"
-                                        onClick={() => handleJoinClick(activity.activity_id)}
-                                    >
-                                        เข้าร่วมกิจกรรม
-                                    </button>
+                                        <button
+                                            className="btn btn-primary"
+                                            onClick={() => handleJoinClick(activity.activity_id)}
+                                        >
+                                            เข้าร่วมกิจกรรม
+                                        </button>
                                     )
                                 )}
                                 <button onClick={() => handleViewDetails(activity.activity_id)} className="btn btn-info">
@@ -434,7 +442,9 @@ function Activity(){
                             />
                         </div>
                         <div className="d-flex justify-content-between">
-                            <button type="submit" className="btn btn-success">ยืนยัน</button>
+                            <button type="submit" className="btn btn-success">
+                               ยืนยัน
+                            </button>
                         </div>
     
                     </form>

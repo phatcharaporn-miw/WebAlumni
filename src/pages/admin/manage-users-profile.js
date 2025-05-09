@@ -13,7 +13,7 @@ function UserProfile() {
       try {
         const res = await axios.get(`http://localhost:3001/admin/users/${userId}`);
         if (res.data.success) {
-          console.log(res.data.data);
+          // console.log(res.data.data);
           setUser(res.data.data);
         }
       } catch (error) {
@@ -40,6 +40,12 @@ function UserProfile() {
           />
           <h4 className="mt-3 mb-0">{user.full_name || "ไม่ระบุชื่อ"}</h4>
           <span className="badge bg-secondary">{user.role_name}</span>
+        </div>
+
+        <div className="d-flex justify-content-end">
+          <a href={`/admin/users/edit-user-profile/${userId}`} className="btn btn-warning btn-sm">
+            แก้ไขข้อมูล
+          </a>
         </div>
 
         <hr />
