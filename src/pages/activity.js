@@ -164,8 +164,7 @@ function Activity(){
             cancelButtonText: "ยกเลิก",
         }).then((result) => {
             if (result.isConfirmed) {
-                axios
-                    .delete(`http://localhost:3001/activity/${activityId}`, {
+                axios.delete(`http://localhost:3001/activity/delete-activity/${activityId}`, {
                         withCredentials: true,
                     })
                     .then(() => {
@@ -234,6 +233,7 @@ function Activity(){
                 <option value="0">กำลังจะจัดขึ้น</option>
             </select>
 
+            {/* นายกสมาคมจัดการ */}
             <div className="activity-management">
                 {userRole === "2" && (
                     <div className="d-flex justify-content-between mb-4">
@@ -296,6 +296,8 @@ function Activity(){
                                     ดูรายละเอียด
                                 </button>
                             </div>
+
+                            {/* นายกสมาคม ลบ แก้ไข */}
                             {userRole === "2" && (
                                 <div className="d-flex justify-content-end mt-3">
                                     <button
@@ -378,7 +380,7 @@ function Activity(){
                         {/* แสดงปีการศึกษา/ระดับการศึกษา */}
                         {userRole === '4' ? ( // ถ้าเป็นศิษย์ปัจจุบัน
                             <>
-                                {/* ระดับการศึกษา */}
+                      
                                 <div className="mb-3">
                                     <label htmlFor="education_level" className="form-label">ระดับการศึกษา</label>
                                     <select

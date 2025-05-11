@@ -177,8 +177,8 @@ function Home() {
         <h6 className="text-secondary">{title}</h6>
         <h3 className="text-primary">
           {animated ? <CountUp end={parseInt(value)} duration={2} separator="," /> : value}
-          {typeof value === "string" && value.includes("คน") && " คน"}
-          {typeof value === "string" && value.includes("บาท") && " บาท"}
+          {typeof value === "string" && value.includes("คน") && ""}
+          {typeof value === "string" && value.includes("บาท") && ""}
         </h3>
       </div>
     </div>

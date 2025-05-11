@@ -21,6 +21,7 @@ Modal.setAppElement('#root');
 
 function Webboard(){
     const { id } = useParams(); // ถ้าคุณใช้ route แบบ /webboard/:id
+    const { categoryId } = useParams();
     const location = useLocation();
     const [webboard, setWebboard] = useState([]);
     const [sortOrder, setSortOrder] = useState("latest");
@@ -33,7 +34,8 @@ function Webboard(){
     const [category, setCategory] = useState([]);
     const [showReplyForm, setShowReplyForm] = useState(null);
     const [replyText, setReplyText] = useState(""); 
-    const [recommendedPosts, setRecommendedPosts] = useState([]); 
+    const [recommendedPosts, setRecommendedPosts] = useState([]); //กระทู้ที่แนะนำ
+    const [expandedReplies, setExpandedReplies] = useState({}); //ซ่อนการตอบกลับ
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -56,6 +58,10 @@ function Webboard(){
             if (response.data.success) {
               
               setWebboard(response.data.data);
+
+              // สุ่มเลือกกระทู้แนะนำ (เช่น 3 กระทู้)
+              const randomPosts = getRandomPosts(response.data.data, 3);
+              setRecommendedPosts(randomPosts);
             } else {
               console.error("เกิดข้อผิดพลาดในการดึงข้อมูลกระทู้:", response.data.message);
             }
@@ -79,6 +85,11 @@ function Webboard(){
           console.error('เกิดข้อผิดพลาดในการดึงข้อมูลกระทู้ที่แนะนำ:', error.message);
         });
     }, []);
+
+    const getRandomPosts = (posts, count) => {
+      const shuffled = [...posts].sort(() => 0.5 - Math.random()); // สุ่มเรียงลำดับ
+      return shuffled.slice(0, count); // เลือกจำนวนที่ต้องการ
+    };
 
         //เรียงลำดับโพสต์ตามวันที่
     const sortedPosts = [...webboard].sort((a, b) => {
@@ -255,6 +266,14 @@ function Webboard(){
       setShowReplyForm(showReplyForm === commentId ? null : commentId);
     };
 
+    // ซ่อนการตอบกลับ
+    const toggleReplies = (commentId) => {
+      setExpandedReplies((prev) => ({
+        ...prev,
+        [commentId]: !prev[commentId],
+      }));
+    };
+
     // ตอบกลับความคิดเห็น
     const handleReplySubmit = (commentId, replyText) => {
       if (!isLoggedin) {
@@ -387,9 +406,9 @@ function Webboard(){
       });
     }, []);
 
-    const handleCategoryClick = (categoryId) => {
-      navigate(`/webboard/${categoryId}`)
-  };
+  const handleCategoryClick = (categoryId) => {
+      navigate(`/webboard/category/${categoryId}`)
+    };
 
     // กำหนดสีหมวดหมู่
   const getCategoryColor = (categoryId) => {
@@ -400,12 +419,29 @@ function Webboard(){
 
 
     return(
-    <section className="container">
+    <section className="container">    
         <div className="webboard-page">
             <h3 className="webboard-title">{showFavorites ? "กระทู้ที่กดใจ" : "กระทู้ทั้งหมด"}</h3>
         </div>
-         
-          <select className="border rounded p-2 mb-3" value={sortOrder} onChange={(e) => setSortOrder(e.target.value)}>
+        {/* <div className="statistics d-flex justify-content-between align-items-center bg-light p-3 rounded mb-4">
+          <div className="stat-item text-center">
+            <h5 className="fw-bold">{webboard.length}</h5>
+            <p className="text-muted">กระทู้ทั้งหมด</p>
+          </div>
+          <div className="stat-item text-center">
+            <h5 className="fw-bold">
+              {webboard.reduce((acc, post) => acc + (post.comments_count || 0), 0)}
+            </h5>
+            <p className="text-muted">ความคิดเห็นทั้งหมด</p>
+          </div>
+          <div className="stat-item text-center">
+            <h5 className="fw-bold">
+              {webboard.reduce((acc, post) => acc + (post.viewCount || 0), 0)}
+            </h5>
+            <p className="text-muted">จำนวนผู้เข้าชม</p>
+          </div>
+        </div> */}
+          <select className="border rounded p-2 mb-3 " value={sortOrder} onChange={(e) => setSortOrder(e.target.value)}>
                 <option value="latest">ล่าสุด</option>
                 <option value="oldest">เก่าสุด</option>
           </select>
@@ -529,76 +565,82 @@ function Webboard(){
                             <h6 className="mb-4">ความคิดเห็นทั้งหมด ({selectedPost?.comments?.length || 0})</h6>
                             {selectedPost.comments && selectedPost.comments.length > 0 ? (
                               selectedPost.comments.map((comment, index) => (
-                                <div key={index} className="comment-item border p-2 rounded mb-2">
+                                <div key={index} className="comment-item bg-light shadow-sm rounded-3 p-3 mb-3">
                                   <div className="d-flex align-items-start">
                                     <img 
                                       src={comment.profile_image ? `http://localhost:3001/${comment.profile_image}` : "/default-profile.png"} 
                                       alt="User" 
-                                      className="rounded-circle me-2" 
-                                      width="40" 
-                                      height="40" 
+                                      className="rounded-circle me-3 border" 
+                                      width="45" 
+                                      height="45" 
                                     />
-                                    <div className="comment-content">
-                                      <p className="comment-user mb-1">{comment.full_name || "ไม่ระบุชื่อ"}</p>
-                                      <p className="comment-time text-muted small mb-1">{new Date(comment.created_at).toLocaleDateString()}</p>
+                                    <div className="flex-grow-1">
+                                      <div className="d-flex justify-content-between align-items-center mb-1">
+                                        <strong>{comment.full_name || "ไม่ระบุชื่อ"}</strong>
+                                        <small className="text-muted">{new Date(comment.created_at).toLocaleDateString()}</small>
+                                      </div>
+                                      <p className="text-muted mb-2 small">{comment.comment_detail}</p>
+
                                       {Number(comment.user_id) === Number(localStorage.getItem("userId")) && (
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                          <span>{comment.comment_detail}</span> 
-                                          <button
-                                            className="btn btn-sm"
-                                            onClick={() => handleDeleteComment(comment.comment_id)}
-                                            style={{ marginLeft: 'auto', border: 'none', background: 'none' }} 
-                                          >
-                                            <MdDelete size={20} color="red"/>
-                                          </button>
-                                        </div>
+                                        <button
+                                          className="btn btn-sm"
+                                          onClick={() => handleDeleteComment(comment.comment_id)}
+                                          style={{ border: "none", background: "none" }}
+                                        >
+                                          <MdDelete size={20} color="red"/>
+                                        </button>
                                       )}
-                                      
-                                      {/* การตอบกลับ comment */}
-                                      <button className="btn btn-link btn-sm" onClick={() => toggleReplyForm(comment.comment_id)}>ตอบกลับความคิดเห็น</button>
+
+                                      <button className="btn btn-link btn-sm p-0" onClick={() => toggleReplyForm(comment.comment_id)}>ตอบกลับ</button>
+
                                       {showReplyForm === comment.comment_id && (
                                         <div className="d-flex mt-2">
                                           <input 
-                                            className="form-control me-3" 
-                                            rows="1" 
+                                            className="form-control me-2"
                                             placeholder="ตอบกลับความคิดเห็นนี้..."
                                             value={replyText}
                                             onChange={(e) => setReplyText(e.target.value)}
                                           />
-                                          <button className="btn btn-primary btn-sm" onClick={() => handleReplySubmit(comment.comment_id, replyText)}>ส่ง</button>
+                                          <button className="btn btn-sm btn-primary" onClick={() => handleReplySubmit(comment.comment_id, replyText)}>ส่ง</button>
                                         </div>
                                       )}
-                                      {comment?.replies && comment.replies.length > 0 &&  (
-                                        <div className="replies mt-2">
-                                          {comment.replies.map((reply, replyIndex) => (
-                                            <div key={replyIndex} className="reply-item border p-2 rounded mb-2">
+
+                                      {comment?.replies && comment.replies.length > 0 && (
+                                        <div className="replies mt-2" style={{ paddingLeft: "15px", borderLeft: "2px solid #eee" }}>
+                                          {(expandedReplies[comment.comment_id]
+                                            ? comment.replies
+                                            : comment.replies.slice(0, 2) // แสดงแค่ 2 อันแรก
+                                          ).map((reply, replyIndex) => (
+                                            <div key={replyIndex} className="reply-item border rounded p-2 mb-2 bg-white">
                                               <div className="d-flex align-items-start">
-                                                <img 
-                                                  src={reply.profile_image ? `http://localhost:3001/${reply.profile_image}` : "/default-profile.png"} 
-                                                  alt="User" 
-                                                  className="rounded-circle me-2" 
-                                                  width="30" 
-                                                  height="30" 
+                                                <img
+                                                  src={reply.profile_image ? `http://localhost:3001/${reply.profile_image}` : "/default-profile.png"}
+                                                  alt="User"
+                                                  className="rounded-circle me-2"
+                                                  width="30"
+                                                  height="30"
                                                 />
-                                                <div className="reply-content">
-                                                  <p className="reply-user fw-bold mb-1">{reply.full_name || "ไม่ระบุชื่อ"}</p>
-                                                  <p className="reply-time text-muted small mb-1">{new Date(reply.created_at).toLocaleDateString()}</p>
-                                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                    <span>{reply.reply_detail}</span> 
-                                                    {Number(reply.user_id) === Number(localStorage.getItem("userId")) && (
-                                                      <button
-                                                        className="btn btn-sm"
-                                                        onClick={() => handleDeleteReply(reply.reply_id, comment.comment_id)}
-                                                        style={{ marginLeft: 'auto', border: 'none', background: 'none' }} 
-                                                      >
-                                                        <MdDelete size={20} color="red"/>
-                                                      </button>
-                                                    )}
+                                                <div className="reply-content">                                
+                                                  <div className="d-flex justify-content-between align-items-center mb-1">
+                                                    <strong>{reply.full_name || "ไม่ระบุชื่อ"}</strong>
+                                                    <small className="text-muted">{new Date(reply.created_at).toLocaleDateString()}</small>
                                                   </div>
+                                                  <p className="text-muted mb-2 small">{reply.reply_detail}</p>
                                                 </div>
                                               </div>
                                             </div>
                                           ))}
+
+                                          {comment.replies.length > 2 && (
+                                            <div className="text-end">
+                                              <button
+                                                className="btn btn-link btn-sm"
+                                                onClick={() => toggleReplies(comment.comment_id)}
+                                              >
+                                                {expandedReplies[comment.comment_id] ? "ซ่อนการตอบกลับ" : `ดูเพิ่มเติม (${comment.replies.length - 2}) การตอบกลับ`}
+                                              </button>
+                                            </div>
+                                          )}
                                         </div>
                                       )}
                                     </div>
@@ -630,7 +672,7 @@ function Webboard(){
                                 </div>
                               )}
                             </div>
-                          </div>
+                        </div>
                     </div>
                 )}
           </Modal>    
@@ -658,8 +700,8 @@ function Webboard(){
                     )}
                 </div>
 
-                <hr className="my-3" />
-                  <h5 className="fw-bold mb-3">หมวดหมู่ที่เกี่ยวข้อง</h5>
+                <hr className="my-3 " />
+                  <h5 className="recommended-title mb-3">หมวดหมู่ที่เกี่ยวข้อง</h5>
                   <div className="d-flex flex-wrap gap-2">
                     {category.length > 0 ? (
                     category.map((category) => (
@@ -681,36 +723,41 @@ function Webboard(){
                     </div>
                   )}
                   </div>
-                </div>
-            </div>
 
-            {/* <div className="mt-5">
-              <h5 className="fw-bold mb-3">เว็บบอร์ดที่แนะนำ</h5>
-              {recommendedPosts.length > 0 ? (
-                <ul className="list-group">
-                  {recommendedPosts.map((post) => (
-                    <li
-                      key={post.webboard_id}
-                      className="list-group-item d-flex justify-content-between align-items-center"
-                      style={{ cursor: "pointer" }}
-                      onClick={() => handlePostClick(post)}
-                    >
-                      <div>
-                        <h6 className="mb-1">{post.title}</h6>
-                        <p className="mb-0 text-muted small">
-                          {post.comments_count} ความคิดเห็น • {post.likes_count} ถูกใจ
-                        </p>
+                  {/* กระทู้ที่แนะนำ */}
+                  <div className="recommended-posts mt-5">
+                    <h5 className="recommended-title mb-3">กระทู้แนะนำ</h5>
+                    {recommendedPosts.length > 0 ? (
+                      <div className="row">
+                        {recommendedPosts.map((post) => (
+                          <div key={post.webboard_id} className="col-md-6 mb-4">
+                            <div className="card shadow-sm border-0 rounded-4 h-100 d-flex flex-column">
+                              <div className="card-body d-flex flex-column justify-content-between">
+                                <div>
+                                  <h6 className="recommended-post-title mb-2">{post.title}</h6>
+                                  <p className="text-muted small mb-4">
+                                    {post.comments_count} ความคิดเห็น • ดู {post.viewCount} ครั้ง
+                                  </p>
+                                </div>
+                                <div className="mt-auto text-end">
+                                  <button
+                                    className="btn btn-outline-primary btn-sm rounded-pill px-3"
+                                    onClick={() => handlePostClick(post)}
+                                  >
+                                    ดูรายละเอียด
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                      <span className="badge bg-primary rounded-pill">
-                        {post.category_name}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-muted">ยังไม่มีเว็บบอร์ดที่แนะนำ</p>
-              )}
-            </div> */}
+                    ) : (
+                      <p className="text-muted">ยังไม่มีเว็บบอร์ดที่แนะนำ</p>
+                    )}
+                  </div>
+                </div>               
+            </div>           
     </section>  
     )
 }

@@ -179,12 +179,12 @@ function Category() {
     }
 
 
-        const handleCategoryClick = (categoryId) => {
-          navigate(`/webboard/category/${categoryId}`)
-      };
+    const handleCategoryClick = (categoryId) => {
+      navigate(`/webboard/category/${categoryId}`)
+    };
     
         // กำหนดสีหมวดหมู่
-        const getCategoryColor = (categoryId) => {
+      const getCategoryColor = (categoryId) => {
           const id = Number(categoryId);  // แปลงเป็นตัวเลข
           const hue = (id * 137) % 360;
           return `hsl(${hue}, 70%, 60%)`;

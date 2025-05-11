@@ -4,6 +4,8 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import axios from 'axios';
 import '../../css/admin-news.css';
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
+
 
 function PresidentCreateNews() {
     const [title, setTitle] = useState('');
@@ -42,8 +44,8 @@ function PresidentCreateNews() {
         })
             .then((response) => {
                 if (response.status === 200) {
-                    alert('โพสต์ข่าวประชาสัมพันธ์เรียบร้อยแล้ว!');
-                    navigate("/admin/news");
+                    Swal.fire("สำเร็จ!", "เพิ่มข่าวประชาสัมพันธ์เรียบร้อยแล้ว", "success");
+                    navigate("/news");
                 } else {
                     alert('เกิดข้อผิดพลาดในการโพสต์ข่าวประชาสัมพันธ์');
                 }

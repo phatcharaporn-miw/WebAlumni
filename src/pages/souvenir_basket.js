@@ -42,13 +42,15 @@ function SouvenirBasket() {
     };
 
     const handleDeleteItem = (productId) => {
-        axios.delete(`http://localhost:3001/souvenir/cart/${productId}`)
-            .then(() => {
-                setCart(prevCart => prevCart.filter(item => item.product_id !== productId));
-            })
-            .catch(error => {
-                console.error("Error deleting item:", error);
-            });
+        axios.delete(`http://localhost:3001/souvenir/cart/${productId}`, {
+        data: { userId: userId } // ส่ง userId ไปใน body ของ request
+    })
+        .then(() => {
+            setCart(prevCart => prevCart.filter(item => item.product_id !== productId));
+        })
+        .catch(error => {
+            console.error("Error deleting item:", error);
+        });
     };
 
     const handleUpdateQuantity = (productId, newQuantity) => {

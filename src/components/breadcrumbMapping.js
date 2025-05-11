@@ -3,13 +3,13 @@ export const breadcrumbMapping = {
     // หน้าเว็บทั้งหมด
     "/": "หน้าหลัก",
     "/webboard": "กระทู้ทั้งหมด",
-    "/webboard/category/:categoryId": "หมวดหมู่", 
+    "/webboard/category": "หมวดหมู่", 
     "/news": "ข่าวประชาสัมพันธ์",
     "/newsDetail": "รายละเอียดข่าวประชาสัมพันธ์",
     "/activity": "กิจกรรม",
     "/about": "เกี่ยวกับสมาคม",
     "/alumni": "ทำเนียบศิษย์เก่า",
-    "/category": "หมวดหมู่",
+    // "/category/:categoryId": "หมวดหมู่",
     "/souvenir": "ของที่ระลึก",
     "/donate": "บริจาค",
     "/donate/donatedetail": "รายละเอียดการบริจาค",
@@ -20,6 +20,8 @@ export const breadcrumbMapping = {
     "/donate/donaterequest": "เพิ่มโครงการบริจาค",
     "/alumni-profile/alumni-profile-souvenir" : "ประวัติการสั่งซื้อ",
     "/alumni/major-detail" : "รายชื่อศิษย์เก่า",
+    "/news/edit" : "แก้ไขข่าวประชาสัมพันธ์",
+    "/activity/edit" : "แก้ไขกิจกรรม",
     // "/alumni/major-detail/:major" : "รายชื่อศิษย์เก่า",
 
     // ส่วนของผู้ใช้

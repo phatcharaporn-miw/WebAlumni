@@ -16,6 +16,8 @@ function CreatePost() {
     const [newCategory, setNewCategory] = useState('');
     const [isLoggedin, setIsLoggedin] = useState(false);
     const [showNewCategoryInput, setShowNewCategoryInput] = useState(false);
+    const [banWords, setBanWords] = useState('');
+    const [error, setError] = useState("");
     const navigate = useNavigate();
 
     // ตรวจสอบว่าผู้ใช้ล็อกอินหรือยัง
@@ -95,8 +97,24 @@ function CreatePost() {
         setImage(event.target.files[0]); // อัปโหลดไฟล์ภาพ
       };
 
+    // คำต้องห้าม
+    const bannedWords = ["ควย", "สัส"];
+
     const handleSubmit = async (event) => {
         event.preventDefault();
+
+    // ตรวจสอบคำต้องห้าม
+  const regex = new RegExp(bannedWords.join("|"), "i"); // ใช้ RegExp เพื่อรองรับการค้นหาคำต้องห้ามไม่สนใจตัวพิมพ์เล็ก-ใหญ่
+    if (regex.test(content)) {
+    const bannedWord = bannedWords.find(word => content.includes(word));
+    setError(`เนื้อหาของกระทู้มีคำที่ต้องห้าม: ${bannedWord}`);
+    Swal.fire({
+        title: "ไม่สามารถสร้างกระทู้ได้",
+        text: `เนื้อหามีคำต้องห้าม: ${bannedWord}`,
+        icon: "warning"
+    });
+    return;
+    }
 
     // ตรวจสอบว่า categoryId เป็นค่าที่ถูกต้อง
     let categoryToSend = categoryId;
@@ -133,7 +151,7 @@ function CreatePost() {
                 .catch((error) => {
                   console.error('เกิดข้อผิดพลาดในการสร้างกระทู้:', error.message);
                 });
-        };    
+    };    
 
         return(
             <section className="createPost-page">
@@ -188,39 +206,41 @@ function CreatePost() {
                     <div className="form-group mb-3">
                         <label>เลือกหมวดหมู่ <span className="text-danger">*</span></label>
                         <select
-                        className="form-control"
-                        value={categoryId}
-                        onChange={handleCategoryChange}
-                        required
+                            className="form-control"
+                            value={categoryId}
+                            onChange={handleCategoryChange}
+                            required
                         >
-                        <option value="">เลือกหมวดหมู่</option>
-                        {Array.isArray(category) && category.length > 0 ? (
-                            category.map(category => (
-                            <option key={category.category_id} value={category.category_id}>
-                                {category.category_name}
-                            </option>
-                            ))
-                        ) : (
-                            <option value="" disabled>ไม่มีหมวดหมู่</option>
-                        )}
-                        <option value="add_new"><IoIosAdd /> เพิ่มหมวดหมู่...</option>
+                            <option value="">เลือกหมวดหมู่</option>
+                            {Array.isArray(category) && category.length > 0 ? (
+                                category.map(category => (
+                                    <option key={category.category_id} value={category.category_id}>
+                                        {category.category_name}
+                                    </option>
+                                ))
+                            ) : (
+                                <option value="" disabled>ไม่มีหมวดหมู่</option>
+                            )}
+                            <option value="add_new">เพิ่มหมวดหมู่...</option>
                         </select>
                     </div>
 
-                    {showNewCategoryInput && (
+                    {/* แสดงฟอร์มเพิ่มหมวดหมู่ใหม่เมื่อเลือก "เพิ่มหมวดหมู่" */}
+                    {categoryId === "add_new" && (
                         <div className="form-group mb-3 d-flex align-items-center">
-                        <input
-                            type="text"
-                            className="form-control me-2"
-                            placeholder="กรอกชื่อหมวดหมู่"
-                            value={newCategory}
-                            onChange={(e) => setNewCategory(e.target.value)}
-                        />
-                        <button type="button" className="btn btn-success" onClick={addCategory}>
-                            <IoIosAdd /> เพิ่ม
-                        </button>
+                            <input
+                                type="text"
+                                className="form-control me-2"
+                                placeholder="กรอกชื่อหมวดหมู่"
+                                value={newCategory}
+                                onChange={(e) => setNewCategory(e.target.value)}
+                            />
+                            <button type="button" className="btn btn-success" onClick={addCategory}>
+                                <IoIosAdd /> เพิ่ม
+                            </button>
                         </div>
                     )}
+
 
                     <div className="form-group">
                         <button type="submit" className="btn btn-primary w-100 mt-3">

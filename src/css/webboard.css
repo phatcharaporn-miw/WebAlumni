@@ -134,3 +134,33 @@
   margin-top: 5px;
   color: #555;
 }
+
+.recommended-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1d3557;
+  border-left: 4px solid #457b9d;
+  padding-left: 10px;
+}
+
+.recommended-post-title {
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: #212529;
+  line-height: 1.4;
+}
+
+.recommended-posts .card {
+  transition: transform 0.2s ease-in-out;
+  background-color: #ffffff;
+  min-height: 180px;
+}
+
+.recommended-posts .card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.recommended-posts .btn {
+  font-size: 0.85rem;
+}

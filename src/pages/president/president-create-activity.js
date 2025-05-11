@@ -3,6 +3,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
+
 
 function PreCreateActivity() {
   const [formData, setFormData] = useState({
@@ -106,10 +108,10 @@ function PreCreateActivity() {
         withCredentials: true,
         headers: { "Content-Type": "multipart/form-data" },
       });
-      console.log("API Response:", response.data);
+      // console.log("API Response:", response.data);
       if (response.status === 200) {
-        alert('เพิ่มกิจกรรมเรียบร้อยแล้ว!');
-        navigate("/admin/activities"); 
+         Swal.fire("สำเร็จ!", "เพิ่มกิจกรรมเรียบร้อยแล้ว", "success");
+        navigate("/activity"); 
       } else {
         alert('เกิดข้อผิดพลาดในการโพสต์กิจกรรม');
       }

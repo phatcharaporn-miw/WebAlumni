@@ -70,6 +70,7 @@ import ParticipantsPage from './pages/admin/participants';
 import PreCreateActivity from './pages/president/president-create-activity';
 import PresidentCreateNews from './pages/president/president-create-news';
 import PresidentEditActivity from './pages/president/president-edit-activity';
+import PresidentEditNews from './pages/president/president-edit-news';
 
 function App() {
 
@@ -89,6 +90,7 @@ function App() {
           <Route path="/donate" element={<Donate />} />
           <Route path="/donate/donaterequest" element={<DonateRequest/>} />
           <Route path="/donate/donatedetail/:projectId" element={<DonateDetail />} />
+          <Route path="/donate/donatedetail" element={<DonateDetail />} />
           <Route path="/donatedetail" element={<DonateDetail/>} />
           <Route path="/alumni" element={<Alumni />} />
           <Route path="/souvenir" element={<Souvenir />} />
@@ -97,6 +99,7 @@ function App() {
           {/* <Route path="/souvenir/souvenir_history" element={<SouvenirHistory />} /> */}
           <Route path="/souvenir/souvenir_request" element={<SouvenirRequest />} />
           <Route path="/souvenir/souvenirDetail/:productId" element={<SouvenirDetail />} />
+          <Route path="/souvenir/souvenirDetail" element={<SouvenirDetail />} />
           <Route path="/webboard" element={<Webboard />} />
           <Route path="/webboard/:id" element={<Webboard />} />
           <Route path="/login" element={<Login />} />
@@ -107,7 +110,8 @@ function App() {
           <Route path="/alumni-favorite" element={<WebboardFavorite/>} />
           <Route path="/news/:newsId" element={<NewsDetail/>} />
           {/* <Route path="/notification" element={<Notifications/>} /> */}
-          <Route path="/webboard/:categoryId" element={<Category/>} />
+          <Route path="/webboard/category/:categoryId" element={<Category/>} />
+          <Route path="/webboard/category" element={<Category/>} />
           <Route path="/alumni-profile/alumni-profile-webboard" element={<AlumniProfileWebboard />} />
           <Route path="/alumni-profile/alumni-profile-webboard/edit-webboard/:webboardId" element={<EditWebboard />} />
           <Route path="/activity/:activityId" element={<ActivityDetail />} />
@@ -115,6 +119,7 @@ function App() {
           <Route path="/alumni-profile/alumni-profile-activity" element={<AlumniProfileActivity />} />
           <Route path="/alumni-profile/alumni-profile-souvenir" element={<AlumniProfileSouvenir />} />
           <Route path="/alumni/major-detail/:major" element={<AlumniMajor />} />
+          <Route path="/alumni/major-detail" element={<AlumniMajor />} />
           <Route path="/searchResult" element={<SearchResult />} />
 
           {/* route ของนายกสมาคม */}
@@ -122,6 +127,7 @@ function App() {
           <Route path="/activity/president-create-activity" element={<PreCreateActivity />} />
           <Route path="/news/president-create-news" element={<PresidentCreateNews />} />
           <Route path="/activity/edit/:activityId" element={<PresidentEditActivity />} />
+          <Route path="/news/edit/:newsId" element={<PresidentEditNews />} />
         </Route>
 
         <Route element={<Admin />}>

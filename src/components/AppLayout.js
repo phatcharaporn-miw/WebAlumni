@@ -43,7 +43,7 @@ function AppLayout() {
     
         if (userId && role) {
           setUser({ userId, role });
-          navigate('/alumni-home');
+          navigate('/');
         } else {
           setUser(null);
         }

@@ -1,17 +1,11 @@
-import React from "react";
+import React,  { useState, useEffect } from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../css/alumni.css';
 import { Link } from "react-router-dom";
+import axios from "axios";
 
 function Alumni() {
-    const alumniData = [
-        { name: "นางสาวพัชราพร นิลพงษ์", position: "ผู้พัฒนาเว็บไซต์", image: "/image/person1.jpg" },
-        { name: "ชื่อ", position: "ตำแหน่ง", image: "/image/person1.jpg" },
-        { name: "ชื่อ", position: "ตำแหน่ง", image: "/image/profile-picture.png" },
-        { name: "ชื่อ", position: "ตำแหน่ง", image: "/image/profile-picture.png" },
-        { name: "ชื่อ", position: "ตำแหน่ง", image: "/image/profile-picture.png" },
-        { name: "ชื่อ", position: "ตำแหน่ง", image: "/image/profile-picture.png" },
-    ];
+    const [alumniData, setAlumniData] = useState([]);
 
     const majors = [
         { title: "วิทยาการคอมพิวเตอร์", image: "/image/cs.png", slug: "cs" },
@@ -20,7 +14,13 @@ function Alumni() {
         { title: "ความปลอดภัยไซเบอร์", image: "/image/cy.jpeg", slug: "cy" },
         { title: "ปัญญาประดิษฐ์", image: "/image/ai.jpg", slug: "ai" },
     ];
-      
+    
+    // ข้อมูลศิษย์เก่าดีเด่น
+    useEffect(() => {
+        axios.get("http://localhost:3001/alumni/outstanding-alumni")
+            .then((res) => setAlumniData(res.data))
+            .catch((err) => console.error("ไม่สามารถโหลดศิษย์เก่าดีเด่น:", err));
+    }, []);
 
     return (
         <section className="container">
@@ -66,21 +66,41 @@ function Alumni() {
                     </div>
                 </div>
 
+                {/* <h5 className="alumni-title">ศิษย์เก่าผู้มีคุณูปการ</h5>
+                    <div className="row justify-content-center mb-5">
+                        {honorAlumni.map((person, index) => (
+                            <div className="col-sm-6 col-md-4 col-lg-3 mb-4" key={index}>
+                            <div className="card shadow-sm border-0 rounded-4 text-center p-3 bg-light">
+                                <img
+                                src={person.image || '/image/profile-picture.png'}
+                                className="rounded-circle mx-auto mb-3"
+                                alt={person.name}
+                                style={{ width: '100px', height: '100px', objectFit: 'cover' }}
+                                />
+                                <div className="card-body">
+                                <h6 className="fw-bold">{person.name}</h6>
+                                <p className="text-muted small">{person.position}</p>
+                                </div>
+                            </div>
+                            </div>
+                        ))}
+                    </div> */}
+
                 <div className="outstanding my-5">
                     <h5 className="alumni-title">ศิษย์เก่าดีเด่น</h5>
-                    <div className="row">
-                        {alumniData.map((alumnus, index) => (
+                    <div className="row mt-5">
+                        {alumniData.map((alumni, index) => (
                             <div className="col-md-6 mb-4" key={index}>
                                 <div className="d-flex align-items-center" id="alumni-row">
                                     <img
-                                        src={alumnus.image}
-                                        alt={alumnus.name}
+                                        src={alumni.image_path ? `http://localhost:3001/${alumni.image_path}` : "/default-profile-pic.jpg"}
+                                        alt={alumni.name}
                                         className="img-fluid rounded-circle me-3"
                                         style={{ width: "80px", height: "80px", objectFit: "cover" }}
                                     />
                                     <div>
-                                        <h5 className="mb-1">{alumnus.name}</h5>
-                                        <p className="mb-0 text-muted">{alumnus.position}</p>
+                                        <h5 className="mb-1">{alumni.name}</h5>
+                                        <p className="mb-0 text-muted">{alumni.position || "ไม่มีข้อมูลตำแหน่ง"}</p>
                                     </div>
                                 </div>
                             </div>

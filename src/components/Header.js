@@ -253,8 +253,8 @@ const addToCart = (productId, quantity, total) => {
           path = `/news/${suggestion.id}`;
       } else if (suggestion.type === "webboard") {
           path = `/webboard/${suggestion.id}`;
-      } else if (suggestion.type === "profile") {
-          path = `/profile/${suggestion.id}`;
+      } else if (suggestion.type === "activity") {
+          path = `/activity/${suggestion.id}`;
       } else if (suggestion.type === "donationproject") {
           path = `/donate/donatedetail/${suggestion.id}`;
       } else if (suggestion.type === "products") {
@@ -301,8 +301,8 @@ const addToCart = (productId, quantity, total) => {
                             {suggestion.type === "webboard" && (
                                 <p className="suggestion-text">กระทู้: {suggestion.title}</p>
                             )}
-                            {suggestion.type === "profile" && (
-                                <p className="suggestion-text">โปรไฟล์: {suggestion.title}</p>
+                            {suggestion.type === "activity" && (
+                                <p className="suggestion-text">กิจกรรม: {suggestion.title}</p>
                             )}
                             {suggestion.type === "donationproject" && (
                                 <p className="suggestion-text">บริจาค: {suggestion.title}</p>
