@@ -25,7 +25,7 @@ import Register from './pages/register';
 import Faq from './pages/faq';
 // import Register from './pages/test-regis';
 import PresidentHome from './pages/president/president-home';
-// import ProtectedRoute from './components/ProtectedRoute';
+import ProtectedRoute from './components/ProtectedRoute';
 import AlumniHome from './pages/alumni/alumni-home';
 import Profile from './pages/alumni/alumni-profile';
 import CreatePost from './pages/createPost';
@@ -45,6 +45,8 @@ import AlumniProfileSouvenir from './pages/alumni/alumni-profile-souvenir';
 import AlumniProfileActivity from './pages/alumni/alumni-profile-activity';
 import SouvenirBasket from './pages/souvenir_basket';
 import AlumniMajor from './pages/major-detail';
+// import AlumniProfile from './pages/alumni/alumni-profile';
+import HomeAlumniProfile from './pages/alumniProfile';
 
 
 // route ของแอดมิน
@@ -71,6 +73,11 @@ import PreCreateActivity from './pages/president/president-create-activity';
 import PresidentCreateNews from './pages/president/president-create-news';
 import PresidentEditActivity from './pages/president/president-edit-activity';
 import PresidentEditNews from './pages/president/president-edit-news';
+import PresidentProfile from './pages/president/president-profile';
+import PresidentProfileActivity from './pages/president/president-profile-activity';
+import PresidentProfileWebboard from './pages/president/president-profile-webboard';
+import Approve from './pages/president/president-approve';
+import PresidentProfileSouvenir from './pages/president/president-profile-souvenir';
 
 function App() {
 
@@ -104,9 +111,21 @@ function App() {
           <Route path="/webboard/:id" element={<Webboard />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/alumni-home" element={<AlumniHome />} />
-          <Route path="/alumni-profile" element={<Profile/>} />
-          <Route path="/createPost" element={<CreatePost/>} />
+          <Route path="/alumni-home" element={
+           
+              <AlumniHome />
+          
+          } />
+          <Route path="/alumni-profile" element={ 
+            
+              <Profile />
+           
+          }/>
+          <Route path="/createPost" element={
+            // <ProtectedRoute> 
+              <CreatePost/> 
+            // </ProtectedRoute>
+          } />
           <Route path="/alumni-favorite" element={<WebboardFavorite/>} />
           <Route path="/news/:newsId" element={<NewsDetail/>} />
           {/* <Route path="/notification" element={<Notifications/>} /> */}
@@ -121,6 +140,7 @@ function App() {
           <Route path="/alumni/major-detail/:major" element={<AlumniMajor />} />
           <Route path="/alumni/major-detail" element={<AlumniMajor />} />
           <Route path="/searchResult" element={<SearchResult />} />
+          <Route path="/alumni/:userId" element={<HomeAlumniProfile />} />
 
           {/* route ของนายกสมาคม */}
           <Route path="/president-home" element={<PresidentHome />} />
@@ -128,12 +148,22 @@ function App() {
           <Route path="/news/president-create-news" element={<PresidentCreateNews />} />
           <Route path="/activity/edit/:activityId" element={<PresidentEditActivity />} />
           <Route path="/news/edit/:newsId" element={<PresidentEditNews />} />
+          <Route path="/president-profile" element={<PresidentProfile />} />
+          <Route path="/president-profile/president-profile-activity" element={<PresidentProfileActivity />} />
+          <Route path="/president-profile/president-profile-webboard" element={<PresidentProfileWebboard />} />
+          <Route path="/president-profile/president-approve" element={<Approve />} />
+          <Route path="/president-profile/president-profile-souvenir" element={<PresidentProfileSouvenir />} />
+
         </Route>
 
         <Route element={<Admin />}>
           {/* <Route path="/admin-home/" element={<AdminHome />} /> */}
           
-            <Route path="/admin-home" element={<AdminHome />} />
+            <Route path="/admin-home" element={ 
+              // <ProtectedRoute requiredRoles={[1]}>
+                <AdminHome />
+              // </ProtectedRoute>
+            } />
             <Route path="/admin/souvenir" element={<AdminSouvenir />} />
             <Route path="/admin/activities" element={<AdminActivity />} />
             <Route path="/admin/activities/admin-create-activity" element={<CreateActivity />} />

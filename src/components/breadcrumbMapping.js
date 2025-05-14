@@ -33,4 +33,13 @@ export const breadcrumbMapping = {
     "/createPost": "สร้างกระทู้ใหม่", 
     "/alumni-profile/alumni-profile-activity": "ประวัติการเข้าร่วมกิจกรรม",
     
+
+    // นายกสมาคม
+    "/president-profile": "โปรไฟล์",
+    "/president-profile/president-profile-activity": "ประวัติการเข้าร่วมกิจกรรม",
+    "/president-profile/president-profile-souvenir": "การซื้อของที่ระลึก",
+    "/president-profile/president-profile-webboard": "กระทู้ที่สร้าง",
+    "/president-profile/president-profile-webboard/edit-webboard": "แก้ไขกระทู้ที่สร้าง",
+    "/president-profile/president-approve": "การอนุมัติ",
+
   };

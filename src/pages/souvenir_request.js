@@ -127,7 +127,7 @@ function SouvenirRequest() {
 
             Swal.fire({
                 title: "เพิ่มสินค้าสำเร็จ!",
-                text: "สินค้าของคุณถูกส่งแล้ว กรุณารอการอนุมัติจากแอดมิน",
+                text: "สินค้าของคุณถูกส่งแล้ว กรุณารอการอนุมัติ",
                 icon: "success",
                 confirmButtonText: "ตกลง"
             }).then(() => {

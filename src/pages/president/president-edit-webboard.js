@@ -6,7 +6,6 @@ import Swal from "sweetalert2";
 
 function EditWebboard() {
     const { webboardId } = useParams();
-    const userId = localStorage.getItem("userId");  
     const navigate = useNavigate();
     const [category, setCategory] = useState([]);
     const [formData, setFormData] = useState({
@@ -172,20 +171,9 @@ function EditWebboard() {
                                 </div>
                                 <div className="d-flex justify-content-end">
                                     <button type="submit" className="btn btn-primary me-2">บันทึกการแก้ไข</button>
-                                    <button
-                                        type="button"
-                                        className="btn btn-secondary"
-                                        onClick={() => {
-                                            if (userId.role === 2) {
-                                            navigate('/president-profile-webboard');
-                                            } else {
-                                            navigate('/alumni-profile-webboard');
-                                            }
-                                        }}
-                                        >
+                                    <button type="button" className="btn btn-secondary" onClick={() => navigate('/president-profile-webboard')}>
                                         ยกเลิก
                                     </button>
-
                                 </div>
                             </form>
                         </div>

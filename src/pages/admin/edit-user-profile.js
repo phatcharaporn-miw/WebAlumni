@@ -77,7 +77,7 @@ function EditUserProfile() {
   };
 
   return (
-    <div className="container mt-5" style={{ maxWidth: "600px" }}>
+    <div className="container my-5" style={{ maxWidth: "600px" }}>
       <h3 className="mb-4">แก้ไขข้อมูลผู้ใช้</h3>
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
@@ -153,8 +153,10 @@ function EditUserProfile() {
             </div>
         </div>
         ))}
-
-        <button type="submit" className="btn btn-primary">บันทึก</button>
+        <div className="mt-5 d-flex gap-3">
+          <button type="button" className="btn btn-secondary w-50" onClick={() => navigate(`/admin/users/user-profile/${userId}`)}>ยกเลิก</button>
+          <button type="submit" className="btn btn-primary w-50">บันทึก</button>
+        </div>
       </form>
     </div>
   );

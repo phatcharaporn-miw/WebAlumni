@@ -7,7 +7,7 @@ import Modal from 'react-modal';
 import { SlHeart } from "react-icons/sl";
 import { MdFavorite } from "react-icons/md";
 import { BiSolidComment } from "react-icons/bi";
-// import { MdEdit } from "react-icons/md";
+import { MdDelete } from "react-icons/md";
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
 import { FaEye } from "react-icons/fa";
@@ -64,6 +64,7 @@ function Home() {
   const [activity, setActivity] = useState([]);
   const [showReplyForm, setShowReplyForm] = useState(null);
   const [replyText, setReplyText] = useState(""); 
+  const [expandedReplies, setExpandedReplies] = useState({}); //ซ่อนการตอบกลับ
   const navigate = useNavigate();
 
   const [projects, setProjects] = useState([]);
@@ -350,146 +351,208 @@ function Home() {
 
   // เมื่อมีการกดคลิกกระทู้
   const handlePostClick = (post) => {
-    if (selectedPost && selectedPost.webboard_id === post.webboard_id) {
-      setModalIsOpen(true);
-      return;
-    }
-    axios.get(`http://localhost:3001/web/webboard/${post.webboard_id}`, {
-      withCredentials: true,
-    })
-      .then((response) => {
-        if (response.data.success) {
-          console.log("Comments Data:", response.data.data.comments);
-
-          setSelectedPost({
-            ...response.data.data,
-            comments: response.data.data.comments.map(comment => ({
-              ...comment,
-              created_at: comment.created_at
-                ? moment(comment.created_at).locale("th").format("DD/MM/YYYY HH:mm:ss")
-                : "ไม่ระบุวันที่"
-            }))
-          });
+        if (selectedPost && selectedPost.webboard_id === post.webboard_id) {
           setModalIsOpen(true);
-        } else {
-          console.error("ไม่สามารถโหลดกระทู้ได้");
-        }
-      })
-      .catch((error) => console.error("เกิดข้อผิดพลาดในการโหลดกระทู้:", error));
+          return;
+         } 
+          axios.get(`http://localhost:3001/web/webboard/${post.webboard_id}`, {
+            withCredentials: true,
+          })
+            .then((response) => {
+              if (response.data.success) {
+                // แปลงวันที่ในคอมเมนต์ให้ถูกต้อง
+              const commentsWithFormattedDate = response.data.data.comments.map(comment => ({
+                ...comment,
+                created_at: comment.created_at 
+                    ? moment(comment.created_at).locale("th").format("DD/MM/YYYY HH:mm:ss") 
+                    : "ไม่ระบุวันที่",
+                replies: comment.replies?.map(reply => ({
+                    ...reply,
+                    created_at: reply.created_at ? reply.created_at : "",
+                    user_id: reply.user_id 
+                })) || [] // ป้องกันกรณีไม่มี replies
+              }));
+              
+              setSelectedPost({
+                ...response.data.data,
+                comments: commentsWithFormattedDate
+              });
+  
+              setModalIsOpen(true);
+              } else {
+                console.error("ไม่สามารถโหลดกระทู้ได้");
+              }
+            })
+            .catch((error) => console.error("เกิดข้อผิดพลาดในการโหลดกระทู้:", error));
   };
 
   // จัดการcomment
-  const handleCommentSubmit = () => {
-    if (!isLoggedin) {
-      alert("กรุณาเข้าสู่ระบบ");
-      return;
-    }
-    if (!commentText.trim()) {
-      alert("กรุณากรอกข้อความก่อนส่งความคิดเห็น");
-      return;
-    }
+    const handleCommentSubmit = () => {
+        if (!isLoggedin) {
+            Swal.fire({
+                title: "กรุณาเข้าสู่ระบบ",
+                text: "คุณต้องเข้าสู่ระบบก่อนแสดงความคิดเห็น",
+                icon: "warning",
+                confirmButtonText: "เข้าสู่ระบบ"
+            }).then(() => {
+                navigate("/login");
+            });
+            return;
+        }
 
-    axios.post(`http://localhost:3001/web/webboard/${selectedPost.webboard_id}/comment`, {
-      comment_detail: commentText,
-    }, {
-      withCredentials: true
-    })
+        if (!commentText.trim()) {
+            Swal.fire({
+                title: "ข้อผิดพลาด",
+                text: "กรุณากรอกข้อความก่อนส่งความคิดเห็น",
+                icon: "error",
+                confirmButtonText: "ตกลง"
+            });
+            return;
+        }
+
+        axios.post(`http://localhost:3001/web/webboard/${selectedPost.webboard_id}/comment`, {
+          comment_detail: commentText,
+        }, {
+          withCredentials: true
+        })
+        .then((response) => {
+          const newComment = response.data; // คอมเมนต์ใหม่ที่ได้จาก Backend
+        
+          // แปลงวันที่ให้ถูกต้องก่อน
+          const formattedNewComment = {
+            ...newComment,
+            created_at: newComment.created_at
+              ? moment(newComment.created_at).locale("th").format("DD/MM/YYYY HH:mm:ss")
+              : "ไม่ระบุวันที่"
+          };
+        
+          // อัปเดต State ของ selectedPost
+          setSelectedPost((prev) => ({
+            ...prev,
+            comments: [...(prev.comments || []), formattedNewComment],
+            comments_count: (prev.comments_count ?? 0) + 1
+          }));
+        
+          // อัปเดต State ของ webboard เพื่อให้จำนวนคอมเมนต์อัปเดตในหน้าแรก
+          setWebboard((prevWebboard) => 
+            prevWebboard.map((post) =>
+              post.webboard_id === selectedPost.webboard_id
+                ? { ...post, comments_count: (post.comments_count ?? 0) + 1 }
+                : post
+            )
+          );
+        
+          setCommentText(""); // ล้างข้อความในช่องคอมเมนต์
+        })
+        .catch((error) => {
+          console.error('เกิดข้อผิดพลาดในการแสดงความคิดเห็น:', error.message);
+        });        
+    };
+
+    const toggleReplyForm = (commentId) => {
+      setShowReplyForm(showReplyForm === commentId ? null : commentId);
+    };
+
+    // ซ่อนการตอบกลับ
+    const toggleReplies = (commentId) => {
+      setExpandedReplies((prev) => ({
+        ...prev,
+        [commentId]: !prev[commentId],
+      }));
+    };
+
+    // ตอบกลับความคิดเห็น
+    const handleReplySubmit = (commentId, replyText) => {
+      if (!isLoggedin) {
+        Swal.fire({
+          title: "กรุณาเข้าสู่ระบบ",
+          text: "คุณต้องเข้าสู่ระบบก่อนเข้าร่วมกิจกรรม",
+          icon: "warning",
+          confirmButtonText: "เข้าสู่ระบบ"
+        }).then(() => {
+        navigate("/login");
+        });
+        return;
+      }
+      if (!replyText.trim()) {
+        alert("กรุณากรอกข้อความก่อนส่งความคิดเห็น");
+        return;
+      }
+    
+      axios.post(`http://localhost:3001/web/webboard/${selectedPost.webboard_id}/comment/${commentId}/reply`, {
+        reply_detail: replyText,
+      }, {
+        withCredentials: true
+      })
       .then((response) => {
-        const newComment = response.data;
+        const newReply = response.data;
         setSelectedPost((prev) => ({
           ...prev,
-          comments: [...(prev.comments || []), newComment],
-          comments_count: (prev.comments_count ?? 0) + 1
+          comments: prev.comments.map((comment) =>
+            comment.comment_id === commentId
+              ? { ...comment, replies: [...(comment.replies || []), newReply] }
+              : comment
+          ),
         }));
-
-        // อัปเดต state `webboard` เพื่อให้จำนวนเมนต์อัปเดตที่หน้าแรก
-        setWebboard((prevWebboard) =>
-          prevWebboard.map((post) =>
-            post.webboard_id === selectedPost.webboard_id
-              ? { ...post, comments_count: (post.comments_count ?? 0) + 1 }
-              : post
-          )
-        );
-
-        setCommentText("");
+        setReplyText("");
+        setShowReplyForm(null);
       })
       .catch((error) => {
-        console.error('เกิดข้อผิดพลาดในการแสดงความคิดเห็น:', error.message);
+        console.error('เกิดข้อผิดพลาดในการตอบกลับความคิดเห็น:', error.message);
       });
-  };
+    };
 
-  const toggleReplyForm = (commentId) => {
-    setShowReplyForm(showReplyForm === commentId ? null : commentId);
-  };
+     // ฟังก์ชันลบความคิดเห็น
+     const handleDeleteComment = (commentId) => {
+      if (window.confirm("คุณต้องการลบความคิดเห็นนี้หรือไม่?")) {
+        axios.delete(`http://localhost:3001/web/webboard/${selectedPost.webboard_id}/comment/${commentId}`, {
+          withCredentials: true
+        })
+        .then((response) => {
+          
+          if (response.data.success) {
+            setSelectedPost((prev) => ({
+              ...prev,
+              comments: prev.comments.filter(comment => comment.comment_id !== commentId)
+            }));
+            Swal.fire("สำเร็จ", "ลบความคิดเห็นสำเร็จแล้ว", "success");
+          } else {
+            Swal.fire("ผิดพลาด", "ไม่สามารถลบความคิดเห็นได้", "error");
+          }
+        })
+        .catch((error) => {
+          console.error("เกิดข้อผิดพลาดในการลบความคิดเห็น:", error.message);
+          Swal.fire("ผิดพลาด", "เกิดข้อผิดพลาดในการลบ", "error");
+        });
+      }
+    };
 
-  // ตอบกลับความคิดเห็น
-  const handleReplySubmit = (commentId, replyText) => {
-    if (!isLoggedin) {
-      Swal.fire({
-        title: "กรุณาเข้าสู่ระบบ",
-        text: "คุณต้องเข้าสู่ระบบก่อนเข้าร่วมกิจกรรม",
-        icon: "warning",
-        confirmButtonText: "เข้าสู่ระบบ"
-      }).then(() => {
-      navigate("/login");
+    // ลบการตอบกลับความคิดเห็น
+    const handleDeleteReply = (replyId, commentId) => {
+      axios.delete(`http://localhost:3001/web/webboard/${selectedPost.webboard_id}/comment/${commentId}/reply/${replyId}`, {
+        withCredentials: true
+      })
+      .then(response => {
+        if (response.data.success) {
+          console.log('ลบการตอบกลับสำเร็จ');
+          // ลบ reply ออกจาก state ของ comment ที่เกี่ยวข้อง
+          setSelectedPost(prevPost => ({
+            ...prevPost,
+            comments: prevPost.comments.map(comment =>
+              comment.comment_id === commentId
+                ? {
+                    ...comment,
+                    replies: comment.replies.filter(reply => reply.reply_id !== replyId)
+                  }
+                : comment
+            )
+          }));
+        }
+      })
+      .catch(error => {
+        console.error('เกิดข้อผิดพลาดในการลบการตอบกลับ:', error);
       });
-      return;
-    }
-    if (!replyText.trim()) {
-      alert("กรุณากรอกข้อความก่อนส่งความคิดเห็น");
-      return;
-    }
-  
-    axios.post(`http://localhost:3001/web/webboard/${selectedPost.webboard_id}/comment/${commentId}/reply`, {
-      reply_detail: replyText,
-    }, {
-      withCredentials: true
-    })
-    .then((response) => {
-      const newReply = response.data;
-      setSelectedPost((prev) => ({
-        ...prev,
-        comments: prev.comments.map((comment) =>
-          comment.comment_id === commentId
-            ? { ...comment, replies: [...(comment.replies || []), newReply] }
-            : comment
-        ),
-      }));
-      setReplyText("");
-      setShowReplyForm(null);
-    })
-    .catch((error) => {
-      console.error('เกิดข้อผิดพลาดในการตอบกลับความคิดเห็น:', error.message);
-    });
-  };
-
-  // ลบความคิดเห็น
-  const handleDeleteComment = (commentId) => {
-    if (!isLoggedin) {
-      Swal.fire({
-        title: "กรุณาเข้าสู่ระบบ",
-        text: "คุณต้องเข้าสู่ระบบก่อนเข้าร่วมกิจกรรม",
-        icon: "warning",
-        confirmButtonText: "เข้าสู่ระบบ"
-      }).then(() => {
-      navigate("/login");
-      });
-      return;
-    }
-  
-    axios.delete(`http://localhost:3001/web/webboard/${selectedPost.webboard_id}/comment/${commentId}`, {
-      withCredentials: true
-    })
-    .then(() => {
-      setSelectedPost((prev) => ({
-        ...prev,
-        comments: prev.comments.filter((comment) => comment.comment_id !== commentId),
-      }));
-    })
-    .catch((error) => {
-      console.error('เกิดข้อผิดพลาดในการลบความคิดเห็น:', error.message);
-    });
-  };
+    };
 
   const closeModal = () => {
     setModalIsOpen(false);
@@ -761,7 +824,7 @@ function Home() {
                 )}
               </div>
 
-               <Modal isOpen={modalIsOpen} onRequestClose={closeModal} className="custom-modal" style={{ overlay: { backgroundColor: 'rgba(0, 0, 0, 0.75)' } }}>
+              <Modal isOpen={modalIsOpen} onRequestClose={closeModal} className="custom-modal" style={{ overlay: { backgroundColor: 'rgba(0, 0, 0, 0.75)' } }}>
                               {selectedPost && (
                                   <div className="modal-content mt-2">
                                     {/* ส่วนหัวของกระทู้ */}
@@ -814,59 +877,87 @@ function Home() {
                                         <FaEye className="me-2 ms-auto " /> {selectedPost.viewCount} ครั้ง
                                       </div>
               
+                                      {/* comment */}
                                       <div className="mt-3">
                                           <h6 className="mb-4">ความคิดเห็นทั้งหมด ({selectedPost?.comments?.length || 0})</h6>
                                           {selectedPost.comments && selectedPost.comments.length > 0 ? (
                                             selectedPost.comments.map((comment, index) => (
-                                              <div key={index} className="comment-item border p-2 rounded mb-2">
+                                              <div key={index} className="comment-item bg-light shadow-sm rounded-3 p-3 mb-3">
                                                 <div className="d-flex align-items-start">
                                                   <img 
                                                     src={comment.profile_image ? `http://localhost:3001/${comment.profile_image}` : "/default-profile.png"} 
                                                     alt="User" 
-                                                    className="rounded-circle me-2" 
-                                                    width="40" 
-                                                    height="40" 
+                                                    className="rounded-circle me-3 border" 
+                                                    width="45" 
+                                                    height="45" 
                                                   />
-                                                  <div className="comment-content">
-                                                    <p className="comment-user mb-1">{comment.full_name || "ไม่ระบุชื่อ"}</p>
-                                                    <p className="comment-time text-muted small mb-1">{new Date(comment.created_at).toLocaleDateString()}</p>
-                                                    <p className="comment-text">{comment.comment_detail}</p>
-                                                    {comment.user_id === localStorage.getItem("userId") && (
-                                                      <button className="btn btn-danger btn-sm" onClick={() => handleDeleteComment(comment.comment_id)}>ลบ</button>
+                                                  <div className="flex-grow-1">
+                                                    <div className="d-flex justify-content-between align-items-center mb-1">
+                                                      <strong>{comment.full_name || "ไม่ระบุชื่อ"}</strong>
+                                                      <small className="text-muted">{new Date(comment.created_at).toLocaleDateString()}</small>
+                                                    </div>
+                                                    <p className="text-muted mb-2 small">{comment.comment_detail}</p>
+              
+                                                    {Number(comment.user_id) === Number(localStorage.getItem("userId")) && (
+                                                      <button
+                                                        className="btn btn-sm"
+                                                        onClick={() => handleDeleteComment(comment.comment_id)}
+                                                        style={{ border: "none", background: "none" }}
+                                                      >
+                                                        <MdDelete size={20} color="red"/>
+                                                      </button>
                                                     )}
-                                                    <button className="btn btn-link btn-sm" onClick={() => toggleReplyForm(comment.comment_id)}>ตอบกลับความคิดเห็น</button>
+              
+                                                    <button className="btn btn-link btn-sm p-0" onClick={() => toggleReplyForm(comment.comment_id)}>ตอบกลับ</button>
+              
                                                     {showReplyForm === comment.comment_id && (
                                                       <div className="d-flex mt-2">
                                                         <input 
-                                                          className="form-control me-3" 
-                                                          rows="1" 
+                                                          className="form-control me-2"
                                                           placeholder="ตอบกลับความคิดเห็นนี้..."
                                                           value={replyText}
                                                           onChange={(e) => setReplyText(e.target.value)}
                                                         />
-                                                        <button className="btn btn-primary btn-sm" onClick={() => handleReplySubmit(comment.comment_id, replyText)}>ส่ง</button>
+                                                        <button className="btn btn-sm btn-primary" onClick={() => handleReplySubmit(comment.comment_id, replyText)}>ส่ง</button>
                                                       </div>
                                                     )}
-                                                    {comment.replies && comment.replies.length > 0 && (
-                                                      <div className="replies mt-2">
-                                                        {comment.replies.map((reply, replyIndex) => (
-                                                          <div key={replyIndex} className="reply-item border p-2 rounded mb-2">
+              
+                                                    {comment?.replies && comment.replies.length > 0 && (
+                                                      <div className="replies mt-2" style={{ paddingLeft: "15px", borderLeft: "2px solid #eee" }}>
+                                                        {(expandedReplies[comment.comment_id]
+                                                          ? comment.replies
+                                                          : comment.replies.slice(0, 2) // แสดงแค่ 2 อันแรก
+                                                        ).map((reply, replyIndex) => (
+                                                          <div key={replyIndex} className="reply-item border rounded p-2 mb-2 bg-white">
                                                             <div className="d-flex align-items-start">
-                                                              <img 
-                                                                src={reply.profile_image ? `http://localhost:3001/${reply.profile_image}` : "/default-profile.png"} 
-                                                                alt="User" 
-                                                                className="rounded-circle me-2" 
-                                                                width="30" 
-                                                                height="30" 
+                                                              <img
+                                                                src={reply.profile_image ? `http://localhost:3001/${reply.profile_image}` : "/default-profile.png"}
+                                                                alt="User"
+                                                                className="rounded-circle me-2"
+                                                                width="30"
+                                                                height="30"
                                                               />
-                                                              <div className="reply-content">
-                                                                <p className="reply-user fw-bold mb-1">{reply.full_name || "ไม่ระบุชื่อ"}</p>
-                                                                <p className="reply-time text-muted small mb-1">{new Date(reply.created_at).toLocaleDateString()}</p>
-                                                                <p className="reply-text">{reply.reply_detail}</p>
+                                                              <div className="reply-content">                                
+                                                                <div className="d-flex justify-content-between align-items-center mb-1">
+                                                                  <strong>{reply.full_name || "ไม่ระบุชื่อ"}</strong>
+                                                                  <small className="text-muted">{new Date(reply.created_at).toLocaleDateString()}</small>
+                                                                </div>
+                                                                <p className="text-muted mb-2 small">{reply.reply_detail}</p>
                                                               </div>
                                                             </div>
                                                           </div>
                                                         ))}
+              
+                                                        {comment.replies.length > 2 && (
+                                                          <div className="text-end">
+                                                            <button
+                                                              className="btn btn-link btn-sm"
+                                                              onClick={() => toggleReplies(comment.comment_id)}
+                                                            >
+                                                              {expandedReplies[comment.comment_id] ? "ซ่อนการตอบกลับ" : `ดูเพิ่มเติม (${comment.replies.length - 2}) การตอบกลับ`}
+                                                            </button>
+                                                          </div>
+                                                        )}
                                                       </div>
                                                     )}
                                                   </div>
@@ -898,10 +989,10 @@ function Home() {
                                               </div>
                                             )}
                                           </div>
-                                        </div>
+                                      </div>
                                   </div>
                               )}
-                          </Modal>  
+              </Modal>  
 
               <div className="text">
                 <a href={`/webboard`} className="btn btn-primary">ดูทั้งหมด</a>

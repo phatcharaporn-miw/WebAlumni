@@ -367,7 +367,7 @@ function Webboard(){
       });
     };
     
-    // เปิด modal ถ้ามี id
+    // search เปิด modal ถ้ามี id
   useEffect(() => {
     if (id) {
       axios.get(`http://localhost:3001/web/webboard/${id}`)

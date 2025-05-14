@@ -2,7 +2,7 @@ import React, {useState, useEffect} from "react";
 import { Link } from 'react-router-dom';
 import '../css/Login.css';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom'; // เพิ่ม useLocation
 // import { GoogleLogin } from '@react-oauth/google';
 import { useOutletContext } from "react-router-dom";
 
@@ -13,6 +13,9 @@ function Login() {
     const [errorMessage, setErrorMessage] = useState('');
     const [passwordError, setPasswordError] = useState('');
     const navigate = useNavigate();
+    const location = useLocation();
+    // อ่าน redirect path จาก query string
+    // const redirectPath = new URLSearchParams(location.search).get("redirect") || null;
     const { handleLogin } = useOutletContext();  // รับ handleLogin จาก Outlet context
 
     const validatePassword = (password) => {
@@ -45,7 +48,7 @@ function Login() {
            const {role, userId, username, image_path } = response.data;
 
            // เก็บข้อมูลใน localStorage
-           localStorage.setItem('userRole', role);
+            localStorage.setItem('userRole', role);
             localStorage.setItem('userId', userId);
             localStorage.setItem('username', username);
             localStorage.setItem('image_path', image_path);

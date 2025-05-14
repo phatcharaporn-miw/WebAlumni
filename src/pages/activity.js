@@ -6,7 +6,7 @@ import axios from 'axios';
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { IoMdClose } from "react-icons/io";
-import { MdEdit, MdDelete } from "react-icons/md";
+import { MdEdit, MdDelete, MdMoreVert } from 'react-icons/md';
 
 
 function Activity(){
@@ -241,14 +241,14 @@ function Activity(){
                             className="btn btn-primary"
                             onClick={() => navigate("/activity/president-create-activity")}
                         >
-                            เพิ่มกิจกรรม
+                            เพิ่มกิจกรรม 
                         </button>
-                        <input
+                        {/* <input
                             type="text"
                             className="form-control w-50"
                             placeholder="ค้นหากิจกรรม..."
                             onChange={(e) => setSearchTerm(e.target.value)}
-                        />
+                        /> */}
                     </div>
                 )}
             </div>

@@ -3,10 +3,11 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import '../css/alumni.css';
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { useNavigate } from 'react-router-dom';
 
 function Alumni() {
     const [alumniData, setAlumniData] = useState([]);
-
+    const navigate = useNavigate();
     const majors = [
         { title: "วิทยาการคอมพิวเตอร์", image: "/image/cs.png", slug: "cs" },
         { title: "เทคโนโลยีสารสนเทศ", image: "/image/it.jpg", slug: "it" },
@@ -14,6 +15,7 @@ function Alumni() {
         { title: "ความปลอดภัยไซเบอร์", image: "/image/cy.jpeg", slug: "cy" },
         { title: "ปัญญาประดิษฐ์", image: "/image/ai.jpg", slug: "ai" },
     ];
+
     
     // ข้อมูลศิษย์เก่าดีเด่น
     useEffect(() => {
@@ -21,6 +23,10 @@ function Alumni() {
             .then((res) => setAlumniData(res.data))
             .catch((err) => console.error("ไม่สามารถโหลดศิษย์เก่าดีเด่น:", err));
     }, []);
+
+    const handleAlumniClick = (userId) => {
+        navigate(`/alumni/${userId}`);
+    };
 
     return (
         <section className="container">
@@ -89,14 +95,20 @@ function Alumni() {
                 <div className="outstanding my-5">
                     <h5 className="alumni-title">ศิษย์เก่าดีเด่น</h5>
                     <div className="row mt-5">
+                        
                         {alumniData.map((alumni, index) => (
-                            <div className="col-md-6 mb-4" key={index}>
+                                <div
+                                    className="col-md-6 mb-4"
+                                    key={index}
+                                    onClick={() => handleAlumniClick(alumni.user_id)} // คลิกแล้วไปหน้าโปรไฟล์
+                                    style={{ cursor: 'pointer' }}
+                                >
                                 <div className="d-flex align-items-center" id="alumni-row">
                                     <img
                                         src={alumni.image_path ? `http://localhost:3001/${alumni.image_path}` : "/default-profile-pic.jpg"}
                                         alt={alumni.name}
                                         className="img-fluid rounded-circle me-3"
-                                        style={{ width: "80px", height: "80px", objectFit: "cover" }}
+                                        style={{ width: "80px", height: "80px", objectFit: "cover", border: "2px solid #0F75BC"}}
                                     />
                                     <div>
                                         <h5 className="mb-1">{alumni.name}</h5>

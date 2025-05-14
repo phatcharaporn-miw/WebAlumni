@@ -9,6 +9,9 @@ function NavAdmin() {
         profilePic: '/default-profile-pic.jpg',
     });
     const navigate = useNavigate();
+    const [donationRequests, setDonationRequests] = useState(0);
+    const [souvenirRequests, setSouvenirRequests] = useState(0);
+
 
     const handleLogout = async () => {
         Swal.fire({
@@ -61,7 +64,21 @@ function NavAdmin() {
         }
     }, [navigate]);
 
+    useEffect(() => {
+    axios.get('http://localhost:3001/admin/notification-counts')
+        .then((res) => {
+            console.log(res.data);
+            setDonationRequests(res.data.donationRequests);
+            setSouvenirRequests(res.data.souvenirRequests);
+        })
+        .catch((err) => {
+            console.error("โหลดแจ้งเตือนล้มเหลว", err);
+        });
+    }, []);
+
+
     return (
+    
         <div style={navAdminStyles}>
             <div className="card-body text-center" style={profileContainer}>
                 <img
@@ -109,13 +126,16 @@ function NavAdmin() {
                 </NavLink>
                 <NavLink
                     to="/admin/donations"
-                    className="nav-link"
+                    className="nav-link d-flex justify-content-between align-items-center"
                     style={({ isActive }) => ({
                         ...(isActive ? active : {}),
                         color: "#FFFFFF",
                     })}
                 >
-                    การบริจาคและโครงการ
+                    <span>การบริจาคและโครงการ</span>
+                    {donationRequests > 0 && (
+                        <span className="badge bg-danger">{donationRequests}</span>
+                    )}
                 </NavLink>
                 <NavLink
                     to="/admin/webboard"
@@ -137,15 +157,26 @@ function NavAdmin() {
                 >
                     ข่าวสารและประชาสัมพันธ์
                 </NavLink>
-                <NavLink
-                    to="/admin/souvenir"
-                    className="nav-link"
-                    style={({ isActive }) => ({
-                        ...(isActive ? active : {}),
-                        color: "#FFFFFF",
-                    })}
-                >
+                <NavLink to="/admin/souvenir" className="nav-link" style={({ isActive }) => ({
+                    ...(isActive ? active : {}),
+                    color: "#FFFFFF",
+                    position: 'relative'
+                })}>
                     ของที่ระลึก
+                    {souvenirRequests > 0 && (
+                        <span
+                            className="bg-danger"
+                            style={{
+                                position: "absolute",
+                                top: 5,
+                                right: -5,
+                                width: 10,
+                                height: 10,
+                                borderRadius: "50%",
+                                display: "inline-block"
+                            }}
+                        ></span>
+                    )}
                 </NavLink>
                 <NavLink
                     to="/admin/users"
@@ -225,9 +256,7 @@ const navLinkStyles = {
 };
 
 const navAdminButtonStyles = {
-    backgroundColor: "#FF3B30",
-    marginTop: "20px",
-    fontWeight: "600",
+    
 };
 
 

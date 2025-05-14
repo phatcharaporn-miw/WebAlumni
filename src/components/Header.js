@@ -364,7 +364,10 @@ const addToCart = (productId, quantity, total) => {
               </div>
             
               {/* รูปโปรไฟล์ */}
-              <NavLink to="/alumni-profile" className="profile-container">
+                <NavLink
+                  to={user.role === 2 ? "/president-profile" : "/alumni-profile"}
+                  className="profile-container"
+                >
                 <img
                   src={`${user.profilePicture}` || "/profile-picture.png"}
                   alt="User Profile"

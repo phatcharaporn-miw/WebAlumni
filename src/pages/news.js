@@ -82,13 +82,13 @@ function News(){
             <h3 className="news">ข่าวประชาสัมพันธ์</h3>
             <div className="py-3 container"> 
                 <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-                    <input
+                    {/* <input
                         type="text"
                         className="form-control w-25 w-md-50"
                         placeholder="ค้นหาข่าว..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                    />
+                    /> */}
 
                      {/* ปุ่มเพิ่มข่าว (role=2) */}
                     {userRole === "2" && (
