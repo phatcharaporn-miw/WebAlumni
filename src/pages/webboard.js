@@ -423,24 +423,6 @@ function Webboard(){
         <div className="webboard-page">
             <h3 className="webboard-title">{showFavorites ? "กระทู้ที่กดใจ" : "กระทู้ทั้งหมด"}</h3>
         </div>
-        {/* <div className="statistics d-flex justify-content-between align-items-center bg-light p-3 rounded mb-4">
-          <div className="stat-item text-center">
-            <h5 className="fw-bold">{webboard.length}</h5>
-            <p className="text-muted">กระทู้ทั้งหมด</p>
-          </div>
-          <div className="stat-item text-center">
-            <h5 className="fw-bold">
-              {webboard.reduce((acc, post) => acc + (post.comments_count || 0), 0)}
-            </h5>
-            <p className="text-muted">ความคิดเห็นทั้งหมด</p>
-          </div>
-          <div className="stat-item text-center">
-            <h5 className="fw-bold">
-              {webboard.reduce((acc, post) => acc + (post.viewCount || 0), 0)}
-            </h5>
-            <p className="text-muted">จำนวนผู้เข้าชม</p>
-          </div>
-        </div> */}
           <select className="border rounded p-2 mb-3 " value={sortOrder} onChange={(e) => setSortOrder(e.target.value)}>
                 <option value="latest">ล่าสุด</option>
                 <option value="oldest">เก่าสุด</option>
@@ -479,9 +461,6 @@ function Webboard(){
                       <p className="text-muted small">{new Date(post.created_at).toLocaleDateString()}</p>
                     </div>
                 </div>
-
-                {/* <img src={post.image_path ? `http://localhost:3001/${post.image_path.replace(/^\/+/, '')}` : "/default-image.png"}   alt="Post" className="img-fluid rounded-3" /> */}
-
 
                 <div className="card-body px-0">
                   <p className="card-text mb-3 text-muted">
@@ -675,89 +654,103 @@ function Webboard(){
                         </div>
                     </div>
                 )}
-          </Modal>    
-                <div class="col-4">
-                    <button 
-                    className="btn btn-primary w-100 mb-3" 
-                    onClick={() => navigate ("/createPost")}
-                    >
-                    <MdEdit /> สร้างกระทู้ใหม่
-                    </button>
-                
-                <div className="d-flex flex-column gap-3">
-                    <div className="d-flex align-items-center text-dark" style={{ cursor: "pointer" }}
-                         onClick={() => setShowFavorites(false)}>
-                        <i className="bi bi-chat-left-text me-2"><BiSolidComment /></i> กระทู้ทั้งหมด
-                    </div>
+          </Modal> 
 
-                    {/* ตรวจสอบการเข้าสู่ระบบก่อนแสดง 'กระทู้ที่กดใจ' */}
-                    {isLoggedin && (
-                      <div className="d-flex align-items-center text-dark" style={{ cursor: "pointer" }}
-                          onClick={() => setShowFavorites(!showFavorites)}>
-                          {showFavorites ? <MdFavorite className="text-danger me-2" /> : <SlHeart className="me-2" />}
-                            กระทู้ที่กดใจ
-                      </div>
-                    )}
+          <div className="col-12 col-md-4 mb-4">
+              <button
+                className="btn btn-primary w-100 mb-3"
+                onClick={() => navigate("/createPost")}
+              >
+                <MdEdit /> สร้างกระทู้ใหม่
+              </button>
+
+              <div className="d-flex flex-column gap-3">
+                <div
+                  className="d-flex align-items-center text-dark"
+                  style={{ cursor: "pointer" }}
+                  onClick={() => setShowFavorites(false)}
+                >
+                  <BiSolidComment className="me-2" /> กระทู้ทั้งหมด
                 </div>
 
-                <hr className="my-3 " />
-                  <h5 className="recommended-title mb-3">หมวดหมู่ที่เกี่ยวข้อง</h5>
-                  <div className="d-flex flex-wrap gap-2">
-                    {category.length > 0 ? (
-                    category.map((category) => (
-                      <span
-                        key={category.category_id}
-                        className="badge px-3 py-2"
-                        style={{
-                          backgroundColor: getCategoryColor(category.category_id), 
-                          color: "white", padding: "6px 10px", borderRadius: "6px" , cursor: "pointer"
-                        }}
-                        onClick={() => handleCategoryClick(category.category_id)}
-                      >
-                        {category.category_name}
-                      </span>
-                    ))
-                  ) : (
-                    <div className="d-flex flex-column align-items-center justify-content-center my-5">
-                      <p className="text-center text-muted fs-5">ยังไม่มีหมวดหมู่ในขณะนี้</p>
-                    </div>
-                  )}
+                {isLoggedin && (
+                  <div
+                    className="d-flex align-items-center text-dark"
+                    style={{ cursor: "pointer" }}
+                    onClick={() => setShowFavorites(!showFavorites)}
+                  >
+                    {showFavorites ? (
+                      <MdFavorite className="text-danger me-2" />
+                    ) : (
+                      <SlHeart className="me-2" />
+                    )}
+                    กระทู้ที่กดใจ
                   </div>
+                )}
+              </div>
 
-                  {/* กระทู้ที่แนะนำ */}
-                  <div className="recommended-posts mt-5">
-                    <h5 className="recommended-title mb-3">กระทู้แนะนำ</h5>
-                    {recommendedPosts.length > 0 ? (
-                      <div className="row">
-                        {recommendedPosts.map((post) => (
-                          <div key={post.webboard_id} className="col-md-6 mb-4">
-                            <div className="card shadow-sm border-0 rounded-4 h-100 d-flex flex-column">
-                              <div className="card-body d-flex flex-column justify-content-between">
-                                <div>
-                                  <h6 className="recommended-post-title mb-2">{post.title}</h6>
-                                  <p className="text-muted small mb-4">
-                                    {post.comments_count} ความคิดเห็น • ดู {post.viewCount} ครั้ง
-                                  </p>
-                                </div>
-                                <div className="mt-auto text-end">
-                                  <button
-                                    className="btn btn-outline-primary btn-sm rounded-pill px-3"
-                                    onClick={() => handlePostClick(post)}
-                                  >
-                                    ดูรายละเอียด
-                                  </button>
-                                </div>
-                              </div>
+              <hr className="my-3" />
+              <h5 className="recommended-title mb-3">หมวดหมู่ที่เกี่ยวข้อง</h5>
+
+              <div className="d-flex flex-wrap gap-2">
+                {category.length > 0 ? (
+                  category.map((category) => (
+                    <span
+                      key={category.category_id}
+                      className="badge px-3 py-2"
+                      style={{
+                        backgroundColor: getCategoryColor(category.category_id),
+                        color: "white",
+                        padding: "6px 10px",
+                        borderRadius: "6px",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => handleCategoryClick(category.category_id)}
+                    >
+                      {category.category_name}
+                    </span>
+                  ))
+                ) : (
+                  <div className="d-flex flex-column align-items-center justify-content-center my-5 w-100">
+                    <p className="text-center text-muted fs-5">ยังไม่มีหมวดหมู่ในขณะนี้</p>
+                  </div>
+                )}
+              </div>
+
+              {/* กระทู้ที่แนะนำ */}
+              <div className="recommended-posts mt-5">
+                <h5 className="recommended-title mb-3">กระทู้แนะนำ</h5>
+                {recommendedPosts.length > 0 ? (
+                  <div className="row">
+                    {recommendedPosts.map((post) => (
+                      <div key={post.webboard_id} className="col-12 col-md-6 mb-4">
+                        <div className="card shadow-sm border-0 rounded-4 h-100 d-flex flex-column">
+                          <div className="card-body d-flex flex-column justify-content-between">
+                            <div>
+                              <h6 className="recommended-post-title mb-2">{post.title}</h6>
+                              <p className="text-muted small mb-4">
+                                {post.comments_count} ความคิดเห็น • ดู {post.viewCount} ครั้ง
+                              </p>
+                            </div>
+                            <div className="mt-auto text-end">
+                              <button
+                                className="btn btn-outline-primary btn-sm rounded-pill px-3"
+                                onClick={() => handlePostClick(post)}
+                              >
+                                ดูรายละเอียด
+                              </button>
                             </div>
                           </div>
-                        ))}
+                        </div>
                       </div>
-                    ) : (
-                      <p className="text-muted">ยังไม่มีเว็บบอร์ดที่แนะนำ</p>
-                    )}
+                    ))}
                   </div>
-                </div>               
-            </div>           
+                ) : (
+                  <p className="text-muted">ยังไม่มีเว็บบอร์ดที่แนะนำ</p>
+                )}
+              </div>
+          </div>              
+        </div>           
     </section>  
     )
 }

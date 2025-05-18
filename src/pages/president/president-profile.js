@@ -229,6 +229,7 @@ const removeEducation = (index) => {
                                     <select
                                       name="title"
                                       value={profile.title || ''}
+                                      className="form-control"
                                       onChange={handleChange}
                                       disabled={!editing}
                                     >

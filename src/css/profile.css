@@ -50,31 +50,7 @@
   }
   
 
-  /* .menu {
-    text-align: left;
-  }
   
-  .menu-item {
-    font-size: 14px;
-    color: #333;
-    padding: 10px;
-    cursor: pointer;
-    text-align: center;
-  }
-  
-  .menu-item:hover {
-    background-color: #e2e6ea;
-  }
-  
-  .menu-item.active {
-    background-color: #0F75BC;
-    color: #fff;
-  } */
-  
-  /* .submit-button {
-    width: 100%;
-    cursor: pointer;
-} */
 
 textarea{
   /* width: 50%; */
@@ -99,4 +75,14 @@ textarea{
 
 .toggle-password:hover {
   text-decoration: underline;
+}
+
+@media (max-width: 767.98px) {
+  .alumni-profile-page .btn {
+    width: 100% !important;
+    margin-bottom: 10px;
+  }
+  .alumni-profile-page .bg-light {
+    padding: 1.5rem !important;
+  }
 }

@@ -35,7 +35,7 @@ function Alumni() {
                 <h5 className="alumni-title">สาขา</h5>
                 <div className="row justify-content-between my-4">
                     {majors.map((major, index) => (
-                        <div className="col-2 mb-4 d-flex justify-content-between" key={index} style={{ width: "20%" }}>
+                        <div className="col-6 col-sm-4 col-md-3 col-lg-2 mb-4" key={index}>
                             <Link to={`/alumni/major-detail/${major.slug}`} className="text-decoration-none w-100">
                                 <div className="major-card text-center">
                                     <img src={major.image} alt={major.title} className="img-fluid" />

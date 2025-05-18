@@ -78,35 +78,27 @@ function News(){
 
     return (
         <section className="news-container">
-            <img src="./image/banner.jpg" className="head-news" alt="news-image" />
-            <h3 className="news">ข่าวประชาสัมพันธ์</h3>
-            <div className="py-3 container"> 
-                <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-                    {/* <input
-                        type="text"
-                        className="form-control w-25 w-md-50"
-                        placeholder="ค้นหาข่าว..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    /> */}
+            <img src="./image/banner.jpg" className="head-news img-fluid w-100" alt="news-image" />
+            <h3 className="news text-center mt-3">ข่าวประชาสัมพันธ์</h3>
 
-                     {/* ปุ่มเพิ่มข่าว (role=2) */}
-                    {userRole === "2" && (
-                    <div className="d-flex justify-content-end mb-3">
-                        <Link to="/news/president-create-news" className="btn btn-success">
+            <div className="py-3 container">
+                <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                {userRole === "2" && (
+                    <div className="ms-auto">
+                    <Link to="/news/president-create-news" className="btn btn-success">
                         + เพิ่มข่าวใหม่
-                        </Link>
+                    </Link>
                     </div>
-                    )}
+                )}
                 </div>
 
-                {/* รายการข่าว */}
-                <div className="news-list">                   
-                {filteredNews.length === 0 
-                    ? <p className="text-center text-muted">ไม่พบข่าวที่ค้นหา</p>
-                    : filteredNews.map(item => (
-                        <div key={item.news_id} className="position-relative news-page d-flex border rounded p-3 mb-3">
-                        {/* เมนูสามจุด (role=2) */}
+                <div className="news-list row justify-content-center">
+                {filteredNews.length === 0 ? (
+                    <p className="text-center text-muted">ไม่พบข่าวที่ค้นหา</p>
+                ) : (
+                    filteredNews.map((item) => (
+                    <div key={item.news_id} className="col-10 mb-3">
+                        <div className="position-relative d-flex flex-column flex-md-row border rounded p-3 h-100">
                         {userRole === "2" && (
                             <div className="dropdown position-absolute top-0 end-0 m-2">
                             <button
@@ -119,41 +111,41 @@ function News(){
                             </button>
                             <ul className="dropdown-menu dropdown-menu-end">
                                 <li>
-                                <button 
+                                <button
                                     className="dropdown-item d-flex align-items-center"
                                     onClick={() => navigate(`/news/edit/${item.news_id}`)}
                                 >
-                                    <MdEdit className="me-2 text-warning"/> แก้ไข
+                                    <MdEdit className="me-2 text-warning" /> แก้ไข
                                 </button>
                                 </li>
                                 <li>
-                                <button 
+                                <button
                                     className="dropdown-item d-flex align-items-center"
                                     onClick={() => handleDeleteNews(item.news_id)}
                                 >
-                                    <MdDelete className="me-2 text-danger"/> ลบ
+                                    <MdDelete className="me-2 text-danger" /> ลบ
                                 </button>
                                 </li>
                             </ul>
                             </div>
                         )}
 
-                        <img 
-                            src={`http://localhost:3001${item.image_path}`} 
-                            alt={item.title} 
-                            className="news-image me-3" 
+                        <img
+                            src={`http://localhost:3001${item.image_path}`}
+                            alt={item.title}
+                            className="news-image w-100 w-md-auto me-md-3 mb-3 mb-md-0"
+                            // style={{ maxWidth: "250px", height: "auto", objectFit: "cover" }}
                         />
-                        <div className="news-content">
-                            <div className="d-flex justify-content-between align-items-start">
-                            <Link to={`/news/${item.news_id}`} className="news-title-link">
-                                {item.title}
+
+                        <div className="news-content d-flex flex-column">
+                            <Link to={`/news/${item.news_id}`} className="news-title-link h5 mb-2">
+                            {item.title}
                             </Link>
-                            </div>
-                            <p className="news-summary">{item.content.substring(0,100)}...</p>
-                            <div className="d-flex align-items-center mt-2">
+                            <p className="news-summary mb-2">{item.content.substring(0, 100)}...</p>
+                            <div className="d-flex align-items-center mt-auto">
                             <div className="news-meta d-flex align-items-center">
-                                <MdDateRange className="me-1"/> 
-                                {new Date(item.created_at).toLocaleDateString('th-TH')}
+                                <MdDateRange className="me-1" />
+                                {new Date(item.created_at).toLocaleDateString("th-TH")}
                             </div>
                             <div className="ms-auto">
                                 <Link to={`/news/${item.news_id}`} className="read-more text-muted">
@@ -163,8 +155,9 @@ function News(){
                             </div>
                         </div>
                         </div>
+                    </div>
                     ))
-                }
+                )}
                 </div>
             </div>
         </section>

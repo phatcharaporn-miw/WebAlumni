@@ -108,7 +108,19 @@ function AdminWebboard() {
                                     <p className="card-text text-muted">
                                         หมวดหมู่: <strong>{post.category_name || "ไม่ระบุหมวดหมู่"}</strong> <br />
                                         จากคุณ {post.full_name || "ไม่ระบุชื่อ"} <br />
-                                        วันที่โพสต์: {new Date(post.created_at).toLocaleDateString()}
+                                        วันที่โพสต์: {new Date(post.created_at).toLocaleDateString()} <br />
+                                       {post.liked_users && (
+                                            <button
+                                                className="btn btn-link btn-sm text-decoration-none "
+                                                onClick={() => {
+                                                    setLikedUsers(post.liked_users.split(', '));
+                                                    setModalPostTitle(post.title);
+                                                    setModalIsOpen(true);
+                                                }}
+                                            >
+                                            รายชื่อผู้กดใจในกระทู้: {post.liked_users.split(', ').length} คน
+                                            </button>
+                                        )}
                                     </p>
                                     <div className="d-flex justify-content-between align-items-center">
                                         <span>
@@ -121,23 +133,12 @@ function AdminWebboard() {
                                         </span>
                                     </div>
 
-                                    <div className="d-flex justify-content-between align-items-center mt-3">
-                                        <span>
+                                    {/* <div className="d-flex justify-content-between align-items-center mt-3"> */}
+                                        {/* <span>
                                             ❤️ {post.like_count ?? 0}
-                                        </span>
-                                        {post.liked_users && (
-                                            <button
-                                                className="btn btn-link btn-sm text-decoration-none ms-2"
-                                                onClick={() => {
-                                                    setLikedUsers(post.liked_users.split(', '));
-                                                    setModalPostTitle(post.title);
-                                                    setModalIsOpen(true);
-                                                }}
-                                            >
-                                                ดูรายชื่อ
-                                            </button>
-                                        )}
-                                    </div>
+                                        </span> */}
+                                       
+                                    {/* </div> */}
                                     
                                     <div className="mt-3 d-flex justify-content-between">
                                         <button
@@ -174,9 +175,9 @@ function AdminWebboard() {
             <Modal isOpen={modalIsOpen} onRequestClose={closeModal} className="custom-modal" style={{ overlay: { backgroundColor: 'rgba(0, 0, 0, 0.75)' } }}>
                 <div className="modal-header">
                     <h5 className="modal-title">รายชื่อผู้กดใจในกระทู้: {modalPostTitle}</h5>
-                    <button type="button" className="btn-close" onClick={closeModal}></button>
+                    <button type="button" className="btn-close ms-auto" onClick={closeModal}></button>
                 </div>
-                <div className="modal-body">
+                <div className="modal-body py-3">
                     <ul className="list-group">
                         {likedUsers.length > 0 ? (
                             likedUsers.map((name, index) => (
@@ -189,11 +190,11 @@ function AdminWebboard() {
                         )}
                     </ul>
                 </div>
-                <div className="modal-footer">
+                {/* <div className="modal-footer">
                     <button type="button" className="btn btn-secondary" onClick={closeModal}>
                         ปิด
                     </button>
-                </div>
+                </div> */}
             </Modal> 
         </div>
     );

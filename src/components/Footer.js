@@ -11,15 +11,15 @@ function Footer(){
     return(
        <footer className="footer">
         <div className="container ">
-            <div className="row">
-                <div className="col-md-3">
+            <div className="row g-3">
+                <div className="col-md-3 ">
                 <img className="footer-logo" src="/image/logoCP1.png" alt="College of Computing Logo"/>
                 <p id="foot-text" className="text-start "> 
                 สมาคมศิษย์เก่ามหาวิทยาลัยขอนแก่นก่อตั้งขึ้นเพื่อเสริมสร้างเครือข่ายและความร่วมมือระหว่างศิษย์เก่า ศิษย์ปัจจุบัน และคณาจารย์ 
                 รวมถึงสนับสนุนการพัฒนาด้านเทคโนโลยีสารสนเทศ ส่งเสริมโอกาสทางอาชีพ และให้การสนับสนุนแก่ศิษย์ปัจจุบันในการศึกษาวิจัยและนวัตกรรม
                 </p>
                 </div>
-                <div className="col-md-3">
+                <div className="col-md-3 ">
                     <h4>ข่าวสาร</h4>
                     <NavLink to="/news" className="foot-news">
                         ประชาสัมพันธ์

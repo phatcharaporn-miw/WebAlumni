@@ -4,6 +4,10 @@ import '../../css/profile.css';
 import { useOutletContext } from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
 import Swal from "sweetalert2";
+import { IoMdCreate } from "react-icons/io";
+import { FaBars, FaTimes } from "react-icons/fa";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 function Profile() {
   const [profile, setProfile] = useState({
@@ -14,6 +18,10 @@ function Profile() {
   const {handleLogout } = useOutletContext();
   const [loginInfo, setLoginInfo] = useState({ username: '', password: '' });
   const [showPassword, setShowPassword] = useState(false); // สำหรับซ่อน/แสดงรหัสผ่าน
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(profile.profilePicture);
+  const userId = localStorage.getItem("userId");
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
  //แก้ไขข้อมูลส่วนตัว
  const [editing, setEditing] = useState(false); //สลับโหมดการแก้ไข
@@ -143,49 +151,108 @@ const removeEducation = (index) => {
       });
   }
 
+//   const handleImageChange = async (e) => {
+//   const file = e.target.files[0];
+//   if (!file) return;
+
+//   const formData = new FormData();
+//   formData.append("profilePicture", file);
+//   formData.append("user_id", userId); // ถ้าคุณใช้ user_id
+
+//   try {
+//     const response = await axios.post("http://localhost:3001/users/upload-profile", formData);
+//     const filename = response.data.filename;
+
+//       // ใช้ URL ที่ backend ตอบกลับ
+//     const newImageUrl = `http://localhost:3001${response.data.imageUrl}`;
+
+//     setProfile(prev => ({
+//       ...prev,
+//       profilePicture: newImageUrl,
+//     }));
+//   } catch (error) {
+//     console.error("Upload failed:", error);
+//   }
+// };
+
+const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+};
+
+  
+
   return (
-    <section className='container'>
+    <section className='container py-4' style={{ maxWidth: 1100 }}>
       <div className='alumni-profile-page'>
-      <h3 className="alumni-title text-center">โปรไฟล์ของฉัน</h3>
-        <div className="row justify-content-between" >
-            <div className="col-12 col-md-4 bg-light rounded text-center p-4">
-              <div className="profile-pic-container mb-3">
-                <img 
-                  src={`${profile.profilePicture}`} 
-                  alt="Profile" 
-                  style={{ width: '140px', height: '140px', borderRadius: '50%' }}
-                  className="img-fluid"
-                />
-              </div>
+      <h3 className="alumni-title text-center mb-4">โปรไฟล์ของฉัน</h3>
+      <div className="row g-4 justify-content-center">
+        {/* Sidebar/Profile */}
+        <div className="col-12 col-md-4 bg-light rounded text-center p-4 shadow-sm">
+      {/* Profile Picture */}
+      <div className="profile-pic-container mb-3">
+        <img
+          src={`${profile.profilePicture}`}
+          alt="Profile"
+          style={{ width: "140px", height: "140px", borderRadius: "50%" }}
+          className="img-fluid"
+        />
+      </div>
 
-              <p className="fw-bold mb-3">{profile.fullName}</p>
+      {/* Name */}
+      <p className="fw-bold mb-3">{profile.fullName}</p>
 
-              <div className="menu">
-                <div className="menu-item active py-2 mb-2 rounded">
-                  ข้อมูลส่วนตัว
-                </div>
-                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/alumni-profile-webboard')}>
-                  กระทู้ที่สร้าง
-                </div>
-                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/donation-history')}>
-                  ประวัติการบริจาค
-                </div>
-                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/alumni-profile-activity')}>
-                  ประวัติการเข้าร่วมกิจกรรม
-                </div>
-                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/alumni-profile-souvenir')}>
-                  ประวัติการสั่งซื้อ
-                </div>
-                <div className="menu-item py-2 rounded" onClick={handleLogout}>
-                  ออกจากระบบ
-                </div>
-              </div>
+      {/* Hamburger Button on Small Screens */}
+      <div className="d-md-none mb-3">
+        <button
+          className="btn btn-outline-primary"
+          onClick={toggleMenu}
+        >
+          {isMenuOpen ? <FaTimes /> : <FaBars />} เมนู
+        </button>
+      </div>
+
+      {/* Menu */}
+      <div className={`menu ${isMenuOpen ? "d-block" : "d-none"} d-md-block`}>
+        <div className="menu-item active py-2 mb-2 rounded">
+          ข้อมูลส่วนตัว
+        </div>
+        <div
+          className="menu-item py-2 mb-2 rounded"
+          onClick={() => handleClick("/alumni-profile/alumni-profile-webboard")}
+        >
+          กระทู้ที่สร้าง
+        </div>
+        <div
+          className="menu-item py-2 mb-2 rounded"
+          onClick={() => handleClick("/alumni-profile/donation-history")}
+        >
+          ประวัติการบริจาค
+        </div>
+        <div
+          className="menu-item py-2 mb-2 rounded"
+          onClick={() => handleClick("/alumni-profile/alumni-profile-activity")}
+        >
+          ประวัติการเข้าร่วมกิจกรรม
+        </div>
+        <div
+          className="menu-item py-2 mb-2 rounded"
+          onClick={() => handleClick("/alumni-profile/alumni-profile-souvenir")}
+        >
+          ประวัติการสั่งซื้อ
+        </div>
+        <div className="menu-item py-2 rounded" onClick={handleLogout}>
+          ออกจากระบบ
+        </div>
+      </div>
             </div>
+  
 
-            <div className="col-7 bg-light rounded">
-              <div className='form-profile'>
-                <form>
-                  <fieldset>
+            {/* Main Content */}
+            <div className="col-12 col-md-8">
+          <div className="bg-light rounded p-4 shadow-sm mb-4">
+            <div className='form-profile'>
+              <form>
+                <fieldset>
                   <legend className="legend-title mb-4">ข้อมูลส่วนตัว</legend>
 
                   {/* <div className="form-group">
@@ -226,7 +293,9 @@ const removeEducation = (index) => {
                                     <select
                                       name="title"
                                       value={profile.title || ''}
-                                      disabled
+                                      className="form-control"
+                                      onChange={handleChange}
+                                      disabled={!editing}
                                     >
                                       <option value="">คำนำหน้า</option>
                                       <option value="นาย">นาย</option>
@@ -347,117 +416,136 @@ const removeEducation = (index) => {
                       
                     </div>
                   
-                    <div className='row justify-content-end'>
-                        <div className="col-7  bg-light ">
-                        <fieldset>
-                          <legend className="legend-title">ข้อมูลการศึกษา</legend>
-                          {Array.isArray(profile.educations) && profile.educations.length > 0 ?(
-                            profile.educations.map((edu, index) => (
-                              <div key={index} className="education-item mb-4">
-                                <div className="form-group">
-                                  <label>ระดับการศึกษา<span className="importent">*</span></label>
-                                  <select
-                                    name="degree"
-                                    value={edu.degree}
-                                    onChange={(e) => handleEducationChange(index, 'degree', e.target.value)}
-                                    className="form-control"
-                                    disabled={!editing}
-                                  >
-                                    <option value="">เลือกระดับการศึกษา</option>
-                                    <option value="1">ป.ตรี</option>
-                                    <option value="2">ป.โท</option>
-                                    <option value="3">ป.เอก</option>
-                                  </select>
-                                </div>
+                    <div className="bg-light rounded p-4 shadow-sm mb-4">
+            <fieldset>
+              <legend className="legend-title">ข้อมูลการศึกษา</legend>
+              {Array.isArray(profile.educations) && profile.educations.length > 0 ?(
+                profile.educations.map((edu, index) => (
+                  <div key={index} className="education-item mb-4">
+                    <div className="form-group">
+                      <label>ระดับการศึกษา<span className="importent">*</span></label>
+                      <select
+                        name="degree"
+                        value={edu.degree}
+                        onChange={(e) => handleEducationChange(index, 'degree', e.target.value)}
+                        className="form-control"
+                        disabled={!editing}
+                      >
+                        <option value="">เลือกระดับการศึกษา</option>
+                        <option value="1">ป.ตรี</option>
+                        <option value="2">ป.โท</option>
+                        <option value="3">ป.เอก</option>
+                      </select>
+                    </div>
 
-                                <div className="form-group">
-                                  <label>สาขา<span className="importent">*</span></label>
-                                  <select
-                                    name="major"
-                                    value={edu.major}
-                                    onChange={(e) => handleEducationChange(index, 'major', e.target.value)}
-                                    className="form-control"
-                                    disabled={!editing}
-                                  >
-                                    <option value="">เลือกสาขา</option>
-                                    {major && major.length > 0 ? (
-                                      major.map((majorItem) => (
-                                        <option key={majorItem.major_id} value={majorItem.major_id}>
-                                          {majorItem.major_name}
-                                        </option>
-                                      ))
-                                    ) : (
-                                      <option value="">ไม่มีข้อมูลสาขา</option>
-                                    )}
-                                  </select>
-                                </div>
+                    <div className="form-group">
+                      <label>สาขา<span className="importent">*</span></label>
+                      <select
+                        name="major"
+                        value={edu.major}
+                        onChange={(e) => handleEducationChange(index, 'major', e.target.value)}
+                        className="form-control"
+                        disabled={!editing}
+                      >
+                        <option value="">เลือกสาขา</option>
+                        {major && major.length > 0 ? (
+                          major.map((majorItem) => (
+                            <option key={majorItem.major_id} value={majorItem.major_id}>
+                              {majorItem.major_name}
+                            </option>
+                          ))
+                        ) : (
+                          <option value="">ไม่มีข้อมูลสาขา</option>
+                        )}
+                      </select>
+                    </div>
 
-                                <div className="form-group">
-                                  <label>รหัสนักศึกษา<span className="importent">*</span></label>
-                                  <input
-                                    type="text"
-                                    className="form-control"
-                                    name="studentId"
-                                    placeholder="รหัสนักศึกษา"
-                                    value={edu.studentId}
-                                    onChange={(e) => handleEducationChange(index, 'studentId', e.target.value)}
-                                    disabled={!editing}
-                                  />
-                                </div>
+                    <div className="form-group">
+                      <label>รหัสนักศึกษา<span className="importent">*</span></label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        name="studentId"
+                        placeholder="รหัสนักศึกษา"
+                        value={edu.studentId}
+                        onChange={(e) => handleEducationChange(index, 'studentId', e.target.value)}
+                        disabled={!editing}
+                      />
+                    </div>
 
-                                <div className="form-group">
-                                  <label>ปีการศึกษาที่จบ<span className="importent">*</span></label>
-                                  <input
-                                    type="text"
-                                    className="form-control"
-                                    name="graduation_year"
-                                    placeholder="ปีการศึกษาที่จบ"
-                                    value={edu.graduation_year}
-                                    onChange={(e) => handleEducationChange(index, 'graduation_year', e.target.value)}
-                                    disabled={!editing}
-                                  />
-                                </div>
+                    <div className="form-group">
+                      <label>ปีการศึกษาที่จบ<span className="importent">*</span></label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        name="graduation_year"
+                        placeholder="ปีการศึกษาที่จบ"
+                        value={edu.graduation_year}
+                        onChange={(e) => handleEducationChange(index, 'graduation_year', e.target.value)}
+                        disabled={!editing}
+                      />
+                    </div>
 
-                                {editing && profile.educations.length > 1 && (
-                                  <button
-                                    type="button"
-                                    className="btn btn-danger mt-2"
-                                    onClick={() => removeEducation(index)}
-                                  >
-                                    ลบรายการ
-                                  </button>
-                                )}
+                    {editing && profile.educations.length > 1 && (
+                      <button
+                        type="button"
+                        className="btn btn-danger mt-2"
+                        onClick={() => removeEducation(index)}
+                      >
+                        ลบรายการ
+                      </button>
+                    )}
 
-                                <hr />
-                              </div>
-                            ))
-                          ) : (
-                            <p>ไม่มีข้อมูลการศึกษา</p>
-                          )}
+                    <hr />
+                  </div>
+                ))
+              ) : (
+                <p>ไม่มีข้อมูลการศึกษา</p>
+              )}
 
-                          {editing && ( 
-                                  <button type="button" className="btn btn-primary mt-3" onClick={addEducation}>
-                                      เพิ่มข้อมูลการศึกษา
-                                  </button>
-                          )}
-                        </fieldset>
-                        </div>
-                   
-                        <div className='row justify-content-end'>
-                              <div className='col-7 text-center '>
-                                {editing ? (
-                                  <>
-                                    <button className="btn btn-secondary me-5" type="button" onClick={() => setEditing(false)} style={{ width: '300px' }}>ยกเลิก</button>
-                                    <button className="btn btn-primary " type="submit" onClick={handleSave} style={{ width: '300px' }}>บันทึก</button>
-                                  </>                                  
-                                ) : (
-                                  <button className="submit-button" type="submit" onClick={handleEdit}>แก้ไขข้อมูลส่วนตัว</button>
-                                )}
-                              </div>
-                        </div>             
-                    </div>  
-      </div> 
-    </section>
+              {editing && (
+                <button type="button" className="btn btn-primary mt-3" onClick={addEducation}>
+                  เพิ่มข้อมูลการศึกษา
+                </button>
+              )}
+            </fieldset>
+          </div>
+
+          <div className='text-center mb-4'>
+            {editing ? (
+              <>
+                <button
+                  className="btn btn-secondary me-2"
+                  type="button"
+                  onClick={() => setEditing(false)}
+                  style={{ minWidth: 120, maxWidth: 200, width: "40%" }}
+                >
+                  ยกเลิก
+                </button>
+                <button
+                  className="btn btn-primary"
+                  type="submit"
+                  onClick={handleSave}
+                  style={{ minWidth: 120, maxWidth: 200, width: "40%" }}
+                >
+                  บันทึก
+                </button>
+              </>
+            ) : (
+              <button
+                className="btn btn-success"
+                type="button"
+                onClick={handleEdit}
+                style={{ minWidth: 120, maxWidth: 250, width: "60%" }}
+              >
+                แก้ไขข้อมูลส่วนตัว
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    
+  </section>
     
   );
 }

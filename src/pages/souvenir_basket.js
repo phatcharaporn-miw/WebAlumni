@@ -2,6 +2,9 @@ import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { useNavigate } from 'react-router-dom';
 import "../css/Souvenir.css";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import Swal from "sweetalert2";
 
 function SouvenirBasket() {
     const [cart, setCart] = useState([]);
@@ -133,9 +136,15 @@ function SouvenirBasket() {
                         ))}
                     </div>
                 ) : (
-                    <p>ไม่มีสินค้าในตะกร้า</p>
+                <div className="text-center text-muted py-5">
+                    <p>ไม่มีสินค้าในตะกร้า 😢</p>
+                </div>
                 )}
-                <button className="souvenir-checkout" onClick={handleCheckoutClick}>ดำเนินการชำระเงิน</button>
+                <div className="text-end mt-4">
+                    <button className="btn btn-success px-4 py-2" onClick={handleCheckoutClick}>
+                        ดำเนินการชำระเงิน
+                    </button>
+                </div>            
             </div>
         </>
     );

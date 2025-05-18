@@ -2,6 +2,7 @@ import React, { useState, useEffect} from "react";
 import { useNavigate } from 'react-router-dom';
 import "../css/Header.css";
 import 'bootstrap/dist/css/bootstrap.min.css'; 
+import 'bootstrap/dist/js/bootstrap.bundle.min';
 import { SlMagnifier } from "react-icons/sl";
 import { SlArrowDown } from "react-icons/sl";
 import { SlBasket } from "react-icons/sl";
@@ -21,13 +22,10 @@ function Header({user}) {
   const [cartCount, setCartCount] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const userId = localStorage.getItem('userId');
-  // const userId = user?.userId;
-
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
 
   // ดึงแจ้งเตือนเมื่อผู้ใช้เข้าสู่ระบบ
   useEffect(() => {
@@ -265,207 +263,320 @@ const addToCart = (productId, quantity, total) => {
       setShowSuggestions(false);
   };
 
-  return (
-    <header className="header">
-      <div className="header-top">
-        {/* โลโก้ */}
-        <img className="logo" src="/image/logoCP1.png" alt="College of Computing Logo" />
+   const toggleMenu = () => {
+    setMenuOpen(!menuOpen);
+  };
 
-        {/* ช่องค้นหาและปุ่มเข้าสู่ระบบ */}
-        <div className="search-and-login">
-          <div className="search">
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={handleSearchChange}
-              className="form-control"
-              placeholder="ค้นหา..."
-            />
-            <button onClick={handleSearchClick} className="search-icon-btn">
-              <SlMagnifier className="search-icon" />
-            </button>
+//   return (
+//     <header className="header bg-light">
+//   <div className="container-fluid">
+//     <nav className="navbar navbar-expand-lg">
+//       {/* โลโก้ */}
+//       <NavLink className="navbar-brand" to="/">
+//         <img src="/image/logoCP1.png" alt="College Logo" className="logo" />
+//       </NavLink>
+
+//       {/* Hamburger ปรากฏเมื่อจอเล็ก */}
+//       <button
+//         className="navbar-toggler"
+//         type="button"
+//         data-bs-toggle="collapse"
+//         data-bs-target="#navbarContent"
+//         aria-controls="navbarContent"
+//         aria-expanded="false"
+//         aria-label="Toggle navigation"
+//       >
+//         <span className="navbar-toggler-icon"></span>
+//       </button>
+
+//       {/* เมนูหลัก */}
+//       <div className="collapse navbar-collapse" id="navbarContent">
+//         <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+//           <li className="nav-item">
+//             <NavLink to="/" className="nav-link">หน้าหลัก</NavLink>
+//           </li>
+//           <li className="nav-item">
+//             <NavLink to="/about" className="nav-link">เกี่ยวกับ</NavLink>
+//           </li>
+//           <li className="nav-item dropdown">
+//             <div className="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown">
+//               ประชาสัมพันธ์
+//             </div>
+//             <ul className="dropdown-menu">
+//               <li><NavLink to="/news" className="dropdown-item">ข่าว</NavLink></li>
+//               <li><NavLink to="/activity" className="dropdown-item">กิจกรรม</NavLink></li>
+//             </ul>
+//           </li>
+//           <li className="nav-item"><NavLink to="/donate" className="nav-link">บริจาค</NavLink></li>
+//           <li className="nav-item"><NavLink to="/alumni" className="nav-link">ทำเนียบศิษย์เก่า</NavLink></li>
+//           <li className="nav-item"><NavLink to="/souvenir" className="nav-link">ของที่ระลึก</NavLink></li>
+//           <li className="nav-item"><NavLink to="/webboard" className="nav-link">เว็บบอร์ด</NavLink></li>
+//         </ul>
+
+//         {/* ส่วนขวา: Search, cart, notification, user */}
+//         <div className="d-flex align-items-center">
+//           {/* ช่องค้นหา */}
+//           <div className="me-3">
+//             <input
+//               type="text"
+//               value={searchTerm}
+//               onChange={handleSearchChange}
+//               className="form-control"
+//               placeholder="ค้นหา..."
+//             />
+//           </div>
+
+//           {/* ถ้ามี suggestions ให้แสดง */}
+//           {showSuggestions && suggestions.length > 0 && (
+//             <div className="suggestions-dropdown">{/* ... */}</div>
+//           )}
+
+//           {/* ตะกร้า */}
+//           <NavLink to="/souvenir/souvenir_basket" className="position-relative me-3">
+//             <SlBasket className="cart-icon" />
+//             {cartCount > 0 && <span className="cart-count">{cartCount}</span>}
+//           </NavLink>
+
+//           {/* แจ้งเตือน + โปรไฟล์ */}
+//           {user ? (
+//             <div className="d-flex align-items-center">
+//               {/* แจ้งเตือน */}
+//               <div className="notification-icon me-3" onClick={toggleNotifications}>
+//                 <IoMdNotificationsOutline />
+//                 {unreadCount > 0 && <span className="unread-count">{unreadCount}</span>}
+//               </div>
+
+//               {/* โปรไฟล์ */}
+//               <NavLink to={user.role === 2 ? "/president-profile" : "/alumni-profile"}>
+//                 <img
+//                   src={user.profilePicture || "/profile-picture.png"}
+//                   alt="Profile"
+//                   className="profile-img"
+//                   style={{ cursor: "pointer" }}
+//                 />
+//               </NavLink>
+//             </div>
+//           ) : (
+//             <NavLink to="/login">
+//               <button className="btn btn-primary">เข้าสู่ระบบ</button>
+//             </NavLink>
+//           )}
+//         </div>
+//       </div>
+//     </nav>
+//   </div>
+// </header>
+//   );
+  return (
+        <header className="header">
+          <div className="header-top">
+            {/* โลโก้ */}
+            <NavLink className="navbar-brand" to="/">
+              <img className="logo" src="/image/logoCP1.png" alt="College of Computing Logo" />
+            </NavLink>
+
+            {/* ปุ่ม Hamburger สำหรับมือถือ */}
+            {/* <button className="hamburger-btn" onClick={toggleMenu} aria-label="Toggle menu">
+              <div className={`bar ${menuOpen ? "open" : ""}`}></div>
+              <div className={`bar ${menuOpen ? "open" : ""}`}></div>
+              <div className={`bar ${menuOpen ? "open" : ""}`}></div>
+            </button> */}
+
+            {/* ช่องค้นหาและปุ่มเข้าสู่ระบบ */}
+            <div className={`search-and-login ${menuOpen ? "open" : ""}`}>
+              <div className="search">
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                  className="form-control"
+                  placeholder="ค้นหา..."
+                />
+                <button onClick={handleSearchClick} className="search-icon-btn">
+                  <SlMagnifier className="search-icon" />
+                </button>
+              </div>
+
+              {/* แสดงคำแนะนำ */}
+                {showSuggestions && suggestions.length > 0 && (
+                    <div className="suggestions-dropdown">
+                        {suggestions.map((suggestion, index) => (
+                            <div
+                                key={index}
+                                className="suggestion-item"
+                                onClick={() => handleSuggestionClick(suggestion)}
+                            >
+                                {suggestion.type === "news" && (
+                                    <p className="suggestion-text">ข่าว: {suggestion.title}</p>
+                                )}
+                                {suggestion.type === "webboard" && (
+                                    <p className="suggestion-text">กระทู้: {suggestion.title}</p>
+                                )}
+                                {suggestion.type === "activity" && (
+                                    <p className="suggestion-text">กิจกรรม: {suggestion.title}</p>
+                                )}
+                                {suggestion.type === "donationproject" && (
+                                    <p className="suggestion-text">บริจาค: {suggestion.title}</p>
+                                )}
+                                {suggestion.type === "products" && (
+                                    <p className="suggestion-text">ของที่ระลึก: {suggestion.title}</p>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                )}
+                
+                  <div className="cart-container me-4 mx-4">
+                      <NavLink to="/souvenir/souvenir_basket">
+                        <SlBasket className="cart-icon" />
+                        {cartCount > 0 && <span className="cart-count">{cartCount}</span>}
+                      </NavLink>
+                  </div>  
+
+              {/*หากผู้ใช้เข้าสู่ระบบแล้วจะแสดงโปรไฟล์และแจ้งเตือน*/}
+              {user ? (
+                <div className="user-profile">
+                  {/* ไอคอนแจ้งเตือน */}
+                  <div className="notification-container me-4">
+                  <div className="notification-icon" onClick={toggleNotifications}>
+                      <IoMdNotificationsOutline />
+                      {unreadCount > 0 && <span className="unread-count">{unreadCount}</span>}
+                  </div>
+
+                    {/* Dropdown แจ้งเตือน */}
+                    {showNotifications && (
+                      <div className="notification-dropdown" onClick={handleDropdownClick}>
+                          <h5 className="notification-title">การแจ้งเตือน</h5>
+                          {notifications.length > 0 ? (
+                              notifications.map((notification) => (
+                                  <div
+                                      key={notification.notification_id}
+                                      className={`notification-item ${notification.read_status === "ยังไม่อ่าน" ? "unread" : ""}`}
+                                      onClick={() => markAsRead(notification.notification_id)}
+                                  >
+                                      <p className="message">{notification.message}</p>
+                                      <p className="notification-date ">{new Date(notification.send_date).toLocaleString()}</p>
+                                      <button
+                                          className="delete-btn"
+                                          onClick={(e) => {
+                                              e.stopPropagation(); // ป้องกันการเรียก `markAsRead` เมื่อคลิกปุ่มลบ
+                                              deleteNotification(notification.notification_id);
+                                          }}
+                                      >
+                                          <FaTrash />
+                                      </button>
+                                  </div>
+                              ))
+                          ) : (
+                              <p className="no-notifications text-center small">ไม่มีการแจ้งเตือน</p>
+                          )}
+                      </div>
+                    )}
+                  </div>
+                
+                  {/* รูปโปรไฟล์ */}
+                    <NavLink
+                      to={user.role === 2 ? "/president-profile" : "/alumni-profile"}
+                      className="profile-container"
+                    >
+                    <img
+                      src={`${user.profilePicture}` || "/profile-picture.png"}
+                      alt="User Profile"
+                      className="profile-img"
+                      style={{ cursor: "pointer" }}
+                    />
+                    {/* ข้อมูลผู้ใช้ */}
+                    <div className="user-info mt-2 text-center">
+                    <p className="user-role mb-1" style={{ textDecoration: "none" }}>
+                      {user.role === 1 ? "แอดมิน" : 
+                      user.role === 2 ? "นายกสมาคม" : 
+                      user.role === 3 ? "ศิษย์เก่า" : 
+                      user.role === 4 ? "ศิษย์ปัจจุบัน" : "ไม่ทราบบทบาท"}
+                    </p>
+                    </div>
+                  </NavLink>
+                </div>
+              ) : (
+                <NavLink to="/login">
+                  <button className="login-btn m-2 ms-5">เข้าสู่ระบบ</button>
+                </NavLink>
+              )}
+            </div>
           </div>
 
-          {/* แสดงคำแนะนำ */}
-            {showSuggestions && suggestions.length > 0 && (
-                <div className="suggestions-dropdown">
-                    {suggestions.map((suggestion, index) => (
-                        <div
-                            key={index}
-                            className="suggestion-item"
-                            onClick={() => handleSuggestionClick(suggestion)}
-                        >
-                            {suggestion.type === "news" && (
-                                <p className="suggestion-text">ข่าว: {suggestion.title}</p>
-                            )}
-                            {suggestion.type === "webboard" && (
-                                <p className="suggestion-text">กระทู้: {suggestion.title}</p>
-                            )}
-                            {suggestion.type === "activity" && (
-                                <p className="suggestion-text">กิจกรรม: {suggestion.title}</p>
-                            )}
-                            {suggestion.type === "donationproject" && (
-                                <p className="suggestion-text">บริจาค: {suggestion.title}</p>
-                            )}
-                            {suggestion.type === "products" && (
-                                <p className="suggestion-text">ของที่ระลึก: {suggestion.title}</p>
-                            )}
-                        </div>
-                    ))}
-                </div>
-            )}
-            
-              <div className="cart-container me-4 mx-4">
-                  <NavLink to="/souvenir/souvenir_basket">
-                    <SlBasket className="cart-icon" />
-                    {cartCount > 0 && <span className="cart-count">{cartCount}</span>}
-                  </NavLink>
-              </div>  
-
-          {/*หากผู้ใช้เข้าสู่ระบบแล้วจะแสดงโปรไฟล์และแจ้งเตือน*/}
-          {user ? (
-            <div className="user-profile">
-              {/* ไอคอนแจ้งเตือน */}
-              <div className="notification-container me-4">
-              <div className="notification-icon" onClick={toggleNotifications}>
-                  <IoMdNotificationsOutline />
-                  {unreadCount > 0 && <span className="unread-count">{unreadCount}</span>}
-              </div>
-
-                {/* Dropdown แจ้งเตือน */}
-                {showNotifications && (
-                  <div className="notification-dropdown" onClick={handleDropdownClick}>
-                      <h5 className="notification-title">การแจ้งเตือน</h5>
-                      {notifications.length > 0 ? (
-                          notifications.map((notification) => (
-                              <div
-                                  key={notification.notification_id}
-                                  className={`notification-item ${notification.read_status === "ยังไม่อ่าน" ? "unread" : ""}`}
-                                  onClick={() => markAsRead(notification.notification_id)}
-                              >
-                                  <p className="message">{notification.message}</p>
-                                  <p className="notification-date ">{new Date(notification.send_date).toLocaleString()}</p>
-                                  <button
-                                      className="delete-btn"
-                                      onClick={(e) => {
-                                          e.stopPropagation(); // ป้องกันการเรียก `markAsRead` เมื่อคลิกปุ่มลบ
-                                          deleteNotification(notification.notification_id);
-                                      }}
-                                  >
-                                      <FaTrash />
-                                  </button>
-                              </div>
-                          ))
-                      ) : (
-                          <p className="no-notifications text-center small">ไม่มีการแจ้งเตือน</p>
-                      )}
-                  </div>
-                )}
-              </div>
-            
-              {/* รูปโปรไฟล์ */}
-                <NavLink
-                  to={user.role === 2 ? "/president-profile" : "/alumni-profile"}
-                  className="profile-container"
+          <nav className={`nav-menu ${menuOpen ? "open" : ""}`}>
+            <ul className="nav">
+              <li className="nav-item">
+                <NavLink 
+                  to="/" 
+                  className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}
                 >
-                <img
-                  src={`${user.profilePicture}` || "/profile-picture.png"}
-                  alt="User Profile"
-                  className="profile-img"
-                  style={{ cursor: "pointer" }}
-                />
-                {/* ข้อมูลผู้ใช้ */}
-                <div className="user-info mt-2 text-center">
-                <p className="user-role mb-1" style={{ textDecoration: "none" }}>
-                  {user.role === 1 ? "แอดมิน" : 
-                  user.role === 2 ? "นายกสมาคม" : 
-                  user.role === 3 ? "ศิษย์เก่า" : 
-                  user.role === 4 ? "ศิษย์ปัจจุบัน" : "ไม่ทราบบทบาท"}
-                </p>
+                  หน้าหลัก
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink 
+                  to="/about" 
+                  className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}
+                >
+                  เกี่ยวกับ
+                </NavLink>
+              </li>          
+              <li className="dropdown">
+                <div className="dropbtn">ประชาสัมพันธ์ <SlArrowDown className="arrow-down" /></div>
+                {/* <SlArrowDown className="arrow-down"/> */}
+                
+                <div className="dropdown-content">
+                  <NavLink 
+                    to="/news" 
+                    className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}
+                  >
+                    ประชาสัมพันธ์
+                  </NavLink>
+                  <NavLink 
+                    to="/activity" 
+                    className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}
+                  >
+                    กิจกรรม
+                  </NavLink>
                 </div>
-              </NavLink>
-            </div>
-          ) : (
-            <NavLink to="/login">
-              <button className="login-btn m-2 ms-5">เข้าสู่ระบบ</button>
-            </NavLink>
-          )}
-        </div>
-      </div>
-
-      <nav>
-        <ul className="nav">
-          <li className="nav-item">
-            <NavLink 
-              to="/" 
-              className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}
-            >
-              หน้าหลัก
-            </NavLink>
-          </li>
-          <li className="nav-item">
-            <NavLink 
-              to="/about" 
-              className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}
-            >
-              เกี่ยวกับ
-            </NavLink>
-          </li>          
-          <li className="dropdown">
-            <div className="dropbtn">ประชาสัมพันธ์</div>
-            <SlArrowDown className="arrow-down"/>
-            <div className="dropdown-content">
-              <NavLink 
-                to="/news" 
-                className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}
-              >
-                ประชาสัมพันธ์
-              </NavLink>
-              <NavLink 
-                to="/activity" 
-                className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}
-              >
-                กิจกรรม
-              </NavLink>
-            </div>
-          </li>
-          <li className="nav-item">
-            <NavLink 
-              to="/donate" 
-              className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}
-            >
-              บริจาค
-            </NavLink>
-          </li>
-          <li className="nav-item">
-            <NavLink 
-              to="/alumni" 
-              className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}
-            >
-              ทำเนียบศิษย์เก่า
-            </NavLink>
-          </li>
-          <li className="nav-item">
-            <NavLink 
-              to="/souvenir" 
-              className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}
-            >
-              ของที่ระลึก
-            </NavLink>
-          </li>
-          <li className="nav-item">
-            <NavLink 
-              to="/webboard" 
-              className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}
-            >
-              เว็บบอร์ด
-            </NavLink>
-          </li>
-        </ul>
-      </nav>
-    </header>
-
-    
+                
+              </li>
+              <li className="nav-item">
+                <NavLink 
+                  to="/donate" 
+                  className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}
+                >
+                  บริจาค
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink 
+                  to="/alumni" 
+                  className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}
+                >
+                  ทำเนียบศิษย์เก่า
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink 
+                  to="/souvenir" 
+                  className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}
+                >
+                  ของที่ระลึก
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink 
+                  to="/webboard" 
+                  className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}
+                >
+                  เว็บบอร์ด
+                </NavLink>
+              </li>
+            </ul>
+          </nav>
+        </header> 
   );
 }
 
