@@ -23,7 +23,7 @@ function Header({user}) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const userId = localStorage.getItem('userId');
   const [menuOpen, setMenuOpen] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  // const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
 
 
@@ -122,7 +122,7 @@ function Header({user}) {
 
   // เพิ่มสินค้าลงในตะกร้า
 const addToCart = (productId, quantity, total) => {
-  const userId = localStorage.getItem('userId'); // 🔥 ดึงค่า userId ตรงนี้กัน null
+  const userId = localStorage.getItem('userId'); 
   
   if (!userId) {
     Swal.fire({

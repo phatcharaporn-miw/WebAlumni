@@ -1,16 +1,18 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import '../css/major-detail.css';
-import { useParams } from 'react-router-dom';
+import '../../css/major-detail.css';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-function MajorDetail() {
+function AdminAlumniView() {
     const { major } = useParams(); 
+    const [alumniData, setAlumniData] = useState([]);
     const [students, setStudents] = useState([]);
     const [filteredStudents, setFilteredStudents] = useState([]);
     const [activeTab, setActiveTab] = useState("ป.ตรี"); // ค่าเริ่มต้นเป็นแท็บ ป.ตรี
     const [searchTerm, setSearchTerm] = useState("");
+    const navigate = useNavigate();
     // const [selectedYear, setSelectedYear] = useState("");
 
     useEffect(() => {
@@ -59,11 +61,48 @@ function MajorDetail() {
         }
     };
 
+    // export file to CSV
+    const exportToCSV = () => {
+        const headers = ["ลำดับ", "ชื่อ", "รหัสนักศึกษา", "ปีที่จบการศึกษา", "ระดับการศึกษา"];
+        const rows = filteredStudents.map((student, index) => [
+            index + 1,
+            student.full_name,
+            student.studentId,
+            student.graduation_year,
+            student.degree
+        ]);
+
+        let csvContent = "data:text/csv;charset=utf-8,\uFEFF" 
+            + [headers, ...rows].map(e => e.join(",")).join("\n");
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `รายชื่อศิษย์เก่าสาขา_${major}_${activeTab}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
+    // useEffect(() => {
+    //     axios.get("http://localhost:3001/alumni/outstanding-alumni")
+    //         .then((res) => setAlumniData(res.data))
+    //         .catch((err) => console.error("โหลดศิษย์เก่าดีเด่นล้มเหลว:", err));
+    // }, []);
+
+    // const handleAlumniClick = (userId) => navigate(`/admin/users/user-profile/${userId}`);
+
     return (
         <section className="container my-5">
-            <div className="major-detail">
-                <h3 className="text-center mb-4">รายชื่อศิษย์เก่า - สาขา {major}</h3>
+            <h3 className="text-center mb-4">ทำเนียบศิษย์เก่าสาขา {major}</h3>
 
+            <div className="mb-3 d-flex justify-content-end">
+                <button className="btn btn-outline-success" onClick={exportToCSV}>
+                    ดาวน์โหลดรายชื่อ
+                </button>
+            </div>
+
+            <div className="major-detail">
                 <ul className="nav nav-tabs mb-4">
                     {["ป.ตรี", "ป.โท", "ป.เอก"].map((degree) => (
                         <li className="nav-item" key={degree}>
@@ -86,21 +125,6 @@ function MajorDetail() {
                         onChange={(e) => handleSearch(e.target.value)}
                     />
                 </div>
-
-                {/* <div className="year-filter" style={{ minWidth: "150px" }}>
-                    <label htmlFor="yearSelect" className="form-label d-none">กรองตามปีที่จบการศึกษา</label>
-                    <select
-                                id="yearSelect"
-                                className="form-select"
-                                value={selectedYear}
-                                onChange={(e) => filterByYear(e.target.value)}
-                    >
-                                <option value="">ทั้งหมด</option>
-                                <option value="2563">2563</option>
-                                <option value="2564">2564</option>
-                                <option value="2565">2565</option>
-                    </select>
-                </div> */}
 
                 <div className="students">
                     <table className="table table-bordered">
@@ -133,9 +157,35 @@ function MajorDetail() {
                     </table>
                 </div>
             </div>
+            <hr className="my-5" />
+
+            {/* <div className="outstanding">
+                <h5 className="mb-4">ศิษย์เก่าดีเด่น</h5>
+                <div className="row">
+                    {alumniData.map((alumni, index) => (
+                        <div
+                            key={index}
+                            className="col-md-6 col-lg-4 mb-4"
+                            onClick={() => handleAlumniClick(alumni.user_id)}
+                            style={{ cursor: "pointer" }}
+                        >
+                            <div className="d-flex align-items-center shadow p-3 rounded-3 bg-light">
+                                <img
+                                    src={alumni.image_path ? `http://localhost:3001/${alumni.image_path}` : "/default-profile-pic.jpg"}
+                                    alt={alumni.name}
+                                    className="rounded-circle me-3"
+                                    style={{ width: "70px", height: "70px", objectFit: "cover", border: "2px solid #0F75BC" }}
+                                />
+                                <div>
+                                    <h6 className="mb-1">{alumni.name}</h6>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div> */}
         </section>
     );
 }
 
-
-export default MajorDetail;
+export default AdminAlumniView;

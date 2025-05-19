@@ -65,7 +65,8 @@ import AdminActivity from './pages/admin/admin-activity';
 import UserManagement from './pages/admin/manage-users';
 import UserProfile from './pages/admin/manage-users-profile';
 import EditUserProfile from './pages/admin/edit-user-profile';
-
+import AdminAlumni from './pages/admin/admin-alumni';
+import AdminAlumniView from './pages/admin/admin-alumniView';
 
 //route ของนายกสมาคม
 import ParticipantsPage from './pages/admin/participants';
@@ -78,6 +79,7 @@ import PresidentProfileActivity from './pages/president/president-profile-activi
 import PresidentProfileWebboard from './pages/president/president-profile-webboard';
 import Approve from './pages/president/president-approve';
 import PresidentProfileSouvenir from './pages/president/president-profile-souvenir';
+
 
 function App() {
 
@@ -183,6 +185,8 @@ function App() {
             <Route path="/admin/users" element={<UserManagement />} />
             <Route path="/admin/users/user-profile/:userId" element={<UserProfile />} />
             <Route path="/admin/users/edit-user-profile/:userId" element={<EditUserProfile />} />
+            <Route path="/admin/admin-alumni" element={<AdminAlumni />} />
+            <Route path="/admin/admin-alumni/admin-alumniView/:major" element={<AdminAlumniView />} />
 
 
         </Route>

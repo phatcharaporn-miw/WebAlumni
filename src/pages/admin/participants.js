@@ -6,6 +6,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 function ParticipantsPage() {
     const { activityId } = useParams();
     const navigate = useNavigate();
+    const [filteredStudents, setFilteredStudents] = useState([]);
     const [participants, setParticipants] = useState([]);
     const [activityName, setActivityName] = useState("");
     const [loading, setLoading] = useState(true);
@@ -33,12 +34,38 @@ function ParticipantsPage() {
         return date.toLocaleDateString('th-TH', options);
     };
 
+    // export file to CSV
+    const exportToCSV = () => {
+        const headers = ["ลำดับ", "ชื่อ-นามสกุล", "อีเมล", "สาขา", "วันที่ลงทะเบียน"];
+        const rows = filteredStudents.map((student, index) => [
+            index + 1,
+            student.full_name,
+            student.email,
+            student.department,
+            student.created_at
+        ]);
+
+        let csvContent = "data:text/csv;charset=utf-8,\uFEFF" 
+            + [headers, ...rows].map(e => e.join(",")).join("\n");
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `รายชื่อผู้เข้าร่วม_${activityName}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
     return (
         <div className="container mt-4">         
-            {/* <button className="btn btn-secondary mb-3" onClick={() => navigate(-1)}>
-                กลับ
-            </button> */}
+            
         <h4>รายชื่อผู้เข้าร่วม: {activityName}</h4>
+            <div className="mb-3 d-flex justify-content-end">
+                <button className="btn btn-outline-success" onClick={exportToCSV}>
+                    ดาวน์โหลดรายชื่อ
+                </button>
+            </div>
             {loading ? (
                 <p>กำลังโหลดข้อมูล...</p>
             ) : participants.length > 0 ? (

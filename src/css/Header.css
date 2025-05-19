@@ -198,7 +198,7 @@
   .notification-item {
     display: flex;
     flex-direction: column;
-    padding: 10px;
+    padding: 5px;
     border-bottom: 1px solid #ddd;
     position: relative;
 }
@@ -385,7 +385,6 @@
     transform: rotate(-45deg) translate(6px, -6px);
   }
 
-  /* ซ่อน search-and-login ปกติ แล้วแสดงในเมนูหรือปรับได้ตามต้องการ */
   .search-and-login {
     display: none;
   }
