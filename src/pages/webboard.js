@@ -176,14 +176,12 @@ function Webboard(){
               // แปลงวันที่ในคอมเมนต์ให้ถูกต้อง
             const commentsWithFormattedDate = response.data.data.comments.map(comment => ({
               ...comment,
-              created_at: comment.created_at 
-                  ? moment(comment.created_at).locale("th").format("DD/MM/YYYY HH:mm:ss") 
-                  : "ไม่ระบุวันที่",
+              // ไม่ต้องแปลง created_at ที่นี่
               replies: comment.replies?.map(reply => ({
                   ...reply,
-                  created_at: reply.created_at ? reply.created_at : "",
+                  // ไม่ต้องแปลง created_at ที่นี่
                   user_id: reply.user_id 
-              })) || [] // ป้องกันกรณีไม่มี replies
+              })) || []
             }));
             
             setSelectedPost({
@@ -229,24 +227,25 @@ function Webboard(){
           withCredentials: true
         })
         .then((response) => {
-          const newComment = response.data; // คอมเมนต์ใหม่ที่ได้จาก Backend
-        
-          // แปลงวันที่ให้ถูกต้องก่อน
+          const newComment = response.data;
+
+          const userProfileImage = localStorage.getItem("image_path") 
+            ? `http://localhost:3001${localStorage.getItem("image_path")}` 
+            : "/default-profile.png";
+          const userName = localStorage.getItem("username") || "ไม่ระบุชื่อ";
+
           const formattedNewComment = {
             ...newComment,
-            created_at: newComment.created_at
-              ? moment(newComment.created_at).locale("th").format("DD/MM/YYYY HH:mm:ss")
-              : "ไม่ระบุวันที่"
+            profile_image: userProfileImage,
+            username: userName,
           };
-        
-          // อัปเดต State ของ selectedPost
+
           setSelectedPost((prev) => ({
             ...prev,
             comments: [...(prev.comments || []), formattedNewComment],
             comments_count: (prev.comments_count ?? 0) + 1
           }));
-        
-          // อัปเดต State ของ webboard เพื่อให้จำนวนคอมเมนต์อัปเดตในหน้าแรก
+
           setWebboard((prevWebboard) => 
             prevWebboard.map((post) =>
               post.webboard_id === selectedPost.webboard_id
@@ -254,9 +253,10 @@ function Webboard(){
                 : post
             )
           );
-        
-          setCommentText(""); // ล้างข้อความในช่องคอมเมนต์
+
+          setCommentText("");
         })
+
         .catch((error) => {
           console.error('เกิดข้อผิดพลาดในการแสดงความคิดเห็น:', error.message);
         });        
@@ -556,20 +556,24 @@ function Webboard(){
                                     <div className="flex-grow-1">
                                       <div className="d-flex justify-content-between align-items-center mb-1">
                                         <strong>{comment.full_name || "ไม่ระบุชื่อ"}</strong>
-                                        <small className="text-muted">{new Date(comment.created_at).toLocaleDateString()}</small>
+                                        <small className="text-muted">
+                                          {comment.created_at
+                                            ? moment(comment.created_at).locale("th").format("DD/MM/YYYY")
+                                            : "ไม่ระบุวันที่"}
+                                        </small>
                                       </div>
-                                      <p className="text-muted mb-2 small">{comment.comment_detail}</p>
-
-                                      {Number(comment.user_id) === Number(localStorage.getItem("userId")) && (
-                                        <button
-                                          className="btn btn-sm"
-                                          onClick={() => handleDeleteComment(comment.comment_id)}
-                                          style={{ border: "none", background: "none" }}
-                                        >
-                                          <MdDelete size={20} color="red"/>
-                                        </button>
-                                      )}
-
+                                      <div className="d-flex align-items-center mb-2">
+                                        <p className="text-muted mb-0 small flex-grow-1">{comment.comment_detail}</p>
+                                        {Number(comment.user_id) === Number(localStorage.getItem("userId")) && (
+                                          <button
+                                            className="btn btn-sm ms-2"
+                                            onClick={() => handleDeleteComment(comment.comment_id)}
+                                            style={{ border: "none", background: "none" }}
+                                          >
+                                            <MdDelete size={20} color="red"/>
+                                          </button>
+                                        )}
+                                      </div>
                                       <button className="btn btn-link btn-sm p-0" onClick={() => toggleReplyForm(comment.comment_id)}>ตอบกลับ</button>
 
                                       {showReplyForm === comment.comment_id && (

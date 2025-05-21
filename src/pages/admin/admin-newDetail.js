@@ -2,12 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import { MdDateRange } from 'react-icons/md';
-import '../css/news-detail.css';
+import '../../css/news-detail.css';
 import Modal from 'react-modal';
 
 Modal.setAppElement('#root');
 
-function NewsDetail() {
+function AdminNewsDetail() {
     const { newsId } = useParams();
     const [news, setNews] = useState(null);
     const [relatedNews, setRelatedNews] = useState([]);
@@ -125,41 +125,8 @@ function NewsDetail() {
 
                 <p className="newsd-content">{news.content}</p>
             </div>
-
-            {/* ข่าวอื่น ๆ */}
-            <div className="newsd-related mt-5">
-                <h3 className="mb-4">ข่าวอื่น ๆ</h3>
-                <div className="row">
-                    {randomRelatedNews.map((related, index) => (
-                        <div className="col-md-4 col-sm-6 mb-4" key={index}>
-                            <div className="newsd-card shadow-sm h-100 rounded">
-                                <img
-                                    src={`http://localhost:3001${related.image_path}`}
-                                    alt={related.title}
-                                    className="newsd-card-img"
-                                />
-                                <div className="p-3">
-                                    <h6 className="newsd-card-title">{related.title}</h6>
-                                    <p className="news-summary">{related.content.substring(0, 100)}...</p>
-                                    <div className="news-meta d-flex align-items-center">
-                                        <span className="me-2">
-                                            <MdDateRange /> {new Date(related.created_at).toLocaleDateString('th-TH')}
-                                        </span>
-                                    </div>
-                                    <Link
-                                        to={`/news/${related.news_id}`}
-                                        className="btn btn-outline-primary btn-sm mt-2 w-100"
-                                    >
-                                        อ่านเพิ่มเติม
-                                    </Link>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
         </section>
     );
 }
 
-export default NewsDetail;
+export default AdminNewsDetail;

@@ -47,6 +47,12 @@ import SouvenirBasket from './pages/souvenir_basket';
 import AlumniMajor from './pages/major-detail';
 // import AlumniProfile from './pages/alumni/alumni-profile';
 import HomeAlumniProfile from './pages/alumniProfile';
+import StudentHome from './pages/students/student-home';
+import StudentProfile from './pages/students/student-profile';
+import StudentProfileWebboard from './pages/students/student-profile-webboard';
+import StudentProfileActivity from './pages/students/student-profile-activity';
+import StudentProfileSouvenir from './pages/students/student-profile-souvenir';
+
 
 
 // route ของแอดมิน
@@ -67,6 +73,7 @@ import UserProfile from './pages/admin/manage-users-profile';
 import EditUserProfile from './pages/admin/edit-user-profile';
 import AdminAlumni from './pages/admin/admin-alumni';
 import AdminAlumniView from './pages/admin/admin-alumniView';
+import AdminNewsDetail from './pages/admin/admin-newDetail';
 
 //route ของนายกสมาคม
 import ParticipantsPage from './pages/admin/participants';
@@ -113,21 +120,9 @@ function App() {
           <Route path="/webboard/:id" element={<Webboard />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/alumni-home" element={
-           
-              <AlumniHome />
-          
-          } />
-          <Route path="/alumni-profile" element={ 
-            
-              <Profile />
-           
-          }/>
-          <Route path="/createPost" element={
-            // <ProtectedRoute> 
-              <CreatePost/> 
-            // </ProtectedRoute>
-          } />
+          <Route path="/alumni-home" element={<AlumniHome />} />
+          <Route path="/alumni-profile" element={ <Profile />}/>
+          <Route path="/createPost" element={<CreatePost/> } />
           <Route path="/alumni-favorite" element={<WebboardFavorite/>} />
           <Route path="/news/:newsId" element={<NewsDetail/>} />
           {/* <Route path="/notification" element={<Notifications/>} /> */}
@@ -143,6 +138,13 @@ function App() {
           <Route path="/alumni/major-detail" element={<AlumniMajor />} />
           <Route path="/searchResult" element={<SearchResult />} />
           <Route path="/alumni/:userId" element={<HomeAlumniProfile />} />
+          
+          {/* route ของศิษย์ปัจจุบัน */}
+          <Route path="/student-profile" element={<StudentProfile />} />
+          <Route path="/student-profile/student-profile-webboard" element={<StudentProfileWebboard />} />
+          <Route path="/student-profile/student-profile-activity" element={<StudentProfileActivity />} />
+          <Route path="/student-profile/student-profile-souvenir" element={<StudentProfileSouvenir />} />
+          <Route path="/student-home" element={<StudentHome />} />
 
           {/* route ของนายกสมาคม */}
           <Route path="/president-home" element={<PresidentHome />} />
@@ -178,7 +180,7 @@ function App() {
             <Route path="/admin/webboard/edit/:webboardId" element={<AdminEditWebboard />} />
             <Route path="/admin/activities/edit/:activityId" element={<EditActivity />} />
             <Route path="/admin/news" element={<AdminNews />} />
-            <Route path="/admin/news/:newsId" element={<NewsDetail />} />
+            <Route path="/admin/news/:newsId" element={<AdminNewsDetail />} />
             <Route path="/admin/news/admin-create-news" element={<CreateNews />} />
             <Route path="/admin/news/edit/:newsId" element={<EditNews />} />
             <Route path="/admin/activities/:activityId/participants" element={<ParticipantsPage />} />

@@ -8,7 +8,7 @@ import DonateDetail from "../pages/donate-detail";
 
 function Breadcrumb() {
   const location = useLocation();
-  const { activityId, newsId, categoryId, webboardId, projectId, productId } = useParams(); 
+  const { activityId, newsId, categoryId, webboardId, projectId, productId, userId } = useParams(); 
   const [breadcrumb, setBreadcrumb] = useState({}); 
 
   // ดึงข้อมูล breadcrumb หากมี activityId, newsId หรือ categoryId
@@ -67,7 +67,16 @@ function Breadcrumb() {
           console.error("Error fetching category breadcrumb:", error);
         });
     }
-  }, [activityId, newsId, categoryId, webboardId, projectId, productId]);
+    if (userId) {
+      axios.get(`http://localhost:3001/alumni/${userId}`)
+        .then(response => {
+          setBreadcrumb(prev => ({ ...prev, alumniProfile: response.data.fullName }));
+        })
+        .catch(error => {
+          console.error("Error fetching category breadcrumb:", error);
+        });
+    }
+  }, [activityId, newsId, categoryId, webboardId, projectId, productId, userId]);
 
   // แยก path ตาม '/'
   const pathnames = location.pathname
@@ -104,6 +113,8 @@ function Breadcrumb() {
             translatedText = breadcrumb.DonateDetail;
           }else if (value === productId?.toString() && breadcrumb.souvenirDetail) {
             translatedText = breadcrumb.souvenirDetail;
+          }else if (value === userId?.toString() && breadcrumb.alumniProfile) {
+            translatedText = breadcrumb.alumniProfile;
           }
 
           return (

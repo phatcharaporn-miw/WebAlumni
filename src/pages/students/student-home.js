@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import "../css/home.css";
-import '../css/webboard.css';
+import "../../css/home.css";
+import '../../css/webboard.css';
 import Modal from 'react-modal';
 import { SlHeart } from "react-icons/sl";
 import { MdFavorite } from "react-icons/md";
@@ -29,7 +29,7 @@ import {
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend, ArcElement);
 
-function Home() {
+function StudentHome() {
   const [background, setBackground] = useState("/image/back-2.png");
   const currentAmount = 3000;
   const goalAmount = 10000;
@@ -1133,4 +1133,4 @@ function Home() {
   )
 }
 
-export default Home;
+export default StudentHome;

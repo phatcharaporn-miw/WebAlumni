@@ -59,6 +59,11 @@
     min-height: 48px;
 }
 
+.newsd-gallery {
+  /* responsive ให้แถวนี้เลื่อนไปด้านล่างในมือถือ */
+  flex-wrap: wrap;
+}
+
 @media (max-width: 768px) {
     .newsd-title {
         font-size: 1.5rem;
@@ -67,4 +72,19 @@
     .newsd-card-img {
         height: 160px;
     }
+    
+  .newsd-gallery {
+    flex-direction: column;
+  }
+  .thumbnail-images {
+    flex-direction: row !important;
+    overflow-x: auto;
+    gap: 10px !important;
+  }
+  .thumbnail-images img {
+    flex: 0 0 auto;
+    width: 90px !important;
+    height: 60px !important;
+  }
 }
+

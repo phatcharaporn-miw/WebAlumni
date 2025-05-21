@@ -476,7 +476,13 @@ const addToCart = (productId, quantity, total) => {
                 
                   {/* รูปโปรไฟล์ */}
                     <NavLink
-                      to={user.role === 2 ? "/president-profile" : "/alumni-profile"}
+                      to={
+                        user.role === 2
+                          ? "/president-profile"
+                          : user.role === 4
+                          ? "/student-profile"
+                          : "/alumni-profile"
+                      }
                       className="profile-container"
                     >
                     <img
