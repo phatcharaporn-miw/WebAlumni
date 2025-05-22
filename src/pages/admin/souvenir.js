@@ -13,12 +13,7 @@ function Souvenir() {
     const [products, setProducts] = useState([]);
     const [open, setOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
-    const [notification, setNotification] = useState({
-        open: false,
-        message: "",
-        severity: "info",
-    });
-
+    
     // useEffect(() => {
     //     window.scrollTo(0, 0);
     //     axios.get("http://localhost:3001/admin/souvenir").then((response) => {
@@ -41,14 +36,6 @@ function Souvenir() {
 
         console.log("User ID:", user_id);
     }, [user_id]);
-
-
-
-    const [notificationCount, setNotificationCount] = useState(0);
-
-    const handleCloseNotification = () => {
-        setNotification({ ...notification, open: false });
-    };
 
     const handleOpen = (product) => {
         setSelectedProduct(product);
@@ -81,14 +68,7 @@ function Souvenir() {
     //         });
     // };
 
-    const handleDelete = (productId) => {
-        // แสดง Snackbar เพื่อยืนยันการลบ
-        setNotification({
-            open: true,
-            message: "คุณต้องการลบสินค้านี้จริงหรือไม่?",
-            severity: "warning",
-        });
-    
+    const handleDelete = (productId) => { 
         // เมื่อผู้ใช้ยืนยันการลบ
         const confirmDelete = window.confirm("คุณต้องการลบสินค้านี้จริงหรือ?");
         
@@ -96,30 +76,14 @@ function Souvenir() {
             axios.delete(`http://localhost:3001/admin/deleteSouvenir/${productId}`)
                 .then(() => {
                     setProducts(products.filter(product => product.product_id !== productId));
-                    setNotification({
-                        open: true,
-                        message: "สินค้าถูกลบเรียบร้อยแล้ว!",
-                        severity: "success",
-                    });
                 })
                 .catch(error => {
                     console.error("เกิดข้อผิดพลาดในการลบ:", error);
-                    setNotification({
-                        open: true,
-                        message: "ไม่สามารถลบสินค้าได้, กรุณาลองใหม่อีกครั้ง",
-                        severity: "error",
-                    });
+                    
                 });
-        } else {
-            setNotification({
-                open: true,
-                message: "คุณยกเลิกการลบสินค้า",
-                severity: "info",
-            });
         }
     };
     
-
     const handleApprove = (productId) => {
         axios.put(`http://localhost:3001/admin/approveSouvenir/${productId}`, { status: "1" })
             .then(response => {
@@ -147,28 +111,7 @@ function Souvenir() {
     };
 
     return (
-        <>
-            <Snackbar
-                open={notification.open}
-                autoHideDuration={4000}
-                onClose={handleCloseNotification}
-                anchorOrigin={{ vertical: "top", horizontal: "right" }}
-            >
-                <Alert onClose={handleCloseNotification} severity={notification.severity}>
-                    {notification.message}
-                </Alert>
-            </Snackbar>
-    
-            <IconButton
-                color="inherit"
-                onClick={() => setNotificationCount(0)} // เคลียร์แจ้งเตือนเมื่อกด
-                size="small" 
-            >
-                <Badge badgeContent={notificationCount} color="error">
-                    <MdNotifications size={20} /> 
-                </Badge>
-            </IconButton>
-    
+        <>   
             <div className="souvenir-top">
                 <div className="souvenir-bt">
                     <Link to={`/admin/souvenir/souvenir_request`}>

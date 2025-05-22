@@ -317,21 +317,7 @@ const toggleMenu = () => {
                                       disabled={!editing}
                                     />
                                   </div>
-
-                                  <div className="form-group">
-                                    <label>ชื่อเล่น<span className="importent">*</span></label>
-                                    <input
-                                      type="text"
-                                      className="form-control"
-                                      id="nick_name"
-                                      name="nick_name"
-                                      placeholder="ชื่อเล่น"
-                                      value={profile.nick_name || ''}
-                                      onChange={handleChange}
-                                      disabled={!editing}
-                                  />
-                                  </div>
-
+                               
                                   <div className="form-group">
                                     <label>อีเมล<span className="importent">*</span></label>
                                     <input
@@ -345,78 +331,14 @@ const toggleMenu = () => {
                                       disabled={!editing}
                                   />
                                   </div>
-
-                                  <div className="form-group">
-                                    <label>ที่อยู่<span className="importent">*</span></label>
-                                    <input
-                                      type="text"
-                                      className="form-control"
-                                      id="address"
-                                      name="address"
-                                      placeholder="ที่อยู่"
-                                      value={profile.address || ''}
-                                      onChange={handleChange}
-                                      disabled={!editing}
-                                  />
-                                  </div>
-
-                                  <div className="form-group">
-                                    <label>วัน/เดือน/ปีเกิด<span className="importent">*</span></label>
-                                    <input
-                                      type="date"
-                                      className="form-control"
-                                      id="birthday"
-                                      name="birthday"
-                                      value={formatBirthday(profile.birthday) || ''}
-                                      onChange={handleChange}
-                                      disabled={!editing}
-                                  />
-                                  </div>
-
-                                  <div className="form-group">
-                                    <label>เบอร์โทร<span className="importent">*</span></label>
-                                    <input
-                                      type="number"
-                                      className="form-control"
-                                      id="phone"
-                                      name="phone"
-                                      placeholder="เบอร์โทร"
-                                      value={profile.phone || ''}
-                                      onChange={handleChange}
-                                      disabled={!editing}
-                                  />
-                                  </div>
-
-                                  <div className="form-group">
-                                    <label>โซเชียล<span className="importent">*</span></label>
-                                    <input
-                                      type="text"
-                                      className="form-control"
-                                      id="line"
-                                      name="line"
-                                      placeholder="Line หรือ Facebook"
-                                      value={profile.line || ''}
-                                      onChange={handleChange}
-                                      disabled={!editing}
-                                  />
-                                  </div>
-
-
-                                {/* <div className="form-group">
-                                    <label>เกี่ยวกับฉัน</label>
-                                    <textarea type="text" className="form-control" id="line" name="line" placeholder='เกี่ยวกับฉัน'  
-                                    onChange={handleChange} disabled={!editing}
-                                    />
-                                </div> */}
                               </fieldset>
                             </form>
-                          </div>
-                          
+                          </div>                         
                     </div> 
                       
                     </div>
                   
-                    <div className="bg-light rounded p-4 shadow-sm mb-4">
+          <div className="bg-light rounded p-4 shadow-sm mb-4">
             <fieldset>
               <legend className="legend-title">ข้อมูลการศึกษา</legend>
               {Array.isArray(profile.educations) && profile.educations.length > 0 ?(
@@ -474,40 +396,23 @@ const toggleMenu = () => {
                     </div>
 
                     <div className="form-group">
-                      <label>ปีการศึกษาที่จบ<span className="importent">*</span></label>
+                      <label>ชั้นปีที่<span className="importent">*</span></label>
                       <input
                         type="text"
                         className="form-control"
-                        name="graduation_year"
-                        placeholder="ปีการศึกษาที่จบ"
-                        value={edu.graduation_year}
-                        onChange={(e) => handleEducationChange(index, 'graduation_year', e.target.value)}
+                        name="student_year"
+                        placeholder="ชั้นปีที่"
+                        value={edu.student_year}
+                        onChange={(e) => handleEducationChange(index, 'student_year', e.target.value)}
                         disabled={!editing}
                       />
                     </div>
-
-                    {editing && profile.educations.length > 1 && (
-                      <button
-                        type="button"
-                        className="btn btn-danger mt-2"
-                        onClick={() => removeEducation(index)}
-                      >
-                        ลบรายการ
-                      </button>
-                    )}
-
                     <hr />
                   </div>
                 ))
               ) : (
                 <p>ไม่มีข้อมูลการศึกษา</p>
-              )}
-
-              {editing && (
-                <button type="button" className="btn btn-primary mt-3" onClick={addEducation}>
-                  เพิ่มข้อมูลการศึกษา
-                </button>
-              )}
+              )}           
             </fieldset>
           </div>
 

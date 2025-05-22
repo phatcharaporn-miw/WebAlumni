@@ -64,7 +64,7 @@ function AdminAlumni() {
                                 <td>นายกสมาคมศิษย์เก่า</td>
                                 <td><span className="badge bg-primary">Active</span></td>
                             </tr>
-                            {/* เพิ่มชื่ออื่นได้ตามต้องการ */}
+                           
                         </tbody>
                     </table>
                 </div>
