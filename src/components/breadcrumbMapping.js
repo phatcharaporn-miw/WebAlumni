@@ -24,7 +24,7 @@ export const breadcrumbMapping = {
     "/activity/edit" : "แก้ไขกิจกรรม",
     // "/alumni/major-detail/:major" : "รายชื่อศิษย์เก่า",
 
-    // ส่วนของผู้ใช้
+    // ส่วนของศิษย์เก่า
     "/alumni-profile": "โปรไฟล์",
     "/alumni-home": "หน้าหลักศิษย์เก่า",
     "/alumni-profile/alumni-profile-webboard": "กระทู้ที่สร้าง",
@@ -33,6 +33,13 @@ export const breadcrumbMapping = {
     "/createPost": "สร้างกระทู้ใหม่", 
     "/alumni-profile/alumni-profile-activity": "ประวัติการเข้าร่วมกิจกรรม",
     
+    // ส่วนศิษย์ปัจุบัน
+    "/student-profile": "โปรไฟล์",
+    "/student-profile/student-profile-webboard": "กระทู้ที่สร้าง",
+    "/student-profile/student-profile-webboard/edit-webboard": "แก้ไขกระทู้ที่สร้าง",
+    "/student-profile/student-profile-activity": "ประวัติการเข้าร่วมกิจกรรม",
+    "/student-profile/student-profile-souvenir": "การซื้อของที่ระลึก",
+   
 
     // นายกสมาคม
     "/president-profile": "โปรไฟล์",
@@ -41,5 +48,6 @@ export const breadcrumbMapping = {
     "/president-profile/president-profile-webboard": "กระทู้ที่สร้าง",
     "/president-profile/president-profile-webboard/edit-webboard": "แก้ไขกระทู้ที่สร้าง",
     "/president-profile/president-approve": "การอนุมัติ",
+    "/activity/president-create-activity": "เพิ่มกิจกรรม",
 
   };

@@ -142,7 +142,7 @@ function Approve() {
     return (
         <> 
             <div className="container my-5">
-                <h2 className="mb-4 text-center text-primary fw-bold">รายการของที่ระลึกที่รออนุมัติ</h2>
+                <h2 className="mb-4 text-center text-primary fw-bold">รายการที่รออนุมัติ</h2>
                 <div className="row g-4">
                     {products.map((product) => (
                     <div key={product.product_id} className="col-sm-6 col-md-4 col-lg-3">

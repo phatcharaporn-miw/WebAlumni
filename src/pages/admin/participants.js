@@ -6,7 +6,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 function ParticipantsPage() {
     const { activityId } = useParams();
     const navigate = useNavigate();
-    const [filteredStudents, setFilteredStudents] = useState([]);
     const [participants, setParticipants] = useState([]);
     const [activityName, setActivityName] = useState("");
     const [loading, setLoading] = useState(true);
@@ -36,26 +35,46 @@ function ParticipantsPage() {
 
     // export file to CSV
     const exportToCSV = () => {
-        const headers = ["ลำดับ", "ชื่อ-นามสกุล", "อีเมล", "สาขา", "วันที่ลงทะเบียน"];
-        const rows = filteredStudents.map((student, index) => [
-            index + 1,
-            student.full_name,
-            student.email,
-            student.department,
-            student.created_at
-        ]);
+        
+        const headers = ["ลำดับ", "ชื่อ-นามสกุล", "อีเมล", "สาขา 1", "สาขา 2", "วันที่ลงทะเบียน"];
 
-        let csvContent = "data:text/csv;charset=utf-8,\uFEFF" 
-            + [headers, ...rows].map(e => e.join(",")).join("\n");
+        const rows = participants.map((p, index) => {
+            let departments = [];
+
+            if (Array.isArray(p.department)) {
+                departments = p.department;
+            } else if (typeof p.department === "string") {
+                departments = p.department.split(",").map(dep => dep.trim()); //แปลงเป็น array ด้วย .split(",").trim() ใช้ลบช่องว่างกรณีมีเว้นวรรค
+            }
+
+            const dep1 = departments[0] || "";
+            const dep2 = departments[1] || "";
+
+            return [
+                index + 1,
+                p.full_name,
+                p.email,
+                dep1,
+                dep2,
+                formatDate(p.created_at)
+            ];
+        });
+
+
+        // console.log([headers, ...rows]);
+
+        let csvContent = "data:text/csv;charset=utf-8,\uFEFF"
+            + [headers, ...rows].map(e => e.join(",")).join("\n"); 
 
         const encodedUri = encodeURI(csvContent);
         const link = document.createElement("a");
         link.setAttribute("href", encodedUri);
-        link.setAttribute("download", `รายชื่อผู้เข้าร่วม_${activityName}.csv`);
+        link.setAttribute("download", `รายชื่อผู้เข้าร่วม_${activityName}.csv`); 
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
     };
+
 
     return (
         <div className="container mt-4">         
@@ -75,8 +94,8 @@ function ParticipantsPage() {
                             <tr>
                                 <th>ชื่อ-นามสกุล</th>
                                 <th>อีเมล</th>
-                                <th>วันที่ลงทะเบียน</th>
                                 <th>สาขา</th>
+                                <th>วันที่ลงทะเบียน</th>
                                 {/* <th>ปีการศึกษา</th> */}
                                 
                             </tr>
@@ -87,9 +106,8 @@ function ParticipantsPage() {
                                     <td>{p.full_name}</td>
                                     <td>{p.email}</td>
                                     {/* <td>{p.batch_year}</td> */}
-                                    <td>{formatDate(p.created_at)}</td>
                                     <td>{p.department}</td>
-                                    
+                                    <td>{formatDate(p.created_at)}</td>                                    
                                 </tr>
                             ))}
                         </tbody>

@@ -52,7 +52,7 @@ import StudentProfile from './pages/students/student-profile';
 import StudentProfileWebboard from './pages/students/student-profile-webboard';
 import StudentProfileActivity from './pages/students/student-profile-activity';
 import StudentProfileSouvenir from './pages/students/student-profile-souvenir';
-
+import StudentEditWebboard from './pages/students/student-editWebboard';
 
 
 // route ของแอดมิน
@@ -145,6 +145,8 @@ function App() {
           <Route path="/student-profile/student-profile-activity" element={<StudentProfileActivity />} />
           <Route path="/student-profile/student-profile-souvenir" element={<StudentProfileSouvenir />} />
           <Route path="/student-home" element={<StudentHome />} />
+          <Route path="/student-profile/student-profile-webboard/edit-webboard/:webboardId" element={<StudentEditWebboard />} />
+          <Route path="/student-profile/student-profile-webboard/edit-webboard" element={<StudentEditWebboard />} />
 
           {/* route ของนายกสมาคม */}
           <Route path="/president-home" element={<PresidentHome />} />

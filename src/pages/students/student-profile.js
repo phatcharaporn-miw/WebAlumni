@@ -18,8 +18,7 @@ function StudentProfile() {
   const {handleLogout } = useOutletContext();
   const [loginInfo, setLoginInfo] = useState({ username: '', password: '' });
   const [showPassword, setShowPassword] = useState(false); // สำหรับซ่อน/แสดงรหัสผ่าน
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState(profile.profilePicture);
+  const [previewImage, setPreviewImage] = useState(null);
   const userId = localStorage.getItem("userId");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
@@ -151,29 +150,41 @@ const removeEducation = (index) => {
       });
   }
 
-//   const handleImageChange = async (e) => {
-//   const file = e.target.files[0];
-//   if (!file) return;
+  // อัปโหลดรูปภาพ
+const handleImageChange = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
 
-//   const formData = new FormData();
-//   formData.append("profilePicture", file);
-//   formData.append("user_id", userId); // ถ้าคุณใช้ user_id
+  // แสดง preview รูปก่อนอัปโหลด
+  setPreviewImage(URL.createObjectURL(file));
 
-//   try {
-//     const response = await axios.post("http://localhost:3001/users/upload-profile", formData);
-//     const filename = response.data.filename;
+  const formData = new FormData();
+  formData.append("image_path", file);
+  formData.append("user_id", profile.userId); 
 
-//       // ใช้ URL ที่ backend ตอบกลับ
-//     const newImageUrl = `http://localhost:3001${response.data.imageUrl}`;
+  try {
+    const res = await axios.post("http://localhost:3001/users/update-profile-image", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
 
-//     setProfile(prev => ({
-//       ...prev,
-//       profilePicture: newImageUrl,
-//     }));
-//   } catch (error) {
-//     console.error("Upload failed:", error);
-//   }
-// };
+    if (res.status === 200) {
+      alert("อัปโหลดรูปสำเร็จ");
+
+      // อัปเดตรูปโปรไฟล์ใน state
+      setProfile((prev) => ({
+        ...prev,
+        profilePicture: res.data.newImagePath,
+      }));
+    } else {
+      alert(res.data.message || "เกิดข้อผิดพลาด");
+    }
+  } catch (err) {
+    console.error(err);
+    alert("ไม่สามารถอัปโหลดรูปได้");
+  }
+};
 
 const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -182,169 +193,107 @@ const toggleMenu = () => {
   
 
   return (
-    <section className='container py-4' style={{ maxWidth: 1100 }}>
-      <div className='alumni-profile-page'>
-      <h3 className="alumni-title text-center mb-4">โปรไฟล์ของฉัน</h3>
-      <div className="row g-4 justify-content-center">
-        {/* Sidebar/Profile */}
-        <div className="col-12 col-md-4 bg-light rounded text-center p-4 shadow-sm">
-      {/* Profile Picture */}
-      <div className="profile-pic-container mb-3">
-        <img
-          src={`${profile.profilePicture}`}
-          alt="Profile"
-          style={{ width: "140px", height: "140px", borderRadius: "50%" }}
-          className="img-fluid"
-        />
-      </div>
-
-      {/* Name */}
-      <p className="fw-bold mb-3">{profile.fullName}</p>
-
-      {/* Hamburger Button on Small Screens */}
-      <div className="d-md-none mb-3">
-        <button
-          className="btn btn-outline-primary"
-          onClick={toggleMenu}
-        >
-          {isMenuOpen ? <FaTimes /> : <FaBars />} เมนู
-        </button>
-      </div>
-
-      {/* Menu */}
-      <div className={`menu ${isMenuOpen ? "d-block" : "d-none"} d-md-block`}>
-        <div className="menu-item active py-2 mb-2 rounded">
-          ข้อมูลส่วนตัว
-        </div>
-        <div
-          className="menu-item py-2 mb-2 rounded"
-          onClick={() => handleClick("/student-profile/student-profile-webboard")}
-        >
-          กระทู้ที่สร้าง
-        </div>
-        <div
-          className="menu-item py-2 mb-2 rounded"
-          onClick={() => handleClick("/student-profile/donation-history")}
-        >
-          ประวัติการบริจาค
-        </div>
-        <div
-          className="menu-item py-2 mb-2 rounded"
-          onClick={() => handleClick("/student-profile/student-profile-activity")}
-        >
-          ประวัติการเข้าร่วมกิจกรรม
-        </div>
-        <div
-          className="menu-item py-2 mb-2 rounded"
-          onClick={() => handleClick("/student-profile/student-profile-souvenir")}
-        >
-          ประวัติการสั่งซื้อ
-        </div>
-        <div className="menu-item py-2 rounded" onClick={handleLogout}>
-          ออกจากระบบ
+    <section className="container py-4">
+    <div className="row justify-content-center">
+      {/* Sidebar/Profile */}
+      <div className="col-12 col-md-3 mb-4">
+        <div className="bg-white rounded-4 shadow-sm text-center p-4">
+          <img
+            src={previewImage || profile.profilePicture}
+            alt="Profile"
+            style={{ width: "130px", height: "130px", borderRadius: "50%", objectFit: "cover", marginBottom: 16 }}
+            className="img-fluid"
+          />
+          <div className="mt-2">
+            <label
+              htmlFor="upload-profile-pic"
+              className="btn btn-sm btn-outline-secondary"
+              style={{ cursor: "pointer" }}
+            >
+              เปลี่ยนรูป
+            </label>
+            <input
+              type="file"
+              id="upload-profile-pic"
+              className="d-none"
+              accept="image/*"
+              onChange={handleImageChange}
+            />
+          </div>
+          <hr />
+          <div className="menu d-block mt-4">
+            <div className="menu-item active py-2 mb-2 rounded" onClick={() => handleClick("/student-profile")}>ข้อมูลส่วนตัว</div>
+            <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/student-profile/student-profile-webboard")}>กระทู้ที่สร้าง</div>
+            <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/student-profile/donation-history")}>ประวัติการบริจาค</div>
+            <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/student-profile/student-profile-activity")}>ประวัติการเข้าร่วมกิจกรรม</div>
+            <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/student-profile/student-profile-souvenir")}>ประวัติการสั่งซื้อ</div>
+            <div className="menu-item py-2 rounded" onClick={handleLogout}>ออกจากระบบ</div>
+          </div>
         </div>
       </div>
-            </div>
-  
 
-            {/* Main Content */}
-            <div className="col-12 col-md-8">
-          <div className="bg-light rounded p-4 shadow-sm mb-4">
-            <div className='form-profile'>
-              <form>
-                <fieldset>
-                  <legend className="legend-title mb-4">ข้อมูลส่วนตัว</legend>
-
-                  {/* <div className="form-group">
-                      <label>ชื่อผู้ใช้งาน<span className="importent">*</span></label>
-                      <input
-                          type="text"
-                          className="form-control"
-                          id="username"
-                          name="username"
-                          value={loginInfo.username}
-                          disabled
-                      />
-                  </div>
-
-                  <div className="form-group">
-                        <label>รหัสผ่าน<span className="importent">*</span></label>
-                        <div className="password-container">
-                            <input
-                                type={showPassword ? "text" : "password"}
-                                className="form-control"
-                                id="password"
-                                name="password"
-                                value={loginInfo.password}
-                                disabled
-                            />
-                            <button
-                                type="button"
-                                className="toggle-password"
-                                onClick={() => setShowPassword(!showPassword)}
-                            >
-                                {showPassword ? "ซ่อน" : "แสดง"}
-                            </button>
-                        </div>
-                    </div> */}
-
-                                <div className="form-group">
-                                    <label>คำนำหน้า<span className="importent">*</span></label>
-                                    <select
-                                      name="title"
-                                      value={profile.title || ''}
-                                      className="form-control"
-                                      onChange={handleChange}
-                                      disabled={!editing}
-                                    >
-                                      <option value="">คำนำหน้า</option>
-                                      <option value="นาย">นาย</option>
-                                      <option value="นาง">นาง</option>
-                                      <option value="นางสาว">นางสาว</option>
-                                    </select>
-                                </div>
-
-                                <div className="form-group">
-                                    <label>ชื่อ-สกุล<span className="importent">*</span></label>
-                                    <input
-                                      type="text"
-                                      className="form-control"
-                                      id="full_name"
-                                      name="full_name"
-                                      placeholder="ชื่อ-สกุล"
-                                      value={profile.full_name || ''}
-                                      onChange={handleChange}
-                                      disabled={!editing}
-                                    />
-                                  </div>
-                               
-                                  <div className="form-group">
-                                    <label>อีเมล<span className="importent">*</span></label>
-                                    <input
-                                      type="email"
-                                      className="form-control"
-                                      id="email"
-                                      name="email"
-                                      placeholder="email@example.com"
-                                      value={profile.email || ''}
-                                      onChange={handleChange}
-                                      disabled={!editing}
-                                  />
-                                  </div>
-                              </fieldset>
-                            </form>
-                          </div>                         
-                    </div> 
-                      
-                    </div>
-                  
-          <div className="bg-light rounded p-4 shadow-sm mb-4">
+      {/* Main Content */}
+      <div className="col-12 col-md-8">
+        <div className="bg-white rounded-4 shadow-sm p-4 mb-4">
+          <h3 className="alumni-title text-center mb-4">โปรไฟล์ของฉัน</h3>
+          <form>
             <fieldset>
-              <legend className="legend-title">ข้อมูลการศึกษา</legend>
-              {Array.isArray(profile.educations) && profile.educations.length > 0 ?(
-                profile.educations.map((edu, index) => (
-                  <div key={index} className="education-item mb-4">
-                    <div className="form-group">
+              <legend className="legend-title mb-4">ข้อมูลส่วนตัว</legend>
+              <div className="row">
+                <div className="col-md-6 mb-3">
+                  <label>คำนำหน้า<span className="importent">*</span></label>
+                  <select
+                    name="title"
+                    value={profile.title || ''}
+                    className="form-control"
+                    onChange={handleChange}
+                    disabled={!editing}
+                  >
+                    <option value="">คำนำหน้า</option>
+                    <option value="นาย">นาย</option>
+                    <option value="นาง">นาง</option>
+                    <option value="นางสาว">นางสาว</option>
+                  </select>
+                </div>
+                <div className="col-md-6 mb-3">
+                  <label>ชื่อ-สกุล<span className="importent">*</span></label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="full_name"
+                    name="full_name"
+                    placeholder="ชื่อ-สกุล"
+                    value={profile.full_name || ''}
+                    onChange={handleChange}
+                    disabled={!editing}
+                  />
+                </div>
+                <div className="col-md-6 mb-3">
+                  <label>อีเมล<span className="importent">*</span></label>
+                  <input
+                    type="email"
+                    className="form-control"
+                    id="email"
+                    name="email"
+                    placeholder="email@example.com"
+                    value={profile.email || ''}
+                    onChange={handleChange}
+                    disabled={!editing}
+                  />
+                </div>               
+              </div>
+            </fieldset>
+          </form>
+        </div>
+
+        <div className="bg-white rounded-4 shadow-sm p-4 mb-4">
+          <fieldset>
+            <legend className="legend-title">ข้อมูลการศึกษา</legend>
+            {Array.isArray(profile.educations) && profile.educations.length > 0 ? (
+              profile.educations.map((edu, index) => (
+                <div key={index} className="education-item mb-4">
+                  <div className="row">
+                    <div className="col-md-6 mb-3">
                       <label>ระดับการศึกษา<span className="importent">*</span></label>
                       <select
                         name="degree"
@@ -359,8 +308,7 @@ const toggleMenu = () => {
                         <option value="3">ป.เอก</option>
                       </select>
                     </div>
-
-                    <div className="form-group">
+                    <div className="col-md-6 mb-3">
                       <label>สาขา<span className="importent">*</span></label>
                       <select
                         name="major"
@@ -381,8 +329,7 @@ const toggleMenu = () => {
                         )}
                       </select>
                     </div>
-
-                    <div className="form-group">
+                    <div className="col-md-6 mb-3">
                       <label>รหัสนักศึกษา<span className="importent">*</span></label>
                       <input
                         type="text"
@@ -394,8 +341,7 @@ const toggleMenu = () => {
                         disabled={!editing}
                       />
                     </div>
-
-                    <div className="form-group">
+                    <div className="col-md-6 mb-3">
                       <label>ชั้นปีที่<span className="importent">*</span></label>
                       <input
                         type="text"
@@ -407,49 +353,49 @@ const toggleMenu = () => {
                         disabled={!editing}
                       />
                     </div>
-                    <hr />
                   </div>
-                ))
-              ) : (
-                <p>ไม่มีข้อมูลการศึกษา</p>
-              )}           
-            </fieldset>
-          </div>
-
-          <div className='text-center mb-4'>
-            {editing ? (
-              <>
-                <button
-                  className="btn btn-secondary me-2"
-                  type="button"
-                  onClick={() => setEditing(false)}
-                  style={{ minWidth: 120, maxWidth: 200, width: "40%" }}
-                >
-                  ยกเลิก
-                </button>
-                <button
-                  className="btn btn-primary"
-                  type="submit"
-                  onClick={handleSave}
-                  style={{ minWidth: 120, maxWidth: 200, width: "40%" }}
-                >
-                  บันทึก
-                </button>
-              </>
+                  <hr />
+                </div>
+              ))
             ) : (
-              <button
-                className="btn btn-success"
-                type="button"
-                onClick={handleEdit}
-                style={{ minWidth: 120, maxWidth: 250, width: "60%" }}
-              >
-                แก้ไขข้อมูลส่วนตัว
-              </button>
+              <p>ไม่มีข้อมูลการศึกษา</p>
             )}
-          </div>
+          </fieldset>
+        </div>
+
+        <div className="text-center mb-4">
+          {editing ? (
+            <>
+              <button
+                className="btn btn-secondary me-2"
+                type="button"
+                onClick={() => setEditing(false)}
+                style={{ minWidth: 120, maxWidth: 200, width: "40%" }}
+              >
+                ยกเลิก
+              </button>
+              <button
+                className="btn btn-primary"
+                type="submit"
+                onClick={handleSave}
+                style={{ minWidth: 120, maxWidth: 200, width: "40%" }}
+              >
+                บันทึก
+              </button>
+            </>
+          ) : (
+            <button
+              className="btn btn-success"
+              type="button"
+              onClick={handleEdit}
+              style={{ minWidth: 120, maxWidth: 250, width: "60%" }}
+            >
+              แก้ไขข้อมูลส่วนตัว
+            </button>
+          )}
         </div>
       </div>
-    
+    </div>
   </section>
     
   );

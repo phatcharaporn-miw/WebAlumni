@@ -107,7 +107,7 @@ function AlumniProfileActivity() {
     return (
         <section className='container'>
           <div className='alumni-profile-page'>
-            <h3 className="alumni-title text-center">ประวัติการเข้าร่วมกิจกรรม</h3>
+            {/* <h3 className="alumni-title text-center">ประวัติการเข้าร่วมกิจกรรม</h3> */}
             <div className="row justify-content-between ">
               <div className="col-12 col-md-4 bg-light rounded text-center p-4 my-4">
                 <div className="profile-pic-container mb-3">
