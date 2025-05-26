@@ -15,6 +15,14 @@ function AdminAlumniView() {
     const navigate = useNavigate();
     // const [selectedYear, setSelectedYear] = useState("");
 
+    const majors = [
+        { title: "วิทยาการคอมพิวเตอร์", slug: "cs" },
+        { title: "เทคโนโลยีสารสนเทศ", slug: "it" },
+        { title: "ภูมิสารสนเทศศาสตร์", slug: "gis" },
+        { title: "ความปลอดภัยไซเบอร์", slug: "cy" },
+        { title: "ปัญญาประดิษฐ์", slug: "ai" },
+    ];
+
     useEffect(() => {
         axios.get(`http://localhost:3001/alumni/major/${major}`)
             .then(res => {
@@ -96,9 +104,28 @@ function AdminAlumniView() {
         <section className="container my-5">
             <h3 className="text-center mb-4">ทำเนียบศิษย์เก่าสาขา {major}</h3>
 
-            <div className="mb-3 d-flex justify-content-end">
+           <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                {/* Dropdown ทางซ้าย */}
+                <div style={{ minWidth: "250px", maxWidth: "100%" }}>
+                <select
+                    id="majorSelect"
+                    className="form-select"
+                    onChange={(e) =>
+                    navigate(`/admin/admin-alumni/admin-alumniView/${e.target.value}`)
+                    }
+                >
+                    <option value="">-- เลือกสาขา --</option>
+                    {majors.map((major, idx) => (
+                    <option key={idx} value={major.slug}>
+                        {major.title}
+                    </option>
+                    ))}
+                </select>
+                </div>
+
+                {/* ปุ่มดาวน์โหลดทางขวา */}
                 <button className="btn btn-outline-success" onClick={exportToCSV}>
-                    ดาวน์โหลดรายชื่อ
+                ดาวน์โหลดรายชื่อ
                 </button>
             </div>
 

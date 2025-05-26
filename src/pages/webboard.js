@@ -72,19 +72,19 @@ function Webboard(){
     }, []);
 
     // แนะนำกระทู้
-    useEffect(() => {
-      axios.get('http://localhost:3001/web/webboard/recommended-posts', {
-        withCredentials: true,
-      })
-        .then((response) => {
-          if (response.data.success) {
-            setRecommendedPosts(response.data.recommendedPosts);
-          }
-        })
-        .catch((error) => {
-          console.error('เกิดข้อผิดพลาดในการดึงข้อมูลกระทู้ที่แนะนำ:', error.message);
-        });
-    }, []);
+    // useEffect(() => {
+    //   axios.get('http://localhost:3001/web/webboard/recommended-posts', {
+    //     withCredentials: true,
+    //   })
+    //     .then((response) => {
+    //       if (response.data.success) {
+    //         setRecommendedPosts(response.data.recommendedPosts);
+    //       }
+    //     })
+    //     .catch((error) => {
+    //       console.error('เกิดข้อผิดพลาดในการดึงข้อมูลกระทู้ที่แนะนำ:', error.message);
+    //     });
+    // }, []);
 
     const getRandomPosts = (posts, count) => {
       const shuffled = [...posts].sort(() => 0.5 - Math.random()); // สุ่มเรียงลำดับ

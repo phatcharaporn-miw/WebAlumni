@@ -19,6 +19,7 @@ function AlumniProfileWebboard() {
     const [profile, setProfile] = useState({});
     const { handleLogout } = useOutletContext();
     const [sortOrder, setSortOrder] = useState("latest");
+    const [previewImage, setPreviewImage] = useState(null); // สำหรับแสดงรูปภาพก่อนอัปโหลด
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -102,92 +103,131 @@ function AlumniProfileWebboard() {
         navigate(path);
     };
 
-    return (
-        <section className='container'>
-            <div className='alumni-profile-page'>
-                {/* <h3 className="alumni-title text-center mb-4">กระทู้ที่สร้าง</h3> */}
-                <div className="row justify-content-between">
-                    <div className="col-12 col-md-4 bg-light rounded text-center p-4 my-4">
-                        <div className="profile-pic-container mb-3">
-                            <img 
-                            src={`${profile.profilePicture}`} 
-                            alt="Profile" 
-                            style={{ width: '140px', height: '140px', borderRadius: '50%' }}
-                            className="img-fluid"
-                            />
-                        </div>
+    // อัปโหลดรูปภาพ
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+  
+    // แสดง preview รูปก่อนอัปโหลด
+    setPreviewImage(URL.createObjectURL(file));
+  
+    const formData = new FormData();
+    formData.append("image_path", file);
+    formData.append("user_id", profile.userId); 
+  
+    try {
+      const res = await axios.post("http://localhost:3001/users/update-profile-image", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+  
+      if (res.status === 200) {
+        alert("อัปโหลดรูปสำเร็จ");
+  
+        // อัปเดตรูปโปรไฟล์ใน state
+        setProfile((prev) => ({
+          ...prev,
+          profilePicture: res.data.newImagePath,
+        }));
+      } else {
+        alert(res.data.message || "เกิดข้อผิดพลาด");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("ไม่สามารถอัปโหลดรูปได้");
+    }
+  };
 
-                        <p className="fw-bold mb-3">{profile.fullName}</p>
-                        
-                        <div className="menu">
-                            <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile')}>
-                            ข้อมูลส่วนตัว
+    return (
+            <section className='container py-4'>
+                <div className='alumni-profile-page'>
+                    <div className="row justify-content-center g-4">
+                        {/* Sidebar/Profile */}
+                        <div className="col-12 col-md-3 mb-4">
+                            <div className="bg-white rounded-4 shadow-sm text-center p-4">
+                            <img
+                                src={previewImage || profile.profilePicture}
+                                alt="Profile"
+                                style={{ width: "130px", height: "130px", borderRadius: "50%", objectFit: "cover", marginBottom: 16, border: '3px solid #eee' }}
+                                className="img-fluid mb-2"
+                            />
+                            <div className="mt-2 mb-3">
+                                <label
+                                htmlFor="upload-profile-pic"
+                                className="btn btn-sm btn-outline-secondary"
+                                style={{ cursor: "pointer" }}
+                                >
+                                เปลี่ยนรูป
+                                </label>
+                                <input
+                                type="file"
+                                id="upload-profile-pic"
+                                className="d-none"
+                                accept="image/*"
+                                onChange={handleImageChange}
+                                />
                             </div>
-                            <div className="menu-item active py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/alumni-profile-webboard')}>
-                            กระทู้ที่สร้าง
+                            <hr className="w-100" />
+                            <div className="menu d-block mt-3 w-100">
+                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile")}>ข้อมูลส่วนตัว</div>
+                                <div className="menu-item active py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-profile-webboard")}>กระทู้ที่สร้าง</div>
+                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/donation-history")}>ประวัติการบริจาค</div>
+                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-profile-activity")}>ประวัติการเข้าร่วมกิจกรรม</div>
+                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-profile-souvenir")}>ประวัติการสั่งซื้อ</div>
+                                <div className="menu-item py-2 rounded" onClick={handleLogout}>ออกจากระบบ</div>
                             </div>
-                            <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/donation-history')}>
-                            ประวัติการบริจาค
-                            </div>
-                            <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/alumni-profile-activity')}>
-                            ประวัติการเข้าร่วมกิจกรรม
-                            </div>
-                            <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/alumni-profile-souvenir')}>
-                            ประวัติการสั่งซื้อ
-                            </div>
-                            <div className="menu-item py-2 rounded" onClick={handleLogout}>
-                            ออกจากระบบ
                             </div>
                         </div>
-                    </div>
-                    <div className="col-8 mt-4">
-                        <div className="row">
-                            {webboard.length > 0 ? (
-                                sortedPosts.map(post => (
-                                    <div key={post.webboard_id} className="col-md-6 col-lg-6 mb-4">
-                                        <div className="card shadow-sm p-3 border rounded-4">
-                                            <div className="d-flex justify-content-between">
-                                                <span className="badge px-3 py-2" style={{ backgroundColor: getCategoryColor(post?.category_id || 0), color: "white" }}>
-                                                    {post.category_name || "ไม่มีหมวดหมู่"}
-                                                </span>
-                                                <div>
-                                                    <IoMdCreate
-                                                        className="fs-5 text-primary me-2"
-                                                        style={{ cursor: "pointer" }}
-                                                        onClick={() => handleEdit(post.webboard_id)}
-                                                    />
-                                                    <MdDelete
-                                                        className="fs-5 text-danger"
-                                                        style={{ cursor: "pointer" }}
-                                                        onClick={() => handleDelete(post.webboard_id)}
-                                                    />
+                        {/* Main Content */}
+                        <div className="col-12 col-md-8">
+                            <div className="row g-4">
+                                {webboard.length > 0 ? (
+                                    sortedPosts.map(post => (
+                                        <div key={post.webboard_id} className="col-md-6 col-lg-6">
+                                            <div className="card shadow-sm p-3 border rounded-4 h-100 d-flex flex-column justify-content-between">
+                                                <div className="d-flex justify-content-between align-items-center mb-2">
+                                                    <span className="badge px-3 py-2" style={{ backgroundColor: getCategoryColor(post?.category_id || 0), color: "white" }}>
+                                                        {post.category_name || "ไม่มีหมวดหมู่"}
+                                                    </span>
+                                                    <div>
+                                                        <IoMdCreate
+                                                            className="fs-5 text-primary me-2"
+                                                            style={{ cursor: "pointer" }}
+                                                            onClick={() => handleEdit(post.webboard_id)}
+                                                        />
+                                                        <MdDelete
+                                                            className="fs-5 text-danger"
+                                                            style={{ cursor: "pointer" }}
+                                                            onClick={() => handleDelete(post.webboard_id)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="card-body p-0">
+                                                    <h5 className="card-title mb-2">{post.title}</h5>
+                                                    <p className="card-text text-truncate" style={{ minHeight: 48 }}>
+                                                        {post.content.length > 100 ? post.content.substring(0, 100) + "..." : post.content}
+                                                    </p>
+                                                </div>
+                                                <div className="d-flex justify-content-between align-items-center mt-2 small text-secondary">
+                                                    <span><BiSolidComment /> {post.comments_count || 0} ความคิดเห็น</span>
+                                                    <span><FaEye /> {post.viewCount || 0} ครั้ง</span>
                                                 </div>
                                             </div>
-                                            <div className="card-body">
-                                                <h5 className="card-title">{post.title}</h5>
-                                                <p className="card-text">
-                                                    {post.content.length > 100 ? post.content.substring(0, 100) + "..." : post.content}
-                                                </p>
-                                            </div>
-                                            <div className="d-flex justify-content-between">
-                                                <span><BiSolidComment /> {post.comments_count || 0} ความคิดเห็น</span>
-                                                <span><FaEye /> {post.viewCount || 0} ครั้ง</span>
-                                            </div>
                                         </div>
+                                    ))
+                                ) : (
+                                    <div className="text-center w-100 py-5">
+                                        <h5 className="mt-3 text-muted">ยังไม่มีกระทู้ที่คุณสร้าง</h5>
+                                        <p className="text-secondary">เริ่มต้นสร้างกระทู้แรกของคุณได้เลย!</p>
                                     </div>
-                                ))
-                            ) : (
-                                <div className="text-center w-100 py-5">
-                                    <h5 className="mt-3 text-muted">ยังไม่มีกระทู้ที่คุณสร้าง</h5>
-                                    <p className="text-secondary">เริ่มต้นสร้างกระทู้แรกของคุณได้เลย!</p>
-                                </div>
-                            )}
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
-    );
+            </section>
+        );
 }
 
 export default AlumniProfileWebboard;

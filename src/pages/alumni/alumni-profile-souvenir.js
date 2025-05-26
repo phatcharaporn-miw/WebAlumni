@@ -16,6 +16,7 @@ function AlumniProfileSouvenir() {
     const [orderHistory, setOrderHistory] = useState([]);
     const [loading, setLoading] = useState(true);
     const userId = localStorage.getItem("userId");
+    const [previewImage, setPreviewImage] = useState(null);
 
     // ดึงข้อมูลโปรไฟล์
     useEffect(() => {
@@ -51,46 +52,84 @@ function AlumniProfileSouvenir() {
         navigate(path);
     };
 
+    // อัปโหลดรูปภาพ
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+  
+    // แสดง preview รูปก่อนอัปโหลด
+    setPreviewImage(URL.createObjectURL(file));
+  
+    const formData = new FormData();
+    formData.append("image_path", file);
+    formData.append("user_id", profile.userId); 
+  
+    try {
+      const res = await axios.post("http://localhost:3001/users/update-profile-image", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+  
+      if (res.status === 200) {
+        alert("อัปโหลดรูปสำเร็จ");
+  
+        // อัปเดตรูปโปรไฟล์ใน state
+        setProfile((prev) => ({
+          ...prev,
+          profilePicture: res.data.newImagePath,
+        }));
+      } else {
+        alert(res.data.message || "เกิดข้อผิดพลาด");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("ไม่สามารถอัปโหลดรูปได้");
+    }
+  };
+
     if (loading) {
         return <div className="loading-container">กำลังโหลด...</div>;
     }
 
     return (
-        <section className='container'>
+        <section className='container py-4'>
             <div className='alumni-profile-page'>
                 {/* <h3 className="alumni-title text-center">โปรไฟล์ของฉัน</h3> */}
                 <div className="row justify-content-between">
-                    <div className="col-12 col-md-4 bg-light rounded text-center p-4 my-4">
-                        <div className="profile-pic-container mb-3">
-                            <img 
-                            src={`${profile.profilePicture}`} 
-                            alt="Profile" 
-                            style={{ width: '140px', height: '140px', borderRadius: '50%' }}
-                            className="img-fluid"
+                    <div className="col-12 col-md-3 mb-4">
+                        <div className="bg-white rounded-4 shadow-sm text-center p-4">
+                        <img
+                            src={previewImage || profile.profilePicture}
+                            alt="Profile"
+                            style={{ width: "130px", height: "130px", borderRadius: "50%", objectFit: "cover", marginBottom: 16, border: '3px solid #eee' }}
+                            className="img-fluid mb-2"
+                        />
+                        <div className="mt-2 mb-3">
+                            <label
+                            htmlFor="upload-profile-pic"
+                            className="btn btn-sm btn-outline-secondary"
+                            style={{ cursor: "pointer" }}
+                            >
+                            เปลี่ยนรูป
+                            </label>
+                            <input
+                            type="file"
+                            id="upload-profile-pic"
+                            className="d-none"
+                            accept="image/*"
+                            onChange={handleImageChange}
                             />
                         </div>
-
-                        <p className="fw-bold mb-3">{profile.fullName}</p>
-                        
-                        <div className="menu">
-                            <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile')}>
-                            ข้อมูลส่วนตัว
-                            </div>
-                            <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/alumni-profile-webboard')}>
-                            กระทู้ที่สร้าง
-                            </div>
-                            <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/donation-history')}>
-                            ประวัติการบริจาค
-                            </div>
-                            <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/alumni-profile-activity')}>
-                            ประวัติการเข้าร่วมกิจกรรม
-                            </div>
-                            <div className="menu-item active py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/alumni-profile-souvenir')}>
-                            ประวัติการสั่งซื้อ
-                            </div>
-                            <div className="menu-item py-2 rounded" onClick={handleLogout}>
-                            ออกจากระบบ
-                            </div>
+                        <hr className="w-100" />
+                        <div className="menu d-block mt-3 w-100">
+                            <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile")}>ข้อมูลส่วนตัว</div>
+                            <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-profile-webboard")}>กระทู้ที่สร้าง</div>
+                            <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/donation-history")}>ประวัติการบริจาค</div>
+                            <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-profile-activity")}>ประวัติการเข้าร่วมกิจกรรม</div>
+                            <div className="menu-item active py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-profile-souvenir")}>ประวัติการสั่งซื้อ</div>
+                            <div className="menu-item py-2 rounded" onClick={handleLogout}>ออกจากระบบ</div>
+                        </div>
                         </div>
                     </div>
 

@@ -222,12 +222,11 @@ return (
               </div>
               <hr className="w-100" />
               <div className="menu d-block mt-3 w-100">
-                <div className="menu-item active py-2 mb-2 rounded" onClick={() => handleClick("/president-profile")}>ข้อมูลส่วนตัว</div>
-                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/president-profile/president-profile-webboard")}>กระทู้ที่สร้าง</div>
-                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/president-profile/donation-history")}>ประวัติการบริจาค</div>
-                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/president-profile/president-profile-activity")}>ประวัติการเข้าร่วมกิจกรรม</div>
-                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/president-profile/president-profile-souvenir")}>ประวัติการสั่งซื้อ</div>
-                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/president-profile/president-approve")}>การอนุมัติ</div>
+                <div className="menu-item active py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile")}>ข้อมูลส่วนตัว</div>
+                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-profile-webboard")}>กระทู้ที่สร้าง</div>
+                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/donation-history")}>ประวัติการบริจาค</div>
+                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-profile-activity")}>ประวัติการเข้าร่วมกิจกรรม</div>
+                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-profile-souvenir")}>ประวัติการสั่งซื้อ</div>
                 <div className="menu-item py-2 rounded" onClick={handleLogout}>ออกจากระบบ</div>
               </div>
             </div>
@@ -274,10 +273,10 @@ return (
                       <input
                         type="text"
                         className="form-control"
-                        id="nickname"
-                        name="nickname"
+                        id="nick_name"
+                        name="nick_name"
                         placeholder="ชื่อเล่น"
-                        value={profile.nickname || ''}
+                        value={profile.nick_name || ''}
                         onChange={handleChange}
                         disabled={!editing}
                       />

@@ -8,6 +8,11 @@
     font-size: 18px;
     text-align: left;
     margin-left: 5%;
+    font-size: 1.25rem;
+  font-weight: 600;
+  color: #1d3557;
+  border-left: 4px solid #457b9d;
+  padding-left: 10px;
 }
 
 .souvenir-top{

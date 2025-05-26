@@ -196,8 +196,7 @@ function PresidentProfileActivity() {
                               alt="กิจกรรม" 
                               style={{ height: 180, objectFit: 'cover', borderRadius: '1rem 1rem 0 0' }}
                             />
-                            <div className={`status-badge position-absolute top-0 end-0 m-2 px-3 py-1 rounded-pill bg-primary text-white small shadow`}
-                              style={{ fontSize: 13, zIndex: 2 }}>
+                            <div className={`status-badge ${getStatusClass(activity.status)}`}>
                               {activity?.status === 0 ? "กำลังจะจัดขึ้น" :
                                 activity?.status === 1 ? "เสร็จสิ้นแล้ว" :
                                 activity?.status === 2 ? "กำลังดำเนินการ" : "ไม่ทราบสถานะ"}

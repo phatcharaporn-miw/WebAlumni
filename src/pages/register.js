@@ -150,7 +150,6 @@ function Register() {
     const handleEducationChange = (index, field, value) => {
         const updatedEducation = [...userData.education];
         updatedEducation[index][field] = value;
-        // ถ้าเลือก degree หรือ major ให้ใช้ id ของ degree และ major
         if (field === "degree") {
             updatedEducation[index][field] = parseInt(value); // degree_id
         }

@@ -12,7 +12,6 @@ import { MdEdit, MdDelete, MdMoreVert } from 'react-icons/md';
 function Activity(){
     const [activityId, setActivityId] = useState(null);
     const [activity, setActivity] = useState([]);
-    // const [sortOrder, setSortOrder] = useState("latest");
     const [selectedStatus, setSelectedStatus] = useState('activity');
     const [showForm, setShowForm] = useState(false);
     const userRole = localStorage.getItem("userRole");  
@@ -218,7 +217,15 @@ function Activity(){
         return `${startHours}:${startMinutes} - ${endHours}:${endMinutes} น.`;
       };
 
-    //   if (loading) return <p>กำลังโหลด...</p>;
+    // Pagination logic
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 3; // จำนวนกิจกรรมต่อหน้า
+    const totalPages = Math.ceil(filteredActivity.length / itemsPerPage);
+    const paginatedActivity = filteredActivity.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+    const handlePageChange = (page) => {
+        if (page >= 1 && page <= totalPages) setCurrentPage(page);
+    };
 
     return(
         <section className="container">
@@ -255,8 +262,8 @@ function Activity(){
 
             <div className="container">
                 <div className="row">
-                    {filteredActivity.length > 0 ? (
-                    filteredActivity.map(activity => (
+                    {paginatedActivity.length > 0 ? (
+                    paginatedActivity.map(activity => (
                         <div className="col-md-4 mb-5" key={activity.activity_id}>
                         <div className="card activity-card">
                             <div className="image-container">
@@ -326,6 +333,24 @@ function Activity(){
                     </div>
                     )}
                 </div>
+                {/* Pagination */}
+                {totalPages > 1 && (
+                    <nav className="d-flex justify-content-center mt-4">
+                        <ul className="pagination">
+                            <li className={`page-item${currentPage === 1 ? ' disabled' : ''}`}>
+                                <button className="page-link" onClick={() => handlePageChange(currentPage - 1)}>&laquo;</button>
+                            </li>
+                            {Array.from({ length: totalPages }, (_, i) => (
+                                <li key={i + 1} className={`page-item${currentPage === i + 1 ? ' active' : ''}`}>
+                                    <button className="page-link" onClick={() => handlePageChange(i + 1)}>{i + 1}</button>
+                                </li>
+                            ))}
+                            <li className={`page-item${currentPage === totalPages ? ' disabled' : ''}`}>
+                                <button className="page-link" onClick={() => handlePageChange(currentPage + 1)}>&raquo;</button>
+                            </li>
+                        </ul>
+                    </nav>
+                )}
             </div>
 
 

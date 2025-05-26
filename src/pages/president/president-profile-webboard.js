@@ -182,16 +182,6 @@ function PresidentProfileWebboard() {
                     </div>
                     {/* Main Content */}
                     <div className="col-12 col-md-8">
-                        <div className="d-flex justify-content-between align-items-center mb-3">
-                            {/* <h3 className="alumni-title mb-0">กระทู้ที่สร้าง</h3> */}
-                            {/* <div className="d-flex align-items-center">
-                                <span className="me-2">เรียงลำดับ:</span>
-                                <select className="form-select form-select-sm" style={{ width: 120 }} value={sortOrder} onChange={e => setSortOrder(e.target.value)}>
-                                    <option value="latest">ใหม่ล่าสุด</option>
-                                    <option value="oldest">เก่าสุด</option>
-                                </select>
-                            </div> */}
-                        </div>
                         <div className="row g-4">
                             {webboard.length > 0 ? (
                                 sortedPosts.map(post => (

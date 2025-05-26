@@ -76,6 +76,16 @@ function News(){
         item.content.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    // Pagination logic
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 5; // จำนวนข่าวต่อหน้า
+    const totalPages = Math.ceil(filteredNews.length / itemsPerPage);
+    const paginatedNews = filteredNews.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+    const handlePageChange = (page) => {
+        if (page >= 1 && page <= totalPages) setCurrentPage(page);
+    };
+
     return (
         <section className="news-container">
             <img src="./image/banner.jpg" className="head-news img-fluid w-100" alt="news-image" />
@@ -93,10 +103,10 @@ function News(){
                 </div>
 
                 <div className="news-list row justify-content-center">
-                {filteredNews.length === 0 ? (
+                {paginatedNews.length === 0 ? (
                     <p className="text-center text-muted">ไม่พบข่าวที่ค้นหา</p>
                 ) : (
-                    filteredNews.map((item) => (
+                    paginatedNews.map((item) => (
                     <div key={item.news_id} className="col-10 mb-3">
                         <div className="position-relative d-flex flex-column flex-md-row border rounded p-3 h-100">
                         {userRole === "2" && (
@@ -159,6 +169,24 @@ function News(){
                     ))
                 )}
                 </div>
+                {/* Pagination */}
+                {totalPages > 1 && (
+                    <nav className="d-flex justify-content-center mt-4">
+                        <ul className="pagination pagination-lg">
+                            <li className={`page-item${currentPage === 1 ? ' disabled' : ''}`}>
+                                <button className="page-link" style={{ minWidth: 44 }} onClick={() => handlePageChange(currentPage - 1)}>&laquo;</button>
+                            </li>
+                            {Array.from({ length: totalPages }, (_, i) => (
+                                <li key={i + 1} className={`page-item${currentPage === i + 1 ? ' active' : ''}`}>
+                                    <button className="page-link" style={{ minWidth: 44 }} onClick={() => handlePageChange(i + 1)}>{i + 1}</button>
+                                </li>
+                            ))}
+                            <li className={`page-item${currentPage === totalPages ? ' disabled' : ''}`}>
+                                <button className="page-link" style={{ minWidth: 44 }} onClick={() => handlePageChange(currentPage + 1)}>&raquo;</button>
+                            </li>
+                        </ul>
+                    </nav>
+                )}
             </div>
         </section>
     );

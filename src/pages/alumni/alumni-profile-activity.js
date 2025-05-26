@@ -15,6 +15,7 @@ function AlumniProfileActivity() {
     const {handleLogout } = useOutletContext();
     const [activity, setActivity] = useState([]);
     const [selectedStatus, setSelectedStatus] = useState('activity');
+    const [previewImage, setPreviewImage] = useState(null);
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -103,95 +104,136 @@ function AlumniProfileActivity() {
         return `${startHours}:${startMinutes} - ${endHours}:${endMinutes} น.`;
       };
 
-        
-    return (
-        <section className='container'>
-          <div className='alumni-profile-page'>
-            {/* <h3 className="alumni-title text-center">ประวัติการเข้าร่วมกิจกรรม</h3> */}
-            <div className="row justify-content-between ">
-              <div className="col-12 col-md-4 bg-light rounded text-center p-4 my-4">
-                <div className="profile-pic-container mb-3">
-                  <img 
-                    src={`${profile.profilePicture}`} 
-                    alt="Profile" 
-                    style={{ width: '140px', height: '140px', borderRadius: '50%' }}
-                    className="img-fluid"
-                  />
-                </div>
+      // อัปโหลดรูปภาพ
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+  
+    // แสดง preview รูปก่อนอัปโหลด
+    setPreviewImage(URL.createObjectURL(file));
+  
+    const formData = new FormData();
+    formData.append("image_path", file);
+    formData.append("user_id", profile.userId); 
+  
+    try {
+      const res = await axios.post("http://localhost:3001/users/update-profile-image", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+  
+      if (res.status === 200) {
+        alert("อัปโหลดรูปสำเร็จ");
+  
+        // อัปเดตรูปโปรไฟล์ใน state
+        setProfile((prev) => ({
+          ...prev,
+          profilePicture: res.data.newImagePath,
+        }));
+      } else {
+        alert(res.data.message || "เกิดข้อผิดพลาด");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("ไม่สามารถอัปโหลดรูปได้");
+    }
+  };
 
-                <p className="fw-bold mb-3">{profile.fullName}</p>
-                
-                <div className="menu">
-                  <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile')}>
-                    ข้อมูลส่วนตัว
+    return (
+        <section className='container py-4'>
+          <div className='alumni-profile-page'>
+            <div className="row justify-content-center g-4">
+              {/* Sidebar/Profile */}
+              <div className="col-12 col-md-3 mb-4">
+                <div className="bg-white rounded-4 shadow-sm text-center p-4">
+                  <img
+                    src={previewImage || profile.profilePicture}
+                    alt="Profile"
+                    style={{ width: "130px", height: "130px", borderRadius: "50%", objectFit: "cover", marginBottom: 16, border: '3px solid #eee' }}
+                    className="img-fluid mb-2"
+                  />
+                  <div className="mt-2 mb-3">
+                    <label
+                      htmlFor="upload-profile-pic"
+                      className="btn btn-sm btn-outline-secondary"
+                      style={{ cursor: "pointer" }}
+                    >
+                      เปลี่ยนรูป
+                    </label>
+                    <input
+                      type="file"
+                      id="upload-profile-pic"
+                      className="d-none"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                    />
                   </div>
-                  <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/alumni-profile-webboard')}>
-                    กระทู้ที่สร้าง
-                  </div>
-                  <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/donation-history')}>
-                    ประวัติการบริจาค
-                  </div>
-                  <div className="menu-item active py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/alumni-profile-activity')}>
-                    ประวัติการเข้าร่วมกิจกรรม
-                  </div>
-                  <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick('/alumni-profile/alumni-profile-souvenir')}>
-                    ประวัติการสั่งซื้อ
-                  </div>
-                  <div className="menu-item py-2 rounded" onClick={handleLogout}>
-                    ออกจากระบบ
+                  <hr className="w-100" />
+                  <div className="menu d-block mt-3 w-100">
+                    <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile")}>ข้อมูลส่วนตัว</div>
+                    <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-profile-webboard")}>กระทู้ที่สร้าง</div>
+                    <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/donation-history")}>ประวัติการบริจาค</div>
+                    <div className="menu-item active py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-profile-activity")}>ประวัติการเข้าร่วมกิจกรรม</div>
+                    <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-profile-souvenir")}>ประวัติการสั่งซื้อ</div>
+                    <div className="menu-item py-2 rounded" onClick={handleLogout}>ออกจากระบบ</div>
                   </div>
                 </div>
               </div>
-              
-              <div className="col-md-7 mt-4">
-                {filteredActivity.length > 0 ? (
-                  filteredActivity.map(activity => (
-                    <div className="col-md-6 col-lg-6 mb-4" key={activity.activity_id}>
-                      <div className="card activity-card">
-                        <div className="image-container">
-                          <img 
-                            src={activity.image_path ? `http://localhost:3001${activity.image_path}` : "/default-image.png"} 
-                            className="card-img-top" 
-                            alt="กิจกรรม" 
-                          />
-                          <div className={`status-badge ${getStatusClass(activity.status)}`}>
-                            {activity?.status === 0 ? "กำลังจะจัดขึ้น" :
-                            activity?.status === 1 ? "เสร็จสิ้นแล้ว" :
-                            activity?.status === 2 ? "กำลังดำเนินการ" : "ไม่ทราบสถานะ"}
-                          </div>
-                        </div>
-                        <div className="card-body">
-                          <h5 className="card-title">{activity.activity_name}</h5>
-                          {activity.check_alumni === 1 && (
-                            <div className="alert alert-warning d-flex align-items-center" role="alert">
-                              <i className="me-2 bi bi-exclamation-circle-fill"></i>
-                              กิจกรรมนี้สำหรับศิษย์เก่า
+              {/* Main Content */}
+              <div className="col-12 col-md-8">
+                {/* <h3 className="alumni-title mb-4">ประวัติการเข้าร่วมกิจกรรม</h3> */}
+                <div className="row g-4">
+                  {filteredActivity.length > 0 ? (
+                    filteredActivity.map(activity => (
+                      <div className="col-md-6 col-lg-6" key={activity.activity_id}>
+                        <div className="card activity-card h-100 d-flex flex-column justify-content-between">
+                          <div className="image-container position-relative">
+                            <img 
+                              src={activity.image_path ? `http://localhost:3001${activity.image_path}` : "/default-image.png"} 
+                              className="card-img-top" 
+                              alt="กิจกรรม" 
+                              style={{ height: 180, objectFit: 'cover', borderRadius: '1rem 1rem 0 0' }}
+                            />
+                            <div className={`status-badge ${getStatusClass(activity.status)}`}>
+                              {activity?.status === 0 ? "กำลังจะจัดขึ้น" :
+                                activity?.status === 1 ? "เสร็จสิ้นแล้ว" :
+                                activity?.status === 2 ? "กำลังดำเนินการ" : "ไม่ทราบสถานะ"}
                             </div>
-                          )}
-                          <h6>
-                            {activity.end_date && activity.end_date !== "0000-00-00" && activity.end_date !== activity.activity_date
-                              ? `${formatDate(activity.activity_date)} - ${formatDate(activity.end_date)}`
-                              : `${formatDate(activity.activity_date)}`}
-                          </h6>
-                          <p className="card-text small text-muted">{activity.description}</p>
-                          <div className="button-group">
-                            <button 
-                              className="btn btn-info" 
-                              onClick={() => navigate(`/activity/${activity.activity_id}`)}
-                            >
-                              ดูรายละเอียด
-                            </button>
+                          </div>
+                          <div className="card-body">
+                            <h5 className="card-title mb-2">{activity.activity_name}</h5>
+                            {activity.check_alumni === 1 && (
+                              <div className="alert alert-warning d-flex align-items-center py-1 px-2 mb-2 small" role="alert">
+                                <i className="me-2 bi bi-exclamation-circle-fill"></i>
+                                กิจกรรมนี้สำหรับศิษย์เก่า
+                              </div>
+                            )}
+                            <h6 className="mb-1">
+                              {activity.end_date && activity.end_date !== "0000-00-00" && activity.end_date !== activity.activity_date
+                                ? `${formatDate(activity.activity_date)} - ${formatDate(activity.end_date)}`
+                                : `${formatDate(activity.activity_date)}`}
+                            </h6>
+                            <p className="card-text small text-muted mb-2">{activity.description}</p>
+                            <div className="button-group text-end">
+                              <button 
+                                className="btn btn-info btn-sm px-3" 
+                                onClick={() => navigate(`/activity/${activity.activity_id}`)}
+                              >
+                                ดูรายละเอียด
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </div>
+                    ))
+                  ) : (
+                    <div className="text-center w-100 py-5">
+                      <h5 className="mt-3 text-muted">ยังไม่มีกิจกรรมในขณะนี้</h5>
+                      <p className="text-secondary">กรุณาตรวจสอบอีกครั้งในภายหลัง</p>
                     </div>
-                  ))
-                ) : (
-                  <div className="text-center w-100 py-5">
-                    <h5 className="mt-3 text-muted">ยังไม่มีกิจกรรมในขณะนี้</h5>
-                    <p className="text-secondary">กรุณาตรวจสอบอีกครั้งในภายหลัง</p>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             </div>
           </div>

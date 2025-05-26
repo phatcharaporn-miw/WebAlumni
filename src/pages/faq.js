@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "../css/faq.css";
-import { FaChevronUp, FaChevronDown } from "react-icons/fa";
+import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 
 function FAQ() {
     const [openIndex, setOpenIndex] = useState(null);
@@ -71,29 +71,49 @@ function FAQ() {
     ];
 
     return (
-        <div className="faq_content">
-            <h3 className="faq-title">คำถามที่พบบ่อย</h3>
-            {faqCategories.map((category, catIndex) => (
-                <div className="faq_content_item_div" key={catIndex}>
-                    <p className="faq_content_item_title">{category.title}</p>
-                    {category.faqs.map((faq, index) => {
-                        const faqIndex = `${catIndex}-${index}`; 
-                        return (
-                            <div key={faqIndex} className="faq_content_item">
-                                <div className="faq_question" onClick={() => toggleFAQ(faqIndex)}>
-                                    <p className="faq_question_p">{faq.question}</p>
-                                    {openIndex === faqIndex ? <FaChevronUp className="faq_icon" /> : <FaChevronDown className="faq_icon" />}
-                                </div>
-                                {openIndex === faqIndex && (
-                                    <p className="faq_answer" dangerouslySetInnerHTML={{ __html: faq.answer }} />
+    <div className="faq_content container py-4">
+        <h3 className="faq-title text-center mb-5">คำถามที่พบบ่อย</h3>
+        {faqCategories.map((category, catIndex) => (
+            <div className="faq_content_item_div mb-4" key={catIndex}>
+                <h5 className="faq_content_item_title mb-3">
+                    {category.title}
+                </h5>
+                {category.faqs.map((faq, index) => {
+                    const faqIndex = `${catIndex}-${index}`;
+                    const isOpen = openIndex === faqIndex;
+                    return (
+                        <div
+                            key={faqIndex}
+                            className={`faq_content_item card shadow-sm mb-3 border-0 ${
+                                isOpen ? "open" : ""
+                            }`}
+                        >
+                            <div
+                                className="faq_question card-header d-flex justify-content-between align-items-center bg-light cursor-pointer"
+                                onClick={() => toggleFAQ(faqIndex)}
+                            >
+                                <p className="faq_question_p mb-0">{faq.question}</p>
+                                {isOpen ? (
+                                    <FaChevronUp className="faq_icon" />
+                                ) : (
+                                    <FaChevronDown className="faq_icon" />
                                 )}
                             </div>
-                        );
-                    })}
-                </div>
-            ))}
-        </div>
-    );
+                            {isOpen && (
+                                <div className="faq_answer card-body">
+                                    <p
+                                        className="mb-0"
+                                        dangerouslySetInnerHTML={{ __html: faq.answer }}
+                                    />
+                                </div>
+                            )}
+                        </div>
+                    );
+                })}
+            </div>
+        ))}
+    </div>
+);
 }
 
 export default FAQ;

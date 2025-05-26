@@ -21,76 +21,91 @@ function Souvenir() {
     }, []);
 
     return (
-        <>
-            <div className="souvenir-top">
-                <div className="souvenir-bt">
-                    <Link to={`/souvenir/souvenir_request`}>
-                        <button className="souvenir-bt-add"><IoIosAddCircleOutline />เพิ่มของที่ระลึก</button>
-                    </Link>
-                </div>
-            </div>
-            <h2 className="titlesouvenir">ของที่ระลึก</h2>
-            <div className="souvenir-content">
-                <div className="souvenir-content-item">
-                </div>
-                {/* สินค้าของวิทยาลัยการคอมพิวเตอร์ */}
-                <div className="souvenir-content-item">
-                    <h3 className="titlesouvenir-type">สินค้าของสมาคมศิษย์เก่า</h3>
-                    <div className="souvenir-item-group">
-                        {products && products.length > 0 ? (
-                            products
-                                .filter((product) => product.role_id === 1 || product.role_id === 2 || product.role_id === 3 )
-                                .map((product) => (
-                                    <Link to={`/souvenir/souvenirDetail/${product.product_id}`} key={product.product_id}>
-                                        <div className="souvenir-item">
-                                            <img
-                                                className="souvenir-item-img"
-                                                src={`http://localhost:3001/uploads/${product.image}`}
-                                                alt={product.product_name}
-                                            />
-                                            <p>{product.product_name}</p>
-                                            <p className="souvenir-item-price">฿{product.price}</p>
-                                        </div>
-                                    </Link>
-                                ))
-                        ) : (
-                            <div className="text-center my-5 text-muted">
-                                <p className="fs-5">ขออภัย ไม่มีสินค้าในขณะนี้</p>
-                            </div>
-                        )}
-                    </div>
-                </div>
+    <>
+        <div className="souvenir-top d-flex justify-content-end mb-3 px-4">
+            <Link to={`/souvenir/souvenir_request`}>
+                <button className="souvenir-bt-add btn btn-primary d-flex align-items-center gap-2">
+                    <IoIosAddCircleOutline size={20} />
+                    เพิ่มของที่ระลึก
+                </button>
+            </Link>
+        </div>
 
-                {/* สินค้าของสมาคมศิษย์เก่า */}
-                <div className="souvenir-content-item">
-                    <h3 className="titlesouvenir-type">สินค้าของศิษย์ปัจจุบัน</h3>
-                    <div className="souvenir-item-group">
-                        {products && products.length > 0 ? (
-                            products
-                                .filter((product) => product.role_id === 4 )
-                                .map((product) => (
-                                    <Link to={`/souvenir/souvenirDetail/${product.product_id}`} key={product.product_id}>
-                                        <div className="souvenir-item">
+        <div className="text-center mb-4">
+            <h2 className="titlesouvenir">ของที่ระลึก</h2>
+        </div>
+
+        <div className="souvenir-content container">
+            {/* สินค้าของสมาคมศิษย์เก่า */}
+            <div className="souvenir-content-item mb-5">
+                <h3 className="titlesouvenir-type ">
+                    สินค้าของสมาคมศิษย์เก่า
+                </h3>
+                <div className="souvenir-item-group row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+                    {products && products.length > 0 ? (
+                        products
+                            .filter((product) => [1, 2, 3].includes(product.role_id))
+                            .map((product) => (
+                                <div className="col" key={product.product_id}>
+                                    <Link to={`/souvenir/souvenirDetail/${product.product_id}`} className="text-decoration-none text-dark">
+                                        <div className="souvenir-item card h-100 shadow-sm border-0">
                                             <img
-                                                className="souvenir-item-img"
+                                                className="souvenir-item-img card-img-top"
                                                 src={`http://localhost:3001/uploads/${product.image}`}
                                                 alt={product.product_name}
                                             />
-                                            <p>{product.product_name}</p>
-                                            <p className="souvenir-item-price">฿{product.price}</p>
+                                            <div className="card-body text-center">
+                                                <p className="card-title fw-semibold">{product.product_name}</p>
+                                                <p className="souvenir-item-price text-success">฿{product.price}</p>
+                                            </div>
                                         </div>
                                     </Link>
-                                ))
-                        ) : (
-                            <div className="text-center my-5 text-muted">
-                                <p className="fs-5">ขออภัย ไม่มีสินค้าในขณะนี้</p>
-                            </div>
-                        )}
-                    </div>
+                                </div>
+                            ))
+                    ) : (
+                        <div className="text-center my-5 text-muted">
+                            <p className="fs-5">ขออภัย ไม่มีสินค้าในขณะนี้</p>
+                        </div>
+                    )}
                 </div>
             </div>
-        </>
-    );
+
+            {/* สินค้าของศิษย์ปัจจุบัน */}
+            <div className="souvenir-content-item mb-5">
+                <h3 className="titlesouvenir-type">
+                    สินค้าของศิษย์ปัจจุบัน
+                </h3>
+                <div className="souvenir-item-group row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+                    {products && products.length > 0 ? (
+                        products
+                            .filter((product) => product.role_id === 4)
+                            .map((product) => (
+                                <div className="col" key={product.product_id}>
+                                    <Link to={`/souvenir/souvenirDetail/${product.product_id}`} className="text-decoration-none text-dark">
+                                        <div className="souvenir-item card h-100 shadow-sm border-0">
+                                            <img
+                                                className="souvenir-item-img card-img-top"
+                                                src={`http://localhost:3001/uploads/${product.image}`}
+                                                alt={product.product_name}
+                                            />
+                                            <div className="card-body text-center">
+                                                <p className="card-title fw-semibold">{product.product_name}</p>
+                                                <p className="souvenir-item-price text-success">฿{product.price}</p>
+                                            </div>
+                                        </div>
+                                    </Link>
+                                </div>
+                            ))
+                    ) : (
+                        <div className="text-center my-5 text-muted">
+                            <p className="fs-5">ขออภัย ไม่มีสินค้าในขณะนี้</p>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    </>
+);
 }
 
 export default Souvenir;

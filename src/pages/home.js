@@ -281,34 +281,6 @@ function Home() {
     return 0;
   });
 
-
-  //ดึงข้อมูลการกดใจกระทู้
-  useEffect(() => {
-    const userId = localStorage.getItem('userId');
-
-    if (isLoggedin && userId) {
-      axios.get(`http://localhost:3001/web/webboard/favorite`, {
-        params: { userId },
-        withCredentials: true,
-      })
-        .then((response) => {
-          if (response.data.success) {
-            // เก็บข้อมูล ID ของกระทู้ที่ถูกใจ
-            // setLikedPosts(response.data.likedPosts.map(post => post.webboard_id));
-            const likedPostsFromDB = response.data.likedPosts.map(post => post.webboard_id);
-            setLikedPosts(likedPostsFromDB);
-
-          }
-        })
-        .catch((error) => {
-          console.error("เกิดข้อผิดพลาดในการโหลดกระทู้ที่ถูกใจ:", error);
-        });
-    } else {
-      setLikedPosts([]);
-    }
-  }, [isLoggedin]);
-
-
   // ฟังก์ชัน Toggle หัวใจ
   const toggleLike = (postId) => {
         if (!isLoggedin) {
