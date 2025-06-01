@@ -20,7 +20,9 @@ function SouvenirDetail() {
 
     useEffect(() => {
         setLoading(true);
-        axios.get(`http://localhost:3001/souvenir/souvenirDetail/${productId}`)
+        axios.get(`http://localhost:3001/souvenir/souvenirDetail/${productId}`,{
+            withCredentials: true
+        })
             .then(response => {
                 setProduct(response.data);
                 setLoading(false);
@@ -32,7 +34,9 @@ function SouvenirDetail() {
             });
 
         // ดึงข้อมูลสินค้าอื่นๆ
-        axios.get('http://localhost:3001/souvenir')
+        axios.get('http://localhost:3001/souvenir',{
+            withCredentials: true
+        })
             .then(response => {
                 setOtherProducts(response.data);
             })
@@ -110,6 +114,8 @@ function SouvenirDetail() {
                 quantity: quantity,
                 user_id: user_id,
                 total: total
+            },{
+                withCredentials: true
             })
                 .then(response => {
                     console.log(response.data);

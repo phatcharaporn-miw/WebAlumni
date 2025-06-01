@@ -14,7 +14,9 @@ function SouvenirCheckout() {
 
     useEffect(() => {
         if (userId) {
-            axios.get(`http://localhost:3001/souvenir/cart?user_id=${userId}`)
+            axios.get(`http://localhost:3001/souvenir/cart?user_id=${userId}`,{
+                 withCredentials: true
+            })
                 .then(response => {
                     setCheckoutCart(Array.isArray(response.data) ? response.data : []);
                 })
@@ -76,7 +78,9 @@ function SouvenirCheckout() {
             shippingAddress: deliveryAddress,
         };
 
-        axios.post("http://localhost:3001/souvenir/checkout", orderData)
+        axios.post("http://localhost:3001/souvenir/checkout", orderData,{
+            withCredentials: true
+        })
             .then(response => {
                 alert("การชำระเงินสำเร็จ!");
                 navigate("/souvenir/souvenir_history");

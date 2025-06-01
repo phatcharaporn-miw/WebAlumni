@@ -38,16 +38,16 @@ function Webboard(){
     const [expandedReplies, setExpandedReplies] = useState({}); //ซ่อนการตอบกลับ
     const navigate = useNavigate();
 
-    useEffect(() => {
-      const userSession = localStorage.getItem("userId");  
-      if (userSession) {
-          setIsLoggedin(true);
-          console.log("ผู้ใช้ล็อกอินแล้ว");
-      } else {
-          setIsLoggedin(false);
-          console.log("ผู้ใช้ยังไม่ได้ล็อกอิน"); 
-      }
-    }, []);
+    // useEffect(() => {
+    //   const userSession = localStorage.getItem("userId");  
+    //   if (userSession) {
+    //       setIsLoggedin(true);
+    //       console.log("ผู้ใช้ล็อกอินแล้ว");
+    //   } else {
+    //       setIsLoggedin(false);
+    //       console.log("ผู้ใช้ยังไม่ได้ล็อกอิน"); 
+    //   }
+    // }, []);
   
     //ดึงข้อมูล webboard
     useEffect(() => {
@@ -70,21 +70,6 @@ function Webboard(){
             console.error('เกิดข้อผิดพลาดในการดึงข้อมูลกระทู้:', error.message);
           });
     }, []);
-
-    // แนะนำกระทู้
-    // useEffect(() => {
-    //   axios.get('http://localhost:3001/web/webboard/recommended-posts', {
-    //     withCredentials: true,
-    //   })
-    //     .then((response) => {
-    //       if (response.data.success) {
-    //         setRecommendedPosts(response.data.recommendedPosts);
-    //       }
-    //     })
-    //     .catch((error) => {
-    //       console.error('เกิดข้อผิดพลาดในการดึงข้อมูลกระทู้ที่แนะนำ:', error.message);
-    //     });
-    // }, []);
 
     const getRandomPosts = (posts, count) => {
       const shuffled = [...posts].sort(() => 0.5 - Math.random()); // สุ่มเรียงลำดับ
@@ -370,7 +355,9 @@ function Webboard(){
     // search เปิด modal ถ้ามี id
   useEffect(() => {
     if (id) {
-      axios.get(`http://localhost:3001/web/webboard/${id}`)
+      axios.get(`http://localhost:3001/web/webboard/${id}`,{
+        withCredentials: true
+      })
         .then((res) => {
           if (res.data.success) {
             setSelectedPost(res.data.data); // ใส่ข้อมูล post
@@ -393,7 +380,9 @@ function Webboard(){
 
     // ดึงcategory
     useEffect(() => {
-      axios.get(`http://localhost:3001/category/category-all`)
+      axios.get(`http://localhost:3001/category/category-all`,{
+        withCredentials: true
+      })
       .then(response => {
           if (response.data.success) {
               setCategory(response.data.data); 
@@ -417,6 +406,8 @@ function Webboard(){
       return `hsl(${hue}, 70%, 60%)`;
   };
 
+  
+
 
     return(
     <section className="container">    
@@ -439,7 +430,7 @@ function Webboard(){
                 <div className="d-flex justify-content-between">
                   <span 
                   key={post.category_id}
-                  className="badge px-3 py-2 ms-auto me-4" style={{ backgroundColor: getCategoryColor(post?.category_id || 0), color: "white", padding: "5px 10px", borderRadius: "6px" , cursor: "pointer"}} 
+                  className="badge px-3 py-2 ms-auto me-4" style={{ backgroundColor: getCategoryColor(post?.category_id || 0), color: "white", padding: "5px 10px", borderRadius: "15px" , cursor: "pointer"}} 
                   onClick={() => handleCategoryClick(post.category_id)}>
                     {post && post.category_name ? post.category_name : ''}
                   </span>
@@ -706,7 +697,7 @@ function Webboard(){
                         backgroundColor: getCategoryColor(category.category_id),
                         color: "white",
                         padding: "6px 10px",
-                        borderRadius: "6px",
+                        borderRadius: "15px",
                         cursor: "pointer",
                       }}
                       onClick={() => handleCategoryClick(category.category_id)}
@@ -753,7 +744,25 @@ function Webboard(){
                   <p className="text-muted">ยังไม่มีเว็บบอร์ดที่แนะนำ</p>
                 )}
               </div>
-          </div>              
+          </div>
+          {/* Pagination
+                {totalPages > 1 && (
+                    <nav className="d-flex justify-content-center mt-4">
+                        <ul className="pagination">
+                            <li className={`page-item${currentPage === 1 ? ' disabled' : ''}`}>
+                                <button className="page-link" onClick={() => handlePageChange(currentPage - 1)}>&laquo;</button>
+                            </li>
+                            {Array.from({ length: totalPages }, (_, i) => (
+                                <li key={i + 1} className={`page-item${currentPage === i + 1 ? ' active' : ''}`}>
+                                    <button className="page-link" onClick={() => handlePageChange(i + 1)}>{i + 1}</button>
+                                </li>
+                            ))}
+                            <li className={`page-item${currentPage === totalPages ? ' disabled' : ''}`}>
+                                <button className="page-link" onClick={() => handlePageChange(currentPage + 1)}>&raquo;</button>
+                            </li>
+                        </ul>
+                    </nav>
+                )}               */}
         </div>           
     </section>  
     )

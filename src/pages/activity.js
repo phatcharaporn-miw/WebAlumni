@@ -233,30 +233,21 @@ function Activity(){
             <div className="activity-page">
             <h3 className="act-title">กิจกรรม</h3>
 
-            <select className="border rounded p-2 mb-3" onChange={handleStatusChange}>
-                <option value="activity">กิจกรรม</option>
-                <option value="2">กำลังดำเนินการ</option>
-                <option value="1">เสร็จสิ้นแล้ว</option>
-                <option value="0">กำลังจะจัดขึ้น</option>
-            </select>
+            <div className="d-flex justify-content-between align-items-center mb-3">
+                <select className="form-select w-auto me-2" onChange={handleStatusChange}>
+                    <option value="activity">กิจกรรม</option>
+                    <option value="2">กำลังดำเนินการ</option>
+                    <option value="1">เสร็จสิ้นแล้ว</option>
+                    <option value="0">กำลังจะจัดขึ้น</option>
+                </select>
 
-            {/* นายกสมาคมจัดการ */}
-            <div className="activity-management">
                 {userRole === "2" && (
-                    <div className="d-flex justify-content-between mb-4">
-                        <button
-                            className="btn btn-primary"
-                            onClick={() => navigate("/activity/president-create-activity")}
-                        >
-                            เพิ่มกิจกรรม 
-                        </button>
-                        {/* <input
-                            type="text"
-                            className="form-control w-50"
-                            placeholder="ค้นหากิจกรรม..."
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        /> */}
-                    </div>
+                    <button
+                        className="btn btn-success ms-auto"
+                        onClick={() => navigate("/activity/president-create-activity")}
+                    >
+                        +เพิ่มกิจกรรม
+                    </button>
                 )}
             </div>
 

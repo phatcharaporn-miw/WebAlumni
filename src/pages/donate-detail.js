@@ -24,7 +24,9 @@ function DonateDetail() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get(`http://localhost:3001/donate/donatedetail/${projectId}`)
+        axios.get(`http://localhost:3001/donate/donatedetail/${projectId}`,{
+            withCredentials: true
+        })
             .then(response => {
                 // console.log("Project Data:", response.data);
                 setProjectData(response.data);
@@ -44,6 +46,8 @@ function DonateDetail() {
         axios.post('http://localhost:3001/donate/generateQR', {
             amount: parseFloat(formData.amount),
             numberPromtpay: projectData.number_promtpay
+        },{
+            withCredentials: true
         })
             .then(response => {
                 if (response.data.Result) {

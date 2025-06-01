@@ -95,9 +95,9 @@ function About(){
                 
             {/* ช่องทางการติดต่อ */}
               <h3 className="about-title">ช่องทางการติดต่อ</h3>
-              <div class="container">
-                  <div class="row mb-5">
-                    <div class="col">
+              <div className="container">
+                  <div className="row mb-5">
+                    <div className="col">
                         <div className="contact-info">
                         <div className="contact-item phone">
                           <IoMdCall className="contact-icon" /> 
@@ -126,7 +126,7 @@ function About(){
                         </div>
                         </div>
                     </div>
-                    <div class="col">
+                    <div className="col">
                       <div className="map-container">
                           <iframe 
                           src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d30607.44894393471!2d102.81615358599814!3d16.47902518541837!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31228b8217d082cb%3A0xb58fd61bc8e85e11!2sCollege%20of%20Computing%20Khon%20Kaen%20University!5e0!3m2!1sen!2sth!4v1736759203949!5m2!1sen!2sth">

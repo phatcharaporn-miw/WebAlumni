@@ -81,13 +81,14 @@ function Register() {
         data.append("image_path", selectedFile);
       }    
 
-    // 🐛 Debug formData ทุก field
+    // Debug formData ทุก field
     for (let [key, value] of data.entries()) {
         console.log(key, value);
     }
 
       try {
         const response = await axios.post("http://localhost:3001/add/register", data, {
+            withCredentials: true
         });
         Swal.fire({
             icon: "success",
@@ -101,7 +102,6 @@ function Register() {
 
     } catch (error) {
         console.error("Register error:", error);
-
         Swal.fire({
             icon: "error",
             title: "เกิดข้อผิดพลาด",
@@ -114,7 +114,9 @@ function Register() {
   useEffect(() => {
     const fetchMajors = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/add/major');
+    const response = await axios.get('http://localhost:3001/add/major',{
+        withCredentials: true
+    });
         setMajor(response.data.major);
       } catch (err) {
         setError("ไม่สามารถดึงข้อมูลสาขาได้");

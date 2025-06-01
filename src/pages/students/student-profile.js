@@ -31,8 +31,9 @@ function StudentProfile() {
       withCredentials: true, 
     })
       .then((response) => {
-        console.log('majors:', response.data.major);     
+        // console.log('majors:', response.data.major);     
         if (response.data.success) {
+          //  console.log('profile data:', response.data.user);
           setProfile(response.data.user);
         }
       })
@@ -102,20 +103,26 @@ function StudentProfile() {
   };
 
   // อัปเดตค่าใน educations
-  const handleEducationChange = (index, field, value) => {
-    const updatedEducations = [...profile.educations];
-    updatedEducations[index][field] = value;
-    setProfile((prevState) => ({
-      ...prevState,
-      educations: updatedEducations,
-    }));
-  };
+const handleEducationChange = (index, field, value) => {
+  const updatedEducations = [...profile.educations];
+  updatedEducations[index][field] = value;
+  setProfile(prevState => ({
+    ...prevState,
+    educations: updatedEducations,
+  }));
+};
 
-  const addEducation = () => {
-    setProfile((prevState) => ({
-        ...prevState,
-        educations: [...prevState.educations, { degree: '', major: '', studentId: '', graduation_year: '' }],
-    }));
+const addEducation = () => {
+  setProfile((prevState) => ({
+    ...prevState,
+    educations: [...prevState.educations, {
+      degree_id: '',
+      major_id: '',
+      studentId: '',
+      // graduation_year: '',
+      student_year: ''
+    }],
+  }));
 };
 
 const removeEducation = (index) => {
@@ -130,9 +137,8 @@ const removeEducation = (index) => {
   };
 
   const handleSave = () => {
-    const updatedProfile = { ...profile };
-    // console.log('ข้อมูลที่ส่งไป Backend:',  updatedProfile); // ตรวจสอบค่า
-    axios.post('http://localhost:3001/users/edit-profile',  updatedProfile, {
+    // console.log("ก่อนส่งข้อมูล educations:", JSON.stringify(profile.educations, null, 2));
+    axios.post('http://localhost:3001/users/edit-profile',  profile, {
       withCredentials: true, 
     })
       .then((response) => {
@@ -167,6 +173,8 @@ const handleImageChange = async (e) => {
       headers: {
         "Content-Type": "multipart/form-data",
       },
+    },{
+      withCredentials: true
     });
 
     if (res.status === 200) {
@@ -342,24 +350,44 @@ const toggleMenu = () => {
                       />
                     </div>
                     <div className="col-md-6 mb-3">
-                      <label>ชั้นปีที่<span className="importent">*</span></label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        name="student_year"
-                        placeholder="ชั้นปีที่"
-                        value={edu.student_year}
-                        onChange={(e) => handleEducationChange(index, 'student_year', e.target.value)}
-                        disabled={!editing}
-                      />
+                      <label>ปีที่เรียน<span className="importent">*</span></label>
+                        <select
+                          name="student_year"
+                          value={edu.student_year || ''}
+                          onChange={(e) => handleEducationChange(index, 'student_year', e.target.value)}
+                          className="form-control"
+                          disabled={!editing}
+                        >
+                          <option value="">เลือกปีที่เรียน</option>
+                          <option value="1">ปี 1</option>
+                          <option value="2">ปี 2</option>
+                          <option value="3">ปี 3</option>
+                          <option value="4">ปี 4</option>
+                          <option value="อื่นๆ">อื่นๆ</option>
+                        </select>
                     </div>
                   </div>
-                  <hr />
-                </div>
-              ))
-            ) : (
-              <p>ไม่มีข้อมูลการศึกษา</p>
-            )}
+                 {editing && profile.educations.length > 1 && (
+                        <button
+                          type="button"
+                          className="btn btn-danger mt-2"
+                          onClick={() => removeEducation(index)}
+                        >
+                          ลบรายการ
+                        </button>
+                      )}
+
+                      <hr />
+                    </div>
+                  ))
+                ) : (
+                  <p>ไม่มีข้อมูลการศึกษา</p>
+                )}
+                {editing && (
+                  <button type="button" className="btn btn-primary mt-3" onClick={addEducation}>
+                    เพิ่มข้อมูลการศึกษา
+                  </button>
+                )}
           </fieldset>
         </div>
 

@@ -48,12 +48,11 @@
     border-bottom: 2px solid #ddd;
 }
 
-.nav-link {
-    /* border: 1px solid #ddd; */
+/* .nav-link {
     border-radius: 1px;
     padding: 10px 15px;
-    color: #1A8DDD;
-}
+    color: #0F75BC;
+} */
 
 /* .nav-link:hover {
     background-color: #0F75BC;  
@@ -72,7 +71,6 @@
     margin-top: 20px;
 }
 
-/* Table Styles */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -113,21 +111,6 @@ table td button:hover {
     background-color: #0B98FA;
 }
 
-/* .souvenir-item-group {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 20px;
-} */
-
-/* .souvenir-item {
-    background-color: #fff;
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    transition: transform 0.3s ease;
-} */
-
 .souvenir-item:hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
@@ -146,7 +129,6 @@ table td button:hover {
     font-weight: bold;
 }
 
-/* Message When No Products */
 .souvenir-item-group p {
     font-size: 18px;
     color: #888;
@@ -181,11 +163,11 @@ table td button:hover {
 }
 
 .souvenir-bt-approve:hover {
-    background-color: #0b7dda; /* เปลี่ยนสีเมื่อ hover */
+    background-color: #0b7dda; 
 }
 
 .souvenir-bt-edit {
-    background-color: #FF9800; /* สีส้ม */
+    background-color: #FF9800; 
     color: white;
     border: none;
     padding: 10px 20px;
@@ -194,11 +176,11 @@ table td button:hover {
 }
 
 .souvenir-bt-edit:hover {
-    background-color: #e68900; /* เปลี่ยนสีเมื่อ hover */
+    background-color: #e68900; 
 }
 
 .souvenir-bt-del {
-    background-color: #F44336; /* สีแดง */
+    background-color: #F44336; 
     color: white;
     border: none;
     padding: 10px 20px;
@@ -207,7 +189,7 @@ table td button:hover {
 }
 
 .souvenir-bt-del:hover {
-    background-color: #d32f2f; /* เปลี่ยนสีเมื่อ hover */
+    background-color: #d32f2f;
 }
 
 .status-available {

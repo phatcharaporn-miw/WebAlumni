@@ -71,6 +71,8 @@ function DonateRequest() {
         try {
             const response = await axios.post('http://localhost:3001/donate/donateRequest', data, {
                 headers: { 'Content-Type': 'multipart/form-data' },
+            },{
+                withCredentials: true
             });
             alert("เพิ่มโครงการบริจาคสำเร็จ!");
             navigate("/donate");

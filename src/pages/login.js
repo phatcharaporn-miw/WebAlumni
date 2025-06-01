@@ -16,7 +16,7 @@ function Login() {
     const location = useLocation();
     // อ่าน redirect path จาก query string
     // const redirectPath = new URLSearchParams(location.search).get("redirect") || null;
-    const { handleLogin } = useOutletContext();  // รับ handleLogin จาก Outlet context
+    const { handleLogin } = useOutletContext(); 
 
     const validatePassword = (password) => {
       const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]+$/;

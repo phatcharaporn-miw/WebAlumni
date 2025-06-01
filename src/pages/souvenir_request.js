@@ -123,6 +123,8 @@ function SouvenirRequest() {
         try {
             const response = await axios.post(url, data, {
                 headers: { 'Content-Type': 'multipart/form-data' },
+            },{
+                withCredentials: true
             });
 
             Swal.fire({

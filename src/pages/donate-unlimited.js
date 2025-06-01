@@ -10,7 +10,9 @@ function DonateUnlimit() {
 
     useEffect(() => {
         axios
-            .get("http://localhost:3001/donate") // เรียก API
+            .get("http://localhost:3001/donate",{
+                withCredentials: true
+            }) // เรียก API
             .then((response) => {
                 setProjects(response.data);
                 setLoading(false);

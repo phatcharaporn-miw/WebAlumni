@@ -20,6 +20,12 @@
     margin-bottom: 15px;
 }
 
+.nav-link {
+    border-radius: 1px;
+    padding: 10px 15px;
+    color: #0F75BC;
+}
+
 .table {
     width: 100%;
     table-layout: fixed;

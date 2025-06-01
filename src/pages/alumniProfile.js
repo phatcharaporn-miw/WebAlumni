@@ -11,7 +11,9 @@ function HomeAlumniProfile() {
     useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await axios.get(`http://localhost:3001/alumni/${userId}`);
+        const res = await axios.get(`http://localhost:3001/alumni/${userId}`,{
+          withCredentials: true
+        });
         if (res.data.success) {
           // console.log(res.data.data);
           setAlumni(res.data.data);

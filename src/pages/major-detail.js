@@ -38,13 +38,22 @@ function MajorDetail() {
     };
 
     const handleSearch = (term) => {
-        setSearchTerm(term);
-        const filteredBySearch = term === "" ? students : students.filter(student =>
-            student.full_name.toLowerCase().includes(term.toLowerCase())
+    setSearchTerm(term);
+
+    const filteredBySearch = term === "" ? students : students.filter(student => {
+        const lowerTerm = term.toLowerCase();
+        return (
+            student.full_name.toLowerCase().includes(lowerTerm) ||
+            student.graduation_year?.toString().includes(lowerTerm) ||
+            student.admission_year?.toString().includes(lowerTerm) ||
+            student.studentId?.toString().includes(lowerTerm)
         );
-        const filteredByDegree = filteredBySearch.filter(student => student.degree === activeTab);
+    });
+
+    const filteredByDegree = filteredBySearch.filter(student => student.degree === activeTab);
         setFilteredStudents(filteredByDegree);
     };
+
 
     const mapDegreeIdToText = (degreeId) => {
         switch (degreeId) {
@@ -81,26 +90,11 @@ function MajorDetail() {
                     <input
                         type="text"
                         className="form-control w-25"
-                        placeholder="ค้นหารายชื่อ..."
+                        placeholder="ค้นหา..."
                         value={searchTerm}
                         onChange={(e) => handleSearch(e.target.value)}
                     />
                 </div>
-
-                {/* <div className="year-filter" style={{ minWidth: "150px" }}>
-                    <label htmlFor="yearSelect" className="form-label d-none">กรองตามปีที่จบการศึกษา</label>
-                    <select
-                                id="yearSelect"
-                                className="form-select"
-                                value={selectedYear}
-                                onChange={(e) => filterByYear(e.target.value)}
-                    >
-                                <option value="">ทั้งหมด</option>
-                                <option value="2563">2563</option>
-                                <option value="2564">2564</option>
-                                <option value="2565">2565</option>
-                    </select>
-                </div> */}
 
                 <div className="students">
                     <table className="table table-bordered">
@@ -108,8 +102,9 @@ function MajorDetail() {
                             <tr>
                                 <th scope="col">ลำดับ</th>
                                 <th scope="col">ชื่อนักศึกษา</th>
-                                <th scope="col">ปีที่จบการศึกษา</th>
                                 <th scope="col">รหัสนักศึกษา</th>
+                                <th scope="col">ปีที่เข้าศึกษา</th>
+                                <th scope="col">ปีที่จบการศึกษา</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -118,13 +113,15 @@ function MajorDetail() {
                                     <tr key={index}>
                                         <th scope="row">{index + 1}</th>
                                         <td>{student.full_name}</td>
-                                        <td>{student.graduation_year}</td>
                                         <td>{student.studentId}</td>
+                                        <td>{student.admission_year}</td>
+                                        <td>{student.graduation_year}</td>
+                                        
                                     </tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="4" className="text-center text-muted">
+                                    <td colSpan="5" className="text-center text-muted">
                                         ยังไม่มีรายชื่อ
                                     </td>
                                 </tr>

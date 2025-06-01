@@ -12,7 +12,9 @@ function Donate() {
 
     useEffect(() => {
         axios
-            .get("http://localhost:3001/donate")
+            .get("http://localhost:3001/donate",{
+                withCredentials: true
+            })
             .then((response) => {
                 setProjects(response.data);
             })

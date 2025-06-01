@@ -277,12 +277,14 @@ function NavAdmin() {
                 >
                     ข่าวสารและประชาสัมพันธ์
                 </NavLink>
-                <NavLink to="/admin/souvenir" className="nav-link my-1" style={({ isActive }) => ({
-                    ...(isActive ? active : {}),
-                    color: "#FFFFFF",
-                    position: 'relative'
-                })}>
-                    ของที่ระลึก
+                <NavLink 
+                    to="/admin/souvenir" 
+                    className="nav-link my-1" 
+                    style={({ isActive }) => ({
+                        ...(isActive ? active : {}),
+                        color: "#FFFFFF",
+                    })}>
+                        ของที่ระลึก
                 </NavLink>
                 <NavLink
                     to="/admin/admin-alumni"
@@ -307,7 +309,10 @@ function NavAdmin() {
                 <NavLink
                     onClick={handleLogout}
                     className="nav-link my-1"
-                    style={navAdminButtonStyles}
+                    style={({ isActive }) => ({
+                        ...(isActive ? active : {}),
+                        color: "#FFFFFF",
+                    })}
                 >
                     ออกจากระบบ
                 </NavLink>
@@ -363,6 +368,7 @@ const navLinkStyles = {
 
 const navAdminButtonStyles = {
     marginTop: "auto",
+     color: "#FFFFFF",
 };
 
 

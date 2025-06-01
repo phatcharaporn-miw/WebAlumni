@@ -10,7 +10,9 @@ function DonateRaise() {
 
     useEffect(() => {
         axios
-            .get("http://localhost:3001/donate")
+            .get("http://localhost:3001/donate",{
+                withCredentials: true
+            })
             .then((response) => {
                 console.log('Received projects:', response.data);
                 setProjects(response.data);

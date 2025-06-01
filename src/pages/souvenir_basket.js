@@ -16,7 +16,9 @@ function SouvenirBasket() {
     const fetchCart = useCallback(() => {
         if (!userId) return;
 
-        axios.get(`http://localhost:3001/souvenir/cart?user_id=${userId}`)
+        axios.get(`http://localhost:3001/souvenir/cart?user_id=${userId}`,{
+            withCredentials: true
+        })
             .then(response => {
                 setCart(Array.isArray(response.data) ? response.data : []);
             })
@@ -47,6 +49,8 @@ function SouvenirBasket() {
     const handleDeleteItem = (productId) => {
         axios.delete(`http://localhost:3001/souvenir/cart/${productId}`, {
         data: { userId: userId } // ส่ง userId ไปใน body ของ request
+    },{
+        withCredentials: true
     })
         .then(() => {
             setCart(prevCart => prevCart.filter(item => item.product_id !== productId));
@@ -63,6 +67,8 @@ function SouvenirBasket() {
             user_id: userId,
             product_id: productId,
             quantity: newQuantity
+        },{
+            withCredentials: true
         })
             .then(() => {
                 setCart(prevCart => prevCart.map(item =>

@@ -49,5 +49,6 @@ export const breadcrumbMapping = {
     "/president-profile/president-profile-webboard/edit-webboard": "แก้ไขกระทู้ที่สร้าง",
     "/president-profile/president-approve": "การอนุมัติ",
     "/activity/president-create-activity": "เพิ่มกิจกรรม",
+    "/news/president-create-news": "เพิ่มข่าวประชาสัมพันธ์",
 
   };

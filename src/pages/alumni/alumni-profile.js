@@ -436,6 +436,11 @@ return (
                 ) : (
                   <p>ไม่มีข้อมูลการศึกษา</p>
                 )}
+                {editing && (
+                  <button type="button" className="btn btn-primary mt-3" onClick={addEducation}>
+                    เพิ่มข้อมูลการศึกษา
+                  </button>
+                )}
               </fieldset>
             </div>
 

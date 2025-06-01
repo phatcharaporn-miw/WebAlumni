@@ -57,6 +57,8 @@ function StudentEditWebboard() {
 
         axios.put(`http://localhost:3001/users/edit-webboard/${webboardId}`, formDataToSend, {
             headers: { "Content-Type": "multipart/form-data" },
+        },{
+            withCredentials: true
         })
             .then((response) => {
                 if (response.data.success) {

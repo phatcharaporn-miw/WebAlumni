@@ -58,7 +58,6 @@ function AdminHome() {
         // ดึงข้อมูลกราฟแท่ง
         axios.get('http://localhost:3001/admin/activity-per-year')
         .then(res => {
-            console.log("กิจกรรมต่อปี", res.data);
             if (Array.isArray(res.data)) {
             const labels = res.data.map(item => `ปี ${item.year + 543}`);
             const data = res.data.map(item => item.total_activities);

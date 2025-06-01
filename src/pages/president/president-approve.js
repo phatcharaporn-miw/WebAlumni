@@ -8,6 +8,7 @@ import { MdNotifications } from "react-icons/md";
 import { Badge, IconButton } from "@mui/material";
 import { Modal, Button, Box, Typography, Snackbar, Alert } from "@mui/material";
 import "../../css/president.css";
+import Swal from "sweetalert2";
 
 function Approve() {
     const [products, setProducts] = useState([]);
@@ -19,15 +20,7 @@ function Approve() {
         severity: "info",
     });
 
-    // useEffect(() => {
-    //     window.scrollTo(0, 0);
-    //     axios.get("http://localhost:3001/admin/souvenir").then((response) => {
-    //         setProducts(response.data);
-    //     });
-    //     console.log(user_id)
-    // }, []);
-
-    const user_id = localStorage.getItem("user_id");
+    const user_id = localStorage.getItem("userId");
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -39,7 +32,6 @@ function Approve() {
                 console.error("Error fetching souvenirs:", error);
             });
 
-        console.log("User ID:", user_id);
     }, [user_id]);
 
 
@@ -61,72 +53,93 @@ function Approve() {
         bgcolor: "background.paper",
         boxShadow: 24,
         p: 4,
-    };
-
-    // const handleDelete = (productId) => {
-
-    //     axios.delete(`http://localhost:3001/admin/deleteSouvenir/${productId}`)
-    //         .then(() => {
-    //             setProducts(products.filter(product => product.product_id !== productId));
-    //         })
-    //         .catch(error => {
-    //             console.error("เกิดข้อผิดพลาดในการลบ:", error);
-    //         });
-    // };
-
-    const handleDelete = (productId) => {
-        // แสดง Snackbar เพื่อยืนยันการลบ
-        setNotification({
-            open: true,
-            message: "คุณต้องการลบสินค้านี้จริงหรือไม่?",
-            severity: "warning",
-        });
-    
-        // เมื่อผู้ใช้ยืนยันการลบ
-        const confirmDelete = window.confirm("คุณต้องการลบสินค้านี้จริงหรือ?");
-        
-        if (confirmDelete) {
-            axios.delete(`http://localhost:3001/admin/deleteSouvenir/${productId}`)
-                .then(() => {
-                    setProducts(products.filter(product => product.product_id !== productId));
-                    setNotification({
-                        open: true,
-                        message: "สินค้าถูกลบเรียบร้อยแล้ว!",
-                        severity: "success",
-                    });
-                })
-                .catch(error => {
-                    console.error("เกิดข้อผิดพลาดในการลบ:", error);
-                    setNotification({
-                        open: true,
-                        message: "ไม่สามารถลบสินค้าได้, กรุณาลองใหม่อีกครั้ง",
-                        severity: "error",
-                    });
-                });
-        } else {
-            setNotification({
-                open: true,
-                message: "คุณยกเลิกการลบสินค้า",
-                severity: "info",
-            });
-        }
-    };
-    
+    };    
 
     const handleApprove = (productId) => {
-        axios.put(`http://localhost:3001/admin/approveSouvenir/${productId}`, { status: "1" })
-            .then(response => {
-                setProducts(prevProducts =>
-                    prevProducts.map(product =>
-                        product.product_id === productId ? { ...product, status: "1" } : product
-                    )
-                );
-                alert("อนุมัติสินค้าสำเร็จ");
-            })
-            .catch(error => {
-                alert("เกิดข้อผิดพลาดในการอนุมัติสินค้า");
-            });
+        Swal.fire({
+            title: "ยืนยันการอนุมัติ?",
+            text: "คุณต้องการอนุมัติสินค้านี้ใช่หรือไม่?",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "ใช่, อนุมัติเลย",
+            cancelButtonText: "ยกเลิก"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                    axios.put(`http://localhost:3001/admin/approveSouvenir/${productId}`, {
+                        status: "1",
+                        approver_id: user_id 
+                    })
+                    .then(() => {
+                        setProducts(prevProducts =>
+                            prevProducts.map(product =>
+                                product.product_id === productId ? { ...product, status: "1" } : product
+                            )
+                        );
+                        Swal.fire("สำเร็จ!", "อนุมัติสินค้าเรียบร้อยแล้ว", "success");
+                    })
+                    .catch(() => {
+                        Swal.fire("เกิดข้อผิดพลาด", "ไม่สามารถอนุมัติสินค้าได้", "error");
+                    });
+            }
+        });
     };
+
+    const handleReject = (productId) => {
+        Swal.fire({
+            title: "ยืนยันการปฏิเสธ?",
+            text: "คุณต้องการปฏิเสธสินค้านี้ใช่หรือไม่?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "ใช่, ปฏิเสธเลย",
+            cancelButtonText: "ยกเลิก"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axios.put(`http://localhost:3001/admin/approveSouvenir/${productId}`, {
+                    approver_id: user_id,
+                    action: "rejected"
+                })
+                .then(() => {
+                    setProducts(prevProducts =>
+                        prevProducts.filter(product => product.product_id !== productId)
+                    );
+                    Swal.fire("สำเร็จ!", "ปฏิเสธสินค้าสำเร็จแล้ว", "success");
+                })
+                .catch(() => {
+                    Swal.fire("เกิดข้อผิดพลาด", "ไม่สามารถปฏิเสธสินค้าได้", "error");
+                });
+            }
+        });
+    };
+
+
+    const handleDelete = (productId) => {
+        Swal.fire({
+            title: "คุณแน่ใจหรือไม่?",
+            text: "เมื่อลบแล้วจะไม่สามารถกู้คืนได้!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#e3342f",
+            cancelButtonColor: "#6c757d",
+            confirmButtonText: "ใช่, ลบเลย",
+            cancelButtonText: "ยกเลิก"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axios.delete(`http://localhost:3001/admin/deleteSouvenir/${productId}`)
+                    .then(() => {
+                        setProducts(products.filter(product => product.product_id !== productId));
+                        Swal.fire("ลบเรียบร้อย!", "สินค้าถูกลบออกจากระบบแล้ว", "success");
+                    })
+                    .catch(() => {
+                        Swal.fire("ผิดพลาด", "ไม่สามารถลบสินค้าได้", "error");
+                    });
+            }
+        });
+    };
+
     const getStatusColor = (status) => {
         if (status === "1") {
             return "green";
@@ -173,26 +186,37 @@ function Approve() {
                             </span>
 
                             <div className="d-flex justify-content-between gap-2">
-                            {product.status === "0" && (
-                                <button
-                                className="btn btn-sm btn-outline-success rounded-pill flex-grow-1"
-                                onClick={() => handleApprove(product.product_id)}
-                                >
-                                ✅ อนุมัติ
-                                </button>
-                            )}
-                            <button
-                                className="btn btn-sm btn-outline-primary rounded-pill"
-                                onClick={() => handleOpen(product)}
-                            >
-                                <FaRegEdit className="me-1" /> แก้ไข
-                            </button>
-                            <button
-                                className="btn btn-sm btn-outline-danger rounded-pill"
-                                onClick={() => handleDelete(product.product_id)}
-                            >
-                                <MdDelete className="me-1" /> ลบ
-                            </button>
+                                {product.status === "0" ? (
+                                    <>
+                                    <button
+                                        className="btn btn-sm btn-outline-success rounded-pill flex-grow-1"
+                                        onClick={() => handleApprove(product.product_id)}
+                                    >
+                                        ✅ อนุมัติ
+                                    </button>
+                                    <button
+                                        className="btn btn-sm btn-outline-danger rounded-pill"
+                                        onClick={() => handleReject(product.product_id)}
+                                    >
+                                        <MdDelete className="me-1" /> ปฏิเสธ
+                                    </button>
+                                    </>
+                                ) : (
+                                    <>
+                                    <button
+                                        className="btn btn-sm btn-outline-primary rounded-pill"
+                                        onClick={() => handleOpen(product)}
+                                    >
+                                        <FaRegEdit className="me-1" /> แก้ไข
+                                    </button>
+                                    <button
+                                        className="btn btn-sm btn-outline-danger rounded-pill"
+                                        onClick={() => handleDelete(product.product_id)}
+                                    >
+                                        <MdDelete className="me-1" /> ลบ
+                                    </button>
+                                    </>
+                                )}
                             </div>
                         </div>
                         </div>

@@ -61,7 +61,9 @@ function CreatePost() {
             return;
         } 
         
-        axios.post('http://localhost:3001/category/add-category', {category_name: newCategory})
+        axios.post('http://localhost:3001/category/add-category', {category_name: newCategory},{
+            withCredentials: true
+        })
         .then(response => {
             if (response.data.success) {
                 console.log('เพิ่มหมวดหมู่ใหม่สำเร็จ:', response.data);

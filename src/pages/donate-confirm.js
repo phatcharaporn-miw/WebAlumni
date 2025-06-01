@@ -65,6 +65,8 @@ function DonateConfirm() {
         try {
             await axios.post('http://localhost:3001/donate/donation/', Data, {
                 headers: { 'Content-Type': 'multipart/form-data' },
+            },{
+                withCredentials: true
             });
             alert("บริจาคสำเร็จ!");
             navigate("/donate");

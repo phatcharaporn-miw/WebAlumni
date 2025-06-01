@@ -48,11 +48,19 @@ function AdminAlumniView() {
     };
 
     const handleSearch = (term) => {
-        setSearchTerm(term);
-        const filteredBySearch = term === "" ? students : students.filter(student =>
-            student.full_name.toLowerCase().includes(term.toLowerCase())
+    setSearchTerm(term);
+
+    const filteredBySearch = term === "" ? students : students.filter(student => {
+        const lowerTerm = term.toLowerCase();
+        return (
+            student.full_name.toLowerCase().includes(lowerTerm) ||
+            student.graduation_year?.toString().includes(lowerTerm) ||
+            student.admission_year?.toString().includes(lowerTerm) ||
+            student.studentId?.toString().includes(lowerTerm)
         );
-        const filteredByDegree = filteredBySearch.filter(student => student.degree === activeTab);
+    });
+
+    const filteredByDegree = filteredBySearch.filter(student => student.degree === activeTab);
         setFilteredStudents(filteredByDegree);
     };
 
@@ -147,7 +155,7 @@ function AdminAlumniView() {
                     <input
                         type="text"
                         className="form-control w-25"
-                        placeholder="ค้นหารายชื่อ..."
+                        placeholder="ค้นหา..."
                         value={searchTerm}
                         onChange={(e) => handleSearch(e.target.value)}
                     />
@@ -159,8 +167,9 @@ function AdminAlumniView() {
                             <tr>
                                 <th scope="col">ลำดับ</th>
                                 <th scope="col">ชื่อนักศึกษา</th>
-                                <th scope="col">ปีที่จบการศึกษา</th>
                                 <th scope="col">รหัสนักศึกษา</th>
+                                <th scope="col">ปีที่เข้าศึกษา</th>
+                                <th scope="col">ปีที่จบการศึกษา</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -169,13 +178,15 @@ function AdminAlumniView() {
                                     <tr key={index}>
                                         <th scope="row">{index + 1}</th>
                                         <td>{student.full_name}</td>
-                                        <td>{student.graduation_year}</td>
                                         <td>{student.studentId}</td>
+                                        <td>{student.admission_year}</td>
+                                        <td>{student.graduation_year}</td>
+                                        
                                     </tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="4" className="text-center text-muted">
+                                    <td colSpan="5" className="text-center text-muted">
                                         ยังไม่มีรายชื่อ
                                     </td>
                                 </tr>
@@ -184,7 +195,6 @@ function AdminAlumniView() {
                     </table>
                 </div>
             </div>
-            <hr className="my-5" />
 
             {/* <div className="outstanding">
                 <h5 className="mb-4">ศิษย์เก่าดีเด่น</h5>

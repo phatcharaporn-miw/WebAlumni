@@ -68,7 +68,7 @@ function AppLayout() {
 
   const handleLogout = () => {
       axios.get('http://localhost:3001/api/logout', {
-          withCredentials: "include"
+          withCredentials: true,
         })
           .then((response) => {
               if (response.status === 200) {
@@ -91,18 +91,26 @@ function AppLayout() {
 
   // ดึงโปรไฟล์ผู้ใช้งาน
   useEffect(() => {
-    axios.get('http://localhost:3001/users/profile', { 
-        withCredentials: true })
+    const userId = localStorage.getItem("userId");
+
+    if (!userId) return;
+
+    axios.get('http://localhost:3001/users/profile', {
+      withCredentials: true,
+    })
       .then((response) => {
-        
         if (response.data.success) {
           setUser(response.data.user);
         }
       })
       .catch((error) => {
-        console.error('เกิดข้อผิดพลาดในการดึงข้อมูลโปรไฟล์ผู้ใช้งาน:', error.response ? error.response.data.message : error.message);
+        console.error(
+          'เกิดข้อผิดพลาดในการดึงข้อมูลโปรไฟล์ผู้ใช้งาน:',
+          error.response ? error.response.data.message : error.message
+        );
       });
   }, []);
+
 
 //    // ตรวจสอบสิทธิ์การเข้าถึงเฉพาะเส้นทางที่ต้องการการเข้าสู่ระบบ
 //    useEffect(() => {

@@ -25,7 +25,6 @@ function PresidentProfile() {
       withCredentials: true, 
     })
       .then((response) => {
-        console.log('majors:', response.data.major);     
         if (response.data.success) {
           setProfile(response.data.user);
         }
@@ -105,12 +104,18 @@ function PresidentProfile() {
     }));
   };
 
-  const addEducation = () => {
-    setProfile((prevState) => ({
-        ...prevState,
-        educations: [...prevState.educations, { degree: '', major: '', studentId: '', graduation_year: '' }],
-    }));
+const addEducation = () => {
+  setProfile((prevState) => ({
+    ...prevState,
+    educations: [...prevState.educations, {
+      degree_id: '',
+      major_id: '',
+      studentId: '',
+      graduation_year: ''
+    }],
+  }));
 };
+
 
 const removeEducation = (index) => {
   const updatedEducations = [...profile.educations];
@@ -263,10 +268,10 @@ const removeEducation = (index) => {
                       <input
                         type="text"
                         className="form-control"
-                        id="nickname"
-                        name="nickname"
+                        id="nick_name"
+                        name="nick_name"
                         placeholder="ชื่อเล่น"
-                        value={profile.nickname || ''}
+                        value={profile.nick_name || ''}
                         onChange={handleChange}
                         disabled={!editing}
                       />
@@ -397,22 +402,38 @@ const removeEducation = (index) => {
                           />
                         </div>
                         <div className="col-md-6">
-                          <label>ชั้นปีที่<span className="importent">*</span></label>
+                          <label>ปีการศึกษาที่จบ<span className="importent">*</span></label>
                           <input
                             type="text"
                             className="form-control"
-                            name="student_year"
-                            placeholder="ชั้นปีที่"
-                            value={edu.student_year}
-                            onChange={(e) => handleEducationChange(index, 'student_year', e.target.value)}
+                            name="graduation_year"
+                            placeholder="ปีการศึกษาที่จบ"
+                            value={edu.graduation_year}
+                            onChange={(e) => handleEducationChange(index, 'graduation_year', e.target.value)}
                             disabled={!editing}
                           />
                         </div>
                       </div>
+                      {editing && profile.educations.length > 1 && (
+                        <button
+                          type="button"
+                          className="btn btn-danger mt-2"
+                          onClick={() => removeEducation(index)}
+                        >
+                          ลบรายการ
+                        </button>
+                      )}
+
+                      <hr />
                     </div>
                   ))
                 ) : (
                   <p>ไม่มีข้อมูลการศึกษา</p>
+                )}
+                {editing && (
+                  <button type="button" className="btn btn-primary mt-3" onClick={addEducation}>
+                    เพิ่มข้อมูลการศึกษา
+                  </button>
                 )}
               </fieldset>
             </div>

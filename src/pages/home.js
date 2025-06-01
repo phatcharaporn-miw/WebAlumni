@@ -126,7 +126,9 @@ function Home() {
   // ดึงข้อมูลสถิติหลัก
   useEffect(() => {
           // ดึงข้อมูลสถิติหลัก
-          axios.get("http://localhost:3001/admin/dashboard-stats")
+          axios.get("http://localhost:3001/admin/dashboard-stats",{
+            withCredentials: true
+          })
           .then((res) => {
               setStats(res.data);
               })
@@ -135,7 +137,9 @@ function Home() {
           });
   
           // ดึงข้อมูลกราฟแท่ง
-          axios.get('http://localhost:3001/admin/activity-per-year')
+          axios.get('http://localhost:3001/admin/activity-per-year',{
+            withCredentials: true
+          })
           .then(res => {
               // console.log("กิจกรรมต่อปี", res.data);
               if (Array.isArray(res.data)) {
@@ -168,7 +172,9 @@ function Home() {
           // });
       
           // ดึงจำนวนศิษย์เก่า
-          axios.get('http://localhost:3001/admin/total-alumni')
+          axios.get('http://localhost:3001/admin/total-alumni',{
+            withCredentials: true
+          })
             .then(res => setAlumniCount(res.data.totalAlumni));
   }, []);
 
@@ -249,9 +255,7 @@ function Home() {
 
   //ดึงข้อมูล webboard
   useEffect(() => {
-    axios.get('http://localhost:3001/web/webboard', {
-      withCredentials: true,
-    })
+    axios.get('http://localhost:3001/web/webboard')
       .then((response) => {
         if (response.data.success) {
 
@@ -265,7 +269,9 @@ function Home() {
       });
 
     axios
-      .get("http://localhost:3001/donate")
+      .get("http://localhost:3001/donate",{
+        withCredentials: true
+      })
       .then((response) => {
         setProjects(response.data);
       })

@@ -10,9 +10,10 @@ function Souvenir() {
     useEffect(() => {
         window.scrollTo(0, 0);
         axios
-            .get("http://localhost:3001/souvenir")
+            .get("http://localhost:3001/souvenir",{
+                 withCredentials: true
+            })
             .then((response) => {
-                console.log(response.data);
                 setProducts(response.data);
             })
             .catch((error) => {

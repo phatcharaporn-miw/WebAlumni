@@ -120,6 +120,8 @@ const handleImageChange = async (e) => {
       headers: {
         "Content-Type": "multipart/form-data",
       },
+    },{
+        withCredentials: true
     });
 
     if (res.status === 200) {
@@ -170,7 +172,7 @@ const handleImageChange = async (e) => {
                             </div>
                             <hr />
                             <div className="menu d-block mt-4">
-                                <div className="menu-item py-2 mb-2 rounded">ข้อมูลส่วนตัว</div>
+                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/student-profile")}>ข้อมูลส่วนตัว</div>
                                 <div className="menu-item active py-2 mb-2 rounded" onClick={() => handleClick("/student-profile/student-profile-webboard")}>กระทู้ที่สร้าง</div>
                                 <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/student-profile/donation-history")}>ประวัติการบริจาค</div>
                                 <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/student-profile/student-profile-activity")}>ประวัติการเข้าร่วมกิจกรรม</div>
