@@ -66,8 +66,7 @@ function Login() {
         } else if (role === 3) {
             navigate('/alumni-home');
         } else if (role === 4) {
-            // navigate('/student-home');
-            navigate('/alumni-home');
+            navigate('/student-home');
         } else {
             setErrorMessage('Unknown role. Please contact support.');
         }
@@ -117,9 +116,7 @@ function Login() {
                                
                             </div>
                         </div>
-
-                    </form>
-                     
+                    </form>        
                       {errorMessage && <p className="error-message">{errorMessage}</p>}
                 </div>
             </div>

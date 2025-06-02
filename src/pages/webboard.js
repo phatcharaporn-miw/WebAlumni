@@ -38,16 +38,16 @@ function Webboard(){
     const [expandedReplies, setExpandedReplies] = useState({}); //ซ่อนการตอบกลับ
     const navigate = useNavigate();
 
-    // useEffect(() => {
-    //   const userSession = localStorage.getItem("userId");  
-    //   if (userSession) {
-    //       setIsLoggedin(true);
-    //       console.log("ผู้ใช้ล็อกอินแล้ว");
-    //   } else {
-    //       setIsLoggedin(false);
-    //       console.log("ผู้ใช้ยังไม่ได้ล็อกอิน"); 
-    //   }
-    // }, []);
+    useEffect(() => {
+      const userSession = localStorage.getItem("userId");  
+      if (userSession) {
+          setIsLoggedin(true);
+          // console.log("ผู้ใช้ล็อกอินแล้ว");
+      } else {
+          setIsLoggedin(false);
+          // console.log("ผู้ใช้ยังไม่ได้ล็อกอิน"); 
+      }
+    }, []);
   
     //ดึงข้อมูล webboard
     useEffect(() => {

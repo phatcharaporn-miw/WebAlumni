@@ -368,25 +368,18 @@ function Register() {
                                                 onChange={(e) => handleEducationChange(index, 'studentId', e.target.value)}
                                                 required
                                             />
-                                        </div>
+                                        </div>                                        
 
                                         <div className="form-group">
-                                            <label>ปีที่เรียน<span className="importent">*</span></label>
-                                            <select
-                                                name="student_year"
-                                                value={edu.student_year || ''}
-                                                onChange={(e) => handleEducationChange(index, 'student_year', e.target.value)}
+                                            <label>ปีที่เข้าศึกษา</label>
+                                            <input
+                                                type="text"
                                                 className="form-control"
-                                                required
-                                            >
-                                                <option value="">เลือกปีที่เรียน</option>
-                                                <option value="1">ปี 1</option>
-                                                <option value="2">ปี 2</option>
-                                                <option value="3">ปี 3</option>
-                                                <option value="4">ปี 4</option>
-                                                <option value="5">ปี 5</option>
-                                                <option value="อื่นๆ">อื่นๆ</option>
-                                            </select>
+                                                name="admission_year"
+                                                placeholder="ปีที่เข้าศึกษา"
+                                                value={edu.admission_year}
+                                                onChange={(e) => handleEducationChange(index, 'admission_year', e.target.value)}
+                                            />
                                         </div>
 
                                         <div className="form-group">

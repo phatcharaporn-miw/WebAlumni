@@ -122,3 +122,26 @@ button:hover {
         width: 100%;
     }
 }
+
+@media (max-width: 468px) {
+    .form-login-logo {
+        width: 350px;
+        height: 120px;
+    }
+
+    .form-login input {
+        width: 100% !important; /* ขยายเต็มหน้าจอ */
+    }
+
+    .form-login-bg {
+        padding: 15px;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    .form-login h2 {
+        font-size: 24px;
+    }
+
+}

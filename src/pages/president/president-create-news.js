@@ -61,7 +61,7 @@ function PresidentCreateNews() {
     return (
         <div className="container mt-5">
             <div className="row justify-content-center">
-                <div className="col-lg-8 col-md-10">
+                <div className="col-lg-6 col-md-10">
                     <div className="card shadow-lg border-0">
                         <div className="card-header bg-primary text-white text-center">
                             <h3 className="mb-0">เพิ่มข่าวประชาสัมพันธ์</h3>

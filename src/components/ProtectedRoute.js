@@ -1,43 +1,45 @@
-// import React from "react";
-// import { Navigate, useLocation } from "react-router-dom";
-// import Swal from "sweetalert2";
+import { useLocation, Navigate } from "react-router-dom";
+import Swal from "sweetalert2";
+import { useEffect, useState } from "react";
 
-// // ตรวจสอบว่าผู้ใช้ login แล้วหรือไม่
-// const isAuthenticated = () => {
-//   return !!localStorage.getItem("token"); // true ถ้ามี token
-// };
+function ProtectedRoute({ children, requiredRoles }) {
+  const location = useLocation();
+  const [redirectPath, setRedirectPath] = useState(null);
+  const userId = localStorage.getItem("userId");
+  const userRole = localStorage.getItem("userRole"); 
 
-// // ตรวจสอบว่า role ของผู้ใช้ตรงกับที่ระบุไว้หรือไม่
-// const hasRole = (requiredRoles) => {
-//   const userRole = parseInt(localStorage.getItem("role"));
-//   return requiredRoles.includes(userRole);
-// };
+useEffect(() => {
+    if (!userId) {
+      Swal.fire({
+        title: "กรุณาเข้าสู่ระบบ",
+        text: "คุณต้องเข้าสู่ระบบก่อนเข้าถึงหน้านี้",
+        icon: "warning",
+        confirmButtonColor: "#0F75BC",
+      }).then(() => {
+        setRedirectPath("/login");
+      });
+    } else if (requiredRoles && !requiredRoles.includes(userRole)) {
+      Swal.fire({
+        title: "ไม่มีสิทธิ์เข้าถึง",
+        text: "คุณไม่มีสิทธิ์เข้าถึงหน้านี้",
+        icon: "error",
+        confirmButtonColor: "#0F75BC",
+      }).then(() => {
+        const fallback = userRole === "1" ? "/admin-home" : "/";
+        setRedirectPath(fallback);
+      });
+    }
+//     console.log("🧪 userId =", userId);
+// console.log("🧪 userRole =", userRole);
+// console.log("🧪 requiredRoles =", requiredRoles);
 
-// // Component ที่ใช้เป็น Route Guard
-// const ProtectedRoute = ({ children, requiredRoles }) => {
-//   const location = useLocation();
+  }, [userId, userRole, requiredRoles]);
 
-//   if (!isAuthenticated()) {
-//     Swal.fire({
-//       icon: "warning",
-//       title: "กรุณาเข้าสู่ระบบก่อน",
-//       text: "คุณต้องเข้าสู่ระบบเพื่อใช้งานหน้านี้",
-//       confirmButtonText: "ตกลง",
-//     });
-//     return <Navigate to="/login" state={{ from: location }} replace />;
-//   }
+  if (redirectPath) {
+    return <Navigate to={redirectPath} replace />;
+  }
 
-//   if (requiredRoles && !hasRole(requiredRoles)) {
-//     Swal.fire({
-//       icon: "error",
-//       title: "เข้าถึงไม่ได้",
-//       text: "คุณไม่มีสิทธิ์เข้าถึงหน้านี้",
-//       confirmButtonText: "ตกลง",
-//     });
-//   }
+  return children;
+}
 
-//   return children;
-// };
-
-// export default ProtectedRoute;
-
+export default ProtectedRoute;
