@@ -265,7 +265,7 @@ function Register() {
 
                                 <div className="form-group">
                                     <label>ชื่อเล่น<span className="importent">*</span></label>
-                                     <input type="text" className="form-control" id="nick_name" name="nick_name" placeholder='ชื่อเล่น'
+                                    <input type="text" className="form-control" id="nick_name" name="nick_name" placeholder='ชื่อเล่น'
                                     value={userData.nick_name}
                                     onChange={handleInputChange}
                                     />

@@ -1,12 +1,13 @@
-import React from 'react';
+// import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import React, { Suspense, lazy } from "react";
 import './App.css';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-// import { LanguageProvider } from './context/LanguageContext';
 import AppLayout from "./components/AppLayout";
-import Home from "./pages/home";
+
+// import Home from "./pages/home";
 import About from "./pages/about";
 import News from './pages/news';
 import Activity from './pages/activity';
@@ -18,12 +19,11 @@ import Souvenir from './pages/souvenir';
 import SouvenirDetail from './pages/souvenirDetail';
 import SouvenirRequest from './pages/souvenir_request';
 import SearchResult from './pages/searchResults';
-import Webboard from './pages/webboard';
+// import Webboard from './pages/webboard';
 import Alumni from './pages/alumni';
 import Login from './pages/login';
 import Register from './pages/register';
 import Faq from './pages/faq';
-// import Register from './pages/test-regis';
 import PresidentHome from './pages/president/president-home';
 import ProtectedRoute from './components/ProtectedRoute';
 import AlumniHome from './pages/alumni/alumni-home';
@@ -44,7 +44,7 @@ import SouvenirCheckout from './pages/souvenir_checkout';
 import AlumniProfileSouvenir from './pages/alumni/alumni-profile-souvenir';
 import AlumniProfileActivity from './pages/alumni/alumni-profile-activity';
 import SouvenirBasket from './pages/souvenir_basket';
-import AlumniMajor from './pages/major-detail';
+//import AlumniMajor from './pages/major-detail';
 // import AlumniProfile from './pages/alumni/alumni-profile';
 import HomeAlumniProfile from './pages/alumniProfile';
 
@@ -93,6 +93,9 @@ import PresidentProfileWebboard from './pages/president/president-profile-webboa
 import Approve from './pages/president/president-approve';
 import PresidentProfileSouvenir from './pages/president/president-profile-souvenir';
 
+const AlumniMajor = lazy(() => import("./pages/major-detail"));
+const Webboard = lazy(() => import("./pages/webboard"));
+const Home = lazy(() => import("./pages/home"));
 
 function App() {
 
@@ -104,7 +107,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route element={<AppLayout />}>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Suspense fallback={<div>Loading...</div>}><Home /></Suspense>} />
             <Route path="/about" element={<About />} />
             <Route path="/news" element={<News />} />
             <Route path="/faq" element={<Faq />} />
@@ -122,8 +125,8 @@ function App() {
             <Route path="/souvenir/souvenir_request" element={<SouvenirRequest />} />
             <Route path="/souvenir/souvenirDetail/:productId" element={<SouvenirDetail />} />
             <Route path="/souvenir/souvenirDetail" element={<SouvenirDetail />} />
-            <Route path="/webboard" element={<Webboard />} />
-            <Route path="/webboard/:id" element={<Webboard />} />
+            <Route path="/webboard" element={<Suspense fallback={<div>Loading...</div>}><Webboard /></Suspense>} />
+            <Route path="/webboard/:id" element={<Suspense fallback={<div>Loading...</div>}><Webboard /></Suspense>} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/news/:newsId" element={<NewsDetail />} />
@@ -131,7 +134,7 @@ function App() {
             <Route path="/webboard/category" element={<Category />} />
             <Route path="/activity/:activityId" element={<ActivityDetail />} />
             <Route path="/forgotPassword" element={<ForgotPassword />} />
-            <Route path="/alumni/major-detail/:major" element={<AlumniMajor />} />
+            <Route path="/alumni/major-detail/:major" element={<Suspense fallback={<div>Loading...</div>}><AlumniMajor /></Suspense>} />
             <Route path="/alumni/major-detail" element={<AlumniMajor />} />
             <Route path="/searchResult" element={<SearchResult />} />
             <Route path="/alumni/:userId" element={<HomeAlumniProfile />} />

@@ -60,12 +60,12 @@ function News(){
         });
     };
 
-    const backgroundVariants = {
-        animate: {
-          backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
-          transition: { duration: 18, repeat: Infinity, ease: "linear" }
-        }
-    };
+    // const backgroundVariants = {
+    //     animate: {
+    //       backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+    //       transition: { duration: 18, repeat: Infinity, ease: "linear" }
+    //     }
+    // };
 
     const handleSearch = (term) => {
         setSearchTerm(term);
@@ -88,8 +88,8 @@ function News(){
 
     return (
         <section className="news-container">
-            <img src="./image/banner.jpg" className="head-news img-fluid w-100" alt="news-image" />
-            <h3 className="news text-center mt-3">ข่าวประชาสัมพันธ์</h3>
+            <img src="./image/frequency-wave.jpg" className="head-news w-100" alt="news-image" />
+            <h3 className="news text-center">ข่าวประชาสัมพันธ์</h3>
 
             <div className="py-3 container">
                 <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">

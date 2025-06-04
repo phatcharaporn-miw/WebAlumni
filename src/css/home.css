@@ -1,9 +1,11 @@
 
-  .news-card img {
-    width: 100%;
-    height: auto;
-    border-bottom: 4px solid #004F9F; 
-  }
+  /* .news-card img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9; 
+  border-bottom: 4px solid #004F9F; 
+  display: block;
+} */
   
   .news-card .card-body {
     padding: 20px;
@@ -15,6 +17,35 @@
     margin-bottom: 5%;
     background-color: #fff;
   }
+
+/* .news-card,
+.news-card img,
+.card-homeweb,
+.act-home-item {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.news-card:hover,
+.card-homeweb:hover,
+.act-home-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+} */
+
+.news-card img,
+.col-md-4 img {
+  object-fit: cover;
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+}
+
+.btn-news-home,
+.card-homeweb,
+.news-card {
+  will-change: transform;
+}
 
   #head-text{
     text-align: center;
@@ -39,14 +70,41 @@
     margin: 0 100px ;
   }
 
-  .content {
+  /* .content {
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: fixed; 
     background-size: cover;
     min-height: 100vh;
+} */
+
+.activity-placeholder {
+  min-height: 500px; /* กะประมาณความสูงของ 3 กิจกรรม */
 }
 
+.placeholder-glow .placeholder {
+  height: 1.2rem;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+}
+
+
+.content {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  
+}
+
+.background-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
+}
 
 .news-title {
   font-weight: bold;
@@ -114,3 +172,28 @@
   outline: none; /* เอาขอบ focus ออก */
 }
 
+.col-md-4 img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3; /* หรือปรับตามจริง */
+}
+
+@media (max-width: 768px) {
+  .home-about {
+    margin: 0 20px;
+  }
+
+  .card-homeweb {
+    height: auto;
+    margin-bottom: 30px;
+  }
+
+  .act-home-item {
+    padding: 10px;
+  }
+
+  .act-date {
+    width: auto;
+    display: inline-block;
+  }
+}

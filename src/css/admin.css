@@ -210,6 +210,9 @@ table td button:hover {
     color: white;
 }
 
+.notification-icon-admin{
+  font-size: 24px;
+}
 
 
 /* Responsive Styles */

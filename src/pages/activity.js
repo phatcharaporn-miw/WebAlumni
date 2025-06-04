@@ -229,7 +229,7 @@ function Activity(){
 
     return(
         <section className="container">
-            {/* <img src="./image/donation.jpg" className="head-activity" alt="donation-image" /> */}
+            {/* <img src="./image/frequency-wave.jpg" className="head-news img-fluid w-100" alt="news-image" /> */}
             <div className="activity-page">
             <h3 className="act-title">กิจกรรม</h3>
 

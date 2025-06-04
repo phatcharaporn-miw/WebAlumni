@@ -123,7 +123,7 @@ function SouvenirRequest() {
         try {
             const response = await axios.post(url, data, {
                 headers: { 'Content-Type': 'multipart/form-data' },
-            },{
+            }, {
                 withCredentials: true
             });
 
@@ -155,6 +155,15 @@ function SouvenirRequest() {
     //         return url;  
     //     });
     // };
+
+    const handleCancel = () => {
+        const role = localStorage.getItem("userRole"); // หรือ user?.role
+        if (role === "1") {
+            navigate("/admin/souvenir");
+        } else {
+            navigate("/souvenir");
+        }
+    };
 
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
@@ -315,10 +324,12 @@ function SouvenirRequest() {
                     </div>
 
                     <div className="group-souvenir-bt">
-                        <Link to="/souvenir">
-                            <button className="cancle-button-souvenirRequest" type="button">ยกเลิก</button>
-                        </Link>
-                        <button type="button" className="button-souvenirRequest" onClick={handleOpen}>เพิ่มสินค้าของที่ระลึก</button>
+                        <button className="cancle-button-souvenirRequest" type="button" onClick={handleCancel}>
+                            ยกเลิก
+                        </button>
+                        <button type="button" className="button-souvenirRequest" onClick={handleOpen}>
+                            เพิ่มสินค้าของที่ระลึก
+                        </button>
                     </div>
                 </form>
             </div>

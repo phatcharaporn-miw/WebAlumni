@@ -93,59 +93,63 @@ function EditNews() {
     }
 
     return(
-        <div className="container mt-4">
-            <h3 className="mb-4 admin-title">แก้ไขข่าวประชาสัมพันธ์</h3>
-            {loading ? (
-                <p className="text-center mt-5">กำลังโหลดข้อมูล...</p>
-            ) : news ? (
-                <div className="card shadow-lg border-0">
-                    <div className="card-body">
-                        <form onSubmit={handleSubmit}>
-                            <div className="mb-3">
-                                <label htmlFor="title" className="form-label">หัวข้อข่าว <span className="text-danger">*</span></label>
-                                <input
-                                    type="text"
-                                    className="form-control w-100"
-                                    id="title"
-                                    name="title"
-                                    placeholder="หัวข้อข่าว"
-                                    value={formData.title}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </div>
-                            <div className="mb-3">
-                                <label htmlFor="content" className="form-label">เนื้อหาข่าว <span className="text-danger">*</span></label>
-                                <textarea
-                                    className="form-control w-100"
-                                    id="content"
-                                    name="content"
-                                    rows="5"
-                                    placeholder="เนื้อหาข่าว"
-                                    value={formData.content}
-                                    onChange={handleChange}
-                                    required
-                                ></textarea>
-                            </div>
-                            <div className="mb-3">
-                                <label htmlFor="images" className="form-label">อัปโหลดภาพ (ถ้ามี)</label>
-                                <input
-                                    type="file"
-                                    className="form-control w-100"
-                                    id="images"
-                                    name="images"
-                                    multiple
-                                    accept="image/*"
-                                    onChange={handleFileChange}
-                                />
-                            </div>
-                            <button type="submit" className="btn btn-primary">บันทึกการแก้ไข</button>
-                        </form>
+        <div className="container">
+            <div className="row justify-content-center">
+                    <h3 className="mb-4 admin-title">แก้ไขข่าวประชาสัมพันธ์</h3>
+                {loading ? (
+                    <p className="text-center mt-5">กำลังโหลดข้อมูล...</p>
+                ) : news ? (
+                    <div className="card shadow-lg border-0 col-7">
+                        <div className="card-body ">
+                            <form onSubmit={handleSubmit}>
+                                <div className="mb-3">
+                                    <label htmlFor="title" className="form-label">หัวข้อข่าว <span className="text-danger">*</span></label>
+                                    <input
+                                        type="text"
+                                        className="form-control w-100"
+                                        id="title"
+                                        name="title"
+                                        placeholder="หัวข้อข่าว"
+                                        value={formData.title}
+                                        onChange={handleChange}
+                                        required
+                                    />
+                                </div>
+                                <div className="mb-3">
+                                    <label htmlFor="content" className="form-label">เนื้อหาข่าว <span className="text-danger">*</span></label>
+                                    <textarea
+                                        className="form-control w-100"
+                                        id="content"
+                                        name="content"
+                                        rows="5"
+                                        placeholder="เนื้อหาข่าว"
+                                        value={formData.content}
+                                        onChange={handleChange}
+                                        required
+                                    ></textarea>
+                                </div>
+                                <div className="mb-3">
+                                    <label htmlFor="images" className="form-label">อัปโหลดภาพ (ถ้ามี)</label>
+                                    <input
+                                        type="file"
+                                        className="form-control w-100"
+                                        id="images"
+                                        name="images"
+                                        multiple
+                                        accept="image/*"
+                                        onChange={handleFileChange}
+                                    />
+                                </div>
+                                <div className="d-grid">
+                                    <button type="submit" className="btn btn-primary">บันทึกการแก้ไข</button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
-                </div>
-            ) : (
-                <p className="text-center mt-5">ไม่พบข้อมูลข่าว</p>
-            )}
+                ) : (
+                    <p className="text-center mt-5">ไม่พบข้อมูลข่าว</p>
+                )}
+            </div>            
         </div>
     );
 }

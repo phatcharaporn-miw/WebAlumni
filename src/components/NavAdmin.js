@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,  } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { FaTrash, FaBars } from 'react-icons/fa';
 import '../css/navAdmin.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { Offcanvas } from "bootstrap"; 
 import { auto } from '@popperjs/core';
 
 function NavAdmin() {
@@ -144,124 +146,124 @@ function NavAdmin() {
     };
 
     return (
-    <>
-        {/* Hamburger Button (แสดงบนมือถือ) */}
-        <div className="d-block d-md-none p-2 bg-primary text-white">
-            <button className="btn btn-light" onClick={toggleMobileMenu}>
-                <FaBars /> เมนู
-            </button>
-        </div>
+        <>
+            {/* Hamburger Button (แสดงบนมือถือ) */}
+            <div className="d-block d-md-none p-2 bg-primary text-white">
+                <button className="btn btn-light" onClick={toggleMobileMenu}>
+                    <FaBars /> เมนู
+                </button>
+            </div>
 
-        {/* Sidebar สำหรับ Desktop และ Mobile */}
-        <div
-            style={{
-                ...navAdminStyles,
-                position: "fixed",
-                top: 0,
-                bottom: 0,
-                zIndex: 1000,
-                transform: isMobileMenuOpen || window.innerWidth >= 768 ? "translateX(0)" : "translateX(-100%)",
-                transition: "transform 0.3s ease-in-out",
-            }}
-            className="d-block"
-        >
-            {/* Notification Icon */}
-            {userInfo && (
-                <div className="notification-container" style={{ position: "absolute", top: 20, right: 20, zIndex: 10 }}>
-                    <div className="notification-icon" onClick={toggleNotifications}>
-                        <IoMdNotificationsOutline />
-                        {unreadCount > 0 && <span className="unread-count">{unreadCount}</span>}
-                    </div>
-
-                    {showNotifications && (
-                        <div className="notification-dropdown-admin" onClick={handleDropdownClick}>
-                            <h5 className="notification-title">การแจ้งเตือน</h5>
-                            {notifications.length > 0 ? (
-                                notifications.map((notification) => (
-                                    <div
-                                        key={notification.notification_id}
-                                        className={`notification-item ${notification.read_status === "ยังไม่อ่าน" ? "unread" : ""}`}
-                                        onClick={() => markAsRead(notification.notification_id)}
-                                    >
-                                        <p className="message">{notification.message}</p>
-                                        <p className="notification-date">
-                                            {new Date(notification.send_date).toLocaleString()}
-                                        </p>
-                                        <button
-                                            className="delete-btn"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                deleteNotification(notification.notification_id);
-                                            }}
-                                        >
-                                            <FaTrash />
-                                        </button>
-                                    </div>
-                                ))
-                            ) : (
-                                <p className="no-notifications text-center small">ไม่มีการแจ้งเตือน</p>
-                            )}
+            {/* Sidebar สำหรับ Desktop และ Mobile */}
+            <div
+                style={{
+                    ...navAdminStyles,
+                    position: "fixed",
+                    top: 0,
+                    bottom: 0,
+                    zIndex: 1000,
+                    transform: isMobileMenuOpen || window.innerWidth >= 768 ? "translateX(0)" : "translateX(-100%)",
+                    transition: "transform 0.3s ease-in-out",
+                }}
+                className="d-block"
+            >
+                {/* Notification Icon */}
+                {userInfo && (
+                    <div className="notification-container" style={{ position: "absolute", top: 20, right: 20, zIndex: 10 }}>
+                        <div className="notification-icon-admin" onClick={toggleNotifications}>
+                            <IoMdNotificationsOutline />
+                            {unreadCount > 0 && <span className="unread-count">{unreadCount}</span>}
                         </div>
-                    )}
-                </div>
-            )}
 
-            {/* Profile */}
-            {userInfo && (
-                <div className="card-body text-center" style={profileContainer}>
-                    <img
-                        src={userInfo.profilePic}
-                        alt="avatar"
-                        className="rounded-circle img-fluid"
-                        style={profilePicStyle}
-                    />
-                    <h5 className="my-3" style={{ fontSize: '18px', fontWeight: '500' }}>
-                        ยินดีต้อนรับ {userInfo.fullName}
-                    </h5>
-                </div>
-            )}
+                        {showNotifications && (
+                            <div className="notification-dropdown-admin" onClick={handleDropdownClick}>
+                                <h5 className="notification-title">การแจ้งเตือน</h5>
+                                {notifications.length > 0 ? (
+                                    notifications.map((notification) => (
+                                        <div
+                                            key={notification.notification_id}
+                                            className={`notification-item ${notification.read_status === "ยังไม่อ่าน" ? "unread" : ""}`}
+                                            onClick={() => markAsRead(notification.notification_id)}
+                                        >
+                                            <p className="message">{notification.message}</p>
+                                            <p className="notification-date">
+                                                {new Date(notification.send_date).toLocaleString()}
+                                            </p>
+                                            <button
+                                                className="delete-btn"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    deleteNotification(notification.notification_id);
+                                                }}
+                                            >
+                                                <FaTrash />
+                                            </button>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p className="no-notifications text-center small">ไม่มีการแจ้งเตือน</p>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                )}
 
-            {/* Menu Items */}
-            <div className="nav flex-column nav-pills">
-                {[
-                    { to: "/admin-home", label: "Dashboard" },
-                    { to: "/admin/calendar", label: "ปฏิทินกิจกรรม" },
-                    { to: "/admin/activities", label: "กิจกรรมและการเข้าร่วม" },
-                    { to: "/admin/donations", label: "การบริจาคและโครงการ" },
-                    { to: "/admin/webboard", label: "การจัดการเว็บบอร์ด" },
-                    { to: "/admin/news", label: "ข่าวสารและประชาสัมพันธ์" },
-                    { to: "/admin/souvenir", label: "ของที่ระลึก" },
-                    { to: "/admin/admin-alumni", label: "ทำเนียบศิษย์เก่า" },
-                    { to: "/admin/users", label: "จัดการผู้ใช้" },
-                ].map(({ to, label }) => (
+                {/* Profile */}
+                {userInfo && (
+                    <div className="card-body text-center" style={profileContainer}>
+                        <img
+                            src={userInfo.profilePic}
+                            alt="avatar"
+                            className="rounded-circle img-fluid"
+                            style={profilePicStyle}
+                        />
+                        <h5 className="my-3" style={{ fontSize: '18px', fontWeight: '500' }}>
+                            ยินดีต้อนรับ {userInfo.fullName}
+                        </h5>
+                    </div>
+                )}
+
+                {/* Menu Items */}
+                <div className="nav flex-column nav-pills">
+                    {[
+                        { to: "/admin-home", label: "Dashboard" },
+                        { to: "/admin/calendar", label: "ปฏิทินกิจกรรม" },
+                        { to: "/admin/activities", label: "กิจกรรมและการเข้าร่วม" },
+                        { to: "/admin/donations", label: "การบริจาคและโครงการ" },
+                        { to: "/admin/webboard", label: "การจัดการเว็บบอร์ด" },
+                        { to: "/admin/news", label: "ข่าวสารและประชาสัมพันธ์" },
+                        { to: "/admin/souvenir", label: "ของที่ระลึก" },
+                        { to: "/admin/admin-alumni", label: "ทำเนียบศิษย์เก่า" },
+                        { to: "/admin/users", label: "จัดการผู้ใช้" },
+                    ].map(({ to, label }) => (
+                        <NavLink
+                            key={to}
+                            to={to}
+                            className="nav-link my-1"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            style={({ isActive }) => ({
+                                ...(isActive ? active : {}),
+                                color: "#FFFFFF",
+                            })}
+                        >
+                            {label}
+                        </NavLink>
+                    ))}
+
                     <NavLink
-                        key={to}
-                        to={to}
+                        onClick={handleLogout}
                         className="nav-link my-1"
-                        onClick={() => setIsMobileMenuOpen(false)}
                         style={({ isActive }) => ({
                             ...(isActive ? active : {}),
                             color: "#FFFFFF",
                         })}
                     >
-                        {label}
+                        ออกจากระบบ
                     </NavLink>
-                ))}
-
-                <NavLink
-                    onClick={handleLogout}
-                    className="nav-link my-1"
-                    style={({ isActive }) => ({
-                        ...(isActive ? active : {}),
-                        color: "#FFFFFF",
-                    })}
-                >
-                    ออกจากระบบ
-                </NavLink>
+                </div>
             </div>
-        </div>
-    </>
-);
+        </>
+    );
 }
 
 const navAdminStyles = {

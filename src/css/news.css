@@ -1,5 +1,6 @@
 .news-title{
     text-align: center; 
+   
 }
   
 .news-page {
@@ -15,7 +16,7 @@
 .head-news{
     position: relative;
     width: 100%;
-    height: 370px;
+    height: 300px;
     object-fit: cover;
     overflow: hidden;
 }
@@ -48,18 +49,18 @@
     color: #777;
 }
 
-.news-imgdetail{
+/* .news-imgdetail{
     width: 80%;
     height: 560px;
     
-}
+} */
 
 .news{
     position: absolute;
-    top: 52%;
+    top: 46%;
     left: 50%;
     transform: translate(-50%, -50%);
-    color: #0F75BC;
+    color: #fff;
     font-weight: bold;
     transition: background-color 0.3s ease, transform 0.3s ease;
     z-index: 2;
@@ -143,5 +144,13 @@
 @media (max-width: 768px) {
   .news-image {
     max-width: 100%; 
+  }
+
+  .head-news{
+    position: relative;
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    overflow: hidden;
   }
 }

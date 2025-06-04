@@ -14,7 +14,11 @@
     max-height: 250px; 
     object-fit: cover;
   }
-  
+
+  #row-webboard {
+    min-height: 500px; /* หรือสูงเท่าๆ กับจำนวนโพสต์ที่คาดว่าจะมี */
+  }
+
   .card-web .card-body {
     padding: 10px;
   }
@@ -113,7 +117,7 @@
   border-radius: 8px;
   padding: 8px;
   margin-top: 5px;
-  margin-left: 40px; /* เพิ่มระยะห่างจากความคิดเห็นหลัก */
+  margin-left: 40px; 
 }
 
 .reply-content {

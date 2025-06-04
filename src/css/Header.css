@@ -13,16 +13,91 @@
     width: 100%;
   }
 
+/* .search-and-login {
+  position: absolute;
+  top: 40px;
+  right: 20px;
+  width: 420px;
+  min-height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  z-index: 1000;
+}
 
+.search {
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+}
 
-  .search-and-login {
+.search input {
+  width: 160px;
+  height: 36px;
+  padding: 4px 8px;
+  font-size: 14px;
+  border-radius: 10px;
+  border-color: #0F75BC;
+}
+
+.search-icon-btn {
+  width: 40px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  color: #0F75BC;
+} */
+
+/* .cart-container {
+  position: relative;
+}
+
+.cart-icon {
+  font-size: 24px;
+}
+
+.cart-count,
+.unread-count {
+  position: absolute;
+  top: -5px;
+  right: -10px;
+  min-width: 18px;
+  height: 18px;
+  background: red;
+  color: #fff;
+  font-size: 12px;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 18px;
+}
+
+.profile-img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.notification-icon {
+  font-size: 22px;
+  cursor: pointer;
+  position: relative;
+} */
+
+ .search-and-login {
     display: flex;
     align-items: center;
     position: absolute;
     top: 15%; 
     right: 2%; 
+    /* width: 600px; */
+    min-height: 70px;
   }
-   
+
   .search input {
     width: 100%; 
     border-radius: 10px;
@@ -58,6 +133,8 @@
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    width: 100px; /* ป้องกันปุ่มกระตุกเวลาเปลี่ยน state */
+    height: 36px;
   }
   
   .login-btn:hover {
@@ -82,17 +159,18 @@
   }
   
   .nav-link {
-    color: #333;
-    text-decoration: none;
-    padding: 8px 12px;
-    
-  }
-  
-  .active-link {
-    color: #0F75BC; 
-    border-bottom: 2px solid #0F75BC; 
-    font-weight: bold;
-  }
+  color: #333;
+  text-decoration: none;
+  padding: 8px 12px;
+  transition: color 0.2s ease, border-bottom 0.2s ease;
+}
+
+.active-link {
+  color: #0F75BC; 
+  border-bottom: 2px solid #0F75BC; 
+  font-weight: bold;
+  transition: color 0.2s ease, border-bottom 0.2s ease;
+}
   
 .dropbtn {
     padding: 8px;
@@ -236,13 +314,13 @@
 }
 
   
-  .notification-icon {
+  /* .notification-icon {
     position: relative;
     cursor: pointer;
     font-size: 25px;
-}
+} */
 
-.unread-count {
+/* .unread-count {
     position: absolute;
     top: -5px;
     right: -5px;
@@ -257,7 +335,7 @@
     align-items: center;
     min-width: 20px;
     height: 20px;
-}
+} */
 
 .search-container {
   flex: 1;
@@ -277,7 +355,6 @@
   max-height: 250px; 
   overflow-y: auto; 
 }
-
 
 .suggestion-item {
   padding: 10px;
@@ -301,27 +378,96 @@
   display: inline-block;
 }
 
-.cart-icon {
+.cart-icon,
+.notification-icon {
   font-size: 24px;
   color: #333;
+  width: 24px;
+  height: 24px;
+  display: inline-block;
 }
 
-.cart-count {
+.cart-count,
+.unread-count {
   position: absolute;
-  top: -8px;
-  right: -13px;
-  background-color: red;
-  color: white;
-  font-size: 10px;
-  font-weight: bold;
-  padding: 3px 7px;
-  border-radius: 100%;
+    top: -5px;
+    right: -5px;
+    background: red;
+    color: white;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 20px;
+    height: 20px;
+}
+
+.profile-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+}
+
+.profile-img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #0F75BC;
+  transition: transform 0.2s ease;
+}
+
+.profile-img:hover {
+  transform: scale(1.05);
+}
+
+.user-info {
+  max-width: 100px;
+  font-size: 12px;
+  color: #333;
+  word-wrap: break-word;
+}
+
+.user-role {
+  margin: 0;
+  font-weight: 500;
+  color: #0F75BC;
 }
 
 
 
 /* ซ่อนเมนูปกติในมือถือ */
 @media (max-width: 768px) {
+  .search-and-login {
+    position: static;
+    flex-direction: column;
+    align-items: flex-end;
+    width: 100%;
+    padding: 10px;
+  }
+
+  .search {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .notification-dropdown {
+    right: 10px;
+    left: auto;
+  }
+
+  .cart-icon {
+    font-size: 20px;
+  }
+
+  .login-btn {
+    width: 100%;
+    max-width: 120px;
+  }
   .nav-menu {
     display: none;
     flex-direction: column;
@@ -392,6 +538,22 @@
     display: block;
     padding: 10px 20px;
     border-top: 1px solid #ddd;
+  }
+
+  .profile-container {
+    flex-direction: row;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .user-info {
+    text-align: left;
+    max-width: none;
+  }
+
+  .profile-img {
+    width: 40px;
+    height: 40px;
   }
 }
 
