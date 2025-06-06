@@ -1,311 +1,358 @@
+// เพิ่ม modal แสดงรายละเอียด + คลิกทั้งแถวเพื่อเปิด
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { IoIosAddCircleOutline } from "react-icons/io";
 import { FaRegEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
-import { MdNotifications } from "react-icons/md";
-import { Badge, IconButton } from "@mui/material";
-import { Modal, Button, Box, Typography, Snackbar, Alert } from "@mui/material";
+import { BsCheck2Square } from "react-icons/bs";
+import { CiSearch } from "react-icons/ci";
+import {
+    TextField, FormControl, InputLabel, Select, MenuItem,
+    Button, Typography, Box, Modal, Snackbar, Alert, InputAdornment
+} from "@mui/material";
+
 import "../../css/admin.css";
 
 function Souvenir() {
     const [products, setProducts] = useState([]);
     const [open, setOpen] = useState(false);
+    const [detailOpen, setDetailOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
-    const [notification, setNotification] = useState({
-        open: false,
-        message: "",
-        severity: "info",
-    });
-
-    // useEffect(() => {
-    //     window.scrollTo(0, 0);
-    //     axios.get("http://localhost:3001/admin/souvenir").then((response) => {
-    //         setProducts(response.data);
-    //     });
-    //     console.log(user_id)
-    // }, []);
-
+    const [detailProduct, setDetailProduct] = useState(null);
+    const [notification, setNotification] = useState({ open: false, message: "", severity: "info" });
+    const [searchTerm, setSearchTerm] = useState("");
     const user_id = localStorage.getItem("user_id");
 
     useEffect(() => {
         window.scrollTo(0, 0);
         axios.get("http://localhost:3001/admin/souvenir")
             .then((response) => {
-                setProducts(response.data);
+                const sortedProducts = response.data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                setProducts(sortedProducts);
             })
-            .catch((error) => {
-                console.error("Error fetching souvenirs:", error);
-            });
-
-        console.log("User ID:", user_id);
+            .catch((error) => console.error("Error fetching souvenirs:", error));
     }, [user_id]);
 
-
-
-    const [notificationCount, setNotificationCount] = useState(0);
-
-    const handleCloseNotification = () => {
-        setNotification({ ...notification, open: false });
-    };
+    const handleCloseNotification = () => setNotification({ ...notification, open: false });
 
     const handleOpen = (product) => {
         setSelectedProduct(product);
         setOpen(true);
     };
+    const handleClose = () => setOpen(false);
 
-    const handleClose = () => {
-        setOpen(false);
+    const handleDetail = (product) => {
+        setDetailProduct(product);
+        setDetailOpen(true);
     };
-
-    const style = {
-        position: "absolute",
-        top: "50%",
-        left: "50%",
-        transform: "translate(-50%, -50%)",
-        width: 400,
-        bgcolor: "background.paper",
-        boxShadow: 24,
-        p: 4,
-    };
-
-    // const handleDelete = (productId) => {
-
-    //     axios.delete(`http://localhost:3001/admin/deleteSouvenir/${productId}`)
-    //         .then(() => {
-    //             setProducts(products.filter(product => product.product_id !== productId));
-    //         })
-    //         .catch(error => {
-    //             console.error("เกิดข้อผิดพลาดในการลบ:", error);
-    //         });
-    // };
+    const handleCloseDetail = () => setDetailOpen(false);
 
     const handleDelete = (productId) => {
-        // แสดง Snackbar เพื่อยืนยันการลบ
-        setNotification({
-            open: true,
-            message: "คุณต้องการลบสินค้านี้จริงหรือไม่?",
-            severity: "warning",
-        });
-    
-        // เมื่อผู้ใช้ยืนยันการลบ
-        const confirmDelete = window.confirm("คุณต้องการลบสินค้านี้จริงหรือ?");
-        
-        if (confirmDelete) {
+        if (window.confirm("คุณต้องการลบสินค้านี้จริงหรือไม่?")) {
             axios.delete(`http://localhost:3001/admin/deleteSouvenir/${productId}`)
                 .then(() => {
-                    setProducts(products.filter(product => product.product_id !== productId));
-                    setNotification({
-                        open: true,
-                        message: "สินค้าถูกลบเรียบร้อยแล้ว!",
-                        severity: "success",
-                    });
+                    setProducts(products.filter(p => p.product_id !== productId));
+                    setNotification({ open: true, message: "ลบสินค้าสำเร็จ", severity: "success" });
                 })
-                .catch(error => {
-                    console.error("เกิดข้อผิดพลาดในการลบ:", error);
-                    setNotification({
-                        open: true,
-                        message: "ไม่สามารถลบสินค้าได้, กรุณาลองใหม่อีกครั้ง",
-                        severity: "error",
-                    });
+                .catch(() => {
+                    setNotification({ open: true, message: "ลบไม่สำเร็จ กรุณาลองใหม่", severity: "error" });
                 });
-        } else {
-            setNotification({
-                open: true,
-                message: "คุณยกเลิกการลบสินค้า",
-                severity: "info",
-            });
         }
     };
-    
 
     const handleApprove = (productId) => {
         axios.put(`http://localhost:3001/admin/approveSouvenir/${productId}`, { status: "1" })
-            .then(response => {
-                setProducts(prevProducts =>
-                    prevProducts.map(product =>
-                        product.product_id === productId ? { ...product, status: "1" } : product
-                    )
-                );
+            .then(() => {
+                setProducts(prev => prev.map(p => p.product_id === productId ? { ...p, status: "1" } : p));
                 alert("อนุมัติสินค้าสำเร็จ");
             })
-            .catch(error => {
-                alert("เกิดข้อผิดพลาดในการอนุมัติสินค้า");
-            });
+            .catch(() => alert("เกิดข้อผิดพลาดในการอนุมัติ"));
     };
-    const getStatusColor = (status) => {
-        if (status === "1") {
-            return "green";
-        } else {
-            return "red"; 
-        }
-    };
-    
-    const statusLabel = (status) => {
-        return status === "1" ? "กำลังจำหน่าย" : "ยังไม่จำหน่าย";
-    };
+
+    const getStatusColor = (status) => status === "1" ? "green" : "red";
+
+    const roleNames = { 1: "แอดมิน", 2: "นายกสมาคม", 3: "สมาชิกทั่วไป" };
+    const statusLabel = (status) => status === "1" ? "กำลังจำหน่าย" : "ยังไม่จำหน่าย";
+
+    const filteredProducts = products.filter(product =>
+        product.product_name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     return (
         <>
-            <Snackbar
-                open={notification.open}
-                autoHideDuration={4000}
-                onClose={handleCloseNotification}
-                anchorOrigin={{ vertical: "top", horizontal: "right" }}
-            >
-                <Alert onClose={handleCloseNotification} severity={notification.severity}>
-                    {notification.message}
-                </Alert>
+            <Snackbar open={notification.open} autoHideDuration={4000} onClose={handleCloseNotification}
+                anchorOrigin={{ vertical: "top", horizontal: "right" }}>
+                <Alert onClose={handleCloseNotification} severity={notification.severity}>{notification.message}</Alert>
             </Snackbar>
 
-            <IconButton
-                color="inherit"
-                onClick={() => setNotificationCount(0)} // เคลียร์แจ้งเตือนเมื่อกด
-            >
-                <Badge badgeContent={notificationCount} color="error">
-                    <MdNotifications size={24} />
-                </Badge>
-            </IconButton>
-
             <div className="souvenir-top">
+                <div className="sort-options">
+                    <label>เรียงตามวันที่:</label>
+                    <select onChange={(e) => {
+                        const sorted = [...products].sort((a, b) =>
+                            e.target.value === "newest" ? new Date(b.created_at) - new Date(a.created_at)
+                                : new Date(a.created_at) - new Date(b.created_at)
+                        );
+                        setProducts(sorted);
+                    }}>
+                        <option value="newest">ล่าสุด</option>
+                        <option value="oldest">เก่าสุด</option>
+                    </select>
+                </div>
+
+                <TextField
+                    className="search_souvenir"
+                    label="ค้นหาชื่อสินค้า"
+                    variant="outlined"
+                    size="small"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    style={{ marginLeft: 16 }}
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <CiSearch />
+                            </InputAdornment>
+                        ),
+                    }}
+                />
                 <div className="souvenir-bt">
-                    <Link to={`/admin/souvenir/souvenir_request`}>
+                    <Link to={`/admin/souvenir/souvenir_request`} style={{ textDecoration: 'none' }}>
                         <button className="souvenir-bt-add"><IoIosAddCircleOutline />เพิ่มของที่ระลึก</button>
                     </Link>
                 </div>
+
             </div>
 
             <h2 className="titlesouvenir">ของที่ระลึก (สำหรับผู้ดูแล)</h2>
-
             <div className="souvenir-content">
                 <div className="souvenir-content-item">
                     <table>
                         <thead>
                             <tr>
                                 <th>รหัสสินค้า</th>
+                                <th>รูปภาพสินค้า</th>
                                 <th>ชื่อสินค้า</th>
                                 <th>ราคา</th>
                                 <th>ผู้ดูแล</th>
                                 <th>สถานะ</th>
+                                <th>วันที่เพิ่ม</th>
                                 <th>จัดการ</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {products.length > 0 ? (
-                                products.map((product) => (
-                                    <tr key={product.product_id}>
+                            {filteredProducts.length === 0 ? (
+                                <tr>
+                                    <td colSpan={8} style={{ padding: 20, textAlign: "center", color: "gray" }}>
+                                        ไม่พบสินค้าที่ค้นหา
+                                    </td>
+                                </tr>
+                            ) : (
+                                filteredProducts.map((product) => (
+                                    <tr key={product.product_id} onClick={() => handleDetail(product)} style={{ cursor: "pointer" }}>
                                         <td>{product.product_id}</td>
+                                        <td className="image-product">
+                                            <img src={`http://localhost:3001/uploads/${product.image}`} alt={product.image}
+                                                onError={(e) => e.target.src = "/image/default.jpg"} />
+                                        </td>
                                         <td>{product.product_name}</td>
                                         <td>{product.price}</td>
-                                        <td>{product.role_id}</td>
+                                        <td>{roleNames[product.role_id]}</td>
                                         <td>
-                                            <p
-                                                className="status-label"
-                                                style={{ color: getStatusColor(product.status) }}
-                                            >
-                                                {product.status === "1" ? "กำลังจำหน่าย" : "ยังไม่จำหน่าย"}
+                                            <p className="statusProduct-label" style={{ color: getStatusColor(product.status) }}>
+                                                {statusLabel(product.status)}
                                             </p>
                                         </td>
-                                        <td>
-                                            {product.status === "0" && (
-                                                <button className="souvenir-bt-approve" onClick={() => handleApprove(product.product_id)}>
-                                                    อนุมัติ
-                                                </button>
-                                            )}
+                                        <td>{new Date(product.created_at).toLocaleDateString("th-TH")}</td>
+                                        <td className="souvenir-bt-group" onClick={(e) => e.stopPropagation()}>
+                                            <button
+                                                className="souvenir-bt-approve"
+                                                onClick={() => handleApprove(product.product_id)}
+                                                disabled={product.status !== "0"}
+                                            >
+                                                <BsCheck2Square /> อนุมัติ
+                                            </button>
 
                                             <button className="souvenir-bt-edit" onClick={() => handleOpen(product)}>
-                                                <FaRegEdit />แก้ไข
+                                                <FaRegEdit /> แก้ไข
                                             </button>
                                             <button className="souvenir-bt-del" onClick={() => handleDelete(product.product_id)}>
-                                                <MdDelete />ลบ
+                                                <MdDelete /> ลบ
                                             </button>
                                         </td>
+
                                     </tr>
                                 ))
-                            ) : (
-                                <tr><td colSpan="6">ขออภัย ไม่มีสินค้าในขณะนี้</td></tr>
                             )}
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <Modal open={open} onClose={handleClose} aria-labelledby="modal-title" aria-describedby="modal-description">
-                <Box sx={style}>
-                    <Typography id="modal-title" variant="h5">แก้ไขข้อมูลสินค้า</Typography>
+            <Modal open={open} onClose={handleClose}>
+                <Box sx={{ width: 400, ...modalStyle }}>
+                    <Typography variant="h6" gutterBottom>
+                        แก้ไขข้อมูลสินค้า
+                    </Typography>
+
                     {selectedProduct && (
-                        <div id="modal-description">
-                            <form>
-                                <div>
-                                    <label className="name_product">ชื่อสินค้า</label><br />
-                                    <input
-                                        type="text"
-                                        value={selectedProduct.product_name}
-                                        onChange={(e) => setSelectedProduct({
-                                            ...selectedProduct,
-                                            product_name: e.target.value,
-                                        })}
-                                    />
-                                </div>
-                                <div>
-                                    <label>ราคา</label><br />
-                                    <input
-                                        type="number"
-                                        value={selectedProduct.price}
-                                        onChange={(e) => setSelectedProduct({
-                                            ...selectedProduct,
-                                            price: e.target.value,
-                                        })}
-                                    />
-                                </div>
-                                <div>
-                                    <label>สถานะ</label><br />
-                                    <select
-                                        value={selectedProduct.status}
-                                        onChange={(e) => setSelectedProduct({
-                                            ...selectedProduct,
-                                            status: e.target.value,
-                                        })}
-                                    >
-                                        <option value="1">กำลังจำหน่าย</option>
-                                        <option value="0">ยังไม่จำหน่าย</option>
-                                    </select>
-                                </div>
-                            </form>
-                        </div>
+                        <form style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                            <Box
+                                sx={{
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    height: 180,
+                                    maxWidth: 340,
+                                    mx: "auto",
+                                    my: 2,
+                                    border: "1px solid #ddd",
+                                    borderRadius: 2,
+                                    backgroundColor: "#fafafa",
+                                    overflow: "hidden",
+                                }}
+                            >
+                                <img
+                                    src={`http://localhost:3001/uploads/${selectedProduct.image}`}
+                                    alt={selectedProduct.image}
+                                    onError={(e) => (e.target.src = "/image/default.jpg")}
+                                    style={{
+                                        width: "100%",
+                                        height: "100%",
+                                        objectFit: "contain",
+                                    }}
+                                />
+                            </Box>
+                            <TextField
+                                label="ชื่อสินค้า"
+                                variant="outlined"
+                                fullWidth
+                                value={selectedProduct.product_name}
+                                onChange={(e) =>
+                                    setSelectedProduct({ ...selectedProduct, product_name: e.target.value })
+                                }
+                            />
+
+                            <TextField
+                                label="ราคา"
+                                variant="outlined"
+                                type="number"
+                                fullWidth
+                                value={selectedProduct.price}
+                                onChange={(e) =>
+                                    setSelectedProduct({ ...selectedProduct, price: e.target.value })
+                                }
+                            />
+
+                            <FormControl fullWidth>
+                                <InputLabel>สถานะ</InputLabel>
+                                <Select
+                                    value={selectedProduct.status}
+                                    label="สถานะ"
+                                    onChange={(e) =>
+                                        setSelectedProduct({ ...selectedProduct, status: e.target.value })
+                                    }
+                                >
+                                    <MenuItem value="1">กำลังจำหน่าย</MenuItem>
+                                    <MenuItem value="0">ยังไม่จำหน่าย</MenuItem>
+                                </Select>
+                            </FormControl>
+
+                            <Box
+                                sx={{
+                                    display: "flex",
+                                    justifyContent: "flex-end", 
+                                    alignItems: "center",
+                                    gap: 2,                    
+                                    padding: 2,                 
+                                    mt: 2,                     
+                                    borderTop: "1px solid #eee" ,
+                                    maxWidth: 340,
+                                }}
+                            >
+                                <Button onClick={handleClose} color="secondary" variant="outlined">
+                                    ยกเลิก
+                                </Button>
+                                <Button
+                                    color="primary"
+                                    variant="contained"
+                                    onClick={() => {
+                                        axios.put(
+                                            `http://localhost:3001/admin/editSouvenir/${selectedProduct.product_id}`,
+                                            selectedProduct
+                                        )
+                                            .then(() => {
+                                                setProducts((prev) =>
+                                                    prev.map((p) =>
+                                                        p.product_id === selectedProduct.product_id
+                                                            ? selectedProduct
+                                                            : p
+                                                    )
+                                                );
+                                                setNotification({
+                                                    open: true,
+                                                    message: "บันทึกข้อมูลสำเร็จ",
+                                                    severity: "success",
+                                                });
+                                                handleClose();
+                                            })
+                                            .catch(() => {
+                                                setNotification({
+                                                    open: true,
+                                                    message: "บันทึกข้อมูลไม่สำเร็จ กรุณาลองใหม่",
+                                                    severity: "error",
+                                                });
+                                            });
+                                    }}
+                                >
+                                    บันทึก
+                                </Button>
+                            </Box>
+
+                        </form>
                     )}
-                    <div style={{ marginTop: "20px", textAlign: "right" }}>
-                        <Button onClick={handleClose} color="secondary">ปิด</Button>
-                        <Button
-                            onClick={() => {
-                                axios.put(`http://localhost:3001/admin/editSouvenir/${selectedProduct.product_id}`, selectedProduct)
-                                    .then(response => {
-                                        console.log("บันทึกข้อมูลสินค้าสำเร็จ:", response.data);
+                </Box>
+            </Modal>
 
-                                        setProducts(prevProducts =>
-                                            prevProducts.map(product =>
-                                                product.product_id === selectedProduct.product_id
-                                                    ? { ...product, ...selectedProduct }
-                                                    : product
-                                            )
-                                        );
-
-                                        handleClose();
-                                    })
-                                    .catch(error => {
-                                        console.error("เกิดข้อผิดพลาดในการบันทึก:", error);
-                                    });
-                            }}
-                            color="primary"
-                        >
-                            บันทึก
-                        </Button>
-                    </div>
+            <Modal open={detailOpen} onClose={handleCloseDetail}>
+                <Box sx={{ width: 500, ...modalStyle }}>
+                    {detailProduct && (
+                        <>
+                            <Typography variant="h6">{detailProduct.product_name}</Typography>
+                            <img src={`http://localhost:3001/uploads/${detailProduct.image}`} alt="preview"
+                                style={{ width: "100%", maxHeight: "200px", objectFit: "contain" }} />
+                            <Typography>ราคา: {detailProduct.price} บาท</Typography>
+                            <Typography>สถานะ: {statusLabel(detailProduct.status)}</Typography>
+                            <Typography>ดูแลโดย: {roleNames[detailProduct.role_id]}</Typography>
+                            <Typography>วันที่เพิ่ม: {new Date(detailProduct.created_at).toLocaleDateString("th-TH")}</Typography>
+                            <div style={{ textAlign: "right", marginTop: 20 }}>
+                                <Button onClick={() => {
+                                    setSelectedProduct(detailProduct);
+                                    setDetailOpen(false);
+                                    setOpen(true);
+                                }}>
+                                    แก้ไข
+                                </Button>
+                                <Button onClick={handleCloseDetail}>ปิด</Button>
+                            </div>
+                        </>
+                    )}
                 </Box>
             </Modal>
         </>
     );
 }
+
+const modalStyle = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    bgcolor: 'background.paper',
+    boxShadow: 24,
+    p: 4,
+    borderRadius: 2,
+};
 
 export default Souvenir;

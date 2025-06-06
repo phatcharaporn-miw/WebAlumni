@@ -19,7 +19,7 @@ function Souvenir() {
                 console.error("เกิดข้อผิดพลาดในการดึงข้อมูล:", error);
             });
     }, []);
-    console.log("Products state:", products);
+    // console.log("Products state:", products);
 
     return (
         <>
@@ -34,13 +34,13 @@ function Souvenir() {
             <div className="souvenir-content">
                 <div className="souvenir-content-item">
                 </div>
-                {/* สินค้าของวิทยาลัยการคอมพิวเตอร์ */}
+                {/* สมาคมศิษย์เก่า */}
                 <div className="souvenir-content-item">
                     <h3 className="titlesouvenir-type">สินค้าของสมาคมศิษย์เก่า</h3>
                     <div className="souvenir-item-group">
-                        {products && products.length > 0 ? (
+                        {products.filter(product => product.role_id === 1 || product.role_id === 2).length > 0 ? (
                             products
-                                // .filter((product) => product.role_id === 1 || product.role_id === 2)
+                                .filter((product) => product.role_id === 1 || product.role_id === 2)
                                 .map((product) => (
                                     <Link to={`/souvenir/souvenirDetail/${product.product_id}`} key={product.product_id}>
                                         <div className="souvenir-item">
@@ -60,13 +60,13 @@ function Souvenir() {
                     </div>
                 </div>
 
-                {/* สินค้าของสมาคมศิษย์เก่า */}
+                {/* ศิษย์ปัจจุบัน */}
                 <div className="souvenir-content-item">
                     <h3 className="titlesouvenir-type">สินค้าของศิษย์ปัจจุบัน</h3>
                     <div className="souvenir-item-group">
-                        {products && products.length > 0 ? (
+                        {products.filter(product => product.role_id === 4).length > 0 ? (
                             products
-                                // .filter((product) => product.role_id === 4 )
+                                .filter((product) => product.role_id === 4)
                                 .map((product) => (
                                     <Link to={`/souvenir/souvenirDetail/${product.product_id}`} key={product.product_id}>
                                         <div className="souvenir-item">
@@ -85,6 +85,7 @@ function Souvenir() {
                         )}
                     </div>
                 </div>
+
             </div>
         </>
     );

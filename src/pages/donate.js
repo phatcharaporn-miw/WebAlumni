@@ -5,7 +5,7 @@ import axios from "axios";
 
 function Donate() {
     const [projects, setProjects] = useState([]);
-    const [filter, setFilter] = useState("all"); // สถานะการกรอง
+    const [filter, setFilter] = useState("all");
     const [error] = useState(null);
 
     useEffect(() => {
@@ -41,7 +41,6 @@ function Donate() {
     return (
         <div>
             <img src="./image/donation (1).jpg" className="head-donate" alt="donation-image" />
-            {/* <button className="donate-button">บริจาค</button> */}
             <div className="content-donate">
                 <div className="donate-request">
                     <Link to={`/donaterequest`}>
@@ -54,7 +53,7 @@ function Donate() {
                         id="donation-type"
                         className="filter-select"
                         value={filter}
-                        onChange={(e) => setFilter(e.target.value)} // เปลี่ยน filter ตามค่าที่เลือก
+                        onChange={(e) => setFilter(e.target.value)} 
                     >
                         <option value="all">โครงการบริจาคทั้งหมด</option>
                         <option value="fundraising">บริจาคแบบระดมทุน</option>
@@ -95,7 +94,7 @@ function Donate() {
                                         />
                                     </div>
                                     <div className="donate-discription">
-                                        <p className={`tag ${project.donation_type || "default"}`}>
+                                    <p className={`tagDonante ${project.donation_type || "default"}`}>
                                             {getFilterTitle(project.donation_type)}
                                         </p>
                                         <p className="donate-discription-date">{formattedStartDate} - {formattedEndDate}</p>
