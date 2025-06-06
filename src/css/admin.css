@@ -11,8 +11,10 @@
 
 .souvenir-top {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 20px;
+    padding: 20px;
 }
 
 .souvenir-bt-add {
@@ -41,6 +43,13 @@
     font-size: 20px;
     font-weight: bold;
     margin-bottom: 15px;
+}
+
+.sort-options{
+    display: grid;
+    grid-template-columns: auto auto;
+    align-items: center;
+    gap: 10px;
 }
 
 /* Tab Styles */
@@ -147,7 +156,6 @@ table td button:hover {
     font-weight: bold;
 }
 
-/* Message When No Products */
 .souvenir-item-group p {
     font-size: 18px;
     color: #888;
@@ -159,21 +167,30 @@ table td button:hover {
     margin-bottom: 0;
 }
 
+
+.statusProduct-label{
+    margin-bottom: 0;
+  }
+  
+
 .souvenir-bt-add {
-    background-color: #4CAF50; /* สีเขียว */
+    background-color: #4CAF50; 
     color: white;
     border: none;
     padding: 10px 20px;
     font-size: 16px;
     cursor: pointer;
+    gap: 10px;
+    text-decoration: none;
+    margin: 10px ;
 }
 
 .souvenir-bt-add:hover {
-    background-color: #45a049; /* เปลี่ยนสีเมื่อ hover */
+    background-color: #45a049;
 }
 
 .souvenir-bt-approve {
-    background-color: #2196F3; /* สีฟ้า */
+    background-color: #2196F3; 
     color: white;
     border: none;
     padding: 10px 20px;
@@ -182,11 +199,11 @@ table td button:hover {
 }
 
 .souvenir-bt-approve:hover {
-    background-color: #0b7dda; /* เปลี่ยนสีเมื่อ hover */
+    background-color: #0b7dda;
 }
 
 .souvenir-bt-edit {
-    background-color: #FF9800; /* สีส้ม */
+    background-color: #FF9800;
     color: white;
     border: none;
     padding: 10px 20px;
@@ -195,11 +212,11 @@ table td button:hover {
 }
 
 .souvenir-bt-edit:hover {
-    background-color: #e68900; /* เปลี่ยนสีเมื่อ hover */
+    background-color: #e68900; 
 }
 
 .souvenir-bt-del {
-    background-color: #F44336; /* สีแดง */
+    background-color: #F44336; 
     color: white;
     border: none;
     padding: 10px 20px;
@@ -208,7 +225,11 @@ table td button:hover {
 }
 
 .souvenir-bt-del:hover {
-    background-color: #d32f2f; /* เปลี่ยนสีเมื่อ hover */
+    background-color: #d32f2f;
+}
+
+.search_souvenir{
+    width: 500px;
 }
 
 .status-available {
@@ -224,14 +245,33 @@ table td button:hover {
     color: white;
 }
 
+.souvenir-bt-approve:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+
 .souvenir-bt-approve-unavailable {
     background-color: red;
     color: white;
 }
+.souvenir-bt-group{
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+}
+.souvenir-bt-group button{
+    height: 50px;
+}
+.image-product img{
+    width:70px;
+    height:70px;
+    
+}
 
-
-
-/* Responsive Styles */
+/*Responsive*/
 @media (max-width: 768px) {
     .souvenir-item-group {
         grid-template-columns: 1fr 1fr;

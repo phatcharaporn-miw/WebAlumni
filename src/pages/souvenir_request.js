@@ -1,9 +1,8 @@
 import React, { useState } from "react";
-import { Button, Modal, Box, Typography, Snackbar, Alert } from '@mui/material';
+import { Button, Modal, Box, Typography } from '@mui/material';
 import "../css/Souvenir_request.css";
 import { Link, useNavigate } from "react-router-dom";
 import axios from 'axios';
-import QRCode from 'qrcode';
 
 function SouvenirRequest() {
     const navigate = useNavigate();
@@ -78,7 +77,7 @@ function SouvenirRequest() {
         e.preventDefault();
 
         if (!validateForm()) return;
-    
+
         const data = new FormData();
         data.append("productName", formData.productName);
         data.append("description", formData.description);
@@ -90,7 +89,7 @@ function SouvenirRequest() {
         data.append("accountNumber", formData.accountNumber);
         data.append("accountName", formData.accountName);
         data.append("promptpayNumber", formData.promptpayNumber);
-    
+
         const role = localStorage.getItem('userRole');
         const user_id = localStorage.getItem('userId');
         if (user_id) {
@@ -99,16 +98,16 @@ function SouvenirRequest() {
             alert("ผู้ใช้ไม่ถูกล็อกอิน");
             return;
         }
-    
-        const url = role ===  '1'
-            ? 'http://localhost:3001/admin/addsouvenir' 
-            : 'http://localhost:3001/souvenir/addsouvenir'; 
-    
+
+        const url = role === '1'
+            ? 'http://localhost:3001/admin/addsouvenir'
+            : 'http://localhost:3001/souvenir/addsouvenir';
+
         try {
             const response = await axios.post(url, data, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
-    
+
             // นำทางไปยังหน้าสินค้า
             navigate("/souvenir");
         } catch (error) {
@@ -116,7 +115,7 @@ function SouvenirRequest() {
             alert(error.response?.data?.error || "เกิดข้อผิดพลาด");
         }
     };
-    
+
 
     // const generateQRCodeForPayment = (productData) => {
     //     const paymentUrl = `https://paymentgateway.com/checkout?productId=${productData.productName}&amount=${productData.price}`;
@@ -154,10 +153,11 @@ function SouvenirRequest() {
                 <form encType="multipart/form-data" onSubmit={handleSubmit}>
                     {/* รายละเอียดเกี่ยวกับสินค้า */}
                     <div className="data-requestSouvenir">
-                        <p>รายละเอียดเกี่ยวกับสินค้า</p>
+                        <p className="data-requestSouvenir-title">รายละเอียดเกี่ยวกับสินค้า</p>
                         <div>
                             <label htmlFor="productName">ชื่อสินค้าของที่ระลึก<span className="important">*</span></label><br />
                             <input
+                                className="data-requestSouvenir-input"
                                 name="productName"
                                 placeholder="ชื่อสินค้าของที่ระลึก"
                                 type="text"
@@ -170,6 +170,7 @@ function SouvenirRequest() {
                         <div>
                             <label htmlFor="description">รายละเอียดสินค้า<span className="important">*</span></label><br />
                             <textarea
+                                className="data-requestSouvenir-input"
                                 name="description"
                                 placeholder="รายละเอียดของสินค้า"
                                 value={formData.description}
@@ -181,6 +182,7 @@ function SouvenirRequest() {
                         <div>
                             <label htmlFor="image">รูปสินค้า<span className="important">*</span></label><br />
                             <input
+                                className="data-requestSouvenir-input"
                                 type="file"
                                 name="image"
                                 placeholder="รูปสินค้า"
@@ -191,6 +193,7 @@ function SouvenirRequest() {
                         <div>
                             <label htmlFor="price">ราคาต่อชิ้น (บาท)<span className="important">*</span></label><br />
                             <input
+                                className="data-requestSouvenir-input"
                                 name="price"
                                 placeholder="ex.259"
                                 type="text"
@@ -203,6 +206,7 @@ function SouvenirRequest() {
                         <div>
                             <label htmlFor="stock">จำนวนสินค้า (ชิ้น)<span className="important">*</span></label><br />
                             <input
+                                className="data-requestSouvenir-input"
                                 name="stock"
                                 placeholder="ex.30"
                                 type="text"
@@ -215,10 +219,11 @@ function SouvenirRequest() {
 
                     {/* ช่องทางการชำระเงิน */}
                     <div className="payment-info">
-                        <p>ช่องทางการชำระเงิน</p>
+                        <p className="data-requestSouvenir-title">ช่องทางการชำระเงิน</p>
                         <div>
                             <label htmlFor="paymentMethod">ช่องทางการชำระเงิน<span className="important">*</span></label><br />
                             <select
+                                className="data-requestSouvenir-input"
                                 name="paymentMethod"
                                 value={formData.paymentMethod}
                                 onChange={handleChange}
@@ -233,6 +238,7 @@ function SouvenirRequest() {
                         <div>
                             <label htmlFor="bankName">ชื่อธนาคาร<span className="important">*</span></label><br />
                             <input
+                                className="data-requestSouvenir-input"
                                 name="bankName"
                                 placeholder="ชื่อธนาคาร"
                                 type="text"
@@ -245,6 +251,7 @@ function SouvenirRequest() {
                         <div>
                             <label htmlFor="accountName">ชื่อบัญชี<span className="important">*</span></label><br />
                             <input
+                                className="data-requestSouvenir-input"
                                 name="accountName"
                                 placeholder="หมายเลขบัญชี"
                                 type="text"
@@ -257,6 +264,7 @@ function SouvenirRequest() {
                         <div>
                             <label htmlFor="accountNumber">หมายเลขบัญชี<span className="important">*</span></label><br />
                             <input
+                                className="data-requestSouvenir-input"
                                 name="accountNumber"
                                 placeholder="หมายเลขบัญชี"
                                 type="text"
@@ -269,6 +277,7 @@ function SouvenirRequest() {
                         <div>
                             <label htmlFor="promptpayNumber">หมายเลขพร้อมเพย์<span className="important">*</span></label><br />
                             <input
+                                className="data-requestSouvenir-input"
                                 name="promptpayNumber"
                                 placeholder="หมายเลขพร้อมเพย์"
                                 type="text"
@@ -312,7 +321,7 @@ function SouvenirRequest() {
                                     <img
                                         src={URL.createObjectURL(formData.image)}
                                         alt="สินค้าของที่ระลึก"
-                                        style={{ maxWidth: "100%", height: "auto", marginTop: "10px" }}
+                                        style={{ maxWidth: "100%", height: "200px", marginTop: "10px" }}
                                     />
                                 </div>
                             )}

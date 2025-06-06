@@ -113,26 +113,28 @@
     display: block;
 }
 
-.tag {
+.tagDonante {
     border-radius: 15px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     font-size: 12px;
     padding: 5px 10px;
     display: inline-block;
-    color: white;
     font-weight: bold;
 }
 
-.tag.fundraising {
+.tagDonante.fundraising {
     background-color: #28A745;
+    color: white;
 }
 
-.tag.unlimited {
+.tagDonante.unlimited {
     background-color: #FFC107;
+    color: white;
 }
 
-.tag.things {
+.tagDonante.things {
     background-color: #6610F2;
+    color: white;
 }
 
 .donate-discription-date{

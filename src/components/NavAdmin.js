@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
+import { AiOutlineDashboard } from "react-icons/ai";
+import { IoCalendarOutline } from "react-icons/io5";
+import { LiaDonateSolid } from "react-icons/lia";
+import { CgWebsite } from "react-icons/cg";
+import { IoNewspaperOutline } from "react-icons/io5";
+import { MdOutlineShoppingCart } from "react-icons/md";
+import { LuUserRoundPen } from "react-icons/lu";
+import { IoSettingsOutline } from "react-icons/io5";
+import { MdLogout } from "react-icons/md";
 import axios from 'axios';
 
 function NavAdmin() {
@@ -33,11 +42,11 @@ function NavAdmin() {
         const userId = localStorage.getItem('userId');
         const role = localStorage.getItem('userRole');
         const username = localStorage.getItem('username');
-        const imagePath = localStorage.getItem('image_path');  // ดึงค่าจาก localStorage
+        const imagePath = localStorage.getItem('image_path');  
 
         const profilePic = imagePath
-            ? `http://localhost:3001/img/${imagePath}` // เชื่อมต่อ URL ของรูปภาพ
-            : '/default-profile-pic.jpg'; // ถ้าไม่มีให้ใช้รูป default
+            ? `http://localhost:3001/img/${imagePath}` 
+            : '/default-profile-pic.jpg'; 
 
         if (role === '1') {
             setUserInfo({
@@ -45,7 +54,7 @@ function NavAdmin() {
                 profilePic: profilePic,
             });
         } else {
-            navigate('/login'); // ถ้าไม่ใช่ Admin ให้กลับไปที่หน้า login
+            navigate('/login');
         }
     }, [navigate]);
 
@@ -72,10 +81,10 @@ function NavAdmin() {
                         color: "#FFFFFF",
                     })}
                 >
-                    Dashboard
+                    <AiOutlineDashboard /> Dashboard
                 </NavLink>
 
-                <NavLink
+                {/* <NavLink
                     to="/admin/calendar"
                     className="nav-link"
                     style={({ isActive }) => ({
@@ -83,8 +92,9 @@ function NavAdmin() {
                         color: "#FFFFFF",
                     })}
                 >
-                    ปฏิทินกิจกรรม
-                </NavLink>
+                    <IoCalendarOutline/> ปฏิทินกิจกรรม
+                </NavLink> */}
+                
                 <NavLink
                     to="/admin/activities"
                     className="nav-link"
@@ -93,7 +103,7 @@ function NavAdmin() {
                         color: "#FFFFFF",
                     })}
                 >
-                    กิจกรรมและการเข้าร่วม
+                    <IoCalendarOutline/> กิจกรรมและการเข้าร่วม
                 </NavLink>
                 <NavLink
                     to="/admin/donations"
@@ -103,7 +113,7 @@ function NavAdmin() {
                         color: "#FFFFFF",
                     })}
                 >
-                    การบริจาคและโครงการ
+                    <LiaDonateSolid /> การบริจาคและโครงการ
                 </NavLink>
                 <NavLink
                     to="/admin/forum"
@@ -113,7 +123,7 @@ function NavAdmin() {
                         color: "#FFFFFF",
                     })}
                 >
-                    การจัดการเว็บบอร์ด
+                    <CgWebsite /> การจัดการเว็บบอร์ด
                 </NavLink>
                 <NavLink
                     to="/admin/news"
@@ -123,7 +133,7 @@ function NavAdmin() {
                         color: "#FFFFFF",
                     })}
                 >
-                    ข่าวสารและประชาสัมพันธ์
+                <IoNewspaperOutline /> ข่าวสารและประชาสัมพันธ์
                 </NavLink>
                 <NavLink
                     to="/admin/souvenir"
@@ -133,7 +143,7 @@ function NavAdmin() {
                         color: "#FFFFFF",
                     })}
                 >
-                    ของที่ระลึก
+                    <MdOutlineShoppingCart /> ของที่ระลึก
                 </NavLink>
                 <NavLink
                     to="/admin/users"
@@ -143,9 +153,10 @@ function NavAdmin() {
                         color: "#FFFFFF",
                     })}
                 >
-                    จัดการผู้ใช้
+                    <LuUserRoundPen /> จัดการผู้ใช้
                 </NavLink>
-                <NavLink
+
+                {/* <NavLink
                     to="/admin/settings"
                     className="nav-link"
                     style={({ isActive }) => ({
@@ -153,14 +164,15 @@ function NavAdmin() {
                         color: "#FFFFFF",
                     })}
                 >
-                    การตั้งค่า
-                </NavLink>
+                    <IoSettingsOutline /> การตั้งค่า
+                </NavLink> */}
+
                 <NavLink
                     onClick={handleLogout}
                     className="nav-link"
                     style={navAdminButtonStyles}
                 >
-                    ออกจากระบบ
+                <MdLogout /> ออกจากระบบ
                 </NavLink>
             </div>
         </div>
