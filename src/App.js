@@ -20,6 +20,7 @@ import SouvenirDetail from './pages/souvenirDetail';
 import SouvenirRequest from './pages/souvenir_request';
 import Webboard from './pages/webboard';
 import Alumni from './pages/alumni';
+import AlumniMajor from './pages/major-detail';
 import Login from './pages/login';
 import Register from './pages/register';
 import Faq from './pages/faq';

@@ -1,100 +1,43 @@
 import React from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import '../css/alumni.css'
+import '../css/alumni.css';
 
-
-function Alumni(){
-
+function Alumni() {
     const alumniData = [
         { name: "นางสาวพัชราพร นิลพงษ์", position: "ผู้พัฒนาเว็บไซต์", image: "/image/person1.jpg" },
         { name: "ชื่อ", position: "ตำแหน่ง", image: "/image/person1.jpg" },
         { name: "ชื่อ", position: "ตำแหน่ง", image: "/image/profile-picture.png" },
         { name: "ชื่อ", position: "ตำแหน่ง", image: "/image/profile-picture.png" },
-        { name: "ชื่อ", position: "ตำแหน่ง", image: "/image/profile-picture.png"},
+        { name: "ชื่อ", position: "ตำแหน่ง", image: "/image/profile-picture.png" },
         { name: "ชื่อ", position: "ตำแหน่ง", image: "/image/profile-picture.png" },
     ];
 
-    return(
+    const majors = [
+        { title: "วิทยาการคอมพิวเตอร์", image: "/image/cs.png", link: "/alumni/major-detail" },
+        { title: "เทคโนโลยีสารสนเทศ", image: "/image/it.jpg", link: "/alumni/major-detail" },
+        { title: "ภูมิสารสนเทศศาสตร์", image: "/image/gis.jpg", link: "/alumni/major-detail" },
+        { title: "ความปลอดภัยไซเบอร์", image: "/image/cy.jpeg", link: "/alumni/major-detail" },
+        { title: "ปัญญาประดิษฐ์", image: "/image/ai.jpg", link: "/alumni/major-detail" },
+    ];
+
+    return (
         <section className="container">
             <div className="alumni-page">
-                <h3 className="alumni-title text-center">ทำเนียบศิษย์เก่า</h3> 
+                <h3 className="alumni-title text-center">ทำเนียบศิษย์เก่า</h3>
                 <h5 className="alumni-title">สาขา</h5>
-                <div  id="majorCarousel" className="carousel slide" >
-                    <div className="carousel-inner my-5">
-
-                        <div className="carousel-item active">
-                            <div className="row justify-content-center">
-                                <div class="col-md-3">
-                                    <a href="/research-detail.html" class="text-decoration-none"> 
-                                    <div class="major-card">
-                                        <img src="/image/cs.png" alt="CS" class="img-fluid"/>
-                                        <div class="major-info">
-                                            <h5 class="major-title">วิทยาการคอมพิวเตอร์</h5>
-                                        </div>
+                <div className="row justify-content-between my-4">
+                    {majors.map((major, index) => (
+                        <div className="col-2 mb-4 d-flex justify-content-between" key={index} style={{ width: "20%" }}>
+                            <a href={major.link} className="text-decoration-none w-100">
+                                <div className="major-card text-center">
+                                    <img src={major.image} alt={major.title} className="img-fluid" />
+                                    <div className="major-info">
+                                        <h6 className="major-title">{major.title}</h6>
                                     </div>
-                                    </a>
                                 </div>
-
-                                <div class="col-md-3">
-                                    <a href="/major-detail.html" class="text-decoration-none"> 
-                                    <div class="major-card">
-                                        <img src="/image/it.jpg" alt="IT" class="img-fluid"/>
-                                        <div class="major-info">
-                                            <h5 class="major-title">เทคโนโลยีสารสนเทศ</h5>
-                                        </div>
-                                    </div>
-                                    </a>
-                                </div>
-
-                                <div class="col-md-3">
-                                    <a href="/major-detail.html" class="text-decoration-none"> 
-                                    <div class="major-card">
-                                        <img src="/image/gis.jpg" alt="GIS" class="img-fluid"/>
-                                        <div class="major-info">
-                                            <h5 class="major-title">ภูมิสารสนเทศศาสตร์</h5>
-                                        </div>
-                                    </div>
-                                    </a>
-                                </div>
-
-                            </div>
+                            </a>
                         </div>
-
-                        <div className="carousel-item">
-                            <div className="row justify-content-center">
-                                <div class="col-md-3">
-                                    <a href="/major-detail.html" class="text-decoration-none"> 
-                                    <div class="major-card">
-                                        <img src="/image/cy.jpeg" alt="CY" class="img-fluid"/>
-                                        <div class="major-info">
-                                            <h5 class="major-title">ความปลอดภัยไซเบอร์</h5>
-                                        </div>
-                                    </div>
-                                    </a>
-                                </div>
-
-                                <div class="col-md-3">
-                                    <a href="/major-detail.html" class="text-decoration-none"> 
-                                    <div class="major-card">
-                                        <img src="/image/ai.jpg" alt="AI" class="img-fluid"/>
-                                        <div class="major-info">
-                                            <h5 class="major-title">ปัญญาประดิษฐ์</h5>
-                                        </div>
-                                    </div>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>                   
-                    </div>
-                    <button className="carousel-control-prev" type="button" data-bs-target="#majorCarousel" data-bs-slide="prev">
-                        <span className="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span className="visually-hidden">Previous</span>
-                    </button>
-                    <button className="carousel-control-next" type="button" data-bs-target="#majorCarousel" data-bs-slide="next">
-                        <span className="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span className="visually-hidden">Next</span>
-                    </button>
+                    ))}
                 </div>
 
                 <h5 className="alumni-title">ศิษย์เก่าผู้มีคุณูปการ</h5>
@@ -122,7 +65,7 @@ function Alumni(){
                 </div>
 
                 <div className="outstanding my-5">
-                        <h5 className="alumni-title">ศิษย์เก่าดีเด่น</h5>
+                    <h5 className="alumni-title">ศิษย์เก่าดีเด่น</h5>
                     <div className="row">
                         {alumniData.map((alumnus, index) => (
                             <div className="col-md-6 mb-4" key={index}>
@@ -142,12 +85,8 @@ function Alumni(){
                         ))}
                     </div>
                 </div>
-               
             </div>
         </section>
-
-        
-        
     );
 }
 
