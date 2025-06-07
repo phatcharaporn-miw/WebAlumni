@@ -6,15 +6,18 @@
   background-color: #f8f9fa;
   text-align: center;
   border-top: 2px solid #0F75BC;
-  width: 100%;
-  min-height: 400px; /* ป้องกัน layout shift */
+  min-height: 450px; 
 }
 
 .footer-logo {
   width: 260px;
-  height: 130px; /* เพิ่มความสูงคงที่ */
+  height: 130px;
   object-fit: contain;
-  margin-bottom: 20px;
+}
+.footer-icon {
+  width: 20px;
+  height: 20px;
+  display: inline-block;
 }
 
 .footer h4 {
@@ -72,7 +75,7 @@
   background-color: #0F75BC;
   color: #fff;
   padding: 10px;
-  min-height: 50px; /* ป้องกัน shift ด้านล่าง */
+  min-height: 50px; 
 }
 
 .footer-bottom p {
@@ -108,11 +111,11 @@
 
   .footer-logo {
     margin: auto;
-    height: 130px; /* ให้ความสูงชัดเจน */
+    height: 130px;
   }
 
   .col-md-3 {
     margin-bottom: 30px;
-    min-height: 220px; /* ป้องกันคอลัมน์ยุบตอน resize */
+    min-height: 220px; 
   }
 }

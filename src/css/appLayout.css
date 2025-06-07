@@ -13,11 +13,3 @@ html, body {
 .main-content {
     flex: 1; 
 }
-
-/* .footer {
-    background-color: #f8f9fa;
-    text-align: center;
-    border-top: 2px solid #0F75BC;
-    width: 100%; 
-    min-height: 300px;
-} */

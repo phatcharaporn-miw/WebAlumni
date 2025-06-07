@@ -257,7 +257,7 @@ function Activity(){
                     paginatedActivity.map(activity => (
                         <div className="col-md-4 mb-5" key={activity.activity_id}>
                         <div className="card activity-card">
-                            <div className="image-container">
+                            <div className="image-container-act">
                             <img 
                                 src={activity.image_path ? `http://localhost:3001${activity.image_path}` : "/default-image.png"} 
                                 className="card-img-top" 

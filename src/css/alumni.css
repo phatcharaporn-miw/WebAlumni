@@ -45,7 +45,8 @@
 
 #alumni-row {
     border-bottom: 1px solid #0F75BC;
-    padding-bottom: 15px;     
+    padding-bottom: 15px; 
+    min-height: 100px;    
 }
 
 

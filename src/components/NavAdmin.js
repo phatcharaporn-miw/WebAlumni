@@ -6,8 +6,8 @@ import { IoMdNotificationsOutline } from "react-icons/io";
 import { FaTrash, FaBars } from 'react-icons/fa';
 import '../css/navAdmin.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Offcanvas } from "bootstrap"; 
-import { auto } from '@popperjs/core';
+// import { Offcanvas } from "bootstrap"; 
+// import { auto } from '@popperjs/core';
 
 function NavAdmin() {
     const [userInfo, setUserInfo] = useState({

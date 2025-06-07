@@ -20,7 +20,7 @@ import SouvenirDetail from './pages/souvenirDetail';
 import SouvenirRequest from './pages/souvenir_request';
 import SearchResult from './pages/searchResults';
 // import Webboard from './pages/webboard';
-import Alumni from './pages/alumni';
+// import Alumni from './pages/alumni';
 import Login from './pages/login';
 import Register from './pages/register';
 import Faq from './pages/faq';
@@ -96,6 +96,7 @@ import PresidentProfileSouvenir from './pages/president/president-profile-souven
 const AlumniMajor = lazy(() => import("./pages/major-detail"));
 const Webboard = lazy(() => import("./pages/webboard"));
 const Home = lazy(() => import("./pages/home"));
+const Alumni = lazy(() => import("./pages/alumni"));
 
 function App() {
 
@@ -117,7 +118,7 @@ function App() {
             <Route path="/donate/donatedetail/:projectId" element={<DonateDetail />} />
             <Route path="/donate/donatedetail" element={<DonateDetail />} />
             <Route path="/donatedetail" element={<DonateDetail />} />
-            <Route path="/alumni" element={<Alumni />} />
+            <Route path="/alumni" element={<Suspense fallback={<div>Loading...</div>}><Alumni /></Suspense> }/>
             <Route path="/souvenir" element={<Souvenir />} />
             <Route path="/souvenir/souvenir_basket" element={<SouvenirBasket />} />
             <Route path="/souvenir/checkout" element={<SouvenirCheckout />} />

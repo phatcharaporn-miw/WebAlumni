@@ -582,9 +582,6 @@ function Home() {
         loading="eager"
         fetchPriority="high"
       />
-      {/* <Helmet> */}
-        {/* <link rel="preload" as="image" href="/image/2.jpeg" fetchpriority="high" /> */}
-      {/* </Helmet> */}
 
       <div id="carouselExampleCaptions" className="carousel slide" data-bs-ride="carousel">
         <div className="carousel-indicators">
@@ -603,7 +600,7 @@ function Home() {
               height="720"
               style={{ objectFit: "cover", height: "auto", maxHeight: "80vh" }}
               fetchPriority="high"
-              loading="eager"
+              loading="lazy"
             />
           </div>
 
@@ -669,52 +666,52 @@ function Home() {
 
 
               <div className="col-md-4 activity-placeholder">
-      <h4 className="activity-title fw-bold">ปฏิทินกิจกรรม</h4>
+                <h4 className="activity-title fw-bold">ปฏิทินกิจกรรม</h4>
 
-      {isLoading ? (
-        [...Array(3)].map((_, index) => (
-          <div key={index} className="act-home-item d-flex mb-3 placeholder-glow">
-            <div className="act-date text-center p-2 bg-secondary rounded text-white">
-              <div className="placeholder col-6 mb-2"></div>
-              <div className="placeholder col-6"></div>
-            </div>
-            <div className="act-content ms-3 w-100">
-              <h5 className="placeholder col-8 mb-2"></h5>
-              <p className="placeholder col-12"></p>
-            </div>
-          </div>
-        ))
-      ) : activity.length > 0 ? (
-        activity
-          .slice(0, 3)
-          .sort((a, b) => new Date(a.activity_date) - new Date(b.activity_date))
-          .map((item) => (
-            <Link
-              to={`/activity/${item.activity_id}`}
-              key={item.activity_id}
-              className="act-home-item d-flex mb-3 text-decoration-none text-dark"
-            >
-              <div className="act-date text-center p-2 text-white rounded bg-primary">
-                <span className="day d-block">{new Date(item.activity_date).getDate()}</span>
-                <span className="month-year d-block">
-                  {new Date(item.activity_date).toLocaleDateString("th-TH", {
-                    month: "long",
-                    year: "numeric",
-                  })}
-                </span>
+                {isLoading ? (
+                  [...Array(3)].map((_, index) => (
+                    <div key={index} className="act-home-item d-flex mb-3 placeholder-glow">
+                      <div className="act-date text-center p-2 bg-secondary rounded text-white">
+                        <div className="placeholder col-6 mb-2"></div>
+                        <div className="placeholder col-6"></div>
+                      </div>
+                      <div className="act-content ms-3 w-100">
+                        <h5 className="placeholder col-8 mb-2"></h5>
+                        <p className="placeholder col-12"></p>
+                      </div>
+                    </div>
+                  ))
+                ) : activity.length > 0 ? (
+                  activity
+                    .slice(0, 3)
+                    .sort((a, b) => new Date(a.activity_date) - new Date(b.activity_date))
+                    .map((item) => (
+                      <Link
+                        to={`/activity/${item.activity_id}`}
+                        key={item.activity_id}
+                        className="act-home-item text-decoration-none text-dark"
+                      >
+                        <div className="act-date text-white">
+                          <span className="day fs-4 fw-bold">{new Date(item.activity_date).getDate()}</span>
+                          <span className="month-year small">
+                            {new Date(item.activity_date).toLocaleDateString("th-TH", {
+                              month: "short",
+                              year: "numeric",
+                            })}
+                          </span>
+                        </div>
+                        <div className="act-content ms-3">
+                          <h5 className="act-name fw-bold mb-1">{item.activity_name}</h5>
+                          <p className="act-text text-muted mb-0">
+                            {item.description ? item.description.substring(0, 80) + "..." : "ไม่มีเนื้อหา"}
+                          </p>
+                        </div>
+                      </Link>
+                    ))
+                ) : (
+                  <p>ไม่มีข้อมูลกิจกรรม</p>
+                )}
               </div>
-              <div className="act-content ms-3">
-                <h5 className="act-name fw-bold">{item.activity_name}</h5>
-                <p className="act-text text-muted">
-                  {item.description ? item.description.substring(0, 100) + "..." : "ไม่มีเนื้อหา"}
-                </p>
-              </div>
-            </Link>
-          ))
-      ) : (
-        <p>ไม่มีข้อมูลกิจกรรม</p>
-      )}
-    </div>
             </div>
           </div>
         </div>

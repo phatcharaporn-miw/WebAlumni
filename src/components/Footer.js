@@ -1,9 +1,10 @@
 import React from "react";
 import "../css/Footer.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { NavLink } from "react-router-dom";
 import { IoMdPin, IoMdCall } from "react-icons/io";
+
+
 
 function Footer() {
   return (
@@ -15,6 +16,9 @@ function Footer() {
               className="footer-logo mb-3"
               src="/image/logoCP1.png"
               alt="College of Computing Logo"
+              loading="lazy"
+              width="260"
+              height="130"
             />
             <p className="text-start" id="foot-text">
               สมาคมศิษย์เก่ามหาวิทยาลัยขอนแก่นก่อตั้งขึ้นเพื่อเสริมสร้างเครือข่ายและความร่วมมือระหว่างศิษย์เก่า ศิษย์ปัจจุบัน และคณาจารย์
@@ -54,7 +58,7 @@ function Footer() {
         </div>
       </div>
 
-      <div className="footer-bottom text-center py-3 mt-4">
+      <div className="footer-bottom text-center mt-4">
         <p className="mb-0">© 2025 College of Computing</p>
       </div>
     </footer>
