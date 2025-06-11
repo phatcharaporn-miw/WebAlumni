@@ -23,6 +23,7 @@ export const breadcrumbMapping = {
     "/news/edit" : "แก้ไขข่าวประชาสัมพันธ์",
     "/activity/edit" : "แก้ไขกิจกรรม",
     // "/alumni/major-detail/:major" : "รายชื่อศิษย์เก่า",
+    "/change-password" : "เปลี่ยนรหัสผ่านครั้งแรก",
 
     // ส่วนของศิษย์เก่า
     "/alumni-profile": "โปรไฟล์",

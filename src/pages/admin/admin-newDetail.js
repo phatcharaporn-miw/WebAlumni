@@ -35,7 +35,7 @@ function AdminNewsDetail() {
         .slice(0, 3);
 
     return (
-        <section className="container py-5">
+        <section className="news-container p-5">
             <div className="newsd-main p-4 shadow-sm rounded">
                 <h2 className="newsd-title mb-3 text-center">{news.title}</h2>
                 {Array.isArray(news.images) && news.images.length > 0 ? (

@@ -29,8 +29,10 @@ function UserProfile() {
   }
 
   return (
-    <div className="container mt-5">
+    <div className="container my-5">
       <div className="card shadow-lg rounded-4 mx-auto p-4" style={{ maxWidth: "800px" }}>
+
+        {/* ส่วนโปรไฟล์ */}
         <div className="text-center mb-4">
           <img
             src={user.image_path ? `http://localhost:3001/${user.image_path}` : "/default-profile-pic.jpg"}
@@ -38,11 +40,11 @@ function UserProfile() {
             className="rounded-circle shadow"
             style={{ width: "120px", height: "120px", objectFit: "cover" }}
           />
-          <h4 className="mt-3 mb-0">{user.full_name || "ไม่ระบุชื่อ"}</h4>
+          <h4 className="mt-3 mb-1">{user.full_name || "ไม่ระบุชื่อ"}</h4>
           <span className="badge bg-secondary">{user.role_name}</span>
         </div>
 
-        <div className="d-flex justify-content-end">
+        <div className="d-flex justify-content-end mb-3">
           <a href={`/admin/users/edit-user-profile/${userId}`} className="btn btn-warning btn-sm">
             แก้ไขข้อมูล
           </a>
@@ -77,8 +79,10 @@ function UserProfile() {
             <ul className="list-group list-group-flush">
               {user.educations.map((edu, index) => (
                 <li key={index} className="list-group-item">
-                  <strong>{edu.degree_name || "-"}</strong> - {edu.major_name || "-"}<br />
+                  <div className="fw-semibold">{edu.degree_name || "-"}</div>
+                  <div>{edu.major_name || "-"}</div>
                   <small className="text-muted">รหัสนักศึกษา: {edu.studentId || "-"}</small><br />
+                  <small className="text-muted">ปีที่เข้าศึกษา: {edu.entry_year || "-"}</small><br />
                   <small className="text-muted">ปีที่จบ: {edu.graduation_year || "-"}</small>
                 </li>
               ))}
@@ -92,7 +96,7 @@ function UserProfile() {
             <h5 className="text-primary mb-3">ประวัติเข้าร่วมกิจกรรม</h5>
             <ul className="list-group list-group-flush">
               {user.activities.map((act, index) => (
-                <li key={index} className="list-group-item d-flex align-items-start gap-3">
+                <li key={index} className="list-group-item d-flex gap-3 align-items-start">
                   <img
                     src={act.image_path ? `http://localhost:3001${act.image_path}` : "/default-activity.jpg"}
                     alt={act.activity_name}
@@ -102,12 +106,11 @@ function UserProfile() {
                   <div>
                     <strong>{act.activity_name}</strong><br />
                     <small className="text-muted">วันที่: {new Date(act.activity_date).toLocaleDateString()}</small><br />
-                    <span className={`badge mt-1 ${
-                      act.status === 1 ? "bg-success" :
-                      act.status === 0 ? "bg-warning" :
-                      act.status === 2 ? "bg-primary" :
-                      "bg-warning text-dark"
-                    }`}>
+                    <span className={`badge mt-1 ${act.status === 1 ? "bg-success" :
+                        act.status === 0 ? "bg-warning" :
+                          act.status === 2 ? "bg-primary" :
+                            "bg-secondary"
+                      }`}>
                       {act.status === 1 ? "เสร็จสิ้นแล้ว" : act.status === 0 ? "ยังไม่เริ่ม" : "กำลังดำเนินการ"}
                     </span>
                   </div>
@@ -119,7 +122,7 @@ function UserProfile() {
 
         {/* กระทู้ */}
         {user.posts?.length > 0 && (
-          <section>
+          <section className="mb-2">
             <h5 className="text-primary mb-3">กระทู้ที่เคยสร้าง</h5>
             <ul className="list-group list-group-flush">
               {user.posts.map((post, index) => (
@@ -135,6 +138,7 @@ function UserProfile() {
     </div>
   );
 
+  // คอมโพเนนต์ย่อย
   function Info({ label, value }) {
     return (
       <li className="list-group-item d-flex">
@@ -145,7 +149,8 @@ function UserProfile() {
       </li>
     );
   }
-  
+
+
 }
 
 export default UserProfile;

@@ -26,12 +26,12 @@ function AdminAlumni() {
 
 
     return (
-        <section className="container py-4">
+        <section className="alumni-container p-5">
             <div className="mb-5">
-                <h2 className="alumni-title text-center">ทำเนียบศิษย์เก่า</h2>
+                <h3 className="admin-title">ทำเนียบศิษย์เก่า</h3>
 
                 <div className="mb-4">
-                     <h4 className="border-bottom pb-2">สาขา</h4>
+                     <h5 className="border-bottom pb-2">สาขา</h5>
                     <select
                         id="majorSelect"
                         className="form-select w-100 w-md-50"
@@ -46,7 +46,7 @@ function AdminAlumni() {
             </div>
 
             <div className="mb-5">
-                <h4 className="border-bottom pb-2">ศิษย์เก่าผู้มีคุณูปการ</h4>
+                <h5 className="border-bottom pb-2">ศิษย์เก่าผู้มีคุณูปการ</h5>
                 <div className="table-responsive mt-3">
                     <table className="table table-bordered table-striped">
                         <thead className="table-light">
@@ -71,7 +71,7 @@ function AdminAlumni() {
             </div>
 
             <div className="mb-5">
-                <h4 className="border-bottom pb-2">ศิษย์เก่าดีเด่น</h4>
+                <h5 className="border-bottom pb-2">ศิษย์เก่าดีเด่น</h5>
                 <div className="table-responsive mt-3">
                     <table className="table table-hover">
                         <thead className="table-light">

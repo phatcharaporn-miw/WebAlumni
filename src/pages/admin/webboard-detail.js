@@ -61,7 +61,7 @@ function WebboardDetail() {
     }
 
     return (
-        <div className="container mt-4">
+        <div className="webboard-container p-5">
             {/* <button className="btn btn-secondary mb-3" onClick={() => navigate(-1)}>ย้อนกลับ</button> */}
             <div className="card shadow-sm mb-4">
                 <div className="card-body">

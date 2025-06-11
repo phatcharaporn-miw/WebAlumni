@@ -57,8 +57,8 @@ function AdminNews() {
     };
 
     return (
-        <div className="container mt-4">
-            <h3 className="mb-4 admin-title">ข่าวสารและประชาสัมพันธ์</h3>
+        <div className="news-container p-5">
+            <h3 className="admin-title">ข่าวสารและประชาสัมพันธ์</h3>
             <div className="row mb-4">
                 <div className="col-md-12 text-end">
                     <button className="btn btn-success" onClick={() => navigate("/admin/news/admin-create-news")}>

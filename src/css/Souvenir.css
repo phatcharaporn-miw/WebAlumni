@@ -37,6 +37,7 @@
     height: 190px;
     border-radius: 10px;
     object-fit: cover;
+    /* border-bottom: 2px solid #004F9F;  */
 }
 
 .souvenir-item {

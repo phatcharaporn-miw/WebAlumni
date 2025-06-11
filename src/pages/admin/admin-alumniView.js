@@ -55,7 +55,7 @@ function AdminAlumniView() {
         return (
             student.full_name.toLowerCase().includes(lowerTerm) ||
             student.graduation_year?.toString().includes(lowerTerm) ||
-            student.admission_year?.toString().includes(lowerTerm) ||
+            student.entry_year?.toString().includes(lowerTerm) ||
             student.studentId?.toString().includes(lowerTerm)
         );
     });
@@ -79,11 +79,12 @@ function AdminAlumniView() {
 
     // export file to CSV
     const exportToCSV = () => {
-        const headers = ["ลำดับ", "ชื่อ", "รหัสนักศึกษา", "ปีที่จบการศึกษา", "ระดับการศึกษา"];
+        const headers = ["ลำดับ", "ชื่อ", "รหัสนักศึกษา", "ปีที่เข้าศึกษา", "ปีที่จบการศึกษา", "ระดับการศึกษา"];
         const rows = filteredStudents.map((student, index) => [
             index + 1,
             student.full_name,
             student.studentId,
+            student.entry_year,
             student.graduation_year,
             student.degree
         ]);
@@ -109,8 +110,8 @@ function AdminAlumniView() {
     // const handleAlumniClick = (userId) => navigate(`/admin/users/user-profile/${userId}`);
 
     return (
-        <section className="container my-5">
-            <h3 className="text-center mb-4">ทำเนียบศิษย์เก่าสาขา {major}</h3>
+        <section className="alumni-container p-5">
+            <h3 className="admin-title">ทำเนียบศิษย์เก่าสาขา {major}</h3>
 
            <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
                 {/* Dropdown ทางซ้าย */}
@@ -179,7 +180,7 @@ function AdminAlumniView() {
                                         <th scope="row">{index + 1}</th>
                                         <td>{student.full_name}</td>
                                         <td>{student.studentId}</td>
-                                        <td>{student.admission_year}</td>
+                                        <td>{student.entry_year}</td>
                                         <td>{student.graduation_year}</td>
                                         
                                     </tr>

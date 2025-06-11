@@ -114,7 +114,7 @@ function Profile() {
   const addEducation = () => {
     setProfile((prevState) => ({
         ...prevState,
-        educations: [...prevState.educations, { degree: '', major: '', studentId: '', graduation_year: '' }],
+        educations: [...prevState.educations, { degree: '', major: '', studentId: '', graduation_year: '',  entry_year: '' }],
     }));
 };
 
@@ -403,6 +403,18 @@ return (
                             placeholder="รหัสนักศึกษา"
                             value={edu.studentId}
                             onChange={(e) => handleEducationChange(index, 'studentId', e.target.value)}
+                            disabled={!editing}
+                          />
+                        </div>
+                        <div className="col-md-6">
+                          <label>ปีที่เข้าศึกษา<span className="importent">*</span></label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            name="entry_year"
+                            placeholder="ปีที่เข้าศึกษา"
+                            value={edu.entry_year}
+                            onChange={(e) => handleEducationChange(index, 'entry_year', e.target.value)}
                             disabled={!editing}
                           />
                         </div>

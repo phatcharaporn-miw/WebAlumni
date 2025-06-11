@@ -119,7 +119,7 @@ function Donate() {
                                         />
                                     </div>
                                     <div className="donate-discription">
-                                        <p className={`tag ${project.donation_type || "default"}`}>
+                                        <p className={`tagDonate ${project.donation_type || "default"}`}>
                                             {getFilterTitle(project.donation_type)}
                                         </p>
                                         <p className="donate-discription-date">

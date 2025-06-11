@@ -21,8 +21,14 @@
     border-color: #bd2130;
 }
 
-.admin-title{
-    /* text-align: center; */
-    color: #0F75BC;
+.admin-title{  
     font-weight: bold;
-  }
+    color: #343a40;
+    margin-bottom: 50px;
+    border-bottom: 3px solid #0F75BC;
+    padding-bottom: 10px;
+}
+
+.activity-container {
+    padding: 40px;
+}

@@ -88,8 +88,8 @@ function AdminWebboard() {
     };
 
     return (
-        <div className="container mt-4">
-            <h3 className="mb-4 admin-title">การจัดการเว็บบอร์ด</h3>
+        <div className="webboard-container p-5">
+            <h3 className="admin-title">การจัดการเว็บบอร์ด</h3>
             <div className="row mb-4">
                 <div className="col-md-12">
                     <button className="btn btn-primary" onClick={() => navigate('/admin/webboard/createPost')}>

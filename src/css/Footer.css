@@ -3,10 +3,10 @@
 }
 
 .footer {
-  background-color: #f8f9fa;
+  background-color: #f2f9ff;
   text-align: center;
   border-top: 2px solid #0F75BC;
-  min-height: 450px; 
+  /* min-height: 450px;  */
 }
 
 .footer-logo {
@@ -74,7 +74,7 @@
 .footer-bottom {
   background-color: #0F75BC;
   color: #fff;
-  padding: 10px;
+  padding: 20px;
   min-height: 50px; 
 }
 

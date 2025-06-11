@@ -83,8 +83,8 @@ function UserManagement() {
   );
 
   return (
-    <div className="container mt-5">
-          <h3 className="text-center admin-title">จัดการผู้ใช้งาน</h3>     
+    <div className="user-container p-5">
+          <h3 className="admin-title">จัดการผู้ใช้งาน</h3>     
         <div className="card-body">
           <div className="mb-3 d-flex justify-content-end">
             <input

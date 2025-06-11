@@ -304,27 +304,45 @@ function Webboard() {
 
   // ฟังก์ชันลบความคิดเห็น
   const handleDeleteComment = (commentId) => {
-    if (window.confirm("คุณต้องการลบความคิดเห็นนี้หรือไม่?")) {
-      axios.delete(`http://localhost:3001/web/webboard/${selectedPost.webboard_id}/comment/${commentId}`, {
-        withCredentials: true
-      })
-        .then((response) => {
+    Swal.fire({
+      title: "ยืนยันการลบ",
+      text: "คุณต้องการลบความคิดเห็นนี้หรือไม่?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "ใช่, ลบเลย",
+      cancelButtonText: "ยกเลิก",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axios
+          .delete(`http://localhost:3001/web/webboard/${selectedPost.webboard_id}/comment/${commentId}`, {
+            withCredentials: true,
+          })
+          .then((response) => {
+            if (response.data.success) {
+              setSelectedPost((prev) => ({
+                ...prev,
+                comments: prev.comments.filter((comment) => comment.comment_id !== commentId),
+              }));
 
-          if (response.data.success) {
-            setSelectedPost((prev) => ({
-              ...prev,
-              comments: prev.comments.filter(comment => comment.comment_id !== commentId)
-            }));
-            Swal.fire("สำเร็จ", "ลบความคิดเห็นสำเร็จแล้ว", "success");
-          } else {
-            Swal.fire("ผิดพลาด", "ไม่สามารถลบความคิดเห็นได้", "error");
-          }
-        })
-        .catch((error) => {
-          console.error("เกิดข้อผิดพลาดในการลบความคิดเห็น:", error.message);
-          Swal.fire("ผิดพลาด", "เกิดข้อผิดพลาดในการลบ", "error");
-        });
-    }
+              Swal.fire({
+                title: "ลบแล้ว!",
+                text: "ลบความคิดเห็นสำเร็จแล้ว",
+                icon: "success",
+                timer: 2000,
+                showConfirmButton: false,
+              });
+            } else {
+              Swal.fire("ผิดพลาด", "ไม่สามารถลบความคิดเห็นได้", "error");
+            }
+          })
+          .catch((error) => {
+            console.error("เกิดข้อผิดพลาดในการลบความคิดเห็น:", error.message);
+            Swal.fire("ผิดพลาด", "เกิดข้อผิดพลาดในการลบ", "error");
+          });
+      }
+    });
   };
 
   // ลบการตอบกลับความคิดเห็น

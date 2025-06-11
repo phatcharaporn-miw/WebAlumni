@@ -71,7 +71,7 @@ function ActivityDetail() {
                     {/* รายละเอียดกิจกรรม */}
                     <div className="col-md-6 mb-4">
                         <h5 className="text-primary mb-3">
-                            📝 รายละเอียดกิจกรรม
+                            รายละเอียดกิจกรรม
                         </h5>
                         <div className="bg-light p-3 rounded shadow-sm" style={{ minHeight: "160px" }}>
                             <p className="mb-0">{activity.description || "ไม่พบรายละเอียดกิจกรรม"}</p>
@@ -81,7 +81,7 @@ function ActivityDetail() {
                     {/* ข้อมูลกิจกรรม */}
                     <div className="col-md-6 mb-4">
                         <h5 className="text-primary mb-3">
-                            📌 ข้อมูลกิจกรรม
+                            ข้อมูลกิจกรรม
                         </h5>
                         <ul className="list-group shadow-sm">
                             <li className="list-group-item d-flex align-items-center">

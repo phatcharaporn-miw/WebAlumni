@@ -1,6 +1,5 @@
 .news-title{
     text-align: center; 
-   
 }
   
 .news-page {
@@ -24,7 +23,7 @@
 .news-image {
   max-width: 200px;
   width: 100%;
-  height: auto;
+  height: 120px;
   border-radius: 5px;
   object-fit: cover;
 }
@@ -39,10 +38,6 @@
 .news-title-link:hover {
     text-decoration: underline;
 }
-
-/* .news-summary {
-    color: #555;
-} */
 
 .news-meta {
     font-size: 0.9rem;
@@ -70,11 +65,6 @@
     margin-bottom: 30px;
 }
 
-/* .news-title {
-    font-size: 2rem;
-    font-weight: bold;
-} */
-
  .news-title-link {
   text-decoration: none;
   color: #333;
@@ -89,6 +79,10 @@
   font-size: 0.95rem;
   color: #555;
 }
+
+/* .read-more{
+ padding: 2px;
+} */
 
 .read-more:hover {
   text-decoration: underline;

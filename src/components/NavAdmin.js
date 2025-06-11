@@ -147,14 +147,12 @@ function NavAdmin() {
 
     return (
         <>
-            {/* Hamburger Button (แสดงบนมือถือ) */}
-            <div className="d-block d-md-none p-2 bg-primary text-white">
+            {/* <div className="d-block d-md-none p-2 bg-primary text-white">
                 <button className="btn btn-light" onClick={toggleMobileMenu}>
                     <FaBars /> เมนู
                 </button>
-            </div>
+            </div> */}
 
-            {/* Sidebar สำหรับ Desktop และ Mobile */}
             <div
                 style={{
                     ...navAdminStyles,
@@ -170,39 +168,40 @@ function NavAdmin() {
                 {/* Notification Icon */}
                 {userInfo && (
                     <div className="notification-container" style={{ position: "absolute", top: 20, right: 20, zIndex: 10 }}>
-                        <div className="notification-icon-admin" onClick={toggleNotifications}>
+                        <div className="notification-icon" onClick={toggleNotifications}>
                             <IoMdNotificationsOutline />
                             {unreadCount > 0 && <span className="unread-count">{unreadCount}</span>}
                         </div>
-
+        
                         {showNotifications && (
                             <div className="notification-dropdown-admin" onClick={handleDropdownClick}>
-                                <h5 className="notification-title">การแจ้งเตือน</h5>
-                                {notifications.length > 0 ? (
-                                    notifications.map((notification) => (
-                                        <div
-                                            key={notification.notification_id}
-                                            className={`notification-item ${notification.read_status === "ยังไม่อ่าน" ? "unread" : ""}`}
-                                            onClick={() => markAsRead(notification.notification_id)}
-                                        >
-                                            <p className="message">{notification.message}</p>
-                                            <p className="notification-date">
-                                                {new Date(notification.send_date).toLocaleString()}
-                                            </p>
-                                            <button
-                                                className="delete-btn"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    deleteNotification(notification.notification_id);
-                                                }}
-                                            >
-                                                <FaTrash />
-                                            </button>
-                                        </div>
-                                    ))
-                                ) : (
-                                    <p className="no-notifications text-center small">ไม่มีการแจ้งเตือน</p>
-                                )}
+                            <h5 className="notification-title">การแจ้งเตือน</h5>
+                            {notifications.length > 0 ? (
+                                notifications.map((notification) => (
+                                <div
+                                    key={notification.notification_id}
+                                    className={`notification-item ${notification.read_status === "ยังไม่อ่าน" ? "unread" : ""
+                                    }`}
+                                    onClick={() => markAsRead(notification.notification_id)}
+                                >
+                                    <p className="message">{notification.message}</p>
+                                    <p className="notification-date">
+                                    {new Date(notification.send_date).toLocaleString()}
+                                    </p>
+                                    <button
+                                    className="delete-btn"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        deleteNotification(notification.notification_id);
+                                    }}
+                                    >
+                                    <FaTrash />
+                                    </button>
+                                </div>
+                                ))
+                            ) : (
+                                <p className="no-notifications text-center small">ไม่มีการแจ้งเตือน</p>
+                            )}
                             </div>
                         )}
                     </div>

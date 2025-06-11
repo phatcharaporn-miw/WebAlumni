@@ -75,6 +75,7 @@ function HomeAlumniProfile() {
                 <li key={index} className="list-group-item">
                   <strong>{edu.degree_name || "-"}</strong> - {edu.major_name || "-"}<br />
                   <small className="text-muted">รหัสนักศึกษา: {edu.studentId || "-"}</small><br />
+                  <small className="text-muted">ปีที่เข้าศึกษา: {edu.entry_year || "-"}</small><br />
                   <small className="text-muted">ปีที่จบ: {edu.graduation_year || "-"}</small>
                 </li>
               ))}

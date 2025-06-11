@@ -4,7 +4,6 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import "../css/home.css";
 import '../css/webboard.css';
 import Modal from 'react-modal';
-// import { Helmet } from "react-helmet";
 import { SlHeart } from "react-icons/sl";
 import { MdFavorite } from "react-icons/md";
 import { BiSolidComment } from "react-icons/bi";
@@ -16,7 +15,7 @@ import { IoMdClose } from "react-icons/io";
 import { Link } from "react-router-dom";
 import moment from "moment";
 import Swal from "sweetalert2";
-import CountUp from "react-countup";
+import { MdVolunteerActivism, MdEvent } from "react-icons/md";
 import { Bar, Pie } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -35,22 +34,22 @@ function Home() {
   const currentAmount = 3000;
   const goalAmount = 10000;
   // const progress = (currentAmount / goalAmount) * 100;
+  
   // กราฟ
-  const [alumniCount, setAlumniCount] = useState(0);
   const [stats, setStats] = useState({
     totalParticipants: 0,
     ongoingActivity: 0,
     ongoingProject: 0,
     totalDonations: 0,
   });
+
+  const [alumniCount, setAlumniCount] = useState(0);
+
   const [barData, setBarData] = useState({
     labels: [],
     datasets: [],
   });
-  // const [pieData, setPieData] = useState({
-  //         labels: [],
-  //         datasets: [],
-  // });
+  
   // webboard
   const [webboard, setWebboard] = useState([]);
   const [sortOrder] = useState("latest");
@@ -127,91 +126,79 @@ function Home() {
   }, []);
 
   // ดึงข้อมูลสถิติหลัก
-  useEffect(() => {
-    // ดึงข้อมูลสถิติหลัก
-    axios.get("http://localhost:3001/admin/dashboard-stats", {
-      withCredentials: true
-    })
-      .then((res) => {
-        setStats(res.data);
-      })
-      .catch((err) => {
-        console.error("Error fetching dashboard stats:", err);
-      });
 
-    // ดึงข้อมูลกราฟแท่ง
-    axios.get('http://localhost:3001/admin/activity-per-year', {
-      withCredentials: true
-    })
+  const [pieData, setPieData] = useState({
+    labels: [],
+    datasets: [],
+  });
+
+  useEffect(() => {
+    // Dashboard Stats
+    axios.get("http://localhost:3001/admin/dashboard-stats")
+      .then((res) => setStats(res.data))
+      .catch((err) => console.error("Error fetching dashboard stats:", err));
+
+    // Activity per year graph
+    axios.get("http://localhost:3001/admin/activity-per-year")
       .then(res => {
-        // console.log("กิจกรรมต่อปี", res.data);
         if (Array.isArray(res.data)) {
           const labels = res.data.map(item => `ปี ${item.year + 543}`);
           const data = res.data.map(item => item.total_activities);
           setBarData({
             labels,
-            datasets: [{ label: 'จำนวนผู้เข้าร่วม (คน)', data, backgroundColor: '#0d6efd' }],
+            datasets: [{
+              label: 'จำนวนกิจกรรม',
+              data,
+              backgroundColor: '#0d6efd'
+            }],
           });
         }
       });
 
-
-    // ดึงข้อมูลกราฟวงกลม
-    // axios.get('http://localhost:3001/admin/donation-stats')
-    // .then(res => {
-    //     if (res.data && Array.isArray(res.data)) {
-    //     const labels = res.data.map(item => `ไตรมาส ${item.quarter}`);
-    //     const data = res.data.map(item => item.total);
+    // Donation statistics for pie chart
+    // axios.get("http://localhost:3001/admin/donation-statistics")
+    //   .then((res) => {
+    //     const labels = res.data.map(item => item.category);
+    //     const data = res.data.map(item => item.total_amount);
     //     setPieData({
-    //         labels,
-    //         datasets: [{
+    //       labels,
+    //       datasets: [{
     //         data,
-    //         backgroundColor: ['#d63384', '#198754', '#fd7e14', '#0dcaf0'],
-    //         }],
+    //         backgroundColor: ['#28a745', '#6f42c1', '#ffc107'], // example colors
+    //       }],
     //     });
-    //     } else {
-    //     console.warn("donation-stats: unexpected data format", res.data);
-    //     }
-    // });
+    //   });
 
-    // ดึงจำนวนศิษย์เก่า
-    axios.get('http://localhost:3001/admin/total-alumni', {
-      withCredentials: true
-    })
+    // Total alumni count
+    axios.get("http://localhost:3001/admin/total-alumni")
       .then(res => setAlumniCount(res.data.totalAlumni));
   }, []);
 
-  const CardInfo = ({ title, value, center = false, animated = false }) => (
-    <div className="col-md-3 mb-3">
-      <div className={`card p-4 shadow-sm ${center ? 'mx-auto' : ''}`} style={{ maxWidth: center ? 400 : "100%" }}>
-        <h6 className="text-secondary">{title}</h6>
-        <h3 className="text-primary">
-          {animated ? <CountUp end={parseInt(value)} duration={2} separator="," /> : value}
-          {typeof value === "string" && value.includes("คน") && ""}
-          {typeof value === "string" && value.includes("บาท") && ""}
-        </h3>
-      </div>
-    </div>
-  );
+  const CardInfo = ({ title, value, type = "activity", center = false }) => {
+    const isDonation = type === "donation";
+    const Icon = isDonation ? MdVolunteerActivism : MdEvent;
+    const bgColor = isDonation ? "bg-success-subtle" : "bg-primary-subtle";
+    const textColor = isDonation ? "text-success" : "text-primary";
 
-  // กราฟวงกลม: สถิติการบริจาครายไตรมาส
-  const pieData = {
-    labels: ['ไตรมาสที่ 1', 'ไตรมาสที่ 2', 'ไตรมาสที่ 3', 'ไตรมาสที่ 4'],
-    datasets: [
-      {
-        data: [10, 45, 30, 15],
-        backgroundColor: ['#d63384', '#198754', '#fd7e14', '#0dcaf0'],
-        borderColor: '#fff',
-        borderWidth: 1,
-      },
-    ],
+    return (
+      <div className="col-md-3 mb-3">
+        <div className={`card p-3 ${bgColor} ${center ? 'text-center' : 'text-start'}`}>
+          <div className="d-flex align-items-center mb-2">
+            <Icon size={24} className={textColor + " me-2"} />
+            <h6 className="mb-0">{title}</h6>
+          </div>
+          <h3 className={textColor}>{value}</h3>
+        </div>
+      </div>
+    );
   };
 
   const barOptions = {
     responsive: true,
     plugins: {
       legend: {
-        display: false,
+        display: true,
+        position: "bottom",
       },
     },
     scales: {
@@ -598,7 +585,7 @@ function Home() {
               className="id-block w-100"
               width="1280"
               height="720"
-              style={{ objectFit: "cover", height: "auto", maxHeight: "80vh" }}
+              style={{ objectFit: "cover", height: "420px", maxHeight: "80vh" }}
               fetchPriority="high"
               loading="lazy"
             />
@@ -612,7 +599,7 @@ function Home() {
               className="id-block w-100"
               width="1280"
               height="720"
-              style={{ objectFit: "cover", height: "auto", maxHeight: "80vh" }}
+              style={{ objectFit: "cover", height: "420px", maxHeight: "80vh" }}
               fetchPriority="auto"
               loading="lazy"
             />
@@ -718,74 +705,40 @@ function Home() {
 
 
         {/* ส่วนของแดชบอร์ด */}
-        <div className="home-dashboard">
-          <h3 id="head-text">ภาพรวมกิจกรรมและการบริจาค</h3>
-          <div className="container mt-4">
+        <div className="home-dashboard p-5">
+          <h3 id="head-text">แดชบอร์ดแสดงข้อมูล</h3>
+          <div className="container">
             <div className="row mb-3">
-              <CardInfo title="จำนวนผู้เข้าร่วมกิจกรรมทั้งหมด" value={`${stats.totalParticipants} คน`} />
-              <CardInfo title="กิจกรรมที่กำลังดำเนินการ" value={`${stats.ongoingActivity} กิจกรรม`} />
-              <CardInfo title="ยอดบริจาครวมทั้งหมด" value={`${stats.totalDonations} บาท`} />
-              <CardInfo title="โครงการที่เปิดรับบริจาค" value={`${stats.ongoingProject} โครงการ`} />
+              <CardInfo title="จำนวนผู้เข้าร่วมกิจกรรมทั้งหมด" value={`${stats.totalParticipants} คน`} type="activity" />
+              <CardInfo title="กิจกรรมที่กำลังดำเนินการ" value={`${stats.ongoingActivity} กิจกรรม`} type="activity" />
+              <CardInfo title="ยอดบริจาครวมทั้งหมด" value={`${stats.totalDonations} บาท`} type="donation" />
+              <CardInfo title="โครงการที่เปิดรับบริจาค" value={`${stats.ongoingProject} โครงการ`} type="donation" />
             </div>
 
-            {/* กราฟแท่ง */}
             <div className="row mb-4">
               <div className="col-md-8">
-                <div className="card p-3 shadow-sm">
-                  <h5 className="mb-3">จำนวนการเข้าร่วมกิจกรรมในแต่ละปี</h5>
-                  {barData.labels.length ? (
-                    <Bar data={barData} options={barOptions} />
-                  ) : (
-                    <div>Loading...</div>
-                  )}
+                <div className="card p-3">
+                  <h5>จำนวนการเข้าร่วมกิจกรรมในแต่ละปี</h5>
+                  {barData.labels.length ? <Bar data={barData} options={barOptions} /> : <div>Loading...</div>}
                 </div>
               </div>
-
-              {/* กราฟวงกลม */}
               <div className="col-md-4">
-                <div className="card p-3 shadow-sm">
-                  <h5 className="mb-3">สถิติการบริจาค</h5>
-                  {pieData.labels.length ? (
-                    <Pie data={pieData} options={pieOptions} />
-                  ) : (
-                    <div>Loading...</div>
-                  )}
+                <div className="card p-3">
+                  <h5>สถิติการบริจาค</h5>
+                  {pieData.labels.length ? <Pie data={pieData} options={pieOptions} /> : <div>Loading...</div>}
                 </div>
               </div>
             </div>
 
-
-
-
-            {/* <div className="col-md-8">
-                <div className="row">
-                  <div className="col-md-6">
-                    <CardInfo title="จำนวนผู้เข้าร่วมกิจกรรมทั้งหมด" value={stats.totalParticipants} animated />
-                  </div>
-                  <div className="col-md-6">
-                    <CardInfo title="กิจกรรมที่กำลังดำเนินการ" value={stats.ongoingActivity} animated />
-                  </div>
-                  <div className="col-md-6">
-                    <CardInfo title="ยอดบริจาครวมทั้งหมด" value={stats.totalDonations} animated />
-                  </div>
-                  <div className="col-md-6">
-                    <CardInfo title="โครงการที่เปิดรับบริจาค" value={stats.openProjects} animated />
-                  </div>
-                </div>
-              </div> */}
-
-
-            {/* การ์ดศิษย์เก่าแสดงอนิเมชัน */}
             <div className="row">
-              <div className="col-12">
-                <CardInfo title="จำนวนศิษย์เก่าทั้งหมด" value={alumniCount} center animated />
-              </div>
+              <CardInfo title="จำนวนศิษย์เก่าทั้งหมด" value={`${alumniCount} คน`} center />
             </div>
           </div>
         </div>
 
+
         {/* ส่วนของเว็บบอร์ด */}
-        <div className="home-webboard">
+        <div div className="home-webboard" >
           <h3 id="head-text">เว็บบอร์ด</h3>
           <div className="container">
             <div className="row justify-content-between" id="row-webboard">
@@ -1025,10 +978,10 @@ function Home() {
               </div>
             </div>
           </div>
-        </div>
+        </div >
 
         {/* ส่วนของบริจาค */}
-        <div className="home-donate">
+        < div className="home-donate" >
           <h3 id="head-text">บริจาค</h3>
           <div className="donate-content">
             {filteredProjects.length === 0 ? (
@@ -1107,9 +1060,9 @@ function Home() {
             )}
 
           </div>
-        </div>
+        </ div>
         {/* ส่วนของสมาคม*/}
-        <div className="home-about py-5">
+        <div div className="home-about" >
           <div className="container">
             <h3 id="head-text" className="text-center mb-4">เกี่ยวกับสมาคม</h3>
             <div className="card shadow-lg border-0 text-center">
@@ -1154,9 +1107,9 @@ function Home() {
               </div>
             </div>
           </div>
-        </div>
-      </section>
-    </div>
+        </div >
+      </section >
+    </div >
   )
 }
 

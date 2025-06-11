@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+// import 'bootstrap/dist/css/bootstrap.min.css';
+// import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { useNavigate } from "react-router-dom";
 import { FaFilter, FaPlay, FaCheck, FaClock } from "react-icons/fa"; 
 import "../../css/admin-activity.css";
@@ -71,8 +71,8 @@ function AdminActivity() {
     if (loading) return <p className="text-center mt-5">กำลังโหลดข้อมูล...</p>;
 
     return (
-        <div className="container mt-4">
-            <h3 className="mb-4 admin-title">กิจกรรมและการเข้าร่วม</h3>
+        <div className="activity-container">
+            <h3 className="admin-title">กิจกรรมและการเข้าร่วม</h3>
 
             {/* Tabs */}
             <ul className="nav nav-tabs mb-3">

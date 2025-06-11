@@ -11,7 +11,16 @@ function MajorDetail() {
     const [filteredStudents, setFilteredStudents] = useState([]);
     const [activeTab, setActiveTab] = useState("ป.ตรี"); // ค่าเริ่มต้นเป็นแท็บ ป.ตรี
     const [searchTerm, setSearchTerm] = useState("");
-    // const [selectedYear, setSelectedYear] = useState("");
+
+    const majors = [
+        { title: "วิทยาการคอมพิวเตอร์", slug: "cs" },
+        { title: "เทคโนโลยีสารสนเทศ", slug: "it" },
+        { title: "ภูมิสารสนเทศศาสตร์", slug: "gis" },
+        { title: "ความปลอดภัยไซเบอร์", slug: "cy" },
+        { title: "ปัญญาประดิษฐ์", slug: "ai" },
+    ];
+    const displayMajor = majors.find((m) => m.slug === major)?.title || major;
+
 
     useEffect(() => {
         axios.get(`http://localhost:3001/alumni/major/${major}`)
@@ -45,7 +54,7 @@ function MajorDetail() {
         return (
             student.full_name.toLowerCase().includes(lowerTerm) ||
             student.graduation_year?.toString().includes(lowerTerm) ||
-            student.admission_year?.toString().includes(lowerTerm) ||
+            student.entry_year?.toString().includes(lowerTerm) ||
             student.studentId?.toString().includes(lowerTerm)
         );
     });
@@ -71,7 +80,7 @@ function MajorDetail() {
     return (
         <section className="container my-5">
             <div className="major-detail">
-                <h3 className="text-center mb-4">รายชื่อศิษย์เก่า - สาขา {major}</h3>
+                <h3 className="text-center mb-4">รายชื่อศิษย์เก่า - สาขา{displayMajor}</h3>
 
                 <ul className="nav nav-tabs mb-4">
                     {["ป.ตรี", "ป.โท", "ป.เอก"].map((degree) => (
@@ -114,7 +123,7 @@ function MajorDetail() {
                                         <th scope="row">{index + 1}</th>
                                         <td>{student.full_name}</td>
                                         <td>{student.studentId}</td>
-                                        <td>{student.admission_year}</td>
+                                        <td>{student.entry_year}</td>
                                         <td>{student.graduation_year}</td>
                                         
                                     </tr>

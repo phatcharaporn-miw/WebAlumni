@@ -44,7 +44,8 @@ label {
     margin-top: 20px;
 }
 
-.button-souvenirRequest, .cancle-button-souvenirRequest {
+.button-souvenirRequest, 
+.cancle-button-souvenirRequest {
     padding: 10px 20px;
     width: 400px;
     border: none;

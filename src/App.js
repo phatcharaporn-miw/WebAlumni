@@ -6,21 +6,16 @@ import './App.css';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AppLayout from "./components/AppLayout";
-
-// import Home from "./pages/home";
 import About from "./pages/about";
 import News from './pages/news';
 import Activity from './pages/activity';
 import Donate from './pages/donate';
 import DonateRequest from './pages/donate-request';
 import DonateDetail from './pages/donate-detail';
-// import AdminDonate from './pages/admin/donate';
 import Souvenir from './pages/souvenir';
 import SouvenirDetail from './pages/souvenirDetail';
 import SouvenirRequest from './pages/souvenir_request';
 import SearchResult from './pages/searchResults';
-// import Webboard from './pages/webboard';
-// import Alumni from './pages/alumni';
 import Login from './pages/login';
 import Register from './pages/register';
 import Faq from './pages/faq';
@@ -44,15 +39,16 @@ import SouvenirCheckout from './pages/souvenir_checkout';
 import AlumniProfileSouvenir from './pages/alumni/alumni-profile-souvenir';
 import AlumniProfileActivity from './pages/alumni/alumni-profile-activity';
 import SouvenirBasket from './pages/souvenir_basket';
-//import AlumniMajor from './pages/major-detail';
-// import AlumniProfile from './pages/alumni/alumni-profile';
 import HomeAlumniProfile from './pages/alumniProfile';
+
+import ChangePassword from './pages/change-password';
 
 import AlumniOnly from './components/AlumniOnly';
 import StudentOnly from './components/StudentOnly';
 import PresidentOnly from './components/PresidentOnly';
 import AdminOnly from './components/AdminOnly';
 
+// import for student
 import StudentHome from './pages/students/student-home';
 import StudentProfile from './pages/students/student-profile';
 import StudentProfileWebboard from './pages/students/student-profile-webboard';
@@ -61,7 +57,7 @@ import StudentProfileSouvenir from './pages/students/student-profile-souvenir';
 import StudentEditWebboard from './pages/students/student-editWebboard';
 
 
-// route ของแอดมิน
+// import ของแอดมิน
 import AdminHome from './pages/admin/home';
 import AdminEditWebboard from './pages/admin/admin-edit-webboard';
 import EditActivity from './pages/admin/edit-activity';
@@ -80,8 +76,9 @@ import EditUserProfile from './pages/admin/edit-user-profile';
 import AdminAlumni from './pages/admin/admin-alumni';
 import AdminAlumniView from './pages/admin/admin-alumniView';
 import AdminNewsDetail from './pages/admin/admin-newDetail';
+import AdminDonate from './pages/admin/admin-donate';
 
-//route ของนายกสมาคม
+//import ของนายกสมาคม
 import ParticipantsPage from './pages/admin/participants';
 import PreCreateActivity from './pages/president/president-create-activity';
 import PresidentCreateNews from './pages/president/president-create-news';
@@ -118,7 +115,7 @@ function App() {
             <Route path="/donate/donatedetail/:projectId" element={<DonateDetail />} />
             <Route path="/donate/donatedetail" element={<DonateDetail />} />
             <Route path="/donatedetail" element={<DonateDetail />} />
-            <Route path="/alumni" element={<Suspense fallback={<div>Loading...</div>}><Alumni /></Suspense> }/>
+            <Route path="/alumni" element={<Suspense fallback={<div>Loading...</div>}><Alumni /></Suspense>} />
             <Route path="/souvenir" element={<Souvenir />} />
             <Route path="/souvenir/souvenir_basket" element={<SouvenirBasket />} />
             <Route path="/souvenir/checkout" element={<SouvenirCheckout />} />
@@ -140,6 +137,7 @@ function App() {
             <Route path="/searchResult" element={<SearchResult />} />
             <Route path="/alumni/:userId" element={<HomeAlumniProfile />} />
             <Route path="/createPost" element={<CreatePost />} />
+            <Route path="/change-password" element={<ChangePassword />} />
 
 
             {/* route ของศิษย์เก่า */}
@@ -198,7 +196,7 @@ function App() {
             <Route path="/admin/users/edit-user-profile/:userId" element={<AdminOnly><EditUserProfile /></AdminOnly>} />
             <Route path="/admin/admin-alumni" element={<AdminOnly><AdminAlumni /></AdminOnly>} />
             <Route path="/admin/admin-alumni/admin-alumniView/:major" element={<AdminOnly><AdminAlumniView /></AdminOnly>} />
-
+            <Route path="/admin/donations" element={<AdminOnly><AdminDonate /></AdminOnly>} />
 
           </Route>
         </Routes>

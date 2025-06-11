@@ -107,7 +107,7 @@ function News(){
                     <p className="text-center text-muted">ไม่พบข่าวที่ค้นหา</p>
                 ) : (
                     paginatedNews.map((item) => (
-                    <div key={item.news_id} className="col-10 mb-3">
+                    <div key={item.news_id} className="col-8 mb-3">
                         <div className="position-relative d-flex flex-column flex-md-row border rounded p-3 h-100">
                         {userRole === "2" && (
                             <div className="dropdown position-absolute top-0 end-0 m-2">
