@@ -24,6 +24,7 @@ export const breadcrumbMapping = {
     "/activity/edit" : "แก้ไขกิจกรรม",
     // "/alumni/major-detail/:major" : "รายชื่อศิษย์เก่า",
     "/change-password" : "เปลี่ยนรหัสผ่านครั้งแรก",
+    "/souvenir/checkout" : "ชำระเงิน",
 
     // ส่วนของศิษย์เก่า
     "/alumni-profile": "โปรไฟล์",
@@ -33,6 +34,7 @@ export const breadcrumbMapping = {
     "/alumni-profile/alumni-profile-webboard/edit-webboard": "แก้ไขกระทู้ที่สร้าง",
     "/createPost": "สร้างกระทู้ใหม่", 
     "/alumni-profile/alumni-profile-activity": "ประวัติการเข้าร่วมกิจกรรม",
+    
     
     // ส่วนศิษย์ปัจุบัน
     "/student-profile": "โปรไฟล์",

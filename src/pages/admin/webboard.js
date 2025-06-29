@@ -28,8 +28,8 @@ function AdminWebboard() {
 
     // Fetching webboard data
     useEffect(() => {
-        axios.get('http://localhost:3001/web/webboard', { 
-            withCredentials: true 
+        axios.get('http://localhost:3001/web/webboard', {
+            withCredentials: true
         })
             .then((response) => {
                 if (response.data.success) {
@@ -101,15 +101,15 @@ function AdminWebboard() {
             <div className="row">
                 {webboard.length > 0 ? (
                     sortedPosts.map(post => (
-                        <div key={post.webboard_id} className="col-md-4 mb-4">
-                            <div className="card-webboard shadow-sm border rounded-4">
-                                <div className="card-body">
+                        <div key={post.webboard_id} className="col-md-4 mb-4 d-flex">
+                            <div className="card-webboard shadow-sm border w-100 d-flex flex-column">
+                                <div className="card-body d-flex flex-column justify-content-between h-100">
                                     <h5 className="card-title">{post.title}</h5>
                                     <p className="card-text text-muted">
                                         หมวดหมู่: <strong>{post.category_name || "ไม่ระบุหมวดหมู่"}</strong> <br />
                                         จากคุณ {post.full_name || "ไม่ระบุชื่อ"} <br />
                                         วันที่โพสต์: {new Date(post.created_at).toLocaleDateString()} <br />
-                                       {post.liked_users && (
+                                        {post.liked_users && (
                                             <button
                                                 className="btn btn-link btn-sm text-decoration-none "
                                                 onClick={() => {
@@ -118,7 +118,7 @@ function AdminWebboard() {
                                                     setModalIsOpen(true);
                                                 }}
                                             >
-                                            รายชื่อผู้กดใจในกระทู้: {post.liked_users.split(', ').length} คน
+                                                รายชื่อผู้กดใจในกระทู้: {post.liked_users.split(', ').length} คน
                                             </button>
                                         )}
                                     </p>
@@ -134,12 +134,12 @@ function AdminWebboard() {
                                     </div>
 
                                     {/* <div className="d-flex justify-content-between align-items-center mt-3"> */}
-                                        {/* <span>
+                                    {/* <span>
                                             ❤️ {post.like_count ?? 0}
                                         </span> */}
-                                       
+
                                     {/* </div> */}
-                                    
+
                                     <div className="mt-3 d-flex justify-content-between">
                                         <button
                                             className="btn btn-outline-primary btn-sm"
@@ -190,12 +190,7 @@ function AdminWebboard() {
                         )}
                     </ul>
                 </div>
-                {/* <div className="modal-footer">
-                    <button type="button" className="btn btn-secondary" onClick={closeModal}>
-                        ปิด
-                    </button>
-                </div> */}
-            </Modal> 
+            </Modal>
         </div>
     );
 }

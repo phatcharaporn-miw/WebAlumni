@@ -52,7 +52,7 @@ function Login() {
           localStorage.setItem('username', username);
           localStorage.setItem('userRole', role);
 
-          return navigate('/change-password'); // ➤ ไปหน้าตั้งรหัสผ่านใหม่
+          return navigate('/change-password'); //ไปหน้าตั้งรหัสผ่านใหม่
         }
 
         // เข้าระบบปกติ

@@ -4,6 +4,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Link, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
+import { useCart } from '../context/CartContext'; 
 
 function SouvenirDetail() {
     const { productId } = useParams();
@@ -16,7 +17,7 @@ function SouvenirDetail() {
     const [loadingAddToCart, setLoadingAddToCart] = useState(false);
     const [selectedItems, setSelectedItems] = useState([]);
     const navigate = useNavigate();
-
+    const {addToCart} = useCart();
 
     useEffect(() => {
         setLoading(true);
@@ -55,7 +56,6 @@ function SouvenirDetail() {
         }
     };
 
-
     const getRandomProducts = (products, num = 4) => {
         const filteredProducts = products.filter(product => product.product_id !== parseInt(productId));
         const shuffled = [...filteredProducts].sort(() => 0.5 - Math.random());
@@ -63,20 +63,17 @@ function SouvenirDetail() {
     };
 
     const handleBuyNow = () => {
-        
-        // const userId = localStorage.getItem('userId'); 
-        
-       if (!user_id) {
-        Swal.fire({
+        if (!user_id) {
+            Swal.fire({
                 title: "กรุณาเข้าสู่ระบบ",
                 text: "คุณต้องเข้าสู่ระบบก่อนสั่งซื้อสินค้า",
                 icon: "warning",
                 confirmButtonText: "เข้าสู่ระบบ"
-              }).then(() => {
+            }).then(() => {
                 navigate("/login");
-              });
-      return;
-    }
+            });
+            return;
+        }
 
         const selectedItem = [
             {
@@ -84,54 +81,76 @@ function SouvenirDetail() {
                 quantity: quantity,
                 product_name: product.product_name,
                 price: product.price,
-                image:product.image
+                image: product.image
             }
         ];
 
         localStorage.setItem('selectedItemsซื้อเลย', JSON.stringify(selectedItem));
-
         navigate("/souvenir/checkout", { state: { selectedItems: selectedItem } });
     };
 
-    const handleAddToCart = (productId, quantity) => {
+    const handleAddToCart = async (productId, quantity) => {
         if (!user_id) {
-              Swal.fire({
-                        title: "กรุณาเข้าสู่ระบบ",
-                        text: "คุณต้องเข้าสู่ระบบก่อนเพิ่มสินค้า",
-                        icon: "warning",
-                        confirmButtonText: "เข้าสู่ระบบ"
-                      }).then(() => {
-                        navigate("/login");
-                      });
-              return;
+            Swal.fire({
+                title: "กรุณาเข้าสู่ระบบ",
+                text: "คุณต้องเข้าสู่ระบบก่อนเพิ่มสินค้า",
+                icon: "warning",
+                confirmButtonText: "เข้าสู่ระบบ"
+            }).then(() => {
+                navigate("/login");
+            });
+            return;
         }
 
         if (product) {
             const total = product.price * quantity;
             setLoadingAddToCart(true);
-            axios.post("http://localhost:3001/souvenir/cart/add", {
-                product_id: productId,
-                quantity: quantity,
-                user_id: user_id,
-                total: total
-            },{
-                withCredentials: true
-            })
-                .then(response => {
-                    console.log(response.data);
-                    setLoadingAddToCart(false);
-                    // อัปเดต selectedItems เมื่อเพิ่มลงตะกร้า
-                    const updatedItems = [...selectedItems, { product_id: productId, quantity: quantity }];
-                    setSelectedItems(updatedItems);
-                    localStorage.setItem('selectedItemsเพิ่มตะกร้า', JSON.stringify(updatedItems));
-                })
-                .catch(error => {
-                    console.error("Error adding item to cart:", error);
-                    setLoadingAddToCart(false);
+            
+            try {
+                // ใช้ addToCart จาก Context แทน axios โดยตรง
+                const response = await addToCart(productId, quantity, total);
+                
+                setLoadingAddToCart(false);
+                
+                // อัปเดต selectedItems
+                const updatedItems = [...selectedItems, { product_id: productId, quantity: quantity }];
+                setSelectedItems(updatedItems);
+                localStorage.setItem('selectedItemsเพิ่มตะกร้า', JSON.stringify(updatedItems));
+                
+                // อัปเดตสต็อกสินค้า
+                setProduct(prevProduct => ({
+                    ...prevProduct,
+                    stock: prevProduct.stock - quantity
+                }));
+                
+                // รีเซ็ตจำนวนสินค้าที่เลือก
+                const newStock = product.stock - quantity;
+                if (newStock < quantity) {
+                    setQuantity(Math.max(1, newStock));
+                }
+                
+                // แสดงข้อความสำเร็จ
+                Swal.fire({
+                    title: "เพิ่มลงตะกร้าสำเร็จ",
+                    text: `เพิ่ม ${product.product_name} จำนวน ${quantity} ชิ้น ลงตะกร้าแล้ว`,
+                    icon: "success",
+                    timer: 2000,
+                    showConfirmButton: false
                 });
+                
+            } catch (error) {
+                console.error("Error adding item to cart:", error);
+                setLoadingAddToCart(false);
+                
+                Swal.fire({
+                    title: "เกิดข้อผิดพลาด",
+                    text: "ไม่สามารถเพิ่มสินค้าลงตะกร้าได้ กรุณาลองใหม่อีกครั้ง",
+                    icon: "error",
+                    confirmButtonText: "ตกลง"
+                });
+            }
         }
     };
-
 
     const randomProducts = getRandomProducts(otherProducts);
 
@@ -171,11 +190,18 @@ function SouvenirDetail() {
                                     <button
                                         className="souvenir-buy_product_basket"
                                         onClick={() => handleAddToCart(product.product_id, quantity)}
-                                        disabled={loadingAddToCart}
+                                        disabled={loadingAddToCart || product.stock === 0}
                                     >
-                                        {loadingAddToCart ? "กำลังโหลด..." : "เพิ่มลงตะกร้า"}
+                                        {loadingAddToCart ? "กำลังโหลด..." : 
+                                         product.stock === 0 ? "สินค้าหมด" : "เพิ่มลงตะกร้า"}
                                     </button>
-                                    <button className="souvenir-buy_product" onClick={handleBuyNow}>สั่งซื้อสินค้า</button>
+                                    <button 
+                                        className="souvenir-buy_product" 
+                                        onClick={handleBuyNow}
+                                        disabled={product.stock === 0}
+                                    >
+                                        {product.stock === 0 ? "สินค้าหมด" : "สั่งซื้อสินค้า"}
+                                    </button>
                                 </div>
 
                                 <div className="description-product">

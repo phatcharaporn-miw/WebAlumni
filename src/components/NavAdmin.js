@@ -1,4 +1,4 @@
-import React, { useState, useEffect,  } from 'react';
+import React, { useState, useEffect, } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2';
@@ -17,7 +17,7 @@ function NavAdmin() {
     const navigate = useNavigate();
     const [notifications, setNotifications] = useState([]);
     const [showNotifications, setShowNotifications] = useState(false);
-    const [unreadCount, setUnreadCount] = useState(0); 
+    const [unreadCount, setUnreadCount] = useState(0);
     const userId = localStorage.getItem('userId');
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -39,13 +39,13 @@ function NavAdmin() {
             if (result.isConfirmed) {
                 try {
                     await axios.get('http://localhost:3001/api/logout', { withCredentials: true });
-    
+
                     // ลบข้อมูลใน localStorage
                     localStorage.removeItem('userId');
                     localStorage.removeItem('userRole');
                     localStorage.removeItem('username');
                     localStorage.removeItem('image_path');
-    
+
                     Swal.fire('ออกจากระบบสำเร็จ!', 'คุณได้ออกจากระบบเรียบร้อยแล้ว', 'success');
                     navigate('/'); // เปลี่ยนเส้นทางไปยังหน้าแรกหลังจากออกจากระบบ
                 } catch (error) {
@@ -58,91 +58,91 @@ function NavAdmin() {
 
     useEffect(() => {
         const role = localStorage.getItem('userRole');
-        const username = localStorage.getItem('username') || 'Admin'; 
-        const imagePath = localStorage.getItem('image_path');  
+        const username = localStorage.getItem('username') || 'Admin';
+        const imagePath = localStorage.getItem('image_path');
 
         const profilePic = imagePath
             ? `http://localhost:3001/${imagePath.replace(/^\/+/, '')}`
             : '/default-profile-pic.jpg';
 
         if (role === '1') {
-            setUserInfo({              
+            setUserInfo({
                 fullName: username,
                 profilePic: profilePic,
             });
         } else {
-            navigate('/login'); 
+            navigate('/login');
         }
     }, [navigate]);
 
     // ดึงแจ้งเตือนเมื่อผู้ใช้เข้าสู่ระบบ
     useEffect(() => {
-      if (!userId) return;
-      const fetchNotifications = () => {
-        axios.get(`http://localhost:3001/notice/notification/${userId}`)
-          .then((response) => {
-            if (response.data.success) {
-              const data = response.data.data || [];
-              setNotifications(data);
-              const unreadNotifications = data.filter((n) => n.status === "ยังไม่อ่าน");
-              setUnreadCount(unreadNotifications.length);
-            }
-          })
-          .catch((error) => console.error("Error loading notifications:", error));
-      };
+        if (!userId) return;
+        const fetchNotifications = () => {
+            axios.get(`http://localhost:3001/notice/notification/${userId}`)
+                .then((response) => {
+                    if (response.data.success) {
+                        const data = response.data.data || [];
+                        setNotifications(data);
+                        const unreadNotifications = data.filter((n) => n.status === "ยังไม่อ่าน");
+                        setUnreadCount(unreadNotifications.length);
+                    }
+                })
+                .catch((error) => console.error("Error loading notifications:", error));
+        };
 
-      fetchNotifications();
+        fetchNotifications();
 
-      const interval = setInterval(fetchNotifications, 30000); // รีเฟรชทุก 30 วินาที
-      return () => clearInterval(interval);
+        const interval = setInterval(fetchNotifications, 30000); // รีเฟรชทุก 30 วินาที
+        return () => clearInterval(interval);
     }, [userId]);
 
 
     const markAsRead = (notificationId) => {
-      axios.put(`http://localhost:3001/notice/read/${notificationId}`)
-          .then(() => {
-              setNotifications((prevNotifications) =>
-                  prevNotifications.map((n) =>
-                      n.notification_id === notificationId
-                          ? { ...n, read_status: "อ่านแล้ว" }
-                          : n
-                  )
-              );
-              setUnreadCount((prev) => Math.max(prev - 1, 0)); // ลดจำนวนแจ้งเตือนที่ยังไม่ได้อ่าน
-          })
-          .catch((error) => console.error("เกิดข้อผิดพลาดในการเปลี่ยนสถานะ:", error));
+        axios.put(`http://localhost:3001/notice/read/${notificationId}`)
+            .then(() => {
+                setNotifications((prevNotifications) =>
+                    prevNotifications.map((n) =>
+                        n.notification_id === notificationId
+                            ? { ...n, read_status: "อ่านแล้ว" }
+                            : n
+                    )
+                );
+                setUnreadCount((prev) => Math.max(prev - 1, 0)); // ลดจำนวนแจ้งเตือนที่ยังไม่ได้อ่าน
+            })
+            .catch((error) => console.error("เกิดข้อผิดพลาดในการเปลี่ยนสถานะ:", error));
     };
 
-  //ลบแจ้งเตือน
-  const deleteNotification = (notificationId) => {
-    axios.delete(`http://localhost:3001/notice/notification/${notificationId}`)
-    .then(() => {
-      setNotifications(notifications.filter((n) => n.notification_id !== notificationId));
-      setUnreadCount((prev) => Math.max(prev - 1, 0)); // ลดตัวนับแจ้งเตือน
-    })
-    .catch((error) => console.error("เกิดข้อผิดพลาดในการลบแจ้งเตือน:", error));
-  };
+    //ลบแจ้งเตือน
+    const deleteNotification = (notificationId) => {
+        axios.delete(`http://localhost:3001/notice/notification/${notificationId}`)
+            .then(() => {
+                setNotifications(notifications.filter((n) => n.notification_id !== notificationId));
+                setUnreadCount((prev) => Math.max(prev - 1, 0)); // ลดตัวนับแจ้งเตือน
+            })
+            .catch((error) => console.error("เกิดข้อผิดพลาดในการลบแจ้งเตือน:", error));
+    };
 
-  //ฟังก์ชันแสดง/ซ่อนแจ้งเตือน
+    //ฟังก์ชันแสดง/ซ่อนแจ้งเตือน
     const toggleNotifications = () => {
-      setShowNotifications(!showNotifications);
+        setShowNotifications(!showNotifications);
     };
-  
+
     // ป้องกันการปิด Dropdown เมื่อคลิกภายนอก
     useEffect(() => {
-      const handleClickOutside = (event) => {
-        if (showNotifications && !event.target.closest(".notification-dropdown") && !event.target.closest(".notification-icon")) {
-          setShowNotifications(false);
-        }
-      };
-  
-      document.addEventListener("click", handleClickOutside);
-      return () => document.removeEventListener("click", handleClickOutside);
+        const handleClickOutside = (event) => {
+            if (showNotifications && !event.target.closest(".notification-dropdown") && !event.target.closest(".notification-icon")) {
+                setShowNotifications(false);
+            }
+        };
+
+        document.addEventListener("click", handleClickOutside);
+        return () => document.removeEventListener("click", handleClickOutside);
     }, [showNotifications]);
-  
+
     // ป้องกันการปิด Dropdown เมื่อคลิกภายใน
     const handleDropdownClick = (event) => {
-     event.stopPropagation(); 
+        event.stopPropagation();
     };
 
     return (
@@ -172,36 +172,36 @@ function NavAdmin() {
                             <IoMdNotificationsOutline />
                             {unreadCount > 0 && <span className="unread-count">{unreadCount}</span>}
                         </div>
-        
+
                         {showNotifications && (
                             <div className="notification-dropdown-admin" onClick={handleDropdownClick}>
-                            <h5 className="notification-title">การแจ้งเตือน</h5>
-                            {notifications.length > 0 ? (
-                                notifications.map((notification) => (
-                                <div
-                                    key={notification.notification_id}
-                                    className={`notification-item ${notification.read_status === "ยังไม่อ่าน" ? "unread" : ""
-                                    }`}
-                                    onClick={() => markAsRead(notification.notification_id)}
-                                >
-                                    <p className="message">{notification.message}</p>
-                                    <p className="notification-date">
-                                    {new Date(notification.send_date).toLocaleString()}
-                                    </p>
-                                    <button
-                                    className="delete-btn"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        deleteNotification(notification.notification_id);
-                                    }}
-                                    >
-                                    <FaTrash />
-                                    </button>
-                                </div>
-                                ))
-                            ) : (
-                                <p className="no-notifications text-center small">ไม่มีการแจ้งเตือน</p>
-                            )}
+                                <h5 className="notification-title">การแจ้งเตือน</h5>
+                                {notifications.length > 0 ? (
+                                    notifications.map((notification) => (
+                                        <div
+                                            key={notification.notification_id}
+                                            className={`notification-item ${notification.read_status === "ยังไม่อ่าน" ? "unread" : ""
+                                                }`}
+                                            onClick={() => markAsRead(notification.notification_id)}
+                                        >
+                                            <p className="message">{notification.message}</p>
+                                            <p className="notification-date">
+                                                {new Date(notification.send_date).toLocaleString()}
+                                            </p>
+                                            <button
+                                                className="delete-btn"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    deleteNotification(notification.notification_id);
+                                                }}
+                                            >
+                                                <FaTrash />
+                                            </button>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p className="no-notifications text-center small">ไม่มีการแจ้งเตือน</p>
+                                )}
                             </div>
                         )}
                     </div>
@@ -249,16 +249,18 @@ function NavAdmin() {
                         </NavLink>
                     ))}
 
-                    <NavLink
+                    <button
                         onClick={handleLogout}
-                        className="nav-link my-1"
-                        style={({ isActive }) => ({
-                            ...(isActive ? active : {}),
-                            color: "#FFFFFF",
-                        })}
+                        className="nav-link my-1 btn btn-link"
+                        style={{
+                            ...navLinkStyles,
+                            ...navAdminButtonStyles,
+                            textAlign: "left",
+                            textDecoration: "none",
+                        }}
                     >
                         ออกจากระบบ
-                    </NavLink>
+                    </button>
                 </div>
             </div>
         </>
@@ -309,8 +311,13 @@ const navLinkStyles = {
 };
 
 const navAdminButtonStyles = {
-    marginTop: "auto",
-     color: "#FFFFFF",
+    color: "#FFFFFF",
+    padding: "10px 20px",
+    textDecoration: "none",
+    fontWeight: "500",
+    margin: "6px 0",
+    borderRadius: "8px",
+    transition: "all 0.2s ease-in-out",
 };
 
 

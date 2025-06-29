@@ -22,6 +22,7 @@ function AdminAlumniView() {
         { title: "ความปลอดภัยไซเบอร์", slug: "cy" },
         { title: "ปัญญาประดิษฐ์", slug: "ai" },
     ];
+    const displayMajor = majors.find((m) => m.slug === major)?.title || major;
 
     useEffect(() => {
         axios.get(`http://localhost:3001/alumni/major/${major}`)
@@ -111,7 +112,7 @@ function AdminAlumniView() {
 
     return (
         <section className="alumni-container p-5">
-            <h3 className="admin-title">ทำเนียบศิษย์เก่าสาขา {major}</h3>
+            <h3 className="admin-title">ทำเนียบศิษย์เก่าสาขา {displayMajor}</h3>
 
            <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
                 {/* Dropdown ทางซ้าย */}

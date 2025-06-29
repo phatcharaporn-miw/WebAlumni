@@ -202,8 +202,8 @@ function Register() {
                             <label className="form-label">เลือกประเภทผู้ใช้:</label>
                                 <select  name="role" value={userData.role} onChange={(e) => handleInputChange({ target: { name: 'role', value: e.target.value } })} className="form-control">
                                     <option value="">เลือกบทบาท</option>
-                                    <option value="1">แอดมิน</option>
-                                    <option value="2">นายกสมาคม</option>
+                                    {/* <option value="1">แอดมิน</option>
+                                    <option value="2">นายกสมาคม</option> */}
                                     <option value="3">ศิษย์เก่า</option>
                                     <option value="4">ศิษย์ปัจจุบัน</option>
                                 </select>

@@ -5,17 +5,16 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 function HomeAlumniProfile() {
-    const { userId } = useParams();
-    const [alumni, setAlumni] = useState(null);
+  const { userId } = useParams();
+  const [alumni, setAlumni] = useState(null);
 
-    useEffect(() => {
+  useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await axios.get(`http://localhost:3001/alumni/${userId}`,{
+        const res = await axios.get(`http://localhost:3001/alumni/${userId}`, {
           withCredentials: true
         });
         if (res.data.success) {
-          // console.log(res.data.data);
           setAlumni(res.data.data);
         }
       } catch (error) {
@@ -46,7 +45,6 @@ function HomeAlumniProfile() {
 
         <hr />
 
-        {/* ข้อมูลทั่วไป */}
         <section className="mb-4">
           <h5 className="text-primary mb-3">ข้อมูลส่วนตัว</h5>
           <ul className="list-group list-group-flush">
@@ -66,7 +64,6 @@ function HomeAlumniProfile() {
           </ul>
         </section>
 
-        {/* การศึกษา */}
         {alumni.educations?.length > 0 && (
           <section className="mb-4">
             <h5 className="text-primary mb-3">ข้อมูลการศึกษา</h5>
@@ -83,7 +80,6 @@ function HomeAlumniProfile() {
           </section>
         )}
 
-        {/* กิจกรรม */}
         {alumni.activities?.length > 0 && (
           <section className="mb-4">
             <h5 className="text-primary mb-3">ประวัติเข้าร่วมกิจกรรม</h5>
@@ -114,7 +110,6 @@ function HomeAlumniProfile() {
           </section>
         )}
 
-        {/* กระทู้ */}
         {alumni.posts?.length > 0 && (
           <section>
             <h5 className="text-primary mb-3">กระทู้ที่เคยสร้าง</h5>
@@ -131,17 +126,18 @@ function HomeAlumniProfile() {
       </div>
     </div>
   );
+}
 
-  function Info({ label, value }) {
-    return (
-      <li className="list-group-item d-flex">
-        <div style={{ width: "120px" }} className="text-secondary fw-medium">
-          {label}:
-        </div>
-        <div className="flex-grow-1">{value || "-"}</div>
-      </li>
-    );
-  }
+// ต้องแยกออกมานอกฟังก์ชันหลัก
+function Info({ label, value }) {
+  return (
+    <li className="list-group-item d-flex">
+      <div style={{ width: "120px" }} className="text-secondary fw-medium">
+        {label}:
+      </div>
+      <div className="flex-grow-1">{value || "-"}</div>
+    </li>
+  );
 }
 
 export default HomeAlumniProfile;

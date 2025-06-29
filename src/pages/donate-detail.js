@@ -140,7 +140,9 @@ function DonateDetail() {
     const progress = projectData.target_amount
         ? (projectData.current_amount / projectData.target_amount) * 100
         : 0;
-    return (<>
+        
+    return (
+    <>
         <div className="donate-detail-content">
             <div className="donate-detail-content-item">
                 <h5>{projectData.project_name}</h5>

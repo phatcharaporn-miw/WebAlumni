@@ -11,6 +11,8 @@ import { IoMdNotificationsOutline } from "react-icons/io";
 import { FaTrash } from "react-icons/fa";
 import Swal from "sweetalert2";
 import axios from "axios";
+import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 
 function Header({ user }) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -19,7 +21,8 @@ function Header({ user }) {
   const [unreadCount, setUnreadCount] = useState(0); // สถานะเก็บจำนวนแจ้งเตือนที่ยังไม่ได้อ่าน
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [cartCount, setCartCount] = useState(0);
+  // const [cartCount, setCartCount] = useState(0);
+  const { cartCount, getCartCount } = useCart();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const userId = localStorage.getItem('userId');
   const [menuOpen, setMenuOpen] = useState(false);
@@ -120,10 +123,20 @@ function Header({ user }) {
     event.stopPropagation();
   };
 
-  // เพิ่มสินค้าลงในตะกร้า
-  const addToCart = (productId, quantity, total) => {
+  // ตรวจสอบและโหลดจำนวนตะกร้าเมื่อ component mount หรือเมื่อ user login
+  useEffect(() => {
     const userId = localStorage.getItem('userId');
+    if (userId) {
+      getCartCount(userId);
+    }
+  }, []); // เรียกครั้งเดียวเมื่อ component mount
 
+  // ฟังก์ชันเพิ่มสินค้าลงตะกร้าสำหรับใช้ในส่วนอื่นๆ ของ Header (ถ้ามี)
+  const { addToCart } = useCart();
+
+  const handleAddToCartFromHeader = async (productId, quantity, total) => {
+    const userId = localStorage.getItem('userId');
+    
     if (!userId) {
       Swal.fire({
         title: "กรุณาเข้าสู่ระบบ",
@@ -136,41 +149,27 @@ function Header({ user }) {
       return;
     }
 
-    axios.post("http://localhost:3001/souvenir/cart/add", {
-      user_id: userId,
-      product_id: productId,
-      quantity: quantity,
-      total: total
-    })
-      .then((response) => {
-        alert(response.data.message);
-        getCartCount(userId); // เรียกอัปเดตจำนวนสินค้าในตะกร้าทันที
-      })
-      .catch((error) => {
-        console.error("เกิดข้อผิดพลาดในการเพิ่มสินค้าลงในตะกร้า:", error);
+    try {
+      await addToCart(productId, quantity, total);
+      
+      Swal.fire({
+        title: "เพิ่มลงตะกร้าสำเร็จ",
+        text: "เพิ่มสินค้าลงตะกร้าแล้ว",
+        icon: "success",
+        timer: 2000,
+        showConfirmButton: false
       });
-  };
-
-  // ดึงข้อมูลสินค้าในตะกร้า
-  const getCartCount = (userId) => {
-    if (!userId) return;
-
-    axios.get(`http://localhost:3001/souvenir/cart/count?user_id=${userId}`, {
-      headers: { "Cache-Control": "no-cache" }
-    })
-      .then(response => {
-        setCartCount(response.data.cartCount || 0);
-      })
-      .catch(error => console.error("Error fetching cart count:", error));
-  };
-
-  // ดึงข้อมูลจำนวนสินค้าตะกร้าเมื่อโหลดหน้า
-  useEffect(() => {
-    const userId = localStorage.getItem('userId'); // ดึง userId อีกครั้ง กันค่า null
-    if (userId) {
-      getCartCount(userId);
+    } catch (error) {
+      console.error("เกิดข้อผิดพลาดในการเพิ่มสินค้าลงในตะกร้า:", error);
+      
+      Swal.fire({
+        title: "เกิดข้อผิดพลาด",
+        text: "ไม่สามารถเพิ่มสินค้าลงตะกร้าได้ กรุณาลองใหม่อีกครั้ง",
+        icon: "error",
+        confirmButtonText: "ตกลง"
+      });
     }
-  }, []);
+  };
 
 
   // การค้นหา

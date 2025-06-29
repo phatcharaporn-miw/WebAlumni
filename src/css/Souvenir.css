@@ -276,8 +276,11 @@
 
 /* card */
 .titlesouvenirBasket{
-    margin-bottom: 0;
+    color: #085A9C;
+    font-weight: bold;
+    text-align: center; 
 }
+
 .souvenirBasket-content {
     display: flex;
     flex-direction: column;

@@ -145,6 +145,7 @@ function EditActivity() {
                                 value={formData.activity_date}
                                 onChange={handleChange}
                                 required
+                                min={new Date().toISOString().split("T")[0]} // เพิ่มบรรทัดนี้
                             />
                         </div>
                         <div className="mb-3">
@@ -156,6 +157,7 @@ function EditActivity() {
                                 name="end_date"
                                 value={formData.end_date}
                                 onChange={handleChange}
+                                min={new Date().toISOString().split("T")[0]}  // ป้องกันย้อนหลังและไม่ให้ก่อนวันเริ่ม
                             />
                         </div>
                         <div className="mb-3">

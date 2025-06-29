@@ -6,6 +6,8 @@ import './App.css';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AppLayout from "./components/AppLayout";
+import { CartProvider } from './context/CartContext'; // ปรับ path ตามโครงสร้างโฟลเดอร์
+import { AuthProvider } from './context/AuthContext';
 import About from "./pages/about";
 import News from './pages/news';
 import Activity from './pages/activity';
@@ -42,6 +44,8 @@ import SouvenirBasket from './pages/souvenir_basket';
 import HomeAlumniProfile from './pages/alumniProfile';
 
 import ChangePassword from './pages/change-password';
+
+import DonationOCRSystem from './pages/test-donate';
 
 import AlumniOnly from './components/AlumniOnly';
 import StudentOnly from './components/StudentOnly';
@@ -103,6 +107,8 @@ function App() {
 
     <GoogleOAuthProvider clientId={clientId}>
       <BrowserRouter>
+      <AuthProvider>
+      <CartProvider>
         <Routes>
           <Route element={<AppLayout />}>
             <Route path="/" element={<Suspense fallback={<div>Loading...</div>}><Home /></Suspense>} />
@@ -138,6 +144,8 @@ function App() {
             <Route path="/alumni/:userId" element={<HomeAlumniProfile />} />
             <Route path="/createPost" element={<CreatePost />} />
             <Route path="/change-password" element={<ChangePassword />} />
+
+            <Route path="/test-donate" element={<DonationOCRSystem />} />
 
 
             {/* route ของศิษย์เก่า */}
@@ -200,6 +208,8 @@ function App() {
 
           </Route>
         </Routes>
+        </CartProvider>
+        </AuthProvider>
       </BrowserRouter>
     </GoogleOAuthProvider>
 
