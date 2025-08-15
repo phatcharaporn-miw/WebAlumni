@@ -56,7 +56,6 @@ function AlumniProfileActivity() {
           return <div>ไม่พบข้อมมูลผู้ใช้</div>;
         }
     
-     // ตรวจสอบว่าเมนูใดควรเป็น active
      const isActive = (path) => location.pathname === path;
 
      const filteredActivity = activity.filter(activity => {
@@ -64,8 +63,6 @@ function AlumniProfileActivity() {
         return activity.status == selectedStatus;
         });
 
-
-      // ฟังก์ชันช่วยสำหรับจัดการคลาสสถานะ
     const getStatusClass = (status) => {
         switch (status) {
             case 0:

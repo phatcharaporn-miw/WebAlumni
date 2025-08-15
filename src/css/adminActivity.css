@@ -20,6 +20,14 @@
     justify-content: center;
 }
 
+.styled-inputTax,
+textarea,
+select {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
 .admin-ativity-item-detail {
     height: 210px;
     background-color: white;

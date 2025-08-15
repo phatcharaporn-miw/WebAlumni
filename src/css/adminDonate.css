@@ -350,6 +350,13 @@
 .admin-delete-button:hover {
     background-color: #c82333;
 }
+.admin-appove-button {
+    background-color: #28a745;
+    color: white;
+}
+.admin-appove-button:hover {
+    background-color: #218838;
+}
 
 .donate-button-container {
     display: flex;
@@ -388,6 +395,38 @@
     color: orange;
 }
 
+.fasfa-edit,.fasfa-delete,.fasfa-info {
+    font-size: 16px;
+    margin-right: 5px;
+    color: white;
+}
+.fasfa-edit {
+    background-color: #ffc107;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+.fasfa-edit:hover {
+    color: #fff;
+    background-color: #e0a800;
+}
+.fasfa-delete {
+    background-color: #dc3545;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+.fasfa-delete:hover {
+    color: #fff;
+    background-color: #c82333;
+}
+.fasfa-info {
+    background-color: #17a2b8;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+.fasfa-info:hover {
+    color: #fff;
+    background-color: #138496;
+}
 
 @media screen and (max-width: 768px) {
     .donate-admin-item-detail {

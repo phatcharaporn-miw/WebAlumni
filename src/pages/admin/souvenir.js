@@ -1,4 +1,3 @@
-// เพิ่ม modal แสดงรายละเอียด + คลิกทั้งแถวเพื่อเปิด
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
@@ -7,11 +6,9 @@ import { FaRegEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import { BsCheck2Square } from "react-icons/bs";
 import { CiSearch } from "react-icons/ci";
-import {
-    TextField, FormControl, InputLabel, Select, MenuItem,
+import { TextField, FormControl, InputLabel, Select, MenuItem,
     Button, Typography, Box, Modal, Snackbar, Alert, InputAdornment
 } from "@mui/material";
-
 import "../../css/admin.css";
 
 function Souvenir() {
@@ -135,6 +132,7 @@ function Souvenir() {
                                 <th>รูปภาพสินค้า</th>
                                 <th>ชื่อสินค้า</th>
                                 <th>ราคา</th>
+                                <th>จำนวน (ชิ้น)</th>
                                 <th>ผู้ดูแล</th>
                                 <th>สถานะ</th>
                                 <th>วันที่เพิ่ม</th>
@@ -158,6 +156,7 @@ function Souvenir() {
                                         </td>
                                         <td>{product.product_name}</td>
                                         <td>{product.price}</td>
+                                        <td>{product.stock}</td>
                                         <td>{roleNames[product.role_id]}</td>
                                         <td>
                                             <p className="statusProduct-label" style={{ color: getStatusColor(product.status) }}>
@@ -242,6 +241,17 @@ function Souvenir() {
                                 value={selectedProduct.price}
                                 onChange={(e) =>
                                     setSelectedProduct({ ...selectedProduct, price: e.target.value })
+                                }
+                            />
+
+                            <TextField
+                                label="จำนวนในคลัง"
+                                variant="outlined"
+                                type="number"
+                                fullWidth
+                                value={selectedProduct.stock}
+                                onChange={(e) =>
+                                    setSelectedProduct({ ...selectedProduct, stock: e.target.value })
                                 }
                             />
 

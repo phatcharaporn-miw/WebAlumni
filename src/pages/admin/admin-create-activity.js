@@ -33,7 +33,6 @@ function CreateActivity() {
         }
       }, []);
 
-  // ฟังก์ชันจัดการการเปลี่ยนแปลงของฟอร์ม
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     if (type === 'checkbox') {
@@ -49,7 +48,6 @@ function CreateActivity() {
     }
   };
 
-  // ฟังก์ชันจัดการการอัพโหลดไฟล์
   const handleFileChange = (e) => {
     setFormData((prevState) => ({
       ...prevState,

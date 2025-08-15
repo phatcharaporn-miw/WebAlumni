@@ -1,5 +1,6 @@
 .donate-detail-content{
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
     gap: 10px;
 }
@@ -59,14 +60,15 @@
     color: #333;
 }
 .donate-detail-details{
-        display: flex;
-        justify-content: space-between;
-        font-size: 14px;
-        color: #085A9C;
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: #085A9C;
         margin: 0 0 5px 0;
 }
+
 .donate-detail-discription {
-    display: grid; 
+    display: grid;
     text-align: justify;
     gap: 2px; 
     font-size: 13px;
@@ -96,6 +98,13 @@
     text-align: end;
     font-size: 14px;
     color: #085A9C;
+}
+
+.promptPay-layout {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
 }
 
 .donate-detail-header {
@@ -131,4 +140,11 @@ p.donate-detail-informations{
     padding: 5%;
     border-radius: 10px;
     margin-bottom: 5%;
+}
+
+.form-group-btn {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    gap: 10px;
 }

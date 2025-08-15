@@ -13,6 +13,7 @@ import Activity from './pages/activity';
 import Donate from './pages/donate';
 import DonateRequest from './pages/donate-request';
 import DonateDetail from './pages/donate-detail';
+import DonateConfirm from './pages/donate-confirm';
 // import AdminDonate from './pages/admin/donate';
 import Souvenir from './pages/souvenir';
 import SouvenirBasket from './pages/souvenir_basket';
@@ -44,11 +45,17 @@ import ForgotPassword from './pages/forgotPassword';
 import SouvenirCheckout from './pages/souvenir_checkout';
 import SouvenirHistory from './pages/souvenir_history';
 import AlumniProfileSouvenir from './pages/alumni/alumni-profile-souvenir';
+import AlumniProfileDonation from './pages/alumni/alumni-profile-donate';
 import Admin from './components/Admin';
 import AdminSouvenir from './pages/admin/souvenir';
 import AdminActivity from './pages/admin/admin-home';
 import AdminDonate from './pages/admin/admin-donate';
 import AlumniProfileActivity from './pages/alumni/alumni-profile-activity';
+import AlumniProfileRequest from './pages/alumni/alumni-request';
+import AdminEditProject from './pages/admin/admin-donate-edit';
+import AdminDonateDetail from './pages/admin/admin-donate-detail';
+import AdminDonateCheckPayment from './pages/admin/admin-donate-checkPayment';
+import AdminDonateCheckPaymentDetail from './pages/admin/admin-donate-checkPayment-detail';
 
 
 function App() {
@@ -69,6 +76,7 @@ function App() {
             <Route path="/donate" element={<Donate />} />
             <Route path="/donaterequest" element={<DonateRequest />} />
             <Route path="/donate/donatedetail/:projectId" element={<DonateDetail />} />
+            <Route path="/donate/donatedetail/donateconfirm/:projectId" element={<DonateConfirm/>} />
             <Route path="/donatedetail" element={<DonateDetail />} />
             <Route path="/alumni" element={<Alumni />} />
             <Route path="/souvenir" element={<Souvenir />} />
@@ -92,6 +100,8 @@ function App() {
             <Route path="/edit-webboard/:webboardId" element={<EditWebboard />} />
             <Route path="/activity/:activityId" element={<ActivityDetail />} />
             <Route path="/forgotPassword" element={<ForgotPassword />} />
+            <Route path="/alumni-profile" element={<Profile />} />
+            <Route path="/alumni-profile/alumni-profile-webboard" element={<AlumniProfileWebboard />} />
             <Route path="/alumni-profile/alumni-profile-activity" element={<AlumniProfileActivity />} />
             <Route path="/alumni-profile-souvenir" element={<AlumniProfileSouvenir />} />
             <Route path="/alumni/major-detail" element={<AlumniMajor />} />
@@ -106,6 +116,11 @@ function App() {
             <Route path="/admin/activities/admin-create-activity" element={<CreateActivity />} />
             <Route path="/admin/souvenir/souvenir_request" element={<SouvenirRequest />} />
             <Route path="/admin/donations" element={<AdminDonate />} />
+            <Route path="/admin/edit/:id" element={<AdminEditProject />} />
+            <Route path="/admin/donatedetail/:id" element={<AdminDonateDetail />} />
+            <Route path="/admin/check-payment-donate" element={<AdminDonateCheckPayment />} />
+            <Route path="/admin/check-payment-donate-detail/:id" element={<AdminDonateCheckPaymentDetail />} />
+
           </Route>
         </Routes>
       </BrowserRouter>

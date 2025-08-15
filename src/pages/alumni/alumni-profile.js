@@ -10,10 +10,9 @@ function Profile() {
   const [major, setMajor] = useState([]);
   const {handleLogout } = useOutletContext();
   const [loginInfo, setLoginInfo] = useState({ username: '', password: '' });
-  const [showPassword, setShowPassword] = useState(false); // สำหรับซ่อน/แสดงรหัสผ่าน
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
- //แก้ไขข้อมูลส่วนตัว
- const [editing, setEditing] = useState(false); //สลับโหมดการแก้ไข
+ const [editing, setEditing] = useState(false); 
  
   
   useEffect(() => {
