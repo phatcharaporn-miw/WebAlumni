@@ -47,6 +47,14 @@ function DonateRequest() {
         e.preventDefault();
         const data = new FormData();
 
+        const userId = localStorage.getItem('userId');
+
+        if (!userId) {
+            alert("กรุณาเข้าสู่ระบบก่อน");
+            return;
+        }
+        data.append("userId", userId);
+
         data.append("projectName", formData.projectName);
         data.append("description", formData.description);
         data.append("targetAmount", formData.targetAmount || null);
@@ -68,13 +76,22 @@ function DonateRequest() {
             alert("กรุณาเลือกไฟล์รูปภาพ");
             return;
         }
+
+        // Debug: ดูข้อมูลที่ส่งไป
+        console.log("Data being sent:");
+        for (let [key, value] of data.entries()) {
+            console.log(key, value);
+        }
+
         try {
             const response = await axios.post('http://localhost:3001/donate/donateRequest', data, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             alert("เพิ่มโครงการบริจาคสำเร็จ!");
-            navigate("/donate");
+            // navigate("/donate");
+            navigate("/alumni-profile/alumni-request");
         } catch (error) {
+            console.error("Error:", error);
             alert(error.response?.data?.error || "เกิดข้อผิดพลาด");
         }
     };
@@ -100,7 +117,7 @@ function DonateRequest() {
                 {successMessage && <div className="success-message">{successMessage}</div>}
                 {errorMessage && <div className="error-message">{errorMessage}</div>}
 
-                <form onSubmit={handleSubmit} encType="multipart/form-data">
+                <form encType="multipart/form-data">
                     <div className="data-requestDonate">
                         <p>
                             <label htmlFor="projectName">ชื่อโครงการ/หัวข้อการขอรับบริจาค<span className="important">*</span></label><br />
@@ -134,7 +151,7 @@ function DonateRequest() {
                                 name="donationType"
                                 value="บริจาคแบบระดมทุน"
                                 onChange={handleChange}
-                                checked={formData.donationType === "บริจาคแบบระดมทุน"}
+                                checked={formData.donationType === "fundraising"}
                                 required
                             /> บริจาคแบบระดมทุน
                             <br />
@@ -143,7 +160,7 @@ function DonateRequest() {
                                 name="donationType"
                                 value="บริจาคแบบไม่จำกัดจำนวน"
                                 onChange={handleChange}
-                                checked={formData.donationType === "บริจาคแบบไม่จำกัดจำนวน"}
+                                checked={formData.donationType === "unlimited"}
                             /> บริจาคแบบไม่จำกัดจำนวน
                             <br />
                             <input
@@ -281,7 +298,7 @@ function DonateRequest() {
                             <input
                                 name="accountNumber"
                                 type="number"
-                                placeholder="ex.123-456-789"
+                                placeholder="ex.123-456-7890"
                                 value={formData.accountNumber}
                                 onChange={handleChange}
                                 required
@@ -304,7 +321,14 @@ function DonateRequest() {
                             <Link to="/donate">
                                 <button className="cancle-button-request" type="button">ยกเลิก</button>
                             </Link>
-                            <button className="submit-button-request" onClick={handleOpen}>เพิ่มโครงการ</button>
+                            <button
+                                className="submit-button-request"
+                                type="button" 
+                                onClick={handleOpen}
+                            >
+                                เพิ่มโครงการ
+                            </button>
+
                         </div>
                     </div>
                 </form>
@@ -338,12 +362,16 @@ function DonateRequest() {
                                 />
                             </div>
                         )}
-
                     </Typography>
 
                     <div style={{ marginTop: '20px', textAlign: 'right' }}>
                         <Button onClick={handleClose} color="secondary">แก้ไข</Button>
-                        <Button onClick={handleSubmit} color="primary" disabled={isSubmitting}>
+                        <Button
+                            onClick={handleSubmit}
+                            color="primary"
+                            disabled={isSubmitting}
+                            variant="contained"
+                        >
                             {isSubmitting ? "กำลังเพิ่ม..." : "ยืนยันเพิ่มโครงการ"}
                         </Button>
                     </div>
