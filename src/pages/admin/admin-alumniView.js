@@ -6,7 +6,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 function AdminAlumniView() {
-    const { major } = useParams(); 
+    const { major } = useParams();
     const [alumniData, setAlumniData] = useState([]);
     const [students, setStudents] = useState([]);
     const [filteredStudents, setFilteredStudents] = useState([]);
@@ -30,11 +30,11 @@ function AdminAlumniView() {
                 // แปลง degree_id เป็นข้อความ
                 const updatedData = res.data.map(student => ({
                     ...student,
-                    degree: mapDegreeIdToText(student.degree_id) 
+                    degree: mapDegreeIdToText(student.degree_id)
                 }));
 
                 setStudents(updatedData);
-                setFilteredStudents(updatedData.filter(student => student.degree === "ป.ตรี")); 
+                setFilteredStudents(updatedData.filter(student => student.degree === "ป.ตรี"));
             })
             .catch(err => console.error(err));
     }, [major]);
@@ -49,19 +49,19 @@ function AdminAlumniView() {
     };
 
     const handleSearch = (term) => {
-    setSearchTerm(term);
+        setSearchTerm(term);
 
-    const filteredBySearch = term === "" ? students : students.filter(student => {
-        const lowerTerm = term.toLowerCase();
-        return (
-            student.full_name.toLowerCase().includes(lowerTerm) ||
-            student.graduation_year?.toString().includes(lowerTerm) ||
-            student.entry_year?.toString().includes(lowerTerm) ||
-            student.studentId?.toString().includes(lowerTerm)
-        );
-    });
+        const filteredBySearch = term === "" ? students : students.filter(student => {
+            const lowerTerm = term.toLowerCase();
+            return (
+                student.full_name.toLowerCase().includes(lowerTerm) ||
+                student.graduation_year?.toString().includes(lowerTerm) ||
+                student.entry_year?.toString().includes(lowerTerm) ||
+                student.studentId?.toString().includes(lowerTerm)
+            );
+        });
 
-    const filteredByDegree = filteredBySearch.filter(student => student.degree === activeTab);
+        const filteredByDegree = filteredBySearch.filter(student => student.degree === activeTab);
         setFilteredStudents(filteredByDegree);
     };
 
@@ -90,7 +90,7 @@ function AdminAlumniView() {
             student.degree
         ]);
 
-        let csvContent = "data:text/csv;charset=utf-8,\uFEFF" 
+        let csvContent = "data:text/csv;charset=utf-8,\uFEFF"
             + [headers, ...rows].map(e => e.join(",")).join("\n");
 
         const encodedUri = encodeURI(csvContent);
@@ -114,28 +114,28 @@ function AdminAlumniView() {
         <section className="alumni-container p-5">
             <h3 className="admin-title">ทำเนียบศิษย์เก่าสาขา {displayMajor}</h3>
 
-           <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
                 {/* Dropdown ทางซ้าย */}
                 <div style={{ minWidth: "250px", maxWidth: "100%" }}>
-                <select
-                    id="majorSelect"
-                    className="form-select"
-                    onChange={(e) =>
-                    navigate(`/admin/admin-alumni/admin-alumniView/${e.target.value}`)
-                    }
-                >
-                    <option value="">-- เลือกสาขา --</option>
-                    {majors.map((major, idx) => (
-                    <option key={idx} value={major.slug}>
-                        {major.title}
-                    </option>
-                    ))}
-                </select>
+                    <select
+                        id="majorSelect"
+                        className="form-select"
+                        onChange={(e) =>
+                            navigate(`/admin/admin-alumni/admin-alumniView/${e.target.value}`)
+                        }
+                    >
+                        <option value="">-- เลือกสาขา --</option>
+                        {majors.map((major, idx) => (
+                            <option key={idx} value={major.slug}>
+                                {major.title}
+                            </option>
+                        ))}
+                    </select>
                 </div>
 
                 {/* ปุ่มดาวน์โหลดทางขวา */}
                 <button className="btn btn-outline-success" onClick={exportToCSV}>
-                ดาวน์โหลดรายชื่อ
+                    ดาวน์โหลดรายชื่อ
                 </button>
             </div>
 
@@ -183,7 +183,7 @@ function AdminAlumniView() {
                                         <td>{student.studentId}</td>
                                         <td>{student.entry_year}</td>
                                         <td>{student.graduation_year}</td>
-                                        
+
                                     </tr>
                                 ))
                             ) : (

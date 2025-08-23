@@ -93,7 +93,7 @@ function EditNews() {
     }
 
     return(
-        <div className="container">
+        <div className="container p-5">
             <div className="row justify-content-center">
                     <h3 className="mb-4 admin-title">แก้ไขข่าวประชาสัมพันธ์</h3>
                 {loading ? (
@@ -140,8 +140,9 @@ function EditNews() {
                                         onChange={handleFileChange}
                                     />
                                 </div>
-                                <div className="d-grid">
+                                <div className="d-flex justify-content-end g-3">
                                     <button type="submit" className="btn btn-primary">บันทึกการแก้ไข</button>
+                                    <button type="button" className="btn btn-secondary" onClick={() => navigate('/admin/news')}>ยกเลิก</button>
                                 </div>
                             </form>
                         </div>

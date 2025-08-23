@@ -1,5 +1,6 @@
-/* .donate-detail-content{
+.donate-detail-content{
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
     gap: 10px;
 }
@@ -10,6 +11,7 @@
     border-radius: 5px;
 }
 .donate-detail-content-item{
+    /* background-color: beige; */
     display: grid;
     grid-template-columns: auto;
     justify-content: center;
@@ -58,14 +60,15 @@
     color: #333;
 }
 .donate-detail-details{
-        display: flex;
-        justify-content: space-between;
-        font-size: 14px;
-        color: #085A9C;
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: #085A9C;
         margin: 0 0 5px 0;
 }
+
 .donate-detail-discription {
-    display: grid; 
+    display: grid;
     text-align: justify;
     gap: 2px; 
     font-size: 13px;
@@ -95,6 +98,13 @@
     text-align: end;
     font-size: 14px;
     color: #085A9C;
+}
+
+.promptPay-layout {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
 }
 
 .donate-detail-header {
@@ -130,174 +140,11 @@ p.donate-detail-informations{
     padding: 5%;
     border-radius: 10px;
     margin-bottom: 5%;
-} */
-
-/* Container layout */
-.donate-detail-content {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-  padding: 2rem;
-  max-width: 1000px;
-  margin: auto;
 }
 
-@media (min-width: 768px) {
-  .donate-detail-content {
-    flex-direction: row;
-    align-items: flex-start;
-  }
+.form-group-btn {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    gap: 10px;
 }
-
-.donate-detail-content-item {
-  flex: 1;
-  background: #fff;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-}
-
-/* Image */
-.donate-detail-content-item img {
-  width: 100%;
-  max-height: 250px;
-  object-fit: cover;
-  border-radius: 8px;
-  margin: 1rem 0;
-}
-
-/* Progress */
-.donate-detail-progress {
-  font-weight: bold;
-  margin-bottom: 0.5rem;
-}
-
-.progress-bar-container {
-  width: 100%;
-  background-color: #e0e0e0;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.progress-bar {
-  background: linear-gradient(to right, #4ade80, #3b82f6);
-  height: 18px;
-  text-align: right;
-  padding-right: 8px;
-  color: #fff;
-  font-size: 12px;
-  font-weight: bold;
-  line-height: 18px;
-}
-
-/* Section spacing */
-.donate-detail-details,
-.donate-detail-discription-day,
-.donate-detail-discription {
-  margin: 1rem 0;
-}
-
-.donate-detail-header {
-  display: flex;
-  align-items: center;
-  font-weight: bold;
-  margin-bottom: 0.5rem;
-}
-
-.custom-icon {
-  margin-right: 0.5rem;
-  font-size: 1.2rem;
-  color: #0d6efd;
-}
-
-/* Form */
-.donate-detail-form-items,
-.donate-detail-form-items-amount {
-  margin-bottom: 1.5rem;
-}
-
-input[type="text"],
-input[type="file"],
-input[type="number"],
-textarea {
-  width: 100%;
-  padding: 0.6rem;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 1rem;
-}
-
-input[type="file"] {
-  background-color: #f8f9fa;
-}
-
-.title-label {
-  font-weight: 500;
-  margin-bottom: 0.5rem;
-  display: inline-block;
-}
-
-/* QR Section */
-.group-promptPay-layout {
-  background-color: #f0f4ff;
-  border-radius: 10px;
-  padding: 1rem;
-  margin-top: 0.5rem;
-}
-
-.title-promptPay-layout {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1rem;
-}
-
-.promptPay-layout img {
-  max-width: 200px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-}
-
-/* Tax */
-.tax-options {
-  display: flex;
-  gap: 2rem;
-  margin-top: 0.5rem;
-}
-
-.tax-options label {
-  display: flex;
-  align-items: center;
-}
-
-.tax-options input {
-  margin-right: 0.5rem;
-}
-
-.tax-options-text {
-  margin: 0;
-}
-
-.donate-detail-tax-form .form-group {
-  margin-bottom: 1rem;
-}
-
-/* Submit */
-.donate-detail-button-submit {
-  background: linear-gradient(to right, #16a34a, #2563eb);
-  border: none;
-  color: white;
-  padding: 0.75rem 1.5rem;
-  border-radius: 10px;
-  font-size: 1rem;
-  font-weight: 500;
-  width: 100%;
-  cursor: pointer;
-  transition: 0.3s ease-in-out;
-}
-
-.donate-detail-button-submit:hover {
-  transform: scale(1.02);
-  background: linear-gradient(to right, #15803d, #1d4ed8);
-}
-

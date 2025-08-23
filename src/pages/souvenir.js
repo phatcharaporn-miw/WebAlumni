@@ -6,6 +6,7 @@ import { IoIosAddCircleOutline } from "react-icons/io";
 
 function Souvenir() {
     const [products, setProducts] = useState([]);
+    const userId = localStorage.getItem("userId");
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -23,17 +24,62 @@ function Souvenir() {
 
     return (
         <>
-            <div className="souvenir-top d-flex justify-content-end mb-3 px-4">
-                <Link to={`/souvenir/souvenir_request`}>
-                    <button className="souvenir-bt-add btn btn-primary d-flex align-items-center gap-2">
-                        <IoIosAddCircleOutline size={20} />
-                        เพิ่มของที่ระลึก
-                    </button>
-                </Link>
-            </div>
+            <div className="text-center mb-5">
+                <div className="d-inline-block position-relative">
+                    <h3 id="head-text" className="text-center mb-3 position-relative">
+                        ของที่ระลึก
+                        <div className="title-underline position-absolute start-50 translate-middle-x mt-2"
+                            style={{
+                                width: '120px',
+                                height: '4px',
+                                background: 'linear-gradient(90deg, #007bff, #6610f2)',
+                                borderRadius: '2px',
+                                boxShadow: '0 2px 8px rgba(0,123,255,0.3)'
+                            }}>
+                        </div>
+                    </h3>
 
-            <div className="text-center mb-4">
-                <h2 className="titlesouvenir">ของที่ระลึก</h2>
+                    {/* Decorative elements */}
+                    <div className="position-absolute top-0 start-0 translate-middle">
+                        <div className="bg-primary opacity-25 rounded-circle"
+                            style={{ width: '20px', height: '20px' }}>
+                        </div>
+                    </div>
+                    <div className="position-absolute top-0 end-0 translate-middle">
+                        <div className="bg-success opacity-25 rounded-circle"
+                            style={{ width: '15px', height: '15px' }}>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div className="souvenir-top d-flex justify-content-end mb-3 px-4">
+                {userId && (
+                    <Link to={`/souvenir/souvenir_request`} className="text-decoration-none">
+                        <button
+                            className="btn btn-gradient d-flex align-items-center gap-2 px-4 py-2 rounded-pill shadow-sm"
+                            style={{
+                                background: 'linear-gradient(45deg, #0d6efd, #4dabf7)',
+                                color: 'white',
+                                fontWeight: '600',
+                                border: 'none',
+                                transition: 'all 0.3s ease'
+                            }}
+                            onMouseEnter={e => {
+                                e.currentTarget.style.background = 'linear-gradient(45deg, #0a58ca, #339af0)';
+                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                e.currentTarget.style.boxShadow = '0 8px 16px rgba(13, 110, 253, 0.3)';
+                            }}
+                            onMouseLeave={e => {
+                                e.currentTarget.style.background = 'linear-gradient(45deg, #0d6efd, #4dabf7)';
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
+                            }}
+                        >
+                            <IoIosAddCircleOutline size={24} />
+                            เพิ่มของที่ระลึก
+                        </button>
+                    </Link>
+                )}
             </div>
 
             <div className="souvenir-content container">
@@ -48,19 +94,36 @@ function Souvenir() {
                                 .filter((product) => [1, 2, 3].includes(product.role_id))
                                 .map((product) => (
                                     <div className="col" key={product.product_id}>
-                                        <Link to={`/souvenir/souvenirDetail/${product.product_id}`} className="text-decoration-none text-dark">
-                                            <div className="souvenir-item card h-100 shadow-sm border-0">
+                                        {product.stock === 0 ? (
+                                            <div className="souvenir-item card h-100 shadow-sm border-0 position-relative">
                                                 <img
                                                     className="souvenir-item-img card-img-top"
                                                     src={`http://localhost:3001/uploads/${product.image}`}
                                                     alt={product.product_name}
+                                                    style={{ filter: "grayscale(90%)", opacity: 0.6 }}
                                                 />
                                                 <div className="card-body text-center">
                                                     <p className="card-title fw-semibold">{product.product_name}</p>
-                                                    <p className="souvenir-item-price text-success">฿{product.price}</p>
+                                                    <p className="souvenir-item-price text-muted">฿{product.price}</p>
+                                                    <span className="badge bg-danger mt-2">สินค้าหมดแล้ว</span>
                                                 </div>
                                             </div>
-                                        </Link>
+                                        ) : (
+                                            <Link to={`/souvenir/souvenirDetail/${product.product_id}`} className="text-decoration-none text-dark">
+                                                <div className="souvenir-item card h-100 shadow-sm border-0 position-relative">
+                                                    <img
+                                                        className="souvenir-item-img card-img-top"
+                                                        src={`http://localhost:3001/uploads/${product.image}`}
+                                                        alt={product.product_name}
+                                                    />
+                                                    <div className="card-body text-center">
+                                                        <p className="card-title fw-semibold">{product.product_name}</p>
+                                                        <p className="souvenir-item-price text-success">฿{product.price}</p>
+                                                    </div>
+                                                </div>
+                                            </Link>
+                                        )}
+
                                     </div>
                                 ))
                         ) : (
@@ -82,19 +145,35 @@ function Souvenir() {
                                 .filter((product) => product.role_id === 4)
                                 .map((product) => (
                                     <div className="col" key={product.product_id}>
-                                        <Link to={`/souvenir/souvenirDetail/${product.product_id}`} className="text-decoration-none text-dark">
-                                            <div className="souvenir-item card h-100 shadow-sm border-0">
+                                        {product.stock === 0 ? (
+                                            <div className="souvenir-item card h-100 shadow-sm border-0 position-relative">
                                                 <img
                                                     className="souvenir-item-img card-img-top"
                                                     src={`http://localhost:3001/uploads/${product.image}`}
                                                     alt={product.product_name}
+                                                    style={{ filter: "grayscale(90%)", opacity: 0.6 }}
                                                 />
                                                 <div className="card-body text-center">
                                                     <p className="card-title fw-semibold">{product.product_name}</p>
-                                                    <p className="souvenir-item-price text-success">฿{product.price}</p>
+                                                    <p className="souvenir-item-price text-muted">฿{product.price}</p>
+                                                    <span className="badge bg-danger mt-2">สินค้าหมดแล้ว</span>
                                                 </div>
                                             </div>
-                                        </Link>
+                                        ) : (
+                                            <Link to={`/souvenir/souvenirDetail/${product.product_id}`} className="text-decoration-none text-dark">
+                                                <div className="souvenir-item card h-100 shadow-sm border-0 position-relative">
+                                                    <img
+                                                        className="souvenir-item-img card-img-top"
+                                                        src={`http://localhost:3001/uploads/${product.image}`}
+                                                        alt={product.product_name}
+                                                    />
+                                                    <div className="card-body text-center">
+                                                        <p className="card-title fw-semibold">{product.product_name}</p>
+                                                        <p className="souvenir-item-price text-success">฿{product.price}</p>
+                                                    </div>
+                                                </div>
+                                            </Link>
+                                        )}
                                     </div>
                                 ))
                         ) : (

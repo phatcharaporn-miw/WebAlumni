@@ -88,7 +88,6 @@ function Login() {
     }
   };
 
-
   const logo = <img className="form-login-logo" src="./image/สมาคม-logo.png" alt="Logo" />;
   return (
     <div className="all-form">

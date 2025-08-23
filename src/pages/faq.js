@@ -71,49 +71,75 @@ function FAQ() {
     ];
 
     return (
-    <div className="faq_content container py-4">
-        <h3 className="faq-title text-center mb-5">คำถามที่พบบ่อย</h3>
-        {faqCategories.map((category, catIndex) => (
-            <div className="faq_content_item_div mb-4" key={catIndex}>
-                <h5 className="faq_content_item_title mb-3">
-                    {category.title}
-                </h5>
-                {category.faqs.map((faq, index) => {
-                    const faqIndex = `${catIndex}-${index}`;
-                    const isOpen = openIndex === faqIndex;
-                    return (
-                        <div
-                            key={faqIndex}
-                            className={`faq_content_item card shadow-sm mb-3 border-0 ${
-                                isOpen ? "open" : ""
-                            }`}
-                        >
+        <div className="faq_content container py-4">
+            <div className="text-center mb-5">
+                <div className="d-inline-block position-relative">
+                    <h3 id="head-text" className="text-center mb-3 position-relative">
+                        คำถามที่พบบ่อย
+                        <div className="title-underline position-absolute start-50 translate-middle-x mt-2"
+                            style={{
+                                width: '120px',
+                                height: '4px',
+                                background: 'linear-gradient(90deg, #007bff, #6610f2)',
+                                borderRadius: '2px',
+                                boxShadow: '0 2px 8px rgba(0,123,255,0.3)'
+                            }}>
+                        </div>
+                    </h3>
+
+                    {/* Decorative elements */}
+                    <div className="position-absolute top-0 start-0 translate-middle">
+                        <div className="bg-primary opacity-25 rounded-circle"
+                            style={{ width: '20px', height: '20px' }}>
+                        </div>
+                    </div>
+                    <div className="position-absolute top-0 end-0 translate-middle">
+                        <div className="bg-success opacity-25 rounded-circle"
+                            style={{ width: '15px', height: '15px' }}>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {faqCategories.map((category, catIndex) => (
+                <div className="faq_content_item_div mb-4" key={catIndex}>
+                    <h5 className="faq_content_item_title mb-3">
+                        {category.title}
+                    </h5>
+                    {category.faqs.map((faq, index) => {
+                        const faqIndex = `${catIndex}-${index}`;
+                        const isOpen = openIndex === faqIndex;
+                        return (
                             <div
-                                className="faq_question card-header d-flex justify-content-between align-items-center bg-light cursor-pointer"
-                                onClick={() => toggleFAQ(faqIndex)}
+                                key={faqIndex}
+                                className={`faq_content_item card shadow-sm mb-3 border-0 ${isOpen ? "open" : ""
+                                    }`}
                             >
-                                <p className="faq_question_p mb-0">{faq.question}</p>
-                                {isOpen ? (
-                                    <FaChevronUp className="faq_icon" />
-                                ) : (
-                                    <FaChevronDown className="faq_icon" />
+                                <div
+                                    className="faq_question card-header d-flex justify-content-between align-items-center bg-light cursor-pointer"
+                                    onClick={() => toggleFAQ(faqIndex)}
+                                >
+                                    <p className="faq_question_p mb-0">{faq.question}</p>
+                                    {isOpen ? (
+                                        <FaChevronUp className="faq_icon" />
+                                    ) : (
+                                        <FaChevronDown className="faq_icon" />
+                                    )}
+                                </div>
+                                {isOpen && (
+                                    <div className="faq_answer card-body">
+                                        <p
+                                            className="mb-0"
+                                            dangerouslySetInnerHTML={{ __html: faq.answer }}
+                                        />
+                                    </div>
                                 )}
                             </div>
-                            {isOpen && (
-                                <div className="faq_answer card-body">
-                                    <p
-                                        className="mb-0"
-                                        dangerouslySetInnerHTML={{ __html: faq.answer }}
-                                    />
-                                </div>
-                            )}
-                        </div>
-                    );
-                })}
-            </div>
-        ))}
-    </div>
-);
+                        );
+                    })}
+                </div>
+            ))}
+        </div>
+    );
 }
 
 export default FAQ;

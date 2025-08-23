@@ -13,12 +13,11 @@ import { useNavigate } from "react-router-dom";
 import { FaEye } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 import { Link } from "react-router-dom";
-import moment from "moment";
 import Swal from "sweetalert2";
-import { MdVolunteerActivism, MdEvent } from "react-icons/md";
-import { Bar, Pie } from 'react-chartjs-2';
 import { format } from 'date-fns';
 import { th } from 'date-fns/locale';
+import { MdVolunteerActivism, MdEvent, MdPeople, MdTrendingUp } from "react-icons/md";
+import { Bar, Pie } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   BarElement,
@@ -35,22 +34,6 @@ function Home() {
   const [background] = useState("/image/back-2.png");
   const currentAmount = 3000;
   const goalAmount = 10000;
-  // const progress = (currentAmount / goalAmount) * 100;
-
-  // กราฟ
-  const [stats, setStats] = useState({
-    totalParticipants: 0,
-    ongoingActivity: 0,
-    ongoingProject: 0,
-    totalDonations: 0,
-  });
-
-  const [alumniCount, setAlumniCount] = useState(0);
-
-  const [barData, setBarData] = useState({
-    labels: [],
-    datasets: [],
-  });
 
   // webboard
   const [webboard, setWebboard] = useState([]);
@@ -66,29 +49,14 @@ function Home() {
   const [activity, setActivity] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showReplyForm, setShowReplyForm] = useState(null);
-  const [replyText, setReplyText] = useState("");
+  const [replyingTo, setReplyingTo] = useState(null); // เก็บ comment_id ที่กำลังตอบกลับ
+  const [replyText, setReplyText] = useState(''); // เก็บข้อความตอบกลับ
   const [expandedReplies, setExpandedReplies] = useState({}); //ซ่อนการตอบกลับ
   const navigate = useNavigate();
-
   const [projects, setProjects] = useState([]);
-  const [filter] = useState("all");
-  const filteredProjects = projects.filter((project) => {
-    if (filter === "all") return true;
-    return project.donation_type === filter;
-  });
-
-  const getFilterTitle = (donationType) => {
-    switch (donationType) {
-      case "fundraising":
-        return "บริจาคแบบระดมทุน";
-      case "unlimited":
-        return "บริจาคแบบไม่จำกัดจำนวน";
-      case "things":
-        return "บริจาคสิ่งของ";
-      default:
-        return "โครงการบริจาคทั้งหมด";
-    }
-  };
+  const [filter, setFilter] = useState("all");
+  const [error] = useState(null);
+  const [filterStatus, setFilterStatus] = useState("all");
 
 
   useEffect(() => {
@@ -116,29 +84,64 @@ function Home() {
         console.error("เกิดข้อผิดพลาดในการโหลดข่าว:", error);
       });
 
+
     // ดึงข้อมูลกิจกรรมที่กำลังจะจัดขึ้น
     axios.get('http://localhost:3001/activity/all-activity')
-    .then(response => {
-      // กรองเฉพาะกิจกรรมที่กำลังจะจัดขึ้นหรือกำลังดำเนินการ
-      const now = new Date();
-      const filtered = (response.data.data || []).filter(item => {
-        const actDate = new Date(item.activity_date);
-        // เงื่อนไข: วันที่กิจกรรม >= วันนี้ (หรือเพิ่มสถานะถ้ามี)
-        return actDate >= now || item.status === "ongoing";
+      .then(response => {
+        // กรองเฉพาะกิจกรรมที่กำลังจะจัดขึ้นหรือกำลังดำเนินการ
+        const now = new Date();
+        const filtered = (response.data.data || []).filter(item => {
+          const actDate = new Date(item.activity_date);
+          // เงื่อนไข: วันที่กิจกรรม >= วันนี้ (หรือเพิ่มสถานะถ้ามี)
+          return item.status === 0 || item.status === 2;
+        });
+        setActivity(filtered);
+        setIsLoading(false);
+      })
+      .catch(error => {
+        console.error("Error fetching activities:", error);
       });
-      setActivity(filtered);
-      setIsLoading(false);
-    })
-    .catch(error => {
-      console.error("Error fetching activities:", error);
-    });
-}, []);
+  }, []);
 
-  // ดึงข้อมูลสถิติหลัก
+  // ฟังก์ชันตรวจสอบว่าโพสต์นั้นใหม่ภายใน 5 วันหรือไม่
+  const isNew = (createdAt) => {
+    const postDate = new Date(createdAt);
+    const now = new Date();
+    const diffTime = now - postDate;
+    const diffDays = diffTime / (1000 * 60 * 60 * 24);
+    return diffDays <= 5;
+  };
 
-  const [pieData, setPieData] = useState({
+  const [stats, setStats] = useState({
+    totalParticipants: 0,
+    ongoingActivity: 0,
+    ongoingProject: 0,
+    totalDonations: 0,
+  });
+
+  const [alumniCount, setAlumniCount] = useState(0);
+  const [barData, setBarData] = useState({
     labels: [],
     datasets: [],
+  });
+
+  const [pieData, setPieData] = useState({
+    labels: ['โครงการศึกษา', 'โครงการสาธารณสุข', 'โครงการสิ่งแวดล้อม'],
+    datasets: [{
+      data: [45, 30, 25],
+      backgroundColor: [
+        'rgba(40, 167, 69, 0.8)',
+        'rgba(111, 66, 193, 0.8)',
+        'rgba(255, 193, 7, 0.8)'
+      ],
+      borderColor: [
+        'rgba(40, 167, 69, 1)',
+        'rgba(111, 66, 193, 1)',
+        'rgba(255, 193, 7, 1)'
+      ],
+      borderWidth: 2,
+      hoverOffset: 8,
+    }],
   });
 
   useEffect(() => {
@@ -158,7 +161,11 @@ function Home() {
             datasets: [{
               label: 'จำนวนกิจกรรม',
               data,
-              backgroundColor: '#0d6efd'
+              backgroundColor: 'rgba(13, 110, 253, 0.8)',
+              borderColor: 'rgba(13, 110, 253, 1)',
+              borderWidth: 2,
+              borderRadius: 6,
+              borderSkipped: false,
             }],
           });
         }
@@ -183,24 +190,74 @@ function Home() {
       .then(res => setAlumniCount(res.data.totalAlumni));
   }, []);
 
-  const CardInfo = ({ title, value, type = "activity", center = false }) => {
-    const isDonation = type === "donation";
-    const Icon = isDonation ? MdVolunteerActivism : MdEvent;
-    const bgColor = isDonation ? "bg-success-subtle" : "bg-primary-subtle";
-    const textColor = isDonation ? "text-success" : "text-primary";
+  useEffect(() => {
+    // Simulate loading
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+  }, []);
+
+  const CardInfo = ({ title, value, type = "activity", center = false, icon: CustomIcon, colClass = "col-md-3" }) => {
+    const getCardStyle = () => {
+      switch (type) {
+        case "donation":
+          return {
+            background: 'linear-gradient(135deg, #28a745 0%, #20c997 100%)',
+            color: 'white',
+            iconColor: 'white'
+          };
+        case "project":
+          return {
+            background: 'linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%)',
+            color: 'white',
+            iconColor: 'white'
+          };
+        case "alumni":
+          return {
+            background: 'linear-gradient(135deg, #fd7e14 0%, #ffc107 100%)',
+            color: 'white',
+            iconColor: 'white'
+          };
+        default:
+          return {
+            background: 'linear-gradient(135deg, #0d6efd 0%, #6610f2 100%)',
+            color: 'white',
+            iconColor: 'white'
+          };
+      }
+    };
+
+    const cardStyle = getCardStyle();
+    const Icon = CustomIcon || (type === "donation" ? MdVolunteerActivism : MdEvent);
 
     return (
-      <div className="col-md-3 mb-3">
-        <div className={`card p-3 ${bgColor} ${center ? 'text-center' : 'text-start'}`}>
-          <div className="d-flex align-items-center mb-2">
-            <Icon size={24} className={textColor + " me-2"} />
-            <h6 className="mb-0">{title}</h6>
+      <div className={`${colClass} mb-4`}>
+        <div
+          className={`card p-4 border-0 shadow-lg position-relative overflow-hidden ${center ? 'text-center' : 'text-start'}`}
+          style={{
+            background: cardStyle.background,
+            color: cardStyle.color,
+          }}>
+          <div className="position-absolute top-0 end-0 p-3 opacity-25">
+            <Icon size={60} />
           </div>
-          <h3 className={textColor}>{value}</h3>
+          <div className="d-flex align-items-center mb-3">
+            <Icon size={28} className="me-3" style={{ color: cardStyle.iconColor }} />
+            <h6 className="mb-0 fw-bold">{title}</h6>
+          </div>
+          <h2 className="fw-bold mb-0">{value}</h2>
         </div>
       </div>
     );
   };
+
+  const LoadingSpinner = () => (
+    <div className="d-flex justify-content-center align-items-center" style={{ height: '200px' }}>
+      <div className="spinner-border text-primary" role="status">
+        <span className="visually-hidden">Loading...</span>
+      </div>
+    </div>
+  );
 
   const barOptions = {
     responsive: true,
@@ -208,23 +265,47 @@ function Home() {
       legend: {
         display: true,
         position: "bottom",
+        labels: {
+          usePointStyle: true,
+          padding: 20,
+          font: {
+            size: 14,
+            weight: 'bold'
+          }
+        }
       },
+      tooltip: {
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        titleColor: 'white',
+        bodyColor: 'white',
+        cornerRadius: 8,
+        padding: 12,
+      }
     },
     scales: {
       y: {
         beginAtZero: true,
         ticks: {
-          stepSize: 50,
-          callback: value => `${value} คน`,
+          stepSize: 10,
+          callback: value => `${value} กิจกรรม`,
+          font: {
+            size: 12
+          }
         },
         grid: {
-          color: '#e0e0e0',
+          color: 'rgba(0, 0, 0, 0.1)',
         },
       },
       x: {
         grid: {
           display: false,
         },
+        ticks: {
+          font: {
+            size: 12,
+            weight: 'bold'
+          }
+        }
       },
     },
   };
@@ -233,19 +314,28 @@ function Home() {
     responsive: true,
     plugins: {
       legend: {
-        position: 'left',
+        position: 'bottom',
         labels: {
           usePointStyle: true,
           padding: 20,
+          font: {
+            size: 14,
+            weight: 'bold'
+          }
         },
       },
       tooltip: {
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        titleColor: 'white',
+        bodyColor: 'white',
+        cornerRadius: 8,
+        padding: 12,
         callbacks: {
           label: function (tooltipItem) {
             const value = tooltipItem.raw;
             const total = tooltipItem.dataset.data.reduce((a, b) => a + b, 0);
             const percent = ((value / total) * 100).toFixed(1);
-            return `${tooltipItem.label} (${percent}%)`;
+            return `${tooltipItem.label}: ${percent}%`;
           },
         },
       },
@@ -300,8 +390,6 @@ function Home() {
       return; // ไม่บันทึกสถานะหากไม่ได้เข้าสู่ระบบ
     }
 
-    // const userId = localStorage.getItem('userId');
-
     axios.post(`http://localhost:3001/web/webboard/${postId}/favorite`, {}, {
       withCredentials: true,
     })
@@ -325,40 +413,48 @@ function Home() {
       .catch((error) => console.error("เกิดข้อผิดพลาดในการกดถูกใจ:", error));
   };
 
-
   // เมื่อมีการกดคลิกกระทู้
-  const handlePostClick = (post) => {
+  const handlePostClick = async (post) => {
     if (selectedPost && selectedPost.webboard_id === post.webboard_id) {
       setModalIsOpen(true);
       return;
     }
-    axios.get(`http://localhost:3001/web/webboard/${post.webboard_id}`, {
-      withCredentials: true,
-    })
-      .then((response) => {
-        if (response.data.success) {
-          // แปลงวันที่ในคอมเมนต์ให้ถูกต้อง
-          const commentsWithFormattedDate = response.data.data.comments.map(comment => ({
-            ...comment,
-            // ไม่ต้องแปลง created_at ที่นี่
-            replies: comment.replies?.map(reply => ({
-              ...reply,
-              // ไม่ต้องแปลง created_at ที่นี่
-              user_id: reply.user_id
-            })) || []
-          }));
 
-          setSelectedPost({
-            ...response.data.data,
-            comments: commentsWithFormattedDate
-          });
+    try {
+      // อัปเดต UI ทันทีก่อน เพื่อประสบการณ์ผู้ใช้ที่ดี
+      setWebboard(prevWebboard =>
+        prevWebboard.map(item =>
+          item.webboard_id === post.webboard_id
+            ? { ...item, viewCount: (item.viewCount || 0) + 1 }
+            : item
+        )
+      );
 
-          setModalIsOpen(true);
-        } else {
-          console.error("ไม่สามารถโหลดกระทู้ได้");
-        }
-      })
-      .catch((error) => console.error("เกิดข้อผิดพลาดในการโหลดกระทู้:", error));
+      const response = await axios.get(`http://localhost:3001/web/webboard/${post.webboard_id}`, {
+        withCredentials: true,
+      });
+
+      if (response.data.success) {
+        const commentsWithFormattedDate = response.data.data.comments.map(comment => ({
+          ...comment,
+          replies: comment.replies?.map(reply => ({
+            ...reply,
+            user_id: reply.user_id
+          })) || []
+        }));
+
+        setSelectedPost({
+          ...response.data.data,
+          comments: commentsWithFormattedDate
+        });
+
+        setModalIsOpen(true);
+      } else {
+        console.error("ไม่สามารถโหลดกระทู้ได้");
+      }
+    } catch (error) {
+      console.error("เกิดข้อผิดพลาดในการโหลดกระทู้:", error);
+    }
   };
 
   // จัดการcomment
@@ -437,57 +533,78 @@ function Home() {
       });
   };
 
+  // ฟังก์ชันสำหรับเปิด/ปิดฟอร์มตอบกลับ
   const toggleReplyForm = (commentId) => {
-    setShowReplyForm(showReplyForm === commentId ? null : commentId);
-  };
-
-  // ซ่อนการตอบกลับ
-  const toggleReplies = (commentId) => {
-    setExpandedReplies((prev) => ({
-      ...prev,
-      [commentId]: !prev[commentId],
-    }));
+    if (replyingTo === commentId) {
+      setReplyingTo(null);
+      setReplyText('');
+    } else {
+      setReplyingTo(commentId);
+      setReplyText('');
+    }
   };
 
   // ตอบกลับความคิดเห็น
-  const handleReplySubmit = (commentId, replyText) => {
-    if (!isLoggedin) {
-      Swal.fire({
-        title: "กรุณาเข้าสู่ระบบ",
-        text: "คุณต้องเข้าสู่ระบบก่อนเข้าร่วมกิจกรรม",
-        icon: "warning",
-        confirmButtonText: "เข้าสู่ระบบ"
-      }).then(() => {
-        navigate("/login");
-      });
-      return;
-    }
+  const handleReplySubmit = async (commentId, replyText) => {
     if (!replyText.trim()) {
-      alert("กรุณากรอกข้อความก่อนส่งความคิดเห็น");
+      alert("กรุณาป้อนข้อความตอบกลับ");
       return;
     }
 
-    axios.post(`http://localhost:3001/web/webboard/${selectedPost.webboard_id}/comment/${commentId}/reply`, {
-      reply_detail: replyText,
-    }, {
-      withCredentials: true
-    })
-      .then((response) => {
-        const newReply = response.data;
-        setSelectedPost((prev) => ({
-          ...prev,
-          comments: prev.comments.map((comment) =>
-            comment.comment_id === commentId
-              ? { ...comment, replies: [...(comment.replies || []), newReply] }
-              : comment
-          ),
-        }));
+    try {
+      const response = await axios.post(`http://localhost:3001/api/replies`, {
+        comment_id: commentId,
+        reply_detail: replyText.trim(),
+        user_id: localStorage.getItem("userId")
+      }, {
+        withCredentials: true
+      });
+
+      if (response.data.success) {
+        // อัปเดต selectedPost state ทันที
+        setSelectedPost(prevPost => {
+          const updatedComments = prevPost.comments.map(comment => {
+            if (comment.comment_id === commentId) {
+              // สร้าง reply object ใหม่
+              const newReply = {
+                reply_id: response.data.reply_id || Date.now(), // ใช้ ID จาก response หรือ timestamp
+                comment_id: commentId,
+                user_id: localStorage.getItem("userId"),
+                reply_detail: replyText.trim(),
+                created_at: new Date().toISOString(),
+                full_name: localStorage.getItem("fullName") || "คุณ", // ดึงชื่อจาก localStorage
+                profile_image: localStorage.getItem("profileImage") || "/default-profile.png"
+              };
+
+              return {
+                ...comment,
+                replies: [...(comment.replies || []), newReply]
+              };
+            }
+            return comment;
+          });
+
+          return {
+            ...prevPost,
+            comments: updatedComments
+          };
+        });
+
+        // รีเซ็ตฟอร์ม
         setReplyText("");
         setShowReplyForm(null);
-      })
-      .catch((error) => {
-        console.error('เกิดข้อผิดพลาดในการตอบกลับความคิดเห็น:', error.message);
-      });
+
+        // แสดงข้อความสำเร็จ (optional)
+        // toast.success("ตอบกลับเรียบร้อยแล้ว!");
+
+      } else {
+        console.error("ไม่สามารถส่งการตอบกลับได้");
+        alert("เกิดข้อผิดพลาดในการส่งการตอบกลับ");
+      }
+    } catch (error) {
+      console.error("เกิดข้อผิดพลาดในการส่งการตอบกลับ:", error);
+      alert("เกิดข้อผิดพลาดในการส่งการตอบกลับ");
+    }
   };
 
   // ฟังก์ชันลบความคิดเห็น
@@ -596,6 +713,58 @@ function Home() {
     navigate(`/news/${newsId}`);
   };
 
+  const calculateDaysRemaining = (endDate) => {
+    const now = new Date();
+    const end = new Date(endDate);
+    return Math.ceil((end - now) / (1000 * 60 * 60 * 24));
+  };
+
+  const handleFilterChange = (e) => {
+    setFilterStatus(e.target.value);
+  };
+
+  if (error) return <p>{error}</p>;
+
+  // ฟิลเตอร์โปรเจกต์ตามประเภทและสถานะกิจกรรม
+  const filteredProjects = projects.filter((project) => {
+    const now = new Date();
+    const endDate = project?.end_date ? new Date(project.end_date) : null;
+
+    // กรองตามประเภทการบริจาค
+    if (filter !== "all" && project.donation_type !== filter) {
+      return false;
+    }
+
+    // กรองตามสถานะกิจกรรม
+    if (filterStatus === "active" && endDate && now > endDate) {
+      return false; // หมดอายุแล้ว
+    }
+    if (filterStatus === "expired" && endDate && now <= endDate) {
+      return false; // ยังไม่หมดอายุ
+    }
+
+    return true;
+  });
+
+  const getFilterTitle = (donationType) => {
+    switch (donationType) {
+      case "fundraising":
+        return "บริจาคแบบระดมทุน";
+      case "unlimited":
+        return "บริจาคแบบไม่จำกัดจำนวน";
+      case "things":
+        return "บริจาคสิ่งของ";
+      default:
+        return "โครงการบริจาคทั้งหมด";
+    }
+  };
+
+  const truncateText = (text, maxLength) => {
+    if (!text) return "";
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + "...";
+  };
+
   return (
     <div className="content">
       <img
@@ -656,452 +825,1023 @@ function Home() {
 
       <section>
         <div className="news-card">
-          <h3 id="head-text">ข่าวประชาสัมพันธ์</h3>
+          <h3 id="head-text" className="section-title">
+            ข่าวประชาสัมพันธ์
+            <div className="title-underline"></div>
+          </h3>
+
           <div className="container">
             <div className="row g-4 justify-content-center">
               {news.length > 0 ? (
                 news.slice(0, 2).map((item, index) => (
                   <div key={item.news_id} className="col-md-4 col-sm-12">
-                    <div className="card shadow-sm border-15 h-100" id="card-news-home">
-                      <img src={`http://localhost:3001${item.image_path}`} alt={item.title}
-                        className="news-image-home"
-                        onError={(e) => e.target.src = '/default-image.png'}
-                        style={{ height: "200px", objectFit: "cover" }}
-                        loading={index === 0 ? "eager" : "lazy"} // ใช้ fetchpriority สำหรับภาพแรก
-                        fetchPriority={index === 0 ? "high" : "auto"}
-                      />
-                      <div className="card-body d-flex flex-column">
-                        <h5 className="card-title">{item.title}</h5>
-                        <p className="news-text flex-grow-1">
+                    <div
+                      className="card shadow-lg border-0 h-100 card-hover"
+                      id="card-news-home"
+                      style={{
+                        borderRadius: '20px',
+                        overflow: 'hidden',
+                        transform: 'translateY(0)',
+                        transition: 'all 0.3s ease-in-out'
+                      }}
+                    >
+                      <div className="image-container position-relative">
+                        <img
+                          src={`http://localhost:3001${item.image_path}`}
+                          alt={item.title}
+                          className="news-image-home"
+                          onError={(e) => e.target.src = '/default-image.png'}
+                          style={{
+                            height: "220px",
+                            objectFit: "cover",
+                            width: "100%",
+                            transition: 'transform 0.3s ease-in-out'
+                          }}
+                          loading={index === 0 ? "eager" : "lazy"}
+                          fetchPriority={index === 0 ? "high" : "auto"}
+                        />
+
+                        {isNew(item.created_at) && (
+                          <div
+                            className="position-absolute"
+                            style={{
+                              top: "12px",
+                              right: "12px",
+                              backgroundColor: "#ff4757",
+                              color: "white",
+                              padding: "6px 12px",
+                              borderRadius: "20px",
+                              fontSize: "0.8rem",
+                              fontWeight: "bold",
+                              zIndex: 10
+                            }}
+                          >
+                            ข่าวใหม่
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="card-body d-flex flex-column p-4">
+                        <h5 className="card-title fw-bold mb-3" style={{
+                          color: '#2c3e50',
+                          lineHeight: '1.4',
+                          fontSize: '1.1rem'
+                        }}>
+                          {item.title}
+                        </h5>
+
+                        <p className="news-text flex-grow-1 mb-4" style={{
+                          color: '#6c757d',
+                          lineHeight: '1.6',
+                          fontSize: '0.95rem'
+                        }}>
                           {item.content ? item.content.substring(0, 100) + "..." : "ไม่มีเนื้อหา"}
                         </p>
+
                         <button
-                          className="btn-news-home btn-primary"
+                          className="btn-news-home btn-gradient w-100"
                           onClick={() => handleReadMore(item.news_id)}
+                          style={{
+                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                            border: 'none',
+                            borderRadius: '12px',
+                            padding: '12px 24px',
+                            color: 'white',
+                            fontWeight: '600',
+                            fontSize: '0.9rem',
+                            transition: 'all 0.3s ease-in-out',
+                            boxShadow: '0 4px 15px rgba(102, 126, 234, 0.3)'
+                          }}
+                          onMouseOver={(e) => {
+                            e.target.style.transform = 'translateY(-2px)';
+                            e.target.style.boxShadow = '0 8px 25px rgba(102, 126, 234, 0.4)';
+                          }}
+                          onMouseOut={(e) => {
+                            e.target.style.transform = 'translateY(0)';
+                            e.target.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.3)';
+                          }}
                         >
-                          อ่านเพิ่มเติม
+                          <span className="btn-text">อ่านเพิ่มเติม</span>
+                          <span className="btn-arrow">→</span>
                         </button>
                       </div>
                     </div>
                   </div>
                 ))
               ) : (
-                <p>ไม่มีข่าวประชาสัมพันธ์</p>
+                <div className="col-12 text-center py-5">
+                  <div className="empty-state">
+                    <h5 className="empty-title">ไม่มีข่าวประชาสัมพันธ์</h5>
+                    <p className="empty-text">กรุณาตรวจสอบอีกครั้งในภายหลัง</p>
+                  </div>
+                </div>
               )}
 
-
               <div className="col-md-4 activity-placeholder">
-                <h4 className="activity-title fw-bold">ปฏิทินกิจกรรม</h4>
+                <div className="activity-section">
+                  <h4 className="activity-title fw-bold mb-4">
+                    ปฏิทินกิจกรรม
+                    <div className="title-underline"></div>
+                  </h4>
 
-                {isLoading ? (
-                  [...Array(3)].map((_, index) => (
-                    <div key={index} className="act-home-item d-flex mb-3 placeholder-glow">
-                      <div className="act-date text-center p-2 bg-secondary rounded text-white">
-                        <div className="placeholder col-6 mb-2"></div>
-                        <div className="placeholder col-6"></div>
-                      </div>
-                      <div className="act-content ms-3 w-100">
-                        <h5 className="placeholder col-8 mb-2"></h5>
-                        <p className="placeholder col-12"></p>
-                      </div>
-                    </div>
-                  ))
-                ) : activity.length > 0 ? (
-                  activity
-                    .slice(0, 3)
-                    .sort((a, b) => new Date(a.activity_date) - new Date(b.activity_date))
-                    .map((item) => (
-                      <Link
-                        to={`/activity/${item.activity_id}`}
-                        key={item.activity_id}
-                        className="act-home-item text-decoration-none text-dark"
-                      >
-                        <div className="act-date text-white">
-                          <span className="day fs-4 fw-bold">{new Date(item.activity_date).getDate()}</span>
-                          <span className="month-year small">
-                            {new Date(item.activity_date).toLocaleDateString("th-TH", {
-                              month: "short",
-                              year: "numeric",
-                            })}
-                          </span>
+                  <div className="activity-content p-3 ">
+                    {isLoading ? (
+                      [...Array(3)].map((_, index) => (
+                        <div key={index} className="act-home-item loading-item d-flex mb-3">
+                          <div className="act-date-skeleton">
+                            <div className="skeleton-day"></div>
+                            <div className="skeleton-month"></div>
+                          </div>
+                          <div className="act-content-skeleton ms-3 w-100">
+                            <div className="skeleton-title"></div>
+                            <div className="skeleton-text"></div>
+                          </div>
                         </div>
-                        <div className="act-content ms-3">
-                          <h5 className="act-name fw-bold mb-1">{item.activity_name}</h5>
-                          <p className="act-text text-muted mb-0">
-                            {item.description ? item.description.substring(0, 80) + "..." : "ไม่มีเนื้อหา"}
-                          </p>
-                        </div>
-                      </Link>
-                    ))
-                ) : (
-                  <p>ไม่มีข้อมูลกิจกรรม</p>
-                )}
+                      ))
+                    ) : activity.length > 0 ? (
+                      activity
+                        .filter(item => item.status === 0 || item.status === 2)
+                        .sort((a, b) => new Date(a.activity_date) - new Date(b.activity_date))
+                        .slice(0, 3)
+                        .map((item, index) => (
+                          <Link
+                            to={`/activity/${item.activity_id}`}
+                            key={item.activity_id}
+                            className="act-home-item text-decoration-none text-dark activity-link"
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              padding: '16px',
+                              borderRadius: '15px',
+                              marginBottom: '12px',
+                              background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
+                              border: '1px solid #dee2e6',
+                              transition: 'all 0.3s ease-in-out',
+                              position: 'relative',
+                              overflow: 'hidden'
+                            }}
+                            onMouseOver={(e) => {
+                              e.currentTarget.style.transform = 'translateX(8px)';
+                              e.currentTarget.style.boxShadow = '0 8px 25px rgba(0,0,0,0.1)';
+                              e.currentTarget.style.background = 'linear-gradient(135deg, #fff 0%, #f8f9fa 100%)';
+                            }}
+                            onMouseOut={(e) => {
+                              e.currentTarget.style.transform = 'translateX(0)';
+                              e.currentTarget.style.boxShadow = 'none';
+                              e.currentTarget.style.background = 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)';
+                            }}
+                          >
+                            <div
+                              className="act-date text-white"
+                              style={{
+                                background: 'linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%)',
+                                borderRadius: '12px',
+                                padding: '12px',
+                                minWidth: '70px',
+                                textAlign: 'center',
+                                boxShadow: '0 4px 15px rgba(255, 107, 107, 0.3)',
+                                position: 'relative',
+                                overflow: 'hidden'
+                              }}
+                            >
+                              <div className="date-shine"></div>
+                              <span className="day fs-4 fw-bold d-block" style={{ lineHeight: '1' }}>
+                                {new Date(item.activity_date).getDate()}
+                              </span>
+                              <span className="month-year small d-block" style={{ fontSize: '0.75rem' }}>
+                                {new Date(item.activity_date).toLocaleDateString("th-TH", {
+                                  month: "short",
+                                  year: "numeric",
+                                })}
+                              </span>
+                            </div>
+
+                            <div className="act-content ms-3 flex-grow-1">
+                              <h5 className="act-name fw-bold mb-1" style={{
+                                color: '#2c3e50',
+                                fontSize: '1rem',
+                                lineHeight: '1.3'
+                              }}>
+                                {item.activity_name}
+                              </h5>
+                              <p className="act-text text-muted mb-0" style={{
+                                fontSize: '0.85rem',
+                                lineHeight: '1.4'
+                              }}>
+                                {item.description ? item.description.substring(0, 80) + "..." : "ไม่มีเนื้อหา"}
+                              </p>
+                            </div>
+                          </Link>
+                        ))
+                    ) : (
+                      <div className="empty-activity text-center py-4">
+                        <h6 className="empty-activity-title">ไม่มีข้อมูลกิจกรรมในขณะนี้</h6>
+                        <p className="empty-activity-text">กรุณาตรวจสอบอีกครั้งในภายหลัง</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-
 
         {/* ส่วนของแดชบอร์ด */}
         <div className="home-dashboard p-5">
-          <h3 id="head-text">แดชบอร์ดแสดงข้อมูล</h3>
+          <h3 id="head-text">
+            แดชบอร์ดแสดงข้อมูล
+            <div className="title-underline"></div>
+          </h3>
           <div className="container">
-            <div className="row mb-3">
-              <CardInfo title="จำนวนผู้เข้าร่วมกิจกรรมทั้งหมด" value={`${stats.totalParticipants} คน`} type="activity" />
-              <CardInfo title="กิจกรรมที่กำลังดำเนินการ" value={`${stats.ongoingActivity} กิจกรรม`} type="activity" />
-              <CardInfo title="ยอดบริจาครวมทั้งหมด" value={`${stats.totalDonations} บาท`} type="donation" />
-              <CardInfo title="โครงการที่เปิดรับบริจาค" value={`${stats.ongoingProject} โครงการ`} type="donation" />
+            {/* Stats Cards */}
+            <div className="row mb-5">
+              <CardInfo
+                title="จำนวนผู้เข้าร่วมกิจกรรมทั้งหมด"
+                value={`${stats.totalParticipants.toLocaleString()} คน`}
+                type="activity"
+                icon={MdPeople}
+              />
+              <CardInfo
+                title="กิจกรรมที่กำลังดำเนินการ"
+                value={`${stats.ongoingActivity} กิจกรรม`}
+                type="activity"
+                icon={MdEvent}
+              />
+              <CardInfo
+                title="ยอดบริจาครวมทั้งหมด"
+                value={`${stats.totalDonations.toLocaleString()} บาท`}
+                type="donation"
+                icon={MdVolunteerActivism}
+              />
+              <CardInfo
+                title="โครงการที่เปิดรับบริจาค"
+                value={`${stats.ongoingProject} โครงการ`}
+                type="project"
+                icon={MdTrendingUp}
+              />
             </div>
 
-            <div className="row mb-4">
-              <div className="col-md-8">
-                <div className="card p-3">
-                  <h5>จำนวนการเข้าร่วมกิจกรรมในแต่ละปี</h5>
-                  {barData.labels.length ? <Bar data={barData} options={barOptions} /> : <div>Loading...</div>}
+            {/* Charts Section */}
+            <div className="row mb-5">
+              <div className="col-lg-8 mb-4">
+                <div className="card border-0 shadow-lg h-100">
+                  <div className="card-header border-0 bg-gradient" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+                    <h5 className="card-title mb-0 fw-bold">
+                      จำนวนกิจกรรมในแต่ละปี
+                    </h5>
+                  </div>
+                  <div className="card-body p-4">
+                    {isLoading ? <LoadingSpinner /> : <Bar data={barData} options={barOptions} />}
+                  </div>
                 </div>
               </div>
-              <div className="col-md-4">
-                <div className="card p-3">
-                  <h5>สถิติการบริจาค</h5>
-                  {pieData.labels.length ? <Pie data={pieData} options={pieOptions} /> : <div>Loading...</div>}
+
+              <div className="col-lg-4 mb-4">
+                <div className="card border-0 shadow-lg h-100">
+                  <div className="card-header border-0 bg-gradient" style={{ background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' }}>
+                    <h5 className="card-title mb-0 fw-bold">
+                      สถิติการบริจาค
+                    </h5>
+                  </div>
+                  <div className="card-body p-4">
+                    {isLoading ? <LoadingSpinner /> : <Pie data={pieData} options={pieOptions} />}
+                  </div>
                 </div>
               </div>
             </div>
 
+            {/* Alumni Section */}
             <div className="row">
-              <CardInfo title="จำนวนศิษย์เก่าทั้งหมด" value={`${alumniCount} คน`} center />
+              <CardInfo
+                title="จำนวนศิษย์เก่าทั้งหมด"
+                value={`${alumniCount.toLocaleString()} คน`}
+                center
+                type="alumni"
+                icon={MdPeople}
+                colClass="col-12"
+              />
             </div>
           </div>
         </div>
 
-
         {/* ส่วนของเว็บบอร์ด */}
-        <div div className="home-webboard" >
-          <h3 id="head-text">เว็บบอร์ด</h3>
+        <div className="home-webboard" >
+          <h3 id="head-text">
+            เว็บบอร์ด
+            <div className="title-underline"></div>
+          </h3>
           <div className="container">
             <div className="row justify-content-between" id="row-webboard">
               <div className="row">
                 {webboard.length > 0 ? (
-                  webboard.sort((a, b) => b.viewCount - a.viewCount) // เรียงโพสต์ตามจำนวนเข้าชม (มาก -> น้อย)
-                    .slice(0, 2) // 2อันดับแรก
+                  webboard.sort((a, b) => b.viewCount - a.viewCount)
+                    .slice(0, 2)
                     .map(post => (
                       <div key={post.webboard_id} className="col-md-6">
-                        <div className="card-homeweb shadow-sm p-3 rounded-4">
+                        <div className="card-homeweb shadow-sm p-3 rounded-4 h-100">
                           {/* ส่วนหัวของกระทู้ */}
-                          <div className="d-flex justify-content-between">
+                          <div className="d-flex justify-content-between mb-3">
                             <span
                               key={post.category_id}
-                              className="badge px-3 py-2 ms-auto me-4" style={{ backgroundColor: getCategoryColor(post?.category_id || 0), color: "white", padding: "5px 10px", borderRadius: "15px", cursor: "pointer" }}
-                              onClick={() => handleCategoryClick(post.category_id)}>
+                              className="badge px-3 py-2 me-4 ms-auto"
+                              style={{
+                                backgroundColor: getCategoryColor(post?.category_id || 0),
+                                color: "white",
+                                borderRadius: "15px",
+                                cursor: "pointer"
+                              }}
+                              onClick={() => handleCategoryClick(post.category_id)}
+                            >
                               {post && post.category_name ? post.category_name : ''}
                             </span>
 
-                            <span onClick={(e) => { e.stopPropagation(); toggleLike(post.webboard_id); }} style={{ cursor: "pointer" }}>
+                            <span
+                              onClick={(e) => { e.stopPropagation(); toggleLike(post.webboard_id); }}
+                              style={{ cursor: "pointer" }}
+                            >
                               {likedPosts.includes(post.webboard_id) ?
                                 <MdFavorite className="fs-5 text-danger" /> :
                                 <SlHeart className="fs-5 text-secondary" />}
                             </span>
                           </div>
 
-                          <div onClick={() => handlePostClick(post)} style={{ cursor: "pointer" }}>
+                          <div onClick={() => handlePostClick(post)} style={{ cursor: "pointer" }} className="flex-grow-1 d-flex flex-column">
                             {/* โปรไฟล์ + ชื่อผู้ใช้ */}
-                            <div className="d-flex mt-3">
-                              <img src={post.profile_image ? `http://localhost:3001/${post.profile_image}` : "/default-profile.png"} alt="User" className="rounded-circle me-3" width="50" height="50" onError={(e) => e.target.src = "/default-profile.png"} />
-                              <div>
-                                <h5 className="fw-bold mb-1">{post.title}</h5>
-                                <p className="text-muted mb-1">จากคุณ <span className="text">{post.full_name || "ไม่ระบุชื่อ"}</span></p>
-                                <p className="text-muted small">{new Date(post.created_at).toLocaleDateString()}</p>
+                            <div className="d-flex mb-3">
+                              <img
+                                src={post.profile_image ? `http://localhost:3001/${post.profile_image}` : "/default-profile.png"}
+                                alt="User"
+                                className="rounded-circle me-3"
+                                width="50"
+                                height="50"
+                                style={{ objectFit: "cover" }}
+                                onError={(e) => e.target.src = "/default-profile.png"}
+                              />
+                              <div className="flex-grow-1">
+                                <h5 className="fw-bold mb-1 text-truncate">{post.title}</h5>
+                                <p className="text-muted mb-1 small">จากคุณ <span className="fw-semibold">{post.full_name || "ไม่ระบุชื่อ"}</span></p>
+                                <p className="text-muted small mb-0">{new Date(post.created_at).toLocaleDateString('th-TH')}</p>
                               </div>
                             </div>
 
-                            {/* <img src={post.image_path ? `http://localhost:3001/${post.image_path.replace(/^\/+/, '')}` : "/default-image.png"}   alt="Post" className="img-fluid rounded-3" /> */}
-
-
-                            <div className="d-flex align-items-center justify-content-between px-2 mt-auto">
-                              <p className="web-text mb-4 flex-grow-1">
-                                {post.content ? (post.content.length > 100 ? post.content.substring(0, 100) + "..." : post.content) : ""}
+                            {/* เนื้อหา */}
+                            <div className="flex-grow-1 mb-3">
+                              <p className="text-secondary mb-0" style={{ lineHeight: "1.5" }}>
+                                {post.content ? (post.content.length > 120 ? post.content.substring(0, 120) + "..." : post.content) : ""}
                               </p>
                             </div>
 
-                            <div className="d-flex align-items-center text-muted flex-grow-1">
-                              {/* ความคิดเห็น */}
-                              <BiSolidComment className="me-2" />
-                              {post.comments_count ?? 0} ความคิดเห็น
-
-                              {/* จำนวนผู้เข้าชม */}
-                              <FaEye className="me-2 ms-auto" /> {post.viewCount} ครั้ง
+                            {/* สถิติ */}
+                            <div className="d-flex align-items-center justify-content-between text-muted small mt-auto">
+                              <div className="d-flex align-items-center">
+                                <BiSolidComment className="me-1" />
+                                <span className="me-3">{post.comments_count ?? 0} ความคิดเห็น</span>
+                              </div>
+                              <div className="d-flex align-items-center">
+                                <FaEye className="me-1" />
+                                <span>{post.viewCount} ครั้ง</span>
+                              </div>
                             </div>
                           </div>
                         </div>
                       </div>
-
                     ))
                 ) : (
-                  <p>ไม่มีโพสต์</p>
-                )}
-              </div>
-
-              <Modal isOpen={modalIsOpen} onRequestClose={closeModal} className="custom-modal" style={{ overlay: { backgroundColor: 'rgba(0, 0, 0, 0.75)' } }}>
-                {selectedPost && (
-                  <div className="modal-content mt-2">
-                    {/* ส่วนหัวของกระทู้ */}
-                    <div className="d-flex justify-content-between">
-                      <button className="close-modal-button ms-auto" onClick={closeModal}>
-                        <IoMdClose />
-                      </button>
-                      <span
-                        key={selectedPost.category_id}
-                        className="badge px-3 py-2 me-4" style={{ backgroundColor: getCategoryColor(selectedPost?.category_id || 0), color: "white", padding: "5px 10px", borderRadius: "6px", cursor: "pointer" }}
-                        onClick={() => handleCategoryClick(selectedPost.category_id)}>
-                        {selectedPost && selectedPost.category_name ? selectedPost.category_name : ''}
-                      </span>
-                      <span onClick={(e) => { e.stopPropagation(); toggleLike(selectedPost.webboard_id); }} style={{ cursor: "pointer" }}>
-                        {likedPosts.includes(selectedPost.webboard_id) ?
-                          <MdFavorite className="fs-5 text-danger me-5" /> :
-                          <SlHeart className="fs-5 text-secondary me-5" />}
-                      </span>
-                    </div>
-
-                    {/* โปรไฟล์ + ชื่อผู้ใช้ */}
-                    <div className="d-flex mt-4">
-                      <img
-                        src={selectedPost.profile_image ? `http://localhost:3001/${selectedPost.profile_image}` : "/default-profile.png"}
-                        alt="User"
-                        className="rounded-circle me-3"
-                        width="50"
-                        height="50"
-                      />
-                      <div>
-                        <h5 className="fw-bold mb-1">{selectedPost.title}</h5>
-                        <p className="text-muted mb-1">จากคุณ <span className="text">{selectedPost.full_name || "ไม่ระบุชื่อ"}</span></p>
-                        <p className="text-muted small">{new Date(selectedPost.created_at).toLocaleDateString()}</p>
+                  <div className="col-12">
+                    <div className="text-center py-5">
+                      <div className="mb-4">
+                        <i className="fas fa-comments fa-3x text-muted opacity-25"></i>
                       </div>
-                    </div>
-
-                    <div className="card-body px-0 small">
-                      <p className="card-text mb-3 text-muted">
-                        {selectedPost.content}
-                      </p>
-                    </div>
-
-                    {/* รูปภาพประกอบ*/}
-                    {selectedPost.image_path && (
-                      <img src={selectedPost.image_path ? `http://localhost:3001/${selectedPost.image_path.replace(/^\/+/, '')}` : "/default-image.png"} alt="Post" className="img-fluid rounded-3" onError={(e) => e.target.style.display = 'none'} />
-                    )}
-
-                    {/* จำนวนผู้เข้าชม */}
-                    <div className="d-flex align-items-center mt-4">
-                      <FaEye className="me-2 ms-auto " /> {selectedPost.viewCount} ครั้ง
-                    </div>
-
-                    {/* comment */}
-                    <div className="mt-3">
-                      <h6 className="mb-4">ความคิดเห็นทั้งหมด ({selectedPost?.comments?.length || 0})</h6>
-                      {selectedPost.comments && selectedPost.comments.length > 0 ? (
-                        selectedPost.comments.map((comment) => (
-                          <div key={comment.comment_id} className="comment-item bg-light shadow-sm rounded-3 p-3 mb-3">
-                            <div className="d-flex align-items-start">
-                              <img
-                                src={comment.profile_image.startsWith('http') || comment.profile_image === '/default-profile.png'
-                                  ? comment.profile_image
-                                  : `http://localhost:3001/${comment.profile_image}`}
-                                alt="User"
-                                className="rounded-circle me-3 border"
-                                width="45"
-                                height="45"
-                              />
-                              <div className="flex-grow-1">
-                                <div className="d-flex justify-content-between align-items-center mb-1">
-                                  <strong>{comment.full_name || "ไม่ระบุชื่อ"}</strong>
-                                  <small className="text-muted">
-                                    {comment.created_at && !isNaN(new Date(comment.created_at).getTime())
-                                      ? format(new Date(comment.created_at), 'dd/MM/yyyy', { locale: th })
-                                      : "ไม่ระบุวันที่"}
-                                  </small>
-                                </div>
-                                <div className="d-flex align-items-center mb-2">
-                                  <p className="text-muted mb-0 small flex-grow-1">{comment.comment_detail}</p>
-                                  {Number(comment.user_id) === Number(localStorage.getItem("userId")) && (
-                                    <button
-                                      className="btn btn-sm ms-2"
-                                      onClick={() => handleDeleteComment(comment.comment_id)}
-                                      style={{ border: "none", background: "none" }}
-                                    >
-                                      <MdDelete size={20} color="red" />
-                                    </button>
-                                  )}
-                                </div>
-                                <button className="btn btn-link btn-sm p-0" onClick={() => toggleReplyForm(comment.comment_id)}>ตอบกลับ</button>
-                                {/* ส่วนที่เหลือเหมือนเดิม */}
-                              </div>
-                            </div>
-                          </div>
-                        ))
-                      ) : (
-                        <p className="text-muted">ยังไม่มีความคิดเห็น</p>
-                      )}
-
-                      <div className="comment-form mt-4">
-                        <h6 className="mb-3">แสดงความคิดเห็น:</h6>
-                        {isLoggedin ? (
-                          <div className="d-flex">
-                            <input
-                              className="form-control me-3"
-                              rows="1"
-                              value={commentText}
-                              onChange={(e) => setCommentText(e.target.value)}
-                              placeholder="เขียนความคิดเห็นของคุณ..."
-                            />
-                            <button className="btn btn-primary" type="submit" onClick={handleCommentSubmit}>
-                              ส่งความคิดเห็น
-                            </button>
-                          </div>
-                        ) : (
-                          <div className="alert text-center" style={{ color: "red" }}>
-                            <p>คุณต้องเข้าสู่ระบบก่อนจึงจะสามารถแสดงความคิดเห็นได้</p>
-                          </div>
-                        )}
-                      </div>
+                      <h5 className="text-muted mb-3">ยังไม่มีกระทู้</h5>
+                      <p className="text-muted">เมื่อมีการโพสต์กระทู้ จะแสดงที่นี่</p>
+                      <a href="/webboard" className="btn btn-outline-primary">
+                        <i className="fas fa-plus me-2"></i>
+                        สร้างกระทู้แรก
+                      </a>
                     </div>
                   </div>
                 )}
-              </Modal>
-
-              <div className="text">
-                <a href={`/webboard`} className="btn btn-primary">ดูทั้งหมด</a>
               </div>
+
+              {/* Alternative: Bottom Section with Stats and Button */}
+              {webboard.length > 0 && (
+                <div className="pt-3 border-top">
+                  <div className="row align-items-center">
+                    <div className="col-md-8">
+                      <small className="text-muted">
+                        <i className="fas fa-info-circle me-1"></i>
+                        แสดง 2 จาก {webboard.length} กระทู้ยอดนิยม • อัปเดตล่าสุด {new Date().toLocaleDateString('th-TH')}
+                      </small>
+                    </div>
+                    <div className="col-md-4 text-md-end mt-2 mt-md-0">
+                      <a href="/webboard" className="btn btn-outline-primary btn-sm">
+                        <i className="fas fa-arrow-right me-2"></i>
+                        ดูกระทู้ทั้งหมด
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
+
+            <Modal isOpen={modalIsOpen} onRequestClose={closeModal} className="custom-modal" style={{ overlay: { backgroundColor: 'rgba(0, 0, 0, 0.75)' } }}>
+              {selectedPost && (
+                <div className="modal-content mt-2">
+                  {/* ส่วนหัวของกระทู้ */}
+                  <div className="d-flex justify-content-between">
+                    <button className="close-modal-button ms-auto" onClick={closeModal}>
+                      <IoMdClose />
+                    </button>
+                    <span
+                      key={selectedPost.category_id}
+                      className="badge px-3 py-2 me-4" style={{ backgroundColor: getCategoryColor(selectedPost?.category_id || 0), color: "white", padding: "5px 10px", borderRadius: "15px", cursor: "pointer" }}
+                      onClick={() => handleCategoryClick(selectedPost.category_id)}>
+                      {selectedPost && selectedPost.category_name ? selectedPost.category_name : ''}
+                    </span>
+                    <span onClick={(e) => { e.stopPropagation(); toggleLike(selectedPost.webboard_id); }} style={{ cursor: "pointer" }}>
+                      {likedPosts.includes(selectedPost.webboard_id) ?
+                        <MdFavorite className="fs-5 text-danger me-5" /> :
+                        <SlHeart className="fs-5 text-secondary me-5" />}
+                    </span>
+                  </div>
+
+                  {/* โปรไฟล์ + ชื่อผู้ใช้ */}
+                  <div className="d-flex mt-4">
+                    <img
+                      src={selectedPost.profile_image ? `http://localhost:3001/${selectedPost.profile_image}` : "/default-profile.png"}
+                      alt="User"
+                      className="rounded-circle me-3"
+                      width="50"
+                      height="50"
+                    />
+                    <div>
+                      <h5 className="fw-bold mb-1">{selectedPost.title}</h5>
+                      <p className="text-muted mb-1">จากคุณ <span className="text">{selectedPost.full_name || "ไม่ระบุชื่อ"}</span></p>
+                      <p className="text-muted small">{new Date(selectedPost.created_at).toLocaleDateString()}</p>
+                    </div>
+                  </div>
+
+                  <div className="card-body px-0 small">
+                    <p className="card-text mb-3 text-muted">
+                      {selectedPost.content}
+                    </p>
+                  </div>
+
+                  {/* รูปภาพประกอบ*/}
+                  {selectedPost.image_path && (
+                    <img src={selectedPost.image_path ? `http://localhost:3001/${selectedPost.image_path.replace(/^\/+/, '')}` : "/default-image.png"} alt="Post" className="img-fluid rounded-3" onError={(e) => e.target.style.display = 'none'} />
+                  )}
+
+                  {/* จำนวนผู้เข้าชม */}
+                  <div className="d-flex align-items-center mt-4">
+                    <FaEye className="me-2 ms-auto " /> {selectedPost.viewCount} ครั้ง
+                  </div>
+
+                  {/* comment */}
+                  <div className="mt-3">
+                    <h6 className="mb-4">ความคิดเห็นทั้งหมด ({selectedPost?.comments?.length || 0})</h6>
+                    {selectedPost.comments && selectedPost.comments.length > 0 ? (
+                      selectedPost.comments.map((comment) => (
+                        <div key={comment.comment_id} className="comment-item bg-light shadow-sm rounded-3 p-3 mb-3">
+                          <div className="d-flex align-items-start">
+                            <img
+                              src={comment.profile_image.startsWith('http') || comment.profile_image === '/default-profile.png'
+                                ? comment.profile_image
+                                : `http://localhost:3001/${comment.profile_image}`}
+                              alt="User"
+                              className="rounded-circle me-3 border"
+                              width="45"
+                              height="45"
+                            />
+                            <div className="flex-grow-1">
+                              <div className="d-flex justify-content-between align-items-center mb-1">
+                                <strong>{comment.full_name || "ไม่ระบุชื่อ"}</strong>
+                                <small className="text-muted">
+                                  {comment.created_at && !isNaN(new Date(comment.created_at).getTime())
+                                    ? format(new Date(comment.created_at), 'dd/MM/yyyy', { locale: th })
+                                    : "ไม่ระบุวันที่"}
+                                </small>
+                              </div>
+                              <div className="d-flex align-items-center mb-2">
+                                <p className="text-muted mb-0 small flex-grow-1">{comment.comment_detail}</p>
+                                {Number(comment.user_id) === Number(localStorage.getItem("userId")) && (
+                                  <button
+                                    className="btn btn-sm ms-2"
+                                    onClick={() => handleDeleteComment(comment.comment_id)}
+                                    style={{ border: "none", background: "none" }}
+                                  >
+                                    <MdDelete size={20} color="red" />
+                                  </button>
+                                )}
+                              </div>
+                              {/* Reply button */}
+                              {isLoggedin && (
+                                <button
+                                  className="btn btn-link btn-sm p-0"
+                                  onClick={() => setShowReplyForm(showReplyForm === comment.comment_id ? null : comment.comment_id)}
+                                >
+                                  <BiSolidComment className="me-1" />
+                                  ตอบกลับ
+                                </button>
+                              )}
+
+                              {/* Reply form */}
+                              {showReplyForm === comment.comment_id && (
+                                <div className="mt-3 p-3 bg-light rounded-3">
+                                  <div className="d-flex gap-2">
+                                    <input
+                                      type="text"
+                                      className="form-control"
+                                      placeholder="เขียนข้อความตอบกลับ..."
+                                      value={replyText}
+                                      onChange={(e) => setReplyText(e.target.value)}
+                                      onKeyDown={e => {
+                                        if (e.key === "Enter" && replyText.trim()) {
+                                          handleReplySubmit(comment.comment_id, replyText);
+                                        }
+                                      }}
+                                      style={{ fontSize: '0.9rem' }}
+                                    />
+                                    <button
+                                      className="btn btn-primary btn-sm px-3"
+                                      onClick={() => handleReplySubmit(comment.comment_id, replyText)}
+                                      disabled={!replyText.trim()}
+                                    >
+                                      ส่ง
+                                    </button>
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* แสดง Replies */}
+                              {comment.replies && comment.replies.length > 0 && (
+                                <div className="replies-section mt-3 ms-3">
+                                  {comment.replies.map((reply) => (
+                                    <div key={reply.reply_id} className="reply-item bg-light rounded-3 p-3 mb-2 border-start border-primary border-3">
+                                      <div className="d-flex align-items-start">
+                                        <img
+                                          src={reply.profile_image?.startsWith('http') || reply.profile_image === '/default-profile.png'
+                                            ? reply.profile_image
+                                            : `http://localhost:3001/${reply.profile_image}`}
+                                          alt="User"
+                                          className="rounded-circle me-3 border"
+                                          width="35"
+                                          height="35"
+                                          style={{ objectFit: 'cover' }}
+                                        />
+                                        <div className="flex-grow-1">
+                                          <div className="d-flex justify-content-between align-items-center mb-1">
+                                            <strong className="text-dark" style={{ fontSize: '0.9rem' }}>
+                                              {reply.full_name || "ไม่ระบุชื่อ"}
+                                            </strong>
+                                            <small className="text-muted" style={{ fontSize: '0.8rem' }}>
+                                              {reply.created_at && !isNaN(new Date(reply.created_at).getTime())
+                                                ? format(new Date(reply.created_at), 'dd/MM/yyyy HH:mm', { locale: th })
+                                                : "ไม่ระบุวันที่"}
+                                            </small>
+                                          </div>
+                                          <p className="text-dark mb-0" style={{ fontSize: '0.85rem', lineHeight: '1.4' }}>
+                                            {reply.reply_detail}
+                                          </p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-muted">ยังไม่มีความคิดเห็น</p>
+                    )}
+
+                    <div className="comment-form mt-4">
+                      <h6 className="mb-3">แสดงความคิดเห็น:</h6>
+                      {isLoggedin ? (
+                        <div className="d-flex">
+                          <input
+                            className="form-control me-3"
+                            rows="1"
+                            value={commentText}
+                            onChange={(e) => setCommentText(e.target.value)}
+                            placeholder="เขียนความคิดเห็นของคุณ..."
+                          />
+                          <button className="btn btn-primary" type="submit" onClick={handleCommentSubmit}>
+                            ส่งความคิดเห็น
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="alert text-center" style={{ color: "red" }}>
+                          <p>คุณต้องเข้าสู่ระบบก่อนจึงจะสามารถแสดงความคิดเห็นได้</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </Modal>
           </div>
         </div >
 
         {/* ส่วนของบริจาค */}
-        < div className="home-donate" >
-          <h3 id="head-text">บริจาค</h3>
-          <div className="donate-content">
-            {filteredProjects.length === 0 ? (
-              <p>ขออภัย ไม่มีโครงการบริจาคในขณะนี้</p>
-            ) : (
-              <div className="donate-content-item">
-                {filteredProjects.slice(0, 3).map((project) => { // แสดงแค่ 3 โครงการแรก
-                  const startDate = project?.start_date ? new Date(project.start_date) : null;
-                  const endDate = project?.end_date ? new Date(project.end_date) : null;
-                  const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        <div className="home-donate" >
+          <h3 id="head-text">
+            บริจาค
+            <div className="title-underline"></div>
+          </h3>
+          <div className="container">
+            <div className="donate-content">
+              {filteredProjects.length === 0 ? (
+                <div className="no-projects">
+                  <p>ขออภัย ไม่มีโครงการบริจาคในขณะนี้</p>
+                </div>
+              ) : (
+                <div className="donate-content-home-grid">
+                  {filteredProjects.slice(0, 3).map((project) => {
+                    const now = new Date();
+                    const startDate = project?.start_date ? new Date(project.start_date) : null;
+                    const endDate = project?.end_date ? new Date(project.end_date) : null;
 
-                  const formattedStartDate = startDate ? startDate.toLocaleDateString('th-TH', options) : "-";
-                  const formattedEndDate = endDate ? endDate.toLocaleDateString('th-TH', options) : "-";
+                    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                    const formattedStartDate = startDate ? startDate.toLocaleDateString('th-TH', options) : "-";
+                    const formattedEndDate = endDate ? endDate.toLocaleDateString('th-TH', options) : "-";
+                    const progress = project.target_amount
+                      ? (project.current_amount / project.target_amount) * 100
+                      : 0;
 
-                  const progress = project.target_amount
-                    ? (project.current_amount / project.target_amount) * 100
-                    : 0;
+                    const countDay = calculateDaysRemaining(endDate);
 
-                  return (
-                    <div className="item-detail" key={project.project_id}>
-                      <div className="image-frame">
-                        <img
-                          src={`http://localhost:3001/uploads/${project.image_path}`}
-                          alt={project.project_name}
-                          onError={(e) => {
-                            e.target.src = "./image/default.jpg";
-                          }}
-                        />
-                      </div>
-                      <div className="donate-discription">
-                        <p className={`tag ${project.donation_type || "default"}`}>
-                          {getFilterTitle(project.donation_type)}
-                        </p>
-                        <p className="donate-discription-date">{formattedStartDate} - {formattedEndDate}</p>
-                        <h5><b>{project.project_name}</b></h5>
-                        <p>{project.description}</p>
-                        <div id="description_">
-                          {(project.donation_type !== "unlimited" && project.donation_type !== "things") && (
-                            <div className="progress">{`${progress.toFixed(2)}%`}</div>
-                          )}
-                          <div className="bar">
+                    return (
+                      <div className="item-detail-home" key={project.project_id}>
+                        <div className="image-donate-frame">
+                          <img
+                            src={`http://localhost:3001/uploads/${project.image_path}`}
+                            alt={project.project_name}
+                            onError={(e) => {
+                              e.target.src = "./image/default.jpg";
+                            }}
+                          />
+                        </div>
+                        <div className="donate-discription">
+                          <div className="tag-date-container">
+                            <p className={`tagDonante ${project.donation_type || "default"}`}>
+                              {getFilterTitle(project.donation_type)}
+                            </p>
+                            <p className="donate-discription-date">{formattedStartDate} - {formattedEndDate}</p>
+                          </div>
+
+                          <div className="project-title">
+                            <h5><b>{truncateText(project.project_name, 60)}</b></h5>
+                          </div>
+
+                          <div className="project-description">
+                            <p>{truncateText(project.description, 120)}</p>
+                          </div>
+
+                          <div className="progress-section">
                             {(project.donation_type !== "unlimited" && project.donation_type !== "things") && (
-                              <div className="progress-bar-container">
-                                <div
-                                  className="progress-bar"
-                                  style={{ width: `${progress ? progress.toFixed(0) : 0}%` }}
-                                >
-                                  <span className="progress-percent">
-                                    {`${progress ? progress.toFixed(0) : 0}%`}
-                                  </span>
+                              <>
+                                <div className="progress-text">{`${progress.toFixed(2)}%`}</div>
+                                <div className="progress-bar-container">
+                                  <div
+                                    className="progress-bar"
+                                    style={{ width: `${progress ? progress.toFixed(0) : 0}%` }}
+                                  >
+                                    <span className="progress-percent">
+                                      {`${progress ? progress.toFixed(0) : 0}%`}
+                                    </span>
+                                  </div>
                                 </div>
-                              </div>
+                              </>
                             )}
                           </div>
-                        </div>
-                        <div className="donate-details">
-                          <div className="details-amount1">
-                            <p>ยอดบริจาคปัจจุบัน:<br /><span className="details-amount-title">{project.current_amount ? project.current_amount.toLocaleString() : "0"} </span>บาท</p><br />
-                          </div>
-                          <div className="details-amount2">
-                            {project.donation_type !== "unlimited" && project.donation_type !== "things" && project.target_amount > 0 && (
-                              <p>เป้าหมาย:<br /><span className="details-amount-title">{project.target_amount ? project.target_amount.toLocaleString() : "0"} </span>บาท</p>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="button-container">
-                        <Link to={`/donate/donatedetail/${project.project_id}`}>
-                          <button className="donate-bt">บริจาค</button>
-                        </Link>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
 
+                          <div className="donate-details">
+                            <div className="details-amount1">
+                              <p>ยอดบริจาคปัจจุบัน:<br />
+                                <span className="details-amount-title">
+                                  {project.current_amount ? project.current_amount.toLocaleString() : "0"}
+                                </span> บาท
+                              </p>
+                            </div>
+                            <div className="details-amount2">
+                              {project.donation_type !== "unlimited" && project.donation_type !== "things" && project.target_amount > 0 && (
+                                <p>เป้าหมาย:<br />
+                                  <span className="details-amount-title">
+                                    {project.target_amount ? project.target_amount.toLocaleString() : "0"}
+                                  </span> บาท
+                                </p>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="donate-detail-discription-day">
+                            {endDate && now > endDate ? (
+                              <span className="expired">โครงการสิ้นสุดแล้ว</span>
+                            ) : (
+                              <span className="remaining">เหลืออีก {countDay} วัน</span>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="button-container">
+                          <Link to={`/donate/donatedetail/${project.project_id}`}>
+                            <button className="donate-bt">
+                              ดูรายละเอียด
+                            </button>
+                          </Link>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+            
+            {/* Alternative: Bottom Section with Stats and Button */}
+              {filteredProjects.length > 0 && (
+                <div className="pt-3 border-top">
+                  <div className="row align-items-center">
+                    <div className="col-12 text-end">
+                      <a href="/donate" className="btn btn-outline-primary btn-sm">
+                        ดูโครงการทั้งหมด
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              )}
           </div>
         </ div>
+
         {/* ส่วนของสมาคม*/}
-        <div div className="home-about" >
+        <div className="home-about py-5" style={{ background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)' }}>
           <div className="container">
-            <h3 id="head-text" className="text-center mb-4">เกี่ยวกับสมาคม</h3>
-            <div className="card shadow-lg border-0 text-center">
-              <img
-                src="/image/about_cp.jpg"
-                className="img-fluid rounded-top w-100"
-                alt="ภาพสมาคม"
-                style={{ maxHeight: "400px", objectFit: "cover" }}
-              />
-              <div className="card-body">
-                <h4 className="card-title fw-bold text-primary">
-                  สมาคมศิษย์เก่าวิทยาลัยการคอมพิวเตอร์ มหาวิทยาลัยขอนแก่น
-                </h4>
-                <p className="card-text text-muted">
-                  สมาคมศิษย์เก่ามหาวิทยาลัยขอนแก่นก่อตั้งขึ้นเพื่อเสริมสร้างเครือข่ายและความร่วมมือระหว่างศิษย์เก่า
-                  ศิษย์ปัจจุบัน และคณาจารย์ รวมถึงสนับสนุนการพัฒนาด้านเทคโนโลยีสารสนเทศ
-                  ส่งเสริมโอกาสทางอาชีพ และให้การสนับสนุนแก่ศิษย์ปัจจุบันในการศึกษาวิจัยและนวัตกรรม
-                </p>
+            {/* Enhanced Header */}
+            <div className="text-center mb-5">
+              <div className="d-inline-block position-relative">
+                <h3 id="head-text" className="text-center mb-3 position-relative">
+                  เกี่ยวกับสมาคม
+                  <div className="title-underline position-absolute start-50 translate-middle-x mt-2"
+                    style={{
+                      width: '120px',
+                      height: '4px',
+                      background: 'linear-gradient(90deg, #007bff, #6610f2)',
+                      borderRadius: '2px',
+                      boxShadow: '0 2px 8px rgba(0,123,255,0.3)'
+                    }}>
+                  </div>
+                </h3>
 
-                <h5 className="mt-4 text-dark fw-bold">วิสัยทัศน์</h5>
-                <p className="text-secondary">
-                  <b>"เชื่อมโยงศิษย์เก่า ก้าวทันเทคโนโลยี สนับสนุนสังคมดิจิทัล"</b>
-                </p>
+                {/* Decorative elements */}
+                <div className="position-absolute top-0 start-0 translate-middle">
+                  <div className="bg-primary opacity-25 rounded-circle"
+                    style={{ width: '20px', height: '20px' }}>
+                  </div>
+                </div>
+                <div className="position-absolute top-0 end-0 translate-middle">
+                  <div className="bg-success opacity-25 rounded-circle"
+                    style={{ width: '15px', height: '15px' }}>
+                  </div>
+                </div>
+              </div>
 
-                <h5 className="mt-4 text-dark fw-bold">พันธกิจของสมาคม</h5>
-                <ul className="list-group list-group-flush text-start">
-                  <li className="list-group-item">สร้างเครือข่ายศิษย์เก่าเพื่อส่งเสริมความร่วมมือด้านอาชีพ</li>
-                  <li className="list-group-item">สนับสนุนกิจกรรมวิชาการและการวิจัยทางคอมพิวเตอร์</li>
-                  <li className="list-group-item">ส่งเสริมโอกาสด้านอาชีพและการประกอบธุรกิจของศิษย์เก่า</li>
-                  <li className="list-group-item">ให้ทุนสนับสนุนการศึกษาและพัฒนาศิษย์ปัจจุบัน</li>
-                  <li className="list-group-item">จัดกิจกรรมสานสัมพันธ์ศิษย์เก่ากับคณะและมหาวิทยาลัย</li>
-                </ul>
+              <p className="text-muted mt-3" style={{ fontSize: '1.1rem', fontStyle: 'italic' }}>
+                สมาคมศิษย์เก่าวิทยาลัยการคอมพิวเตอร์ มหาวิทยาลัยขอนแก่น
+              </p>
+            </div>
 
-                <div className="text-center mt-4">
-                  <button
-                    className="btn btn-primary px-4 py-2 fw-bold"
-                    onClick={() => navigate("/about")}
-                  >
-                    ประวัติความเป็นมา
-                  </button>
+            {/* Enhanced Main Card */}
+            <div className="card shadow-lg border-0 overflow-hidden position-relative"
+              style={{
+                borderRadius: '20px',
+                background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
+                border: '1px solid rgba(0,123,255,0.1)'
+              }}>
+
+              {/* Decorative corner elements */}
+              <div className="position-absolute top-0 start-0 bg-primary opacity-75"
+                style={{ width: '60px', height: '60px', clipPath: 'polygon(0 0, 100% 0, 0 100%)' }}>
+              </div>
+              <div className="position-absolute top-0 end-0 bg-success opacity-75"
+                style={{ width: '40px', height: '40px', clipPath: 'polygon(100% 0, 0 0, 100% 100%)' }}>
+              </div>
+
+              {/* Enhanced Image Section */}
+              <div className="position-relative">
+                <img
+                  src="/image/about_cp.jpg"
+                  className="img-fluid w-100"
+                  alt="ภาพสมาคม"
+                  style={{
+                    maxHeight: "450px",
+                    objectFit: "cover",
+                    filter: 'brightness(0.95) contrast(1.05)'
+                  }}
+                />
+
+                {/* Image overlay with gradient */}
+                <div className="position-absolute bottom-0 start-0 end-0 p-4"
+                  style={{
+                    background: 'linear-gradient(transparent, rgba(0,0,0,0.7))',
+                    color: 'white'
+                  }}>
+                  <div className="text-center">
+                    <h5 className="mb-0 fw-bold" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
+                      🏛️ วิทยาลัยการคอมพิวเตอร์ มหาวิทยาลัยขอนแก่น
+                    </h5>
+                  </div>
+                </div>
+              </div>
+
+              <div className="card-body p-5">
+                {/* Enhanced Title */}
+                <div className="text-center mb-4">
+                  <h4 className="card-title fw-bold mb-3 position-relative d-inline-block"
+                    style={{
+                      color: '#2c3e50',
+                      fontSize: '1.8rem',
+                      lineHeight: '1.3'
+                    }}>
+                    สมาคมศิษย์เก่าวิทยาลัยการคอมพิวเตอร์ มหาวิทยาลัยขอนแก่น
+                    <div className="position-absolute bottom-0 start-50 translate-middle-x bg-primary"
+                      style={{ width: '60px', height: '3px', borderRadius: '2px' }}>
+                    </div>
+                  </h4>
+                </div>
+
+                {/* Enhanced Description */}
+                <div className="mb-5">
+                  <p className="card-text text-muted text-center lh-lg px-3"
+                    style={{
+                      fontSize: '1.1rem',
+                      textAlign: 'justify',
+                      textIndent: '2rem'
+                    }}>
+                    สมาคมศิษย์เก่ามหาวิทยาลัยขอนแก่นก่อตั้งขึ้นเพื่อเสริมสร้างเครือข่ายและความร่วมมือระหว่างศิษย์เก่า
+                    ศิษย์ปัจจุบัน และคณาจารย์ รวมถึงสนับสนุนการพัฒนาด้านเทคโนโลยีสารสนเทศ
+                    ส่งเสริมโอกาสทางอาชีพ และให้การสนับสนุนแก่ศิษย์ปัจจุบันในการศึกษาวิจัยและนวัตกรรม
+                  </p>
+                </div>
+
+                {/* Enhanced Vision Section */}
+                <div className="row mb-5">
+                  <div className="col-12">
+                    <div className="card border-primary border-2 bg-light-subtle h-100">
+                      <div className="card-header bg-primary text-white text-center py-3">
+                        <h5 className="mb-0 fw-bold">
+                          <i className="fas fa-eye me-2"></i>
+                          วิสัยทัศน์
+                        </h5>
+                      </div>
+                      <div className="card-body text-center py-4">
+                        <blockquote className="blockquote mb-0">
+                          <p className="fw-bold text-primary" style={{ fontSize: '1.3rem', fontStyle: 'italic' }}>
+                            "เชื่อมโยงศิษย์เก่า ก้าวทันเทคโนโลยี สนับสนุนสังคมดิจิทัล"
+                          </p>
+                        </blockquote>
+                        {/* <div className="mt-3">
+                          <div className="d-inline-block bg-primary opacity-25 rounded-circle me-2"
+                            style={{ width: '8px', height: '8px' }}>
+                          </div>
+                          <div className="d-inline-block bg-success opacity-25 rounded-circle me-2"
+                            style={{ width: '8px', height: '8px' }}>
+                          </div>
+                          <div className="d-inline-block bg-warning opacity-25 rounded-circle"
+                            style={{ width: '8px', height: '8px' }}>
+                          </div>
+                        </div> */}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Enhanced Mission Section */}
+                <div className="mb-5">
+                  <div className="text-center mb-4">
+                    <h5 className="fw-bold text-dark position-relative d-inline-block"
+                      style={{ fontSize: '1.5rem' }}>
+                      <i className="fas fa-bullseye me-2"></i>
+                      พันธกิจของสมาคม
+                      <div className="position-absolute bottom-0 start-50 translate-middle-x bg-success"
+                        style={{ width: '40px', height: '2px', borderRadius: '1px' }}>
+                      </div>
+                    </h5>
+                  </div>
+
+                  <div className="row g-3">
+                    {[
+                      {
+                        icon: "🤝",
+                        title: "เครือข่ายศิษย์เก่า",
+                        description: "สร้างเครือข่ายศิษย์เก่าเพื่อส่งเสริมความร่วมมือด้านอาชีพ"
+                      },
+                      {
+                        icon: "📚",
+                        title: "วิชาการและวิจัย",
+                        description: "สนับสนุนกิจกรรมวิชาการและการวิจัยทางคอมพิวเตอร์"
+                      },
+                      {
+                        icon: "💼",
+                        title: "โอกาสทางอาชีพ",
+                        description: "ส่งเสริมโอกาสด้านอาชีพและการประกอบธุรกิจของศิษย์เก่า"
+                      },
+                      {
+                        icon: "🎓",
+                        title: "ทุนการศึกษา",
+                        description: "ให้ทุนสนับสนุนการศึกษาและพัฒนาศิษย์ปัจจุบัน"
+                      },
+                      {
+                        icon: "🏫",
+                        title: "สานสัมพันธ์",
+                        description: "จัดกิจกรรมสานสัมพันธ์ศิษย์เก่ากับคณะและมหาวิทยาลัย"
+                      }
+                    ].map((mission, index) => (
+                      <div key={index} className="col-md-6 col-lg-4">
+                        <div className="card h-100 border-0 shadow-sm position-relative overflow-hidden"
+                          style={{
+                            borderRadius: '15px',
+                            background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)'
+                          }}>
+
+                          {/* Card accent */}
+                          <div className="position-absolute top-0 start-0 end-0 bg-primary"
+                            style={{ height: '4px', borderRadius: '15px 15px 0 0' }}>
+                          </div>
+
+                          <div className="card-body p-4 text-center">
+                            <div className="mb-3">
+                              <span style={{ fontSize: '2.5rem' }}>{mission.icon}</span>
+                            </div>
+                            <h6 className="card-title fw-bold text-dark mb-2">
+                              {mission.title}
+                            </h6>
+                            <p className="card-text text-muted small lh-base">
+                              {mission.description}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Enhanced Call to Action */}
+                <div className="text-center mt-5">
+                  <div className="d-inline-block position-relative">
+                    <button
+                      className="btn btn-primary px-5 py-3 fw-bold position-relative overflow-hidden"
+                      onClick={() => navigate("/about")}
+                      style={{
+                        fontSize: '1.1rem',
+                        borderRadius: '25px',
+                        background: 'linear-gradient(45deg, #007bff, #6610f2)',
+                        border: '2px solid transparent',
+                        boxShadow: '0 4px 15px rgba(0,123,255,0.3)',
+                        transition: 'all 0.3s ease',
+                        textTransform: 'none',
+                        letterSpacing: '0.5px'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.transform = 'translateY(-3px)';
+                        e.target.style.boxShadow = '0 8px 25px rgba(0,123,255,0.4)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.transform = 'translateY(0)';
+                        e.target.style.boxShadow = '0 4px 15px rgba(0,123,255,0.3)';
+                      }}
+                    >
+                      <i className="fas fa-history me-2"></i>
+                      📖 ประวัติความเป็นมา
+
+                      {/* Button shine effect */}
+                      <div className="position-absolute top-0 start-0 w-100 h-100 opacity-25"
+                        style={{
+                          background: 'linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.5) 50%, transparent 70%)',
+                          transform: 'translateX(-100%)',
+                          transition: 'transform 0.6s ease'
+                        }}>
+                      </div>
+                    </button>
+
+                    {/* Decorative elements around button */}
+                    <div className="position-absolute top-0 start-0 translate-middle">
+                      <div className="bg-warning opacity-50 rounded-circle"
+                        style={{ width: '12px', height: '12px', animation: 'pulse 2s infinite' }}>
+                      </div>
+                    </div>
+                    <div className="position-absolute bottom-0 end-0 translate-middle">
+                      <div className="bg-success opacity-50 rounded-circle"
+                        style={{ width: '8px', height: '8px', animation: 'pulse 2s infinite 0.5s' }}>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div >
+        </div>
       </section >
     </div >
   )

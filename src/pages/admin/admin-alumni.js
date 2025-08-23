@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../../css/alumni.css';
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { BsAwardFill } from "react-icons/bs";
 
 function AdminAlumni() {
     const [alumniData, setAlumniData] = useState([]);
@@ -26,16 +27,21 @@ function AdminAlumni() {
 
 
     return (
-        <section className="alumni-container p-5">
+        <section className="alumni-container p-4 p-md-5 bg-light rounded-4 shadow-sm">
             <div className="mb-5">
-                <h3 className="admin-title">ทำเนียบศิษย์เก่า</h3>
+                <h3 className="admin-title">
+                    ทำเนียบศิษย์เก่า
+                </h3>
 
+                {/* สาขา */}
                 <div className="mb-4">
-                     <h5 className="border-bottom pb-2">สาขา</h5>
+                    <label htmlFor="majorSelect" className="form-label fw-semibold">เลือกสาขา</label>
                     <select
                         id="majorSelect"
-                        className="form-select w-100 w-md-50"
-                        onChange={(e) => navigate(`/admin/admin-alumni/admin-alumniView/${e.target.value}`)}
+                        className="form-select w-100 w-md-50 shadow-sm"
+                        onChange={(e) =>
+                            navigate(`/admin/admin-alumni/admin-alumniView/${e.target.value}`)
+                        }
                     >
                         <option value="">-- เลือกสาขา --</option>
                         {majors.map((major, idx) => (
@@ -45,10 +51,13 @@ function AdminAlumni() {
                 </div>
             </div>
 
+            {/* ผู้มีคุณูปการ */}
             <div className="mb-5">
-                <h5 className="border-bottom pb-2">ศิษย์เก่าผู้มีคุณูปการ</h5>
-                <div className="table-responsive mt-3">
-                    <table className="table table-bordered table-striped">
+                <h5 className="border-start border-4 border-primary ps-3 mb-3 fw-bold">
+                    🏅 ศิษย์เก่าผู้มีคุณูปการ
+                </h5>
+                <div className="table-responsive rounded-3 shadow-sm">
+                    <table className="table table-bordered table-striped align-middle mb-0">
                         <thead className="table-light">
                             <tr>
                                 <th>ลำดับ</th>
@@ -60,52 +69,63 @@ function AdminAlumni() {
                         <tbody>
                             <tr>
                                 <td>1</td>
-                                <td>นางสาวพัชราพร นิลพงษ์</td>
-                                <td>นายกสมาคมศิษย์เก่า</td>
-                                <td><span className="badge bg-primary">Active</span></td>
+                                <td>นายวิมล นามอาษา</td>
+                                <td>นายกสมาคมศิษย์เก่าวิทยาลัยการคอมพิวเตอร์</td>
+                                <td>
+                                    <span className="badge bg-success px-3 py-2">ใช้งาน</span>
+                                </td>
                             </tr>
-                           
                         </tbody>
                     </table>
                 </div>
             </div>
 
+            {/* ศิษย์เก่าดีเด่น */}
             <div className="mb-5">
-                <h5 className="border-bottom pb-2">ศิษย์เก่าดีเด่น</h5>
-                <div className="table-responsive mt-3">
-                    <table className="table table-hover">
+                <h5 className="border-start border-4 border-warning ps-3 mb-3 fw-bold">
+                    <BsAwardFill className="me-2 text-warning" />
+                    ศิษย์เก่าดีเด่น
+                </h5>
+                <div className="table-responsive shadow-sm rounded-3">
+                    <table className="table table-hover align-middle mb-0">
                         <thead className="table-light">
                             <tr>
-                                <th>#</th>
+                                <th style={{ width: "60px" }}>#</th>
                                 <th>ชื่อ</th>
-                                <th>ดูโปรไฟล์</th>
+                                <th style={{ width: "140px" }}>ดูโปรไฟล์</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {alumniData.map((alumni, index) => (
+                            {alumniData.length > 0 ? alumniData.map((alumni, index) => (
                                 <tr key={index}>
                                     <td>{index + 1}</td>
                                     <td>
                                         <div className="d-flex align-items-center">
                                             <img
-                                                src={alumni.image_path ? `http://localhost:3001/${alumni.image_path}` : "/default-profile-pic.jpg"}
+                                                src={alumni.image_path 
+                                                    ? `http://localhost:3001/${alumni.image_path}` 
+                                                    : "้http://localhost:3001/uploads/default-profile.png"}
                                                 alt={alumni.name}
-                                                className="rounded-circle me-2"
-                                                style={{ width: "40px", height: "40px", objectFit: "cover" }}
+                                                className="rounded-circle me-3 border"
+                                                style={{ width: "45px", height: "45px", objectFit: "cover" }}
                                             />
-                                            {alumni.name}
+                                            <span className="fw-semibold">{alumni.name}</span>
                                         </div>
                                     </td>
                                     <td>
-                                        <button className="btn btn-sm btn-outline-primary" onClick={() => handleAlumniClick(alumni.user_id)}>
+                                        <button
+                                            className="btn btn-outline-primary btn-sm shadow-sm"
+                                            onClick={() => handleAlumniClick(alumni.user_id)}
+                                        >
                                             ดูโปรไฟล์
                                         </button>
                                     </td>
                                 </tr>
-                            ))}
-                            {alumniData.length === 0 && (
+                            )) : (
                                 <tr>
-                                    <td colSpan="3" className="text-center text-muted">ไม่มีข้อมูลศิษย์เก่าดีเด่น</td>
+                                    <td colSpan="3" className="text-center text-muted py-4">
+                                        ไม่มีข้อมูลศิษย์เก่าดีเด่น
+                                    </td>
                                 </tr>
                             )}
                         </tbody>

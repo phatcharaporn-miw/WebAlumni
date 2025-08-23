@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import Swal from 'sweetalert2';
 
 function EditUserProfile() {
   const { userId } = useParams();
@@ -18,6 +19,7 @@ function EditUserProfile() {
   useEffect(() => {
     axios.get(`http://localhost:3001/admin/users/${userId}`)
       .then(res => {
+        // console.log("User data fetched:", res.data);
         if (res.data.success) {
           setFormData({
             email: res.data.data.email || "",
@@ -67,12 +69,23 @@ function EditUserProfile() {
     try {
       const res = await axios.put(`http://localhost:3001/admin/edit-profile-users/${userId}`, formData);
       if (res.data.success) {
-        alert("แก้ไขข้อมูลเรียบร้อยแล้ว");
-        navigate(`/admin/users/user-profile/${userId}`);
+        Swal.fire({
+          icon: 'success',
+          title: 'สำเร็จ',
+          text: 'แก้ไขข้อมูลเรียบร้อยแล้ว',
+          confirmButtonText: 'ตกลง'
+        }).then(() => {
+          navigate(`/admin/users/user-profile/${userId}`);
+        });
       }
     } catch (err) {
       console.error(err);
-      alert("เกิดข้อผิดพลาดในการบันทึก");
+      Swal.fire({
+        icon: 'error',
+        title: 'เกิดข้อผิดพลาด',
+        text: 'เกิดข้อผิดพลาดในการบันทึก',
+        confirmButtonText: 'ตกลง'
+      });
     }
   };
 
@@ -161,6 +174,17 @@ function EditUserProfile() {
                     name="studentId"
                     value={edu.studentId || ""}
                     onChange={e => handleEduChange(idx, "studentId", e.target.value)}
+                    className="form-control w-100"
+                  />
+                </div>
+
+                <div className="mb-0">
+                  <label className="form-label">ปีที่เข้าศึกษา</label>
+                  <input
+                    type="text"
+                    name="entry_year"
+                    value={edu.entry_year || ""}
+                    onChange={e => handleEduChange(idx, "entry_year", e.target.value)}
                     className="form-control w-100"
                   />
                 </div>

@@ -91,7 +91,7 @@ function AdminWebboard() {
         <div className="webboard-container p-5">
             <h3 className="admin-title">การจัดการเว็บบอร์ด</h3>
             <div className="row mb-4">
-                <div className="col-md-12">
+                <div className="col-md-12 text-end">
                     <button className="btn btn-primary" onClick={() => navigate('/admin/webboard/createPost')}>
                         สร้างกระทู้ใหม่
                     </button>
@@ -133,13 +133,6 @@ function AdminWebboard() {
                                         </span>
                                     </div>
 
-                                    {/* <div className="d-flex justify-content-between align-items-center mt-3"> */}
-                                    {/* <span>
-                                            ❤️ {post.like_count ?? 0}
-                                        </span> */}
-
-                                    {/* </div> */}
-
                                     <div className="mt-3 d-flex justify-content-between">
                                         <button
                                             className="btn btn-outline-primary btn-sm"
@@ -172,7 +165,7 @@ function AdminWebboard() {
             </div>
 
             {/* Modal สำหรับแสดงรายชื่อผู้กดใจ */}
-            <Modal isOpen={modalIsOpen} onRequestClose={closeModal} className="custom-modal" style={{ overlay: { backgroundColor: 'rgba(0, 0, 0, 0.75)' } }}>
+            <Modal isOpen={modalIsOpen} onRequestClose={closeModal} className="webboard-modal" style={{ overlay: { backgroundColor: 'rgba(0, 0, 0, 0.75)' } }}>
                 <div className="modal-header">
                     <h5 className="modal-title">รายชื่อผู้กดใจในกระทู้: {modalPostTitle}</h5>
                     <button type="button" className="btn-close ms-auto" onClick={closeModal}></button>

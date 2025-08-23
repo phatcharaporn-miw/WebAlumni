@@ -123,7 +123,8 @@ function NewsDetail() {
                     <p><MdDateRange /> {new Date(news.created_at).toLocaleDateString('th-TH')}</p>
                 </div>
 
-                <p className="newsd-content">{news.content}</p>
+                {/* การใช้ dangerouslySetInnerHTML เพื่อให้ render เป็น HTML */}
+                <div dangerouslySetInnerHTML={{ __html: news.content }} />
             </div>
 
             {/* ข่าวอื่น ๆ */}

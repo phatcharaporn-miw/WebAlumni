@@ -200,7 +200,7 @@ function EditActivity() {
                             <label htmlFor="images" className="form-label">รูปภาพกิจกรรม</label>
                             <input
                                 type="file"
-                                className="form-control"
+                                className="form-control w-100"
                                 id="images"
                                 name="images"
                                 multiple
@@ -222,7 +222,10 @@ function EditActivity() {
                                 <option value={2}>กำลังดำเนินการ</option>
                             </select>
                         </div>
-                        <button type="submit" className="btn btn-primary w-100">บันทึกการแก้ไข</button>
+                        <div className="d-flex justify-content-end g-3">
+                            <button type="submit" className="btn btn-primary">บันทึกการแก้ไข</button>
+                            <button type="button" className="btn btn-secondary ms-2" onClick={() => navigate('/admin/activities')}>ยกเลิก</button>
+                        </div>
                     </form>
                 </div>
             </div>

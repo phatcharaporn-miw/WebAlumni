@@ -230,11 +230,13 @@ const toggleMenu = () => {
           </div>
           <hr />
           <div className="menu d-block mt-4">
-            <div className="menu-item active py-2 mb-2 rounded" onClick={() => handleClick("/student-profile")}>ข้อมูลส่วนตัว</div>
+            <div className="menu-item active py-2 mb-2 rounded" onClick={() => handleClick("/student-profile")}>โปรไฟล์ของฉัน</div>
+            <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/student-profile/student-request")}>คำร้องขอ</div>
+            <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/student-profile/student-manage-orders")}>จัดการคำสั่งซื้อของที่ระลึก</div>
             <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/student-profile/student-profile-webboard")}>กระทู้ที่สร้าง</div>
-            <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/student-profile/donation-history")}>ประวัติการบริจาค</div>
+            <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/student-profile/student-profile-donation")}>ประวัติการบริจาค</div>
             <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/student-profile/student-profile-activity")}>ประวัติการเข้าร่วมกิจกรรม</div>
-            <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/student-profile/student-profile-souvenir")}>ประวัติการสั่งซื้อ</div>
+            <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/student-profile/student-profile-souvenir")}>ประวัติการสั่งซื้อของที่ระลึก</div>
             <div className="menu-item py-2 rounded" onClick={handleLogout}>ออกจากระบบ</div>
           </div>
         </div>

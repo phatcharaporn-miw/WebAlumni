@@ -16,102 +16,137 @@ export const AuthProvider = ({ children }) => {
   const [notifications, setNotifications] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  // ดึงข้อมูลโปรไฟล์ผู้ใช้งาน
-  const fetchUserProfile = async () => {
-    const userId = localStorage.getItem("userId");
+// ดึงข้อมูลโปรไฟล์ผู้ใช้ (รองรับทั้ง user และ admin)
+const fetchUserProfile = async () => {
+  const userId = localStorage.getItem("userId");
+  const role = localStorage.getItem("userRole");
+  
+  if (!userId || !role) {
+    setUser(null);
+    setLoading(false);
+    return;
+  }
+
+  try {
+    // ใช้ endpoint เดียวกันสำหรับทุก role โดยไม่ส่ง userId ใน URL
+    // เพราะ backend ดึง userId จาก session
+    const endpoint = 'http://localhost:3001/users/profile'; 
     
-    if (!userId) {
-      setUser(null);
-      setLoading(false);
-      return;
-    }
+    console.log('Fetching profile for userId:', userId, 'role:', role);
 
-    try {
-      const response = await axios.get('http://localhost:3001/users/profile', {
-        withCredentials: true,
+    const response = await axios.get(endpoint, {
+      withCredentials: true, // สำคัญมาก! เพื่อส่ง session cookie
+    });
+
+    console.log('Profile API Response:', response.data);
+
+    if (response.data.success) {
+      setUser({
+        ...response.data.user,
+        userId: response.data.user.userId || userId,
+        role: response.data.user.role || role,
+        isAdmin: role === '1',
+        isUser: role !== '1',
       });
-      
-      if (response.data.success) {
-        setUser(response.data.user);
-      }
-    } catch (error) {
-      console.error(
-        'เกิดข้อผิดพลาดในการดึงข้อมูลโปรไฟล์ผู้ใช้งาน:',
-        error.response ? error.response.data.message : error.message
-      );
+    } else {
+      console.log('API returned success: false');
       setUser(null);
-    } finally {
-      setLoading(false);
+      localStorage.removeItem('userId');
+      localStorage.removeItem('userRole');
+      localStorage.removeItem('username');
+      localStorage.removeItem('image_path');
     }
-  };
+  } catch (error) {
+    console.error('เกิดข้อผิดพลาดในการดึงข้อมูลโปรไฟล์:', error);
+    console.error('Error status:', error.response?.status);
+    console.error('Error message:', error.response?.data?.message);
+    
+    // ถ้าเป็น 401 (unauthorized) แสดงว่า session หมดอายุ
+    if (error.response?.status === 401) {
+      console.log('Session expired - clearing localStorage');
+      localStorage.removeItem('userId');
+      localStorage.removeItem('userRole');
+      localStorage.removeItem('username');
+      localStorage.removeItem('image_path');
+    }
+    
+    setUser(null);
+  } finally {
+    setLoading(false);
+  }
+};
 
-  // หลังจาก login สำเร็จ
+  // login
   const handleLogin = async (userId, role, userData = null) => {
     localStorage.setItem('userId', userId);
     localStorage.setItem('userRole', role);
-    
     if (userData) {
-      // ถ้ามี userData จาก login response ให้ใช้ทันที
-      setUser(userData);
+      setUser({
+        ...userData,
+        userId,
+        role,
+        isAdmin: role === '1',
+        isUser: role !== '1',
+      });
     } else {
-      // ไม่งั้นให้ fetch ข้อมูลใหม่
       await fetchUserProfile();
     }
-    
-    // setNotifications(3); // ถ้าต้องการ
   };
 
-  // ออกจากระบบ
+  // logout
   const handleLogout = async () => {
+    // ล้างข้อมูลใน state ทันที
+    setUser(null);
+    setNotifications(0);
+
+    // ล้าง localStorage
+    localStorage.removeItem('userId');
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('username');
+    localStorage.removeItem('image_path');
+
+    // ส่ง custom event
+    window.dispatchEvent(new CustomEvent('userLogout'));
+
+    // เรียก API logout (ไม่ต้องสนใจ error)
     try {
-      const response = await axios.get('http://localhost:3001/api/logout', {
+      await axios.get('http://localhost:3001/api/logout', {
         withCredentials: true,
       });
-      
-      if (response.status === 200) {
-        localStorage.removeItem('userId');
-        localStorage.removeItem('userRole');
-        localStorage.removeItem('image_path');
-        localStorage.removeItem('username');
-        
-        setUser(null);
-        return true;
-      } else {
-        console.error("ออกจากระบบไม่สำเร็จ");
-        return false;
-      }
     } catch (error) {
-      console.error("เกิดข้อผิดพลาดขณะออกจากระบบ:", error.response ? error.response.data : error.message);
-      return false;
+      // ไม่ต้องทำอะไร
     }
+
+    setLoading(false);
+    return true;
   };
 
-  // ตรวจสอบ localStorage เมื่อ component mount
+  // เพิ่ม function สำหรับบังคับ refresh state
+  const forceRefresh = () => {
+    setUser(null);
+    setNotifications(0);
+    localStorage.clear();
+  };
+
   useEffect(() => {
-    const initializeAuth = () => {
-      const userId = localStorage.getItem("userId");
-      const role = localStorage.getItem("userRole");
-      
-      if (userId && role) {
-        // ถ้ามี userId และ role ใน localStorage ให้ fetch profile
-        fetchUserProfile();
-      } else {
-        setUser(null);
-        setLoading(false);
-      }
+    fetchUserProfile();
+
+    // ฟัง storage event และ custom logout event
+    const handleStorageChange = () => {
+      fetchUserProfile();
     };
 
-    initializeAuth();
-
-    // ตรวจจับการเปลี่ยนแปลงของ localStorage (สำหรับหลาย tab)
-    const handleStorageChange = () => {
-      initializeAuth();
+    const handleLogoutEvent = () => {
+      setUser(null);
+      setNotifications(0);
     };
 
     window.addEventListener("storage", handleStorageChange);
-    
+    window.addEventListener("userLogout", handleLogoutEvent);
+
     return () => {
       window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener("userLogout", handleLogoutEvent);
     };
   }, []);
 
@@ -124,7 +159,12 @@ export const AuthProvider = ({ children }) => {
       loading,
       handleLogin,
       handleLogout,
-      refreshUser: fetchUserProfile
+      refreshUser: fetchUserProfile,
+      forceRefresh,
+      // เพิ่ม helper functions
+      isAdmin: user?.role === '1',
+      isUser: user?.role !== '1' && user?.role,
+      isLoggedIn: !!user,
     }}>
       {children}
     </AuthContext.Provider>

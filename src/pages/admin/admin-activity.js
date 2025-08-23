@@ -178,11 +178,11 @@ function AdminActivity() {
                                             <td>{formatTime(act.start_time, act.end_time)}</td>
                                             <td>
                                                 {act.status === 0 ? (
-                                                    <span className="badge bg-warning">ยังไม่เริ่ม</span>
+                                                    <span className="badge bg-warning bg-opacity-10 text-warning">ยังไม่เริ่ม</span>
                                                 ) : act.status === 1 ? (
-                                                    <span className="badge bg-success">เสร็จสิ้นแล้ว</span>
+                                                    <span className="badge bg-success  bg-opacity-10 text-success">เสร็จสิ้นแล้ว</span>
                                                 ) : (
-                                                    <span className="badge bg-primary">กำลังดำเนินการ</span>
+                                                    <span className="badge bg-primary  bg-opacity-10 text-primary">กำลังดำเนินการ</span>
                                                 )}
                                             </td>
                                             <td>

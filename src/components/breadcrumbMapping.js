@@ -18,13 +18,13 @@ export const breadcrumbMapping = {
     "/faq": "คำถามที่พบบ่อย",
     "/souvenir/souvenir_request" : "เพิ่มสินค้าของที่ระลึก",
     "/donate/donaterequest": "เพิ่มโครงการบริจาค",
-    "/alumni-profile/alumni-profile-souvenir" : "ประวัติการสั่งซื้อ",
     "/alumni/major-detail" : "รายชื่อศิษย์เก่า",
     "/news/edit" : "แก้ไขข่าวประชาสัมพันธ์",
     "/activity/edit" : "แก้ไขกิจกรรม",
-    // "/alumni/major-detail/:major" : "รายชื่อศิษย์เก่า",
     "/change-password" : "เปลี่ยนรหัสผ่านครั้งแรก",
     "/souvenir/checkout" : "ชำระเงิน",
+    "/check-studentId": "ตรวจสอบข้อมูล",
+    "/search": "ผลการค้นหา",
 
     // ส่วนของศิษย์เก่า
     "/alumni-profile": "โปรไฟล์",
@@ -34,6 +34,12 @@ export const breadcrumbMapping = {
     "/alumni-profile/alumni-profile-webboard/edit-webboard": "แก้ไขกระทู้ที่สร้าง",
     "/createPost": "สร้างกระทู้ใหม่", 
     "/alumni-profile/alumni-profile-activity": "ประวัติการเข้าร่วมกิจกรรม",
+    "/alumni-profile/alumni-request": "รายการคำร้องที่รออนุมัติ",
+    "/alumni-profile/alumni-profile-souvenir": "ประวัติการสั่งซื้อของที่ระลึก",
+    "/alumni-profile/alumni-profile-donation": "ประวัติการบริจาค",
+    "/alumni-profile/alumni-manage-orders": "จัดการคำสั่งซื้อของที่ระลึก",
+    // "/alumni-profile/alumni-profile-souvenir/alumni-orders-history": "ประวัติการสั่งซื้อของที่ระลึก",
+    
     
     
     // ส่วนศิษย์ปัจุบัน
@@ -41,9 +47,12 @@ export const breadcrumbMapping = {
     "/student-profile/student-profile-webboard": "กระทู้ที่สร้าง",
     "/student-profile/student-profile-webboard/edit-webboard": "แก้ไขกระทู้ที่สร้าง",
     "/student-profile/student-profile-activity": "ประวัติการเข้าร่วมกิจกรรม",
-    "/student-profile/student-profile-souvenir": "การซื้อของที่ระลึก",
-   
-
+    "/student-profile/student-profile-souvenir": "ประวัติการสั่งซื้อของที่ระลึก",
+    "/student-profile/student-request": "รายการคำร้องที่รออนุมัติ",
+    "/student-profile/student-profile-donation": "ประวัติการบริจาค",
+    "/student-profile/student-manage-orders": "จัดการคำสั่งซื้อของที่ระลึก",
+    // "/student-profile/student-profile-souvenir/student-orders-history": "ประวัติการสั่งซื้อของที่ระลึก",
+    
     // นายกสมาคม
     "/president-profile": "โปรไฟล์",
     "/president-profile/president-profile-activity": "ประวัติการเข้าร่วมกิจกรรม",
@@ -53,5 +62,7 @@ export const breadcrumbMapping = {
     "/president-profile/president-approve": "การอนุมัติ",
     "/activity/president-create-activity": "เพิ่มกิจกรรม",
     "/news/president-create-news": "เพิ่มข่าวประชาสัมพันธ์",
+    "/president-profile/president-profile-donation": "ประวัติการบริจาค",
+    "/president-profile/president-manage-orders": "จัดการคำสั่งซื้อของที่ระลึก",
 
   };

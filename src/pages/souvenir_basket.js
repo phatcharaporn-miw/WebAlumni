@@ -36,18 +36,38 @@ function SouvenirBasket() {
         fetchCart();
     }, [fetchCart]);
 
+    // ปรับ handleSelectItem
     const handleSelectItem = (productId) => {
         const selectedItem = cart.find(item => item.product_id === productId);
 
-        setSelectedItems(prevState => {
-            const isAlreadySelected = prevState.some(item => item.product_id === productId);
+        // ถ้ายังไม่มีสินค้าใดถูกเลือก เลือกได้เลย
+        if (selectedItems.length === 0) {
+            setSelectedItems([{ ...selectedItem, isSelected: true }]);
+            return;
+        }
 
-            if (isAlreadySelected) {
-                return prevState.filter(item => item.product_id !== productId);
+        // ถ้ามีสินค้าใน selectedItems แล้ว
+        const isAlreadySelected = selectedItems.some(item => item.product_id === productId);
+
+        if (isAlreadySelected) {
+            // ยกเลิกเลือกเฉพาะสินค้านี้
+            setSelectedItems(prev =>
+                prev.filter(item => item.product_id !== productId)
+            );
+        } else {
+            // ตรวจสอบ promptpay_number ของสินค้าที่เลือกใหม่กับที่เลือกอยู่
+            const currentPromptpay = selectedItems[0].promptpay_number;
+            if (selectedItem.promptpay_number === currentPromptpay) {
+                setSelectedItems(prev => [...prev, { ...selectedItem, isSelected: true }]);
             } else {
-                return [...prevState, { ...selectedItem, isSelected: true }];
+                Swal.fire({
+                    title: "เลือกสินค้าไม่ได้",
+                    text: "สามารถเลือกได้เฉพาะสินค้าที่มี PromptPay เดียวกันเท่านั้น",
+                    icon: "warning",
+                    confirmButtonText: "ตกลง"
+                });
             }
-        });
+        }
     };
 
     const handleDeleteItem = async (productId) => {
@@ -228,6 +248,14 @@ function SouvenirBasket() {
         }
     };
 
+    // สร้างกลุ่มสินค้าตาม promptpay_number
+    const groupedCart = cart.reduce((groups, item) => {
+        const key = item.promptpay_number || "ไม่ระบุ PromptPay";
+        if (!groups[key]) groups[key] = [];
+        groups[key].push(item);
+        return groups;
+    }, {});
+
     return (
         <>
             <h3 className="titlesouvenirBasket">ตะกร้าสินค้า</h3>
@@ -238,12 +266,15 @@ function SouvenirBasket() {
                         <div className="d-flex justify-content-between align-items-center mb-3">
                             <h5>รายการสินค้า ({cart.length} รายการ)</h5>
                             <div>
+                                {/* 
                                 <button
                                     className="btn btn-outline-primary btn-sm me-2"
                                     onClick={handleSelectAll}
+                                    disabled // ปิดการใช้งาน
                                 >
-                                    {selectedItems.length === cart.length ? "ยกเลิกเลือกทั้งหมด" : "เลือกทั้งหมด"}
+                                    เลือกทั้งหมด
                                 </button>
+                                */}
                                 {selectedItems.length > 0 && (
                                     <button
                                         className="btn btn-outline-danger btn-sm"
@@ -255,56 +286,68 @@ function SouvenirBasket() {
                             </div>
                         </div>
 
-                        <div className="cart-items-title">
-                            <p>เลือก</p>
-                            <p>สินค้า</p>
-                            <p>ราคาต่อชิ้น</p>
-                            <p>จำนวน</p>
-                            <p>ราคารวม</p>
-                            <p>จัดการ</p>
-                        </div>
-
-                        {cart.map((item) => (
-                            <div
-                                key={item.product_id}
-                                className={`cart-item-card ${selectedItems.some(selectedItem => selectedItem.product_id === item.product_id) ? 'selected' : ''}`}
-                            >
-                                <input
-                                    type="checkbox"
-                                    checked={selectedItems.some(selectedItem => selectedItem.product_id === item.product_id)}
-                                    onChange={() => handleSelectItem(item.product_id)}
-                                />
-                                <div className="cart-item-img">
-                                    <img
-                                        src={item.image ? `http://localhost:3001/uploads/${item.image}` : "/images/product-default.png"}
-                                        alt={item.product_name}
-                                    />
-                                    <p>{item.product_name}</p>
+                        {/* วนแต่ละกลุ่ม promptpay */}
+                        {Object.entries(groupedCart).map(([promptpay, items], idx) => (
+                            <div key={promptpay} className="mb-4 p-3 rounded border" style={{ background: "#f0f8ff" }}>
+                                <div className="mb-2 d-flex align-items-center">
+                                    <span className="badge bg-info text-dark me-2" style={{ fontSize: "1rem" }}>
+                                        รายการที่ {idx + 1}
+                                    </span>
+                                    <span className="text-muted small">
+                                        {items.length} รายการ
+                                    </span>
                                 </div>
-                                <p>฿{item.price}</p>
-                                <div className="quantity-control">
-                                    <button
-                                        className="quantity-btn"
-                                        onClick={() => handleUpdateQuantity(item.product_id, item.quantity - 1)}
-                                        disabled={item.quantity <= 1}
-                                    >
-                                        -
-                                    </button>
-                                    <span>{item.quantity}</span>
-                                    <button
-                                        className="quantity-btn"
-                                        onClick={() => handleUpdateQuantity(item.product_id, item.quantity + 1)}
-                                    >
-                                        +
-                                    </button>
+                                <div className="cart-items-title">
+                                    <p>เลือก</p>
+                                    <p>สินค้า</p>
+                                    <p>ราคาต่อชิ้น</p>
+                                    <p>จำนวน</p>
+                                    <p>ราคารวม</p>
+                                    <p>จัดการ</p>
                                 </div>
-                                <p>฿{item.price * item.quantity}</p>
-                                <button
-                                    className="souvenir-del"
-                                    onClick={() => handleDeleteItem(item.product_id)}
-                                >
-                                    ลบ
-                                </button>
+                                {items.map((item) => (
+                                    <div
+                                        key={item.product_id}
+                                        className={`cart-item-card ${selectedItems.some(selectedItem => selectedItem.product_id === item.product_id) ? 'selected' : ''}`}
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedItems.some(selectedItem => selectedItem.product_id === item.product_id)}
+                                            onChange={() => handleSelectItem(item.product_id)}
+                                        />
+                                        <div className="cart-item-img">
+                                            <img
+                                                src={item.image ? `http://localhost:3001/uploads/${item.image}` : "/images/product-default.png"}
+                                                alt={item.product_name}
+                                            />
+                                            <p>{item.product_name}</p>
+                                        </div>
+                                        <p>฿{item.price}</p>
+                                        <div className="quantity-control">
+                                            <button
+                                                className="quantity-btn"
+                                                onClick={() => handleUpdateQuantity(item.product_id, item.quantity - 1)}
+                                                disabled={item.quantity <= 1}
+                                            >
+                                                -
+                                            </button>
+                                            <span>{item.quantity}</span>
+                                            <button
+                                                className="quantity-btn"
+                                                onClick={() => handleUpdateQuantity(item.product_id, item.quantity + 1)}
+                                            >
+                                                +
+                                            </button>
+                                        </div>
+                                        <p>฿{item.price * item.quantity}</p>
+                                        <button
+                                            className="souvenir-del"
+                                            onClick={() => handleDeleteItem(item.product_id)}
+                                        >
+                                            ลบ
+                                        </button>
+                                    </div>
+                                ))}
                             </div>
                         ))}
 

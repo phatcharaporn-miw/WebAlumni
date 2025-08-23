@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button, Modal, Box, Typography } from '@mui/material';
 import "../css/Souvenir_request.css";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 import Swal from "sweetalert2";
 
@@ -16,6 +16,8 @@ function SouvenirRequest() {
         paymentMethod: "",
         bankName: "",
         accountNumber: "",
+        accountName: "",
+        promptpayNumber: "",
     });
 
     const user_id = localStorage.getItem('userId');
@@ -112,7 +114,7 @@ function SouvenirRequest() {
         if (user_id) {
             data.append("user_id", user_id);
         } else {
-            alert("ผู้ใช้ไม่ถูกล็อกอิน");
+            alert("ผู้ใช้ไม่ได้เข้าสู่ระบบ");
             return;
         }
 
@@ -127,34 +129,29 @@ function SouvenirRequest() {
                 withCredentials: true
             });
 
+            handleClose(); // ปิด modal หลังจากส่งข้อมูลสำเร็จ
+
             Swal.fire({
                 title: "เพิ่มสินค้าสำเร็จ!",
                 text: "สินค้าของคุณถูกส่งแล้ว กรุณารอการอนุมัติ",
                 icon: "success",
                 confirmButtonText: "ตกลง"
             }).then(() => {
-                // นำทางไปยังหน้าสินค้า
-                navigate("/souvenir");
+                // นำทางไปยังหน้าตาม role
+                if (role === '2') {
+                    navigate("/president-profile/president-request");
+                } else if (role === '4') {
+                    navigate("/student-profile/student-request");
+                } else {
+                    navigate("/alumni-profile/alumni-request");
+                }
             });
         } catch (error) {
+            handleClose();
             console.error("Error:", error);
             alert(error.response?.data?.error || "เกิดข้อผิดพลาด");
         }
     };
-
-
-    // const generateQRCodeForPayment = (productData) => {
-    //     const paymentUrl = https://paymentgateway.com/checkout?productId=${productData.productName}&amount=${productData.price};
-
-    //     QRCode.toDataURL(paymentUrl, (err, url) => {
-    //         if (err) {
-    //             console.error("Error generating QR code", err);
-    //             return;
-    //         }
-    //         console.log("Generated QR Code URL:", url);
-    //         return url;  
-    //     });
-    // };
 
     const handleCancel = () => {
         const role = localStorage.getItem("userRole"); // หรือ user?.role
@@ -183,7 +180,7 @@ function SouvenirRequest() {
 
     return (
         <div>
-            <h3>เพิ่มสินค้าของที่ระลึก</h3>
+            <h3 className="alumni-title text-center">เพิ่มสินค้าของที่ระลึก</h3>
             <div className="request-souvenir-form ">
                 <form encType="multipart/form-data" onSubmit={handleSubmit}>
                     {/* รายละเอียดเกี่ยวกับสินค้า */}
@@ -334,6 +331,7 @@ function SouvenirRequest() {
                 </form>
             </div>
 
+            {/* Modal */}
             <Modal
                 open={open}
                 onClose={handleClose}
@@ -404,6 +402,7 @@ function SouvenirRequest() {
             </Modal>
         </div>
     );
+
 }
 
 export default SouvenirRequest;

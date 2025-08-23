@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import '../css/news.css';
@@ -9,7 +9,7 @@ import { MdDateRange, MdEdit, MdDelete } from "react-icons/md";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 
-function News(){
+function News() {
     const [news, setNews] = useState([]);
     const userRole = localStorage.getItem("userRole");
     const userId = localStorage.getItem("userId");
@@ -41,8 +41,8 @@ function News(){
             cancelButtonText: "ยกเลิก",
         }).then((result) => {
             if (result.isConfirmed) {
-                axios.delete(`http://localhost:3001/news/delete-news/${newsId}`, { 
-                    withCredentials: true 
+                axios.delete(`http://localhost:3001/news/delete-news/${newsId}`, {
+                    withCredentials: true
                 })
                     .then((response) => {
                         if (response.data.success) {
@@ -71,8 +71,8 @@ function News(){
         setSearchTerm(term);
     };
 
-    const filteredNews = news.filter((item) => 
-        item.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    const filteredNews = news.filter((item) =>
+        item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.content.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
@@ -93,81 +93,102 @@ function News(){
 
             <div className="py-3 container">
                 <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-                {userRole === "2" && (
-                    <div className="ms-auto">
-                    <Link to="/news/president-create-news" className="btn btn-success">
-                        + เพิ่มข่าวใหม่
-                    </Link>
-                    </div>
-                )}
+                    {userRole === "2" && (
+                        <div className="ms-auto ">
+                            <Link to={`/news/president-create-news`} className="text-decoration-none">
+                                <button
+                                    className="btn btn-gradient d-flex align-items-center gap-2 px-4 py-2 shadow-sm"
+                                    style={{
+                                        background: 'linear-gradient(45deg, #0d6efd, #4dabf7)',
+                                        color: 'white',
+                                        fontWeight: '600',
+                                        border: 'none',
+                                        transition: 'all 0.3s ease'
+                                    }}
+                                    onMouseEnter={e => {
+                                        e.currentTarget.style.background = 'linear-gradient(45deg, #0a58ca, #339af0)';
+                                        e.currentTarget.style.transform = 'translateY(-2px)';
+                                        e.currentTarget.style.boxShadow = '0 8px 16px rgba(13, 110, 253, 0.3)';
+                                    }}
+                                    onMouseLeave={e => {
+                                        e.currentTarget.style.background = 'linear-gradient(45deg, #0d6efd, #4dabf7)';
+                                        e.currentTarget.style.transform = 'translateY(0)';
+                                        e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)โ';
+                                    }}
+                                >
+                                    เพิ่มข่าวประชาสัมพันธ์
+                                </button>
+                            </Link>
+                        </div>
+                    )}
                 </div>
 
                 <div className="news-list row justify-content-center">
-                {paginatedNews.length === 0 ? (
-                    <p className="text-center text-muted">ไม่พบข่าวที่ค้นหา</p>
-                ) : (
-                    paginatedNews.map((item) => (
-                    <div key={item.news_id} className="col-8 mb-3">
-                        <div className="position-relative d-flex flex-column flex-md-row border rounded p-3 h-100">
-                        {userRole === "2" && (
-                            <div className="dropdown position-absolute top-0 end-0 m-2">
-                            <button
-                                className="btn btn-light btn-sm p-1"
-                                type="button"
-                                data-bs-toggle="dropdown"
-                                aria-expanded="false"
-                            >
-                                <BsThreeDotsVertical size={18} />
-                            </button>
-                            <ul className="dropdown-menu dropdown-menu-end">
-                                <li>
-                                <button
-                                    className="dropdown-item d-flex align-items-center"
-                                    onClick={() => navigate(`/news/edit/${item.news_id}`)}
-                                >
-                                    <MdEdit className="me-2 text-warning" /> แก้ไข
-                                </button>
-                                </li>
-                                <li>
-                                <button
-                                    className="dropdown-item d-flex align-items-center"
-                                    onClick={() => handleDeleteNews(item.news_id)}
-                                >
-                                    <MdDelete className="me-2 text-danger" /> ลบ
-                                </button>
-                                </li>
-                            </ul>
-                            </div>
-                        )}
+                    {paginatedNews.length === 0 ? (
+                        <p className="text-center text-muted">ไม่พบข่าวที่ค้นหา</p>
+                    ) : (
+                        paginatedNews.map((item) => (
+                            <div key={item.news_id} className="col-8 mb-3">
+                                <div className="position-relative d-flex flex-column flex-md-row border rounded p-3 h-100">
+                                    {userRole === "2" && (
+                                        <div className="dropdown position-absolute top-0 end-0 m-2">
+                                            <button
+                                                className="btn btn-light btn-sm p-1"
+                                                type="button"
+                                                data-bs-toggle="dropdown"
+                                                aria-expanded="false"
+                                            >
+                                                <BsThreeDotsVertical size={18} />
+                                            </button>
+                                            <ul className="dropdown-menu dropdown-menu-end">
+                                                <li>
+                                                    <button
+                                                        className="dropdown-item d-flex align-items-center"
+                                                        onClick={() => navigate(`/news/edit/${item.news_id}`)}
+                                                    >
+                                                        <MdEdit className="me-2 text-warning" /> แก้ไข
+                                                    </button>
+                                                </li>
+                                                <li>
+                                                    <button
+                                                        className="dropdown-item d-flex align-items-center"
+                                                        onClick={() => handleDeleteNews(item.news_id)}
+                                                    >
+                                                        <MdDelete className="me-2 text-danger" /> ลบ
+                                                    </button>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    )}
 
-                        <img
-                            src={`http://localhost:3001${item.image_path}`}
-                            alt={item.title}
-                            className="news-image w-100 w-md-auto me-md-3 mb-3 mb-md-0"
-                            // style={{ maxWidth: "250px", height: "auto", objectFit: "cover" }}
-                        />
+                                    <img
+                                        src={`http://localhost:3001${item.image_path}`}
+                                        alt={item.title}
+                                        className="news-image w-100 w-md-auto me-md-3 mb-3 mb-md-0"
+                                    // style={{ maxWidth: "250px", height: "auto", objectFit: "cover" }}
+                                    />
 
-                        <div className="news-content d-flex flex-column">
-                            <Link to={`/news/${item.news_id}`} className="news-title-link h5 mb-2">
-                            {item.title}
-                            </Link>
-                            <p className="news-summary mb-2">{item.content.substring(0, 100)}...</p>
-                            <div className="d-flex align-items-center mt-auto">
-                            <div className="news-meta d-flex align-items-center">
-                                <MdDateRange className="me-1" />
-                                {new Date(item.created_at).toLocaleDateString("th-TH")}
+                                    <div className="news-content d-flex flex-column">
+                                        <Link to={`/news/${item.news_id}`} className="news-title-link h5 mb-2">
+                                            {item.title}
+                                        </Link>
+                                        <p className="news-summary mb-2">{item.content.substring(0, 100)}...</p>
+                                        <div className="d-flex align-items-center mt-auto">
+                                            <div className="news-meta d-flex align-items-center">
+                                                <MdDateRange className="me-1" />
+                                                {new Date(item.created_at).toLocaleDateString("th-TH")}
+                                            </div>
+                                            <div className="ms-auto">
+                                                <Link to={`/news/${item.news_id}`} className="read-more text-muted">
+                                                    อ่านเพิ่มเติม
+                                                </Link>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div className="ms-auto">
-                                <Link to={`/news/${item.news_id}`} className="read-more text-muted">
-                                อ่านเพิ่มเติม
-                                </Link>
-                            </div>
-                            </div>
-                        </div>
-                        </div>
-                    </div>
-                    ))
-                )}
+                        ))
+                    )}
                 </div>
                 {/* Pagination */}
                 {totalPages > 1 && (

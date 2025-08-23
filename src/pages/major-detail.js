@@ -21,7 +21,6 @@ function MajorDetail() {
     ];
     const displayMajor = majors.find((m) => m.slug === major)?.title || major;
 
-
     useEffect(() => {
         axios.get(`http://localhost:3001/alumni/major/${major}`)
             .then(res => {
@@ -62,7 +61,6 @@ function MajorDetail() {
     const filteredByDegree = filteredBySearch.filter(student => student.degree === activeTab);
         setFilteredStudents(filteredByDegree);
     };
-
 
     const mapDegreeIdToText = (degreeId) => {
         switch (degreeId) {

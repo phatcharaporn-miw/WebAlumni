@@ -81,7 +81,8 @@ function SouvenirDetail() {
                 quantity: quantity,
                 product_name: product.product_name,
                 price: product.price,
-                image: product.image
+                image: product.image,
+                promptpay_number: product.promptpay_number
             }
         ];
 
@@ -193,7 +194,7 @@ function SouvenirDetail() {
                                         disabled={loadingAddToCart || product.stock === 0}
                                     >
                                         {loadingAddToCart ? "กำลังโหลด..." : 
-                                         product.stock === 0 ? "สินค้าหมด" : "เพิ่มลงตะกร้า"}
+                                        product.stock === 0 ? "สินค้าหมด" : "เพิ่มลงตะกร้า"}
                                     </button>
                                     <button 
                                         className="souvenir-buy_product" 

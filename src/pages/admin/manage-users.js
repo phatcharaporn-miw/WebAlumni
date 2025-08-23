@@ -126,7 +126,7 @@ function UserManagement() {
                       </select>
                     </td>
                     <td className="text-center">
-                      <span className={`badge ${user.is_active ? "bg-success" : "bg-secondary"}`}>
+                      <span className={`badge ${user.is_active ? "bg-success bg-opacity-10 text-success" : "bg-secondary bg-opacity-10 text-secondary"}`}>
                         {user.is_active ? "ใช้งาน" : "ระงับ"}
                       </span>
                     </td>

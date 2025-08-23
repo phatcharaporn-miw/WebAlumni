@@ -67,7 +67,7 @@ function EditWebboard() {
                         confirmButtonColor: "#0F75BC",
                         confirmButtonText: "ตกลง",
                     }).then(() => {                     
-                        navigate("/alumni-profile-webboard");                       
+                        navigate("/alumni-profile/alumni-profile-webboard");                       
                     });
                 }
             })
@@ -179,13 +179,12 @@ function EditWebboard() {
                                             if (userId.role === 2) {
                                             navigate('/president-profile-webboard');
                                             } else {
-                                            navigate('/alumni-profile-webboard');
+                                            navigate('/alumni-profile/alumni-profile-webboard');
                                             }
                                         }}
                                         >
                                         ยกเลิก
                                     </button>
-
                                 </div>
                             </form>
                         </div>

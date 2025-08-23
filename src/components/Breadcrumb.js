@@ -81,11 +81,15 @@ function Breadcrumb() {
   // แยก path ตาม '/'
   const pathnames = location.pathname
   .split('/')
-  .filter((item) => item && item !== 'alumni-home'); // ซ่อน alumni-home
+  .filter((item) =>
+    item &&
+    item !== 'alumni-home' &&
+    item !== 'president-home' &&
+    item !== 'student-home'
+  );
 
-   
-  // ซ่อน breadcrumb ในหน้า Login และ Register
-  const hiddenPaths = ["/login", "/register", "/forgotPassword"];
+  // ซ่อน breadcrumb 
+  const hiddenPaths = ["/login", "/register", "/forgotPassword", "/change-password"];
   if (hiddenPaths.includes(location.pathname)) {
     return null; 
   }

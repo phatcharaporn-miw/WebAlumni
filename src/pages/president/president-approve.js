@@ -1,16 +1,26 @@
 import React, { useEffect, useState } from "react";
+import { useOutletContext } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 import axios from "axios";
-import { Link } from "react-router-dom";
-import { IoIosAddCircleOutline } from "react-icons/io";
 import { FaRegEdit } from "react-icons/fa";
+import { FaUser, FaBarcode, FaEdit, FaTrash, FaCheckCircle, FaHourglassHalf, FaTimesCircle } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
-import { MdNotifications } from "react-icons/md";
-import { Badge, IconButton } from "@mui/material";
-import { Modal, Button, Box, Typography, Snackbar, Alert } from "@mui/material";
-import "../../css/president.css";
+import { Modal, Button, Box, Typography } from "@mui/material";
 import Swal from "sweetalert2";
 
+
+// CSS & Bootstrap
+import '../../css/profile.css';
+import "../../css/president.css";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+
 function Approve() {
+    const [profile, setProfile] = useState({});
+    const { handleLogout } = useOutletContext();
+    const navigate = useNavigate();
+    const [previewImage, setPreviewImage] = useState(null);
+    const [loading, setLoading] = useState(true);
     const [products, setProducts] = useState([]);
     const [open, setOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
@@ -21,6 +31,20 @@ function Approve() {
     });
 
     const user_id = localStorage.getItem("userId");
+
+    // ดึงข้อมูลโปรไฟล์
+    useEffect(() => {
+        axios.get('http://localhost:3001/users/profile', { withCredentials: true })
+            .then((response) => {
+                if (response.data.success) {
+                    setProfile(response.data.user);
+                }
+            })
+            .catch((error) => {
+                console.error('เกิดข้อผิดพลาดในการดึงข้อมูลโปรไฟล์:', error.response ? error.response.data.message : error.message);
+            });
+    }, []);
+
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -53,7 +77,7 @@ function Approve() {
         bgcolor: "background.paper",
         boxShadow: 24,
         p: 4,
-    };    
+    };
 
     const handleApprove = (productId) => {
         Swal.fire({
@@ -67,10 +91,10 @@ function Approve() {
             cancelButtonText: "ยกเลิก"
         }).then((result) => {
             if (result.isConfirmed) {
-                    axios.put(`http://localhost:3001/admin/approveSouvenir/${productId}`, {
-                        status: "1",
-                        approver_id: user_id 
-                    })
+                axios.put(`http://localhost:3001/admin/approveSouvenir/${productId}`, {
+                    status: "1",
+                    approver_id: user_id
+                })
                     .then(() => {
                         setProducts(prevProducts =>
                             prevProducts.map(product =>
@@ -102,15 +126,15 @@ function Approve() {
                     approver_id: user_id,
                     action: "rejected"
                 })
-                .then(() => {
-                    setProducts(prevProducts =>
-                        prevProducts.filter(product => product.product_id !== productId)
-                    );
-                    Swal.fire("สำเร็จ!", "ปฏิเสธสินค้าสำเร็จแล้ว", "success");
-                })
-                .catch(() => {
-                    Swal.fire("เกิดข้อผิดพลาด", "ไม่สามารถปฏิเสธสินค้าได้", "error");
-                });
+                    .then(() => {
+                        setProducts(prevProducts =>
+                            prevProducts.filter(product => product.product_id !== productId)
+                        );
+                        Swal.fire("สำเร็จ!", "ปฏิเสธสินค้าสำเร็จแล้ว", "success");
+                    })
+                    .catch(() => {
+                        Swal.fire("เกิดข้อผิดพลาด", "ไม่สามารถปฏิเสธสินค้าได้", "error");
+                    });
             }
         });
     };
@@ -144,87 +168,226 @@ function Approve() {
         if (status === "1") {
             return "green";
         } else {
-            return "red"; 
+            return "red";
         }
     };
-    
+
     const statusLabel = (status) => {
         return status === "1" ? "กำลังจำหน่าย" : "ยังไม่จำหน่าย";
     };
 
+    // ฟังก์ชันเปลี่ยนหน้า
+    const handleClick = (path) => {
+        navigate(path);
+    };
+
+    // อัปโหลดรูปภาพ
+    const handleImageChange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // แสดง preview รูปก่อนอัปโหลด
+        setPreviewImage(URL.createObjectURL(file));
+
+        const formData = new FormData();
+        formData.append("image_path", file);
+        formData.append("user_id", profile.userId);
+
+        try {
+            const res = await axios.post("http://localhost:3001/users/update-profile-image", formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            }, {
+                withCredentials: true
+            });
+
+            if (res.status === 200) {
+                alert("อัปโหลดรูปสำเร็จ");
+
+                // อัปเดตรูปโปรไฟล์ใน state
+                setProfile((prev) => ({
+                    ...prev,
+                    profilePicture: res.data.newImagePath,
+                }));
+            } else {
+                alert(res.data.message || "เกิดข้อผิดพลาด");
+            }
+        } catch (err) {
+            console.error(err);
+            alert("ไม่สามารถอัปโหลดรูปได้");
+        }
+    };
+
+    // if (loading) {
+    //     return <div className="loading-container">กำลังโหลด...</div>;
+    // }
+
     return (
-        <> 
-            <div className="container my-5">
-                <h2 className="mb-4 text-center text-primary fw-bold">รายการที่รออนุมัติ</h2>
-                <div className="row g-4">
-                    {products.map((product) => (
-                    <div key={product.product_id} className="col-sm-6 col-md-4 col-lg-3">
-                        <div className="card h-100 border-0 shadow-sm rounded-4 p-2">
-                        <img
-                            src={`http://localhost:3001/uploads/${product.image}`}
-                            alt={product.product_name}
-                            className="card-img-top rounded-3"
-                            style={{ height: "180px", objectFit: "cover" }}
-                        />
-
-                        <div className="card-body px-2 py-3">
-                            <h6 className="card-title text-dark fw-semibold mb-2">{product.product_name}</h6>
-                            <p className="card-text text-muted mb-1" style={{ fontSize: "14px" }}>
-                            ราคา: <strong>{product.price}</strong> บาท
-                            </p>
-                            <p className="card-text text-muted mb-2" style={{ fontSize: "13px" }}>
-                            ผู้ดูแล ID: {product.role_id}
-                            </p>
-
-                            <span
-                            className={`badge rounded-pill px-3 py-1 mb-3 ${
-                                product.status === "1" ? "bg-success-subtle text-success" : "bg-secondary-subtle text-secondary"
-                            }`}
-                            style={{ fontSize: "12px" }}
-                            >
-                            {product.status === "1" ? "กำลังจำหน่าย" : "ยังไม่จำหน่าย"}
-                            </span>
-
-                            <div className="d-flex justify-content-between gap-2">
-                                {product.status === "0" ? (
-                                    <>
-                                    <button
-                                        className="btn btn-sm btn-outline-success rounded-pill flex-grow-1"
-                                        onClick={() => handleApprove(product.product_id)}
-                                    >
-                                        ✅ อนุมัติ
-                                    </button>
-                                    <button
-                                        className="btn btn-sm btn-outline-danger rounded-pill"
-                                        onClick={() => handleReject(product.product_id)}
-                                    >
-                                        <MdDelete className="me-1" /> ปฏิเสธ
-                                    </button>
-                                    </>
-                                ) : (
-                                    <>
-                                    <button
-                                        className="btn btn-sm btn-outline-primary rounded-pill"
-                                        onClick={() => handleOpen(product)}
-                                    >
-                                        <FaRegEdit className="me-1" /> แก้ไข
-                                    </button>
-                                    <button
-                                        className="btn btn-sm btn-outline-danger rounded-pill"
-                                        onClick={() => handleDelete(product.product_id)}
-                                    >
-                                        <MdDelete className="me-1" /> ลบ
-                                    </button>
-                                    </>
-                                )}
+        <section className="container py-4">
+            <div className="president-profile-page">
+                <div className="row justify-content-center g-4">
+                    {/* Sidebar/Profile */}
+                    <div className="col-12 col-md-3 mb-4">
+                        <div className="bg-white rounded-4 shadow-sm text-center p-4">
+                            <img
+                                src={previewImage || profile.profilePicture}
+                                alt="Profile"
+                                style={{ width: "130px", height: "130px", borderRadius: "50%", objectFit: "cover", marginBottom: 16, border: '3px solid #eee' }}
+                                className="img-fluid mb-2"
+                            />
+                            <div className="mt-2 mb-3">
+                                <label
+                                    htmlFor="upload-profile-pic"
+                                    className="btn btn-sm btn-outline-secondary"
+                                    style={{ cursor: "pointer" }}
+                                >
+                                    เปลี่ยนรูป
+                                </label>
+                                <input
+                                    type="file"
+                                    id="upload-profile-pic"
+                                    className="d-none"
+                                    accept="image/*"
+                                    onChange={handleImageChange}
+                                />
+                            </div>
+                            <hr className="w-100" />
+                            <div className="menu d-block mt-3 w-100">
+                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/president-profile")}>โปรไฟล์ของฉัน</div>
+                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/president-profile/president-manage-orders")}>จัดการคำสั่งซื้อของที่ระลึก</div>
+                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/president-profile/president-profile-webboard")}>กระทู้ที่สร้าง</div>
+                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/president-profile/president-profile-donation")}>ประวัติการบริจาค</div>
+                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/president-profile/president-profile-activity")}>ประวัติการเข้าร่วมกิจกรรม</div>
+                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/president-profile/president-profile-souvenir")}>ประวัติการสั่งซื้อของที่ระลึก</div>
+                                <div className="menu-item active py-2 mb-2 rounded" onClick={() => handleClick("/president-profile/president-approve")}>การอนุมัติ</div>
+                                <div className="menu-item py-2 rounded" onClick={handleLogout}>ออกจากระบบ</div>
                             </div>
                         </div>
-                        </div>
                     </div>
-                    ))}
+                    {/* Main Content */}
+                    <div className="col-12 col-md-8">
+                        {/* Header Section */}
+                        <div className="bg-white rounded-4 shadow-sm p-4 mb-4">
+                            <div className="d-flex justify-content-between align-items-center">
+                                <div className="d-flex align-items-center">
+                                    <div className="bg-success bg-opacity-10 rounded-circle p-2 me-3">
+                                        <i className="fas fa-calendar-check text-success fs-5"></i>
+                                    </div>
+                                    <div>
+                                        <h4 className="fw-bold mb-1">การอนุมัติ</h4>
+                                        <p className="text-muted mb-0 small">รวบรวมการการอนุมัติ</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="row g-3">
+                            {products.map((product) => (
+                                <div key={product.product_id} className="col-12 col-sm-6 col-md-4">
+                                    <div className="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
+
+                                        {/* Product Image */}
+                                        <div className="position-relative">
+                                            <img
+                                                src={`http://localhost:3001/uploads/${product.image}`}
+                                                alt={product.product_name}
+                                                className="card-img-top"
+                                                style={{ height: "180px", objectFit: "cover" }}
+                                            />
+                                            {product.stock === 0 && (
+                                                <span className="position-absolute top-0 start-0 bg-danger text-white px-2 py-1 rounded-end fw-bold small">
+                                                    <FaTimesCircle className="me-1" /> สินค้าหมด
+                                                </span>
+                                            )}
+                                        </div>
+
+                                        {/* Card Body */}
+                                        <div className="card-body d-flex flex-column p-3">
+                                            <h6 className="card-title text-dark fw-semibold mb-2" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                                {product.product_name}
+                                            </h6>
+
+                                            {/* Price */}
+                                            <div className="mb-2">
+                                                <span className="bg-light border rounded-pill px-3 py-1 d-inline-flex align-items-center">
+                                                    <span className="text-success fw-semibold">
+                                                        ฿{product.price.toLocaleString()}
+                                                    </span>
+                                                </span>
+                                            </div>
+
+                                            {/* Admin Info */}
+                                            <div className="d-flex align-items-center mb-3 text-muted small">
+                                                <FaUser className="me-1" />
+                                                ผู้ดูแล: <span className="fw-semibold ms-1">{product.full_name}</span>
+                                            </div>
+
+                                            {/* Status Badge */}
+                                            <div className="mb-3">
+                                                <span
+                                                    className={`badge rounded-pill px-3 py-2 ${product.status === "1"
+                                                            ? "bg-success text-white"
+                                                            : "bg-warning text-white"
+                                                        }`}
+                                                    style={{ fontSize: "0.75rem", fontWeight: '600' }}
+                                                >
+                                                    {product.status === "1" ? (
+                                                        <>
+                                                            <FaCheckCircle className="me-1" /> กำลังจำหน่าย
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <FaHourglassHalf className="me-1" /> ยังไม่จำหน่าย
+                                                        </>
+                                                    )}
+                                                </span>
+                                            </div>
+
+                                            {/* Buttons */}
+                                            <div className="mt-auto d-flex flex-column gap-2">
+                                                {product.status === "0" ? (
+                                                    <>
+                                                        <button
+                                                            className="btn btn-sm btn-outline-success rounded-pill w-100"
+                                                            onClick={() => handleApprove(product.product_id)}
+                                                        >
+                                                            <FaCheckCircle className="me-1" /> อนุมัติ
+                                                        </button>
+                                                        <button
+                                                            className="btn btn-sm btn-outline-danger rounded-pill w-100"
+                                                            onClick={() => handleReject(product.product_id)}
+                                                        >
+                                                            <FaTrash className="me-1" /> ปฏิเสธ
+                                                        </button>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <button
+                                                            className="btn btn-sm btn-outline-primary rounded-pill w-100"
+                                                            onClick={() => handleOpen(product)}
+                                                        >
+                                                            <FaEdit className="me-1" /> แก้ไข
+                                                        </button>
+                                                        <button
+                                                            className="btn btn-sm btn-outline-danger rounded-pill w-100"
+                                                            onClick={() => handleDelete(product.product_id)}
+                                                        >
+                                                            <FaTrash className="me-1" /> ลบ
+                                                        </button>
+                                                    </>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                    </div>
                 </div>
+
             </div>
-    
+
             <Modal open={open} onClose={handleClose} aria-labelledby="modal-title" aria-describedby="modal-description">
                 <Box sx={style}>
                     <Typography id="modal-title" variant="h5" sx={{ fontWeight: 'bold', mb: 2, textAlign: 'center' }}>
@@ -296,66 +459,66 @@ function Approve() {
                         </div>
                     )}
 
-                <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
-                    <Button
-                        onClick={handleClose}
-                        variant="outlined"
-                        color="secondary"
-                        size="small"
-                        sx={{
-                            paddingX: 2,
-                            paddingY: 1,
-                            fontSize: '14px',
-                            borderRadius: '8px',
-                            textTransform: 'none',
-                            '&:hover': {
-                                backgroundColor: '#f0f0f0',
-                                borderColor: '#999',
-                            }
-                        }}
-                    >
-                        ปิด
-                    </Button>
-                    <Button
-                        onClick={() => {
-                            axios.put(`http://localhost:3001/admin/editSouvenir/${selectedProduct.product_id}`, selectedProduct)
-                                .then(response => {
-                                    console.log("บันทึกข้อมูลสินค้าสำเร็จ:", response.data);
-                                    setProducts(prevProducts =>
-                                        prevProducts.map(product =>
-                                            product.product_id === selectedProduct.product_id
-                                                ? { ...product, ...selectedProduct }
-                                                : product
-                                        )
-                                    );
-                                    handleClose();
-                                })
-                                .catch(error => {
-                                    console.error("เกิดข้อผิดพลาดในการบันทึก:", error);
-                                });
-                        }}
-                        variant="contained"
-                        color="primary"
-                        size="small"
-                        sx={{
-                            paddingX: 2.5,
-                            paddingY: 1,
-                            fontSize: '14px',
-                            borderRadius: '8px',
-                            textTransform: 'none',
-                            '&:hover': {
-                                backgroundColor: '#2c6ad4',
-                            }
-                        }}
-                    >
-                        บันทึก
-                    </Button>
-                </div>
+                    <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+                        <Button
+                            onClick={handleClose}
+                            variant="outlined"
+                            color="secondary"
+                            size="small"
+                            sx={{
+                                paddingX: 2,
+                                paddingY: 1,
+                                fontSize: '14px',
+                                borderRadius: '8px',
+                                textTransform: 'none',
+                                '&:hover': {
+                                    backgroundColor: '#f0f0f0',
+                                    borderColor: '#999',
+                                }
+                            }}
+                        >
+                            ปิด
+                        </Button>
+                        <Button
+                            onClick={() => {
+                                axios.put(`http://localhost:3001/admin/editSouvenir/${selectedProduct.product_id}`, selectedProduct)
+                                    .then(response => {
+                                        console.log("บันทึกข้อมูลสินค้าสำเร็จ:", response.data);
+                                        setProducts(prevProducts =>
+                                            prevProducts.map(product =>
+                                                product.product_id === selectedProduct.product_id
+                                                    ? { ...product, ...selectedProduct }
+                                                    : product
+                                            )
+                                        );
+                                        handleClose();
+                                    })
+                                    .catch(error => {
+                                        console.error("เกิดข้อผิดพลาดในการบันทึก:", error);
+                                    });
+                            }}
+                            variant="contained"
+                            color="primary"
+                            size="small"
+                            sx={{
+                                paddingX: 2.5,
+                                paddingY: 1,
+                                fontSize: '14px',
+                                borderRadius: '8px',
+                                textTransform: 'none',
+                                '&:hover': {
+                                    backgroundColor: '#2c6ad4',
+                                }
+                            }}
+                        >
+                            บันทึก
+                        </Button>
+                    </div>
 
                 </Box>
             </Modal>
-        </>
-    );    
+        </section>
+    );
 }
 
 export default Approve;

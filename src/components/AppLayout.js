@@ -1,8 +1,6 @@
-// 
-
-import React from 'react';
 import Header from './Header';
 import Footer from './Footer';
+import Chat from '../components/Chat';
 import "../css/appLayout.css";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import Breadcrumb from './Breadcrumb';
@@ -13,7 +11,7 @@ function AppLayout() {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const hideHeaderPaths = ["/login", "/register", "/forgotPassword"];
+    const hideHeaderPaths = ["/login", "/register", "/forgotPassword", "/change-password", "/reset-password"];
     const shouldHideHeader = hideHeaderPaths.includes(location.pathname);
     const shouldHideFooter = hideHeaderPaths.includes(location.pathname);
 
@@ -42,10 +40,11 @@ function AppLayout() {
                     setUser={setUser}
                     notifications={notifications}
                     handleLogin={handleLogin}
+                    handleLogout={handleLogoutWithNav}
                 />
             )}
 
-            <main className="main-content">
+            <main className={`main-content${shouldHideHeader ? ' no-header-margin' : ''}`}>
                 <Breadcrumb />
                 <Outlet context={{ 
                     user, 
@@ -56,6 +55,9 @@ function AppLayout() {
             </main>
 
             {!shouldHideFooter && <Footer />}
+
+            {/* เพิ่มChat Widget */}
+            <Chat/>
         </div>   
     );
 }

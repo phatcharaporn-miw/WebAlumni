@@ -1,9 +1,9 @@
-
-
 .souvenir-top {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 20px;
+    padding: 20px;
 }
 
 .souvenir-bt-add {
@@ -34,24 +34,29 @@
     margin-bottom: 15px;
 }
 
-/* Tab Styles */
+.sort-options{
+    display: grid;
+    grid-template-columns: auto auto;
+    align-items: center;
+    gap: 10px;
+}
+
 .nav-tabs {
     border-bottom: 2px solid #ddd;
 }
 
-.bg-primary-subtle {
-  background-color: #e7f1ff !important;
+.nav-link {
+    /* border: 1px solid #ddd; */
+    border-radius: 1px;
+    padding: 10px 15px;
+    color: #1A8DDD;
 }
-
-.bg-success-subtle {
-  background-color: #e6f4ea !important;
-}
-
 
 .tab-content {
     margin-top: 20px;
 }
 
+/* Table Styles */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -62,7 +67,6 @@ table {
 table th,
 table td {
     border: 1px solid #ddd;
-    padding: 12px;
     text-align: center;
 }
 
@@ -90,6 +94,21 @@ table td button {
 
 table td button:hover {
     background-color: #0B98FA;
+}
+
+.souvenir-item-group {
+    display: grid;
+    /* grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); */
+    gap: 20px;
+}
+
+.souvenir-item {
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.3s ease;
 }
 
 .souvenir-item:hover {
@@ -121,6 +140,11 @@ table td button:hover {
     margin-bottom: 0;
 }
 
+
+.statusProduct-label{
+    margin-bottom: 0;
+}
+  
 .souvenir-bt-add {
     background-color: #4CAF50; 
     color: white;
@@ -128,10 +152,13 @@ table td button:hover {
     padding: 10px 20px;
     font-size: 16px;
     cursor: pointer;
+    gap: 10px;
+    text-decoration: none;
+    margin: 10px ;
 }
 
 .souvenir-bt-add:hover {
-    background-color: #45a049; 
+    background-color: #45a049;
 }
 
 .souvenir-bt-approve {
@@ -144,11 +171,11 @@ table td button:hover {
 }
 
 .souvenir-bt-approve:hover {
-    background-color: #0b7dda; 
+    background-color: #0b7dda;
 }
 
 .souvenir-bt-edit {
-    background-color: #FF9800; 
+    background-color: #FF9800;
     color: white;
     border: none;
     padding: 10px 20px;
@@ -173,6 +200,10 @@ table td button:hover {
     background-color: #d32f2f;
 }
 
+.search_souvenir{
+    width: 500px;
+}
+
 .status-available {
     color: green;
 }
@@ -186,17 +217,45 @@ table td button:hover {
     color: white;
 }
 
+.souvenir-bt-approve:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .souvenir-bt-approve-unavailable {
     background-color: red;
     color: white;
 }
+.souvenir-bt-group{
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+}
+.souvenir-bt-group button{
+    height: 50px;
+}
+.image-product img{
+    width:70px;
+    height:70px;
+    
+}
 
-.notification-icon-admin{
-  font-size: 24px;
+.souvenir-bt-manage {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
 }
 
 
-/* Responsive Styles */
+/*Responsive*/
 @media (max-width: 768px) {
     .souvenir-item-group {
         grid-template-columns: 1fr 1fr;

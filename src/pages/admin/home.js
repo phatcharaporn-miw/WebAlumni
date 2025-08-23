@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { MdVolunteerActivism, MdEvent } from "react-icons/md";
+import { MdVolunteerActivism, MdEvent, MdPeople, MdTrendingUp } from "react-icons/md";
 import { Bar, Pie } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -11,7 +11,6 @@ import {
   Legend,
   ArcElement,
 } from 'chart.js';
-import "../../css/admin.css";
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend, ArcElement);
 
@@ -24,6 +23,7 @@ function AdminHome() {
   });
 
   const [alumniCount, setAlumniCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
   const [barData, setBarData] = useState({
     labels: [],
@@ -31,8 +31,22 @@ function AdminHome() {
   });
 
   const [pieData, setPieData] = useState({
-    labels: [],
-    datasets: [],
+    labels: ['โครงการศึกษา', 'โครงการสาธารณสุข', 'โครงการสิ่งแวดล้อม'],
+    datasets: [{
+      data: [45, 30, 25],
+      backgroundColor: [
+        'rgba(40, 167, 69, 0.8)',
+        'rgba(111, 66, 193, 0.8)',
+        'rgba(255, 193, 7, 0.8)'
+      ],
+      borderColor: [
+        'rgba(40, 167, 69, 1)',
+        'rgba(111, 66, 193, 1)',
+        'rgba(255, 193, 7, 1)'
+      ],
+      borderWidth: 2,
+      hoverOffset: 8,
+    }],
   });
 
   useEffect(() => {
@@ -52,7 +66,11 @@ function AdminHome() {
             datasets: [{
               label: 'จำนวนกิจกรรม',
               data,
-              backgroundColor: '#0d6efd'
+              backgroundColor: 'rgba(13, 110, 253, 0.8)',
+              borderColor: 'rgba(13, 110, 253, 1)',
+              borderWidth: 2,
+              borderRadius: 6,
+              borderSkipped: false,
             }],
           });
         }
@@ -77,24 +95,75 @@ function AdminHome() {
       .then(res => setAlumniCount(res.data.totalAlumni));
   }, []);
 
-  const CardInfo = ({ title, value, type = "activity", center = false }) => {
-    const isDonation = type === "donation";
-    const Icon = isDonation ? MdVolunteerActivism : MdEvent;
-    const bgColor = isDonation ? "bg-success-subtle" : "bg-primary-subtle";
-    const textColor = isDonation ? "text-success" : "text-primary";
+  useEffect(() => {
+    // Simulate loading
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+  }, []);
+
+  const CardInfo = ({ title, value, type = "activity", center = false, icon: CustomIcon, colClass = "col-md-3" }) => {
+    const getCardStyle = () => {
+      switch (type) {
+        case "donation":
+          return {
+            background: 'linear-gradient(135deg, #28a745 0%, #20c997 100%)',
+            color: 'white',
+            iconColor: 'white'
+          };
+        case "project":
+          return {
+            background: 'linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%)',
+            color: 'white',
+            iconColor: 'white'
+          };
+        case "alumni":
+          return {
+            background: 'linear-gradient(135deg, #fd7e14 0%, #ffc107 100%)',
+            color: 'white',
+            iconColor: 'white'
+          };
+        default:
+          return {
+            background: 'linear-gradient(135deg, #0d6efd 0%, #6610f2 100%)',
+            color: 'white',
+            iconColor: 'white'
+          };
+      }
+    };
+
+    const cardStyle = getCardStyle();
+    const Icon = CustomIcon || (type === "donation" ? MdVolunteerActivism : MdEvent);
 
     return (
-      <div className="col-md-3 mb-3">
-        <div className={`card p-3 ${bgColor} ${center ? 'text-center' : 'text-start'}`}>
-          <div className="d-flex align-items-center mb-2">
-            <Icon size={24} className={textColor + " me-2"} />
-            <h6 className="mb-0">{title}</h6>
+      <div className={`${colClass} mb-4`}>
+        <div
+          className={`card p-4 border-0 shadow-lg position-relative overflow-hidden ${center ? 'text-center' : 'text-start'}`}
+          style={{
+            background: cardStyle.background,
+            color: cardStyle.color,
+          }}
+        >
+          <div className="position-absolute top-0 end-0 p-3 opacity-25">
+            <Icon size={60} />
           </div>
-          <h3 className={textColor}>{value}</h3>
+          <div className="d-flex align-items-center mb-3">
+            <Icon size={28} className="me-3" style={{ color: cardStyle.iconColor }} />
+            <h6 className="mb-0 fw-bold">{title}</h6>
+          </div>
+          <h2 className="fw-bold mb-0">{value}</h2>
         </div>
       </div>
     );
   };
+
+  const LoadingSpinner = () => (
+    <div className="d-flex justify-content-center align-items-center" style={{ height: '200px' }}>
+      <div className="spinner-border text-primary" role="status">
+        <span className="visually-hidden">Loading...</span>
+      </div>
+    </div>
+  );
 
   const barOptions = {
     responsive: true,
@@ -102,23 +171,47 @@ function AdminHome() {
       legend: {
         display: true,
         position: "bottom",
+        labels: {
+          usePointStyle: true,
+          padding: 20,
+          font: {
+            size: 14,
+            weight: 'bold'
+          }
+        }
       },
+      tooltip: {
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        titleColor: 'white',
+        bodyColor: 'white',
+        cornerRadius: 8,
+        padding: 12,
+      }
     },
     scales: {
       y: {
         beginAtZero: true,
         ticks: {
-          stepSize: 50,
-          callback: value => `${value} คน`,
+          stepSize: 10,
+          callback: value => `${value} กิจกรรม`,
+          font: {
+            size: 12
+          }
         },
         grid: {
-          color: '#e0e0e0',
+          color: 'rgba(0, 0, 0, 0.1)',
         },
       },
       x: {
         grid: {
           display: false,
         },
+        ticks: {
+          font: {
+            size: 12,
+            weight: 'bold'
+          }
+        }
       },
     },
   };
@@ -127,19 +220,28 @@ function AdminHome() {
     responsive: true,
     plugins: {
       legend: {
-        position: 'left',
+        position: 'bottom',
         labels: {
           usePointStyle: true,
           padding: 20,
+          font: {
+            size: 14,
+            weight: 'bold'
+          }
         },
       },
       tooltip: {
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        titleColor: 'white',
+        bodyColor: 'white',
+        cornerRadius: 8,
+        padding: 12,
         callbacks: {
           label: function (tooltipItem) {
             const value = tooltipItem.raw;
             const total = tooltipItem.dataset.data.reduce((a, b) => a + b, 0);
             const percent = ((value / total) * 100).toFixed(1);
-            return `${tooltipItem.label} (${percent}%)`;
+            return `${tooltipItem.label}: ${percent}%`;
           },
         },
       },
@@ -147,35 +249,86 @@ function AdminHome() {
   };
 
   return (
-    <div className="home-container p-5">
-      <h3 className="admin-title">Dashboard</h3>
-
-      <div className="row mb-3">
-        <CardInfo title="จำนวนผู้เข้าร่วมกิจกรรมทั้งหมด" value={`${stats.totalParticipants} คน`} type="activity" />
-        <CardInfo title="กิจกรรมที่กำลังดำเนินการ" value={`${stats.ongoingActivity} กิจกรรม`} type="activity" />
-        <CardInfo title="ยอดบริจาครวมทั้งหมด" value={`${stats.totalDonations} บาท`} type="donation" />
-        <CardInfo title="โครงการที่เปิดรับบริจาค" value={`${stats.ongoingProject} โครงการ`} type="donation" />
-      </div>
-
-      <div className="row mb-4">
-        <div className="col-md-8">
-          <div className="card p-3">
-            <h5>จำนวนการเข้าร่วมกิจกรรมในแต่ละปี</h5>
-            {barData.labels.length ? <Bar data={barData} options={barOptions} /> : <div>Loading...</div>}
-          </div>
-        </div>
-        <div className="col-md-4">
-          <div className="card p-3">
-            <h5>สถิติการบริจาค</h5>
-            {pieData.labels.length ? <Pie data={pieData} options={pieOptions} /> : <div>Loading...</div>}
+    <div className="container-fluid p-5" style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
+      <div className="row mb-5">
+        <div className="col-12">
+          <h3 className="admin-title">Dashboard</h3>
+          <div className="d-flex justify-content-end">
+            <small className="text-muted">อัปเดตล่าสุด: {new Date().toLocaleDateString('th-TH')}</small>
           </div>
         </div>
       </div>
 
+      {/* Stats Cards */}
+      <div className="row mb-5">
+        <CardInfo
+          title="จำนวนผู้เข้าร่วมกิจกรรมทั้งหมด"
+          value={`${stats.totalParticipants.toLocaleString()} คน`}
+          type="activity"
+          icon={MdPeople}
+        />
+        <CardInfo
+          title="กิจกรรมที่กำลังดำเนินการ"
+          value={`${stats.ongoingActivity} กิจกรรม`}
+          type="activity"
+          icon={MdEvent}
+        />
+        <CardInfo
+          title="ยอดบริจาครวมทั้งหมด"
+          value={`${stats.totalDonations.toLocaleString()} บาท`}
+          type="donation"
+          icon={MdVolunteerActivism}
+        />
+        <CardInfo
+          title="โครงการที่เปิดรับบริจาค"
+          value={`${stats.ongoingProject} โครงการ`}
+          type="project"
+          icon={MdTrendingUp}
+        />
+      </div>
+
+      {/* Charts Section */}
+      <div className="row mb-5">
+        <div className="col-lg-8 mb-4">
+          <div className="card border-0 shadow-lg h-100">
+            <div className="card-header border-0 bg-gradient" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+              <h5 className="card-title mb-0 fw-bold">
+                จำนวนกิจกรรมในแต่ละปี
+              </h5>
+            </div>
+            <div className="card-body p-4">
+              {isLoading ? <LoadingSpinner /> : <Bar data={barData} options={barOptions} />}
+            </div>
+          </div>
+        </div>
+        <div className="col-lg-4 mb-4">
+          <div className="card border-0 shadow-lg h-100">
+            <div className="card-header border-0 bg-gradient" style={{ background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' }}>
+              <h5 className="card-title mb-0 fw-bold">
+                สถิติการบริจาค
+              </h5>
+            </div>
+            <div className="card-body p-4">
+              {isLoading ? <LoadingSpinner /> : <Pie data={pieData} options={pieOptions} />}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Alumni Section */}
       <div className="row">
-        <CardInfo title="จำนวนศิษย์เก่าทั้งหมด" value={`${alumniCount} คน`} center />
+        {/* <div className="col-12"> */}
+        <CardInfo
+          title="จำนวนศิษย์เก่าทั้งหมด"
+          value={`${alumniCount.toLocaleString()} คน`}
+          center
+          type="alumni"
+          icon={MdPeople}
+          colClass="col-12"
+        />
       </div>
     </div>
+    // </div>
   );
 }
 

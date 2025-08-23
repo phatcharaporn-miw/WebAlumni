@@ -1,0 +1,201 @@
+/* FloatingChat.css */
+.floating-chat-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999;
+}
+
+.chat-window {
+  width: 320px;
+  height: 400px;
+  border-radius: 15px !important;
+  overflow: hidden;
+  border: none !important;
+}
+
+.chat-header {
+  border-top-left-radius: 15px !important;
+  border-top-right-radius: 15px !important;
+}
+
+.chat-messages {
+  height: 280px;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
+.chat-messages::-webkit-scrollbar {
+  width: 5px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 10px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+.messages-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.message-wrapper {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+.message-bubble {
+  max-width: 85%;
+  word-wrap: break-word;
+  position: relative;
+}
+
+.user-message {
+  border-bottom-right-radius: 5px !important;
+}
+
+.bot-message {
+  border-bottom-left-radius: 5px !important;
+}
+
+.chat-input {
+  border-bottom-left-radius: 15px !important;
+  border-bottom-right-radius: 15px !important;
+}
+
+.chat-toggle-btn {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  border: none !important;
+}
+
+.chat-toggle-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 8px 25px rgba(0, 123, 255, 0.3) !important;
+}
+
+.chat-toggle-btn:focus {
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Typing indicator animation */
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.typing-indicator span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #6c757d;
+  animation: typing 1.4s infinite ease-in-out;
+}
+
+.typing-indicator span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typing {
+  0%, 60%, 100% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  30% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .floating-chat-container {
+    bottom: 15px;
+    right: 15px;
+  }
+  
+  .chat-window {
+    width: calc(100vw - 30px);
+    max-width: 320px;
+  }
+  
+  .chat-toggle-btn {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .chat-toggle-btn i {
+    font-size: 1.1rem !important;
+  }
+}
+
+/* Custom scrollbar for Firefox */
+.chat-messages {
+  scrollbar-width: thin;
+  scrollbar-color: #c1c1c1 #f1f1f1;
+}
+
+/* Input focus styles */
+.chat-input .form-control:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Button loading state */
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Message bubble hover effects */
+.user-message:hover {
+  background-color: #0056b3 !important;
+}
+
+.bot-message:hover {
+  background-color: #f8f9fa !important;
+}
+
+/* Animation for chat window open/close */
+.chat-window {
+  animation: slideInUp 0.3s ease-out;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

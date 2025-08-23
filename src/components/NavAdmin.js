@@ -1,13 +1,12 @@
-import React, { useState, useEffect, } from 'react';
+import { useState, useEffect, } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { IoMdNotificationsOutline } from "react-icons/io";
-import { FaTrash, FaBars } from 'react-icons/fa';
+import { FaTrash } from 'react-icons/fa';
 import '../css/navAdmin.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-// import { Offcanvas } from "bootstrap"; 
-// import { auto } from '@popperjs/core';
+import { useAuth } from '../context/AuthContext';
 
 function NavAdmin() {
     const [userInfo, setUserInfo] = useState({
@@ -21,11 +20,13 @@ function NavAdmin() {
     const userId = localStorage.getItem('userId');
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-    const toggleMobileMenu = () => {
-        setIsMobileMenuOpen(!isMobileMenuOpen);
-    };
+    // const toggleMobileMenu = () => {
+    //     setIsMobileMenuOpen(!isMobileMenuOpen);
+    // };
 
-    const handleLogout = async () => {
+    const { user, handleLogout, isAdmin, isUser, isLoggedIn } = useAuth();
+
+    const onLogout = async () => {
         Swal.fire({
             title: 'คุณแน่ใจหรือไม่?',
             text: 'คุณต้องการออกจากระบบหรือไม่?',
@@ -37,19 +38,11 @@ function NavAdmin() {
             cancelButtonText: 'ยกเลิก',
         }).then(async (result) => {
             if (result.isConfirmed) {
-                try {
-                    await axios.get('http://localhost:3001/api/logout', { withCredentials: true });
-
-                    // ลบข้อมูลใน localStorage
-                    localStorage.removeItem('userId');
-                    localStorage.removeItem('userRole');
-                    localStorage.removeItem('username');
-                    localStorage.removeItem('image_path');
-
+                const success = await handleLogout();
+                if (success) {
                     Swal.fire('ออกจากระบบสำเร็จ!', 'คุณได้ออกจากระบบเรียบร้อยแล้ว', 'success');
-                    navigate('/'); // เปลี่ยนเส้นทางไปยังหน้าแรกหลังจากออกจากระบบ
-                } catch (error) {
-                    console.error('Logout Error:', error);
+                    navigate('/');
+                } else {
                     Swal.fire('เกิดข้อผิดพลาด!', 'ไม่สามารถออกจากระบบได้', 'error');
                 }
             }
@@ -58,22 +51,29 @@ function NavAdmin() {
 
     useEffect(() => {
         const role = localStorage.getItem('userRole');
-        const username = localStorage.getItem('username') || 'Admin';
+        const username = localStorage.getItem('username');
         const imagePath = localStorage.getItem('image_path');
+
+        if (!role) {
+            // ถ้าไม่มี role ให้บังคับไป login เลย
+            navigate('/login');
+            return;
+        }
 
         const profilePic = imagePath
             ? `http://localhost:3001/${imagePath.replace(/^\/+/, '')}`
-            : '/default-profile-pic.jpg';
+            : 'http://localhost:3001/uploads/default-profile.png';
 
         if (role === '1') {
             setUserInfo({
-                fullName: username,
+                fullName: username || 'Admin',
                 profilePic: profilePic,
             });
         } else {
             navigate('/login');
         }
     }, [navigate]);
+
 
     // ดึงแจ้งเตือนเมื่อผู้ใช้เข้าสู่ระบบ
     useEffect(() => {
@@ -147,12 +147,6 @@ function NavAdmin() {
 
     return (
         <>
-            {/* <div className="d-block d-md-none p-2 bg-primary text-white">
-                <button className="btn btn-light" onClick={toggleMobileMenu}>
-                    <FaBars /> เมนู
-                </button>
-            </div> */}
-
             <div
                 style={{
                     ...navAdminStyles,
@@ -160,15 +154,28 @@ function NavAdmin() {
                     top: 0,
                     bottom: 0,
                     zIndex: 1000,
-                    transform: isMobileMenuOpen || window.innerWidth >= 768 ? "translateX(0)" : "translateX(-100%)",
+                    // transform: isMobileMenuOpen || window.innerWidth >= 768 ? "translateX(0)" : "translateX(-100%)",
                     transition: "transform 0.3s ease-in-out",
                 }}
                 className="d-block"
             >
                 {/* Notification Icon */}
                 {userInfo && (
-                    <div className="notification-container" style={{ position: "absolute", top: 20, right: 20, zIndex: 10 }}>
-                        <div className="notification-icon" onClick={toggleNotifications}>
+                    <div className="notification" style={{ position: "absolute", top: 20, right: 20, zIndex: 10 }}>
+                        <div
+                            className="notification-icon-admin"
+                            onClick={e => {
+                                e.stopPropagation();
+                                toggleNotifications();
+                            }}
+                            style={{ cursor: "pointer" }}
+                            tabIndex={0} // ให้สามารถกดด้วยคีย์บอร์ดได้
+                            role="button"
+                            aria-label="เปิดการแจ้งเตือน"
+                            onKeyDown={e => {
+                                if (e.key === "Enter" || e.key === " ") toggleNotifications();
+                            }}
+                        >
                             <IoMdNotificationsOutline />
                             {unreadCount > 0 && <span className="unread-count">{unreadCount}</span>}
                         </div>
@@ -182,7 +189,7 @@ function NavAdmin() {
                                             key={notification.notification_id}
                                             className={`notification-item ${notification.read_status === "ยังไม่อ่าน" ? "unread" : ""
                                                 }`}
-                                            onClick={() => markAsRead(notification.notification_id)}
+                                        // onClick={() => goToNotificationDetail(notification)}
                                         >
                                             <p className="message">{notification.message}</p>
                                             <p className="notification-date">
@@ -226,7 +233,7 @@ function NavAdmin() {
                 <div className="nav flex-column nav-pills">
                     {[
                         { to: "/admin-home", label: "Dashboard" },
-                        { to: "/admin/calendar", label: "ปฏิทินกิจกรรม" },
+                        { to: "/admin/verify", label: "ตรวจสอบการโอนเงิน" },
                         { to: "/admin/activities", label: "กิจกรรมและการเข้าร่วม" },
                         { to: "/admin/donations", label: "การบริจาคและโครงการ" },
                         { to: "/admin/webboard", label: "การจัดการเว็บบอร์ด" },
@@ -250,7 +257,7 @@ function NavAdmin() {
                     ))}
 
                     <button
-                        onClick={handleLogout}
+                        onClick={onLogout}
                         className="nav-link my-1 btn btn-link"
                         style={{
                             ...navLinkStyles,
