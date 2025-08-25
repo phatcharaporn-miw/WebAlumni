@@ -1,69 +1,121 @@
-.footer {
-    background-color: #f8f9fa;
-    height: auto;
-    text-align: center;
-    border-top: 2px solid #0F75BC;
-  }
+.container {
+  margin-top: 30px;
+}
 
-  .container{
-    margin-top: 30px;
-  }
-  
-  .footer-logo {
-    width: 260px;
-    object-fit: cover;
-  }
-  
-  /* .footer .row {
-    margin-bottom: 20px;
-  }
-   */
-  .footer  h4 {
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin: 30px 0;
-    color: #0F75BC;
-  }
+.footer {
+  background-color: #f2f9ff;
+  text-align: center;
+  border-top: 2px solid #0F75BC;
+  /* min-height: 450px;  */
+}
+
+.footer-logo {
+  width: 260px;
+  height: 130px;
+  object-fit: contain;
+}
+.footer-icon {
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+}
+
+.footer h4 {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin: 20px 0;
+  color: #0F75BC;
+  text-align: start;
+}
+
+#foot-text {
+  font-size: 0.95rem;
+  text-align: start;
+  color: #333;
+}
 
 .foot-news,
 .foot-act,
 .foot-donate,
 .foot-faq {
   display: block;
-  margin-bottom: 10px; 
+  margin-bottom: 10px;
   text-decoration: none;
   color: #333;
+  text-align: start;
 }
-  
- .footer-icon {
-    margin-right: 8px; 
-  }
-  
-  .foot-news :hover,
-  .foot-faq :hover,
-  .foot-act :hover,
-  .foot-donate :hover {
-    color: #0F75BC;
+
+.footer-icon {
+  margin-right: 8px;
+  color: #0F75BC;
+  font-size: 1.2rem;
+}
+
+.foot-news:hover,
+.foot-faq:hover,
+.foot-act:hover,
+.foot-donate:hover {
+  color: #0F75BC;
+}
+
+.footer-contact,
+.footer-contact2,
+.footer-contact3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-start;
+  margin-bottom: 10px;
+  color: #333;
+  font-size: 0.95rem;
+  text-align: start;
+}
+
+.footer-bottom {
+  background-color: #0F75BC;
+  color: #fff;
+  padding: 20px;
+  min-height: 50px; 
+}
+
+.footer-bottom p {
+  margin: 0;
+  padding: 0;
+}
+
+@media (max-width: 768px) {
+  .footer {
+    text-align: center;
+    padding: 30px 10px 10px;
   }
 
-  .footer-bottom {
-    background-color: #0F75BC;
-    color: #fff;
-    padding: 10px; 
+  .footer h4,
+  #foot-text,
+  .footer-contact,
+  .footer-contact2,
+  .footer-contact3,
+  .foot-news,
+  .foot-act,
+  .foot-donate,
+  .foot-faq {
+    text-align: center;
+    justify-content: center;
   }
-  .footer-bottom p{
-    padding-top: 10px;
+
+  .footer-contact,
+  .footer-contact2,
+  .footer-contact3 {
+    align-items: center;
+    gap: 4px;
   }
-  
-  .footer-contact {
-    display: flex;
-    margin-left: 50px;
+
+  .footer-logo {
+    margin: auto;
+    height: 130px;
+  }
+
+  .col-md-3 {
+    margin-bottom: 30px;
+    min-height: 220px; 
+  }
 }
-  
-  .footer-contact .footer-icon {
-    font-size: 1.2rem;
-    color: #0F75BC;
-    
-  }
-  
-  

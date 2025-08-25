@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button, Modal, Box, Typography } from '@mui/material';
 import "../css/Souvenir_request.css";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
@@ -62,15 +62,30 @@ function SouvenirRequest() {
 
     const validateForm = () => {
         if (!formData.productName || !formData.description || !formData.price || !formData.stock || !formData.image || !formData.paymentMethod || !formData.bankName || !formData.accountNumber) {
-            alert("กรุณากรอกข้อมูลให้ครบถ้วน!");
+            Swal.fire({
+                title: "ข้อผิดพลาด",
+                text: "กรุณากรอกข้อมูลให้ครบถ้วน!",
+                icon: "error",
+                confirmButtonText: "ตกลง"
+            });
             return false;
         }
         if (isNaN(formData.price) || formData.price <= 0) {
-            alert("กรุณากรอกราคาที่ถูกต้อง");
+            Swal.fire({
+                title: "ข้อผิดพลาด",
+                text: "กรุณากรอกราคาที่ถูกต้อง",
+                icon: "error",
+                confirmButtonText: "ตกลง"
+            });
             return false;
         }
         if (isNaN(formData.stock) || formData.stock <= 0) {
-            alert("กรุณากรอกจำนวนสินค้าเป็นตัวเลขที่ถูกต้อง");
+            Swal.fire({
+                title: "ข้อผิดพลาด",
+                text: "กรุณากรอกจำนวนสินค้าเป็นตัวเลขที่ถูกต้อง",
+                icon: "error",
+                confirmButtonText: "ตกลง"
+            });
             return false;
         }
         return true;
@@ -116,25 +131,16 @@ function SouvenirRequest() {
         data.append("accountNumber", formData.accountNumber);
         data.append("accountName", formData.accountName);
         data.append("promptpayNumber", formData.promptpayNumber);
+        data.append("status", "0"); // รอการอนุมัติ
 
         const role = localStorage.getItem('userRole');
         const user_id = localStorage.getItem('userId');
         if (user_id) {
             data.append("user_id", user_id);
         } else {
-            alert("ผู้ใช้ไม่ถูกล็อกอิน");
+            alert("ผู้ใช้ไม่ได้เข้าสู่ระบบ");
             return;
         }
-
-        formData.variants.forEach((variant, index) => {
-            data.append(`variants[${index}][color]`, variant.color);
-            data.append(`variants[${index}][size]`, variant.size);
-            data.append(`variants[${index}][price]`, variant.price);
-            data.append(`variants[${index}][stock]`, variant.stock);
-            if (variant.image) {
-                data.append(`variants[${index}][image]`, variant.image);
-            }
-        });
 
         const url = role === '1'
             ? 'http://localhost:3001/admin/addsouvenir'
@@ -143,15 +149,42 @@ function SouvenirRequest() {
         try {
             const response = await axios.post(url, data, {
                 headers: { 'Content-Type': 'multipart/form-data' },
+            }, {
+                withCredentials: true
             });
 
-            navigate("/souvenir");
+            handleClose(); // ปิด modal หลังจากส่งข้อมูลสำเร็จ
+
+            Swal.fire({
+                title: "เพิ่มสินค้าสำเร็จ!",
+                text: "สินค้าของคุณถูกส่งแล้ว กรุณารอการอนุมัติ",
+                icon: "success",
+                confirmButtonText: "ตกลง"
+            }).then(() => {
+                // นำทางไปยังหน้าตาม role
+                if (role === '2') {
+                    navigate("/president-profile/president-request");
+                } else if (role === '4') {
+                    navigate("/student-profile/student-request");
+                } else {
+                    navigate("/alumni-profile/alumni-request");
+                }
+            });
         } catch (error) {
+            handleClose();
             console.error("Error:", error);
             alert(error.response?.data?.error || "เกิดข้อผิดพลาด");
         }
     };
 
+    const handleCancel = () => {
+        const role = localStorage.getItem("userRole"); // หรือ user?.role
+        if (role === "1") {
+            navigate("/admin/souvenir");
+        } else {
+            navigate("/souvenir");
+        }
+    };
 
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
@@ -169,7 +202,7 @@ function SouvenirRequest() {
     };
     return (
         <div>
-            <h3>เพิ่มสินค้าของที่ระลึก</h3>
+            <h3 className="alumni-title text-center">เพิ่มสินค้าของที่ระลึก</h3>
             <div className="request-souvenir-form ">
                 <form encType="multipart/form-data" onSubmit={handleSubmit}>
                     {/* รายละเอียดเกี่ยวกับสินค้า */}
@@ -373,48 +406,80 @@ function SouvenirRequest() {
                     </div>
 
                     <div className="group-souvenir-bt">
-                        <Link to="/souvenir">
-                            <button className="cancle-button-souvenirRequest" type="button">ยกเลิก</button>
-                        </Link>
-                        <button type="button" className="button-souvenirRequest" onClick={handleOpen}>เพิ่มสินค้าของที่ระลึก</button>
+                        <button className="cancle-button-souvenirRequest" type="button" onClick={handleCancel}>
+                            ยกเลิก
+                        </button>
+                        <button type="button" className="button-souvenirRequest" onClick={handleOpen}>
+                            เพิ่มสินค้าของที่ระลึก
+                        </button>
                     </div>
                 </form>
             </div>
 
+            {/* Modal */}
             <Modal
                 open={open}
                 onClose={handleClose}
                 aria-labelledby="modal-title"
                 aria-describedby="modal-description"
             >
-                <Box sx={style}>
-                    <Typography id="modal-title" variant="h6">ตรวจสอบข้อมูลสินค้า</Typography>
-                    <Typography id="modal-description" sx={{ mt: 2 }}>
-                        <div>
-                            <strong>ชื่อสินค้าของที่ระลึก:</strong> {formData.productName} <br />
-                            <strong>รายละเอียดของสินค้า:</strong> {formData.description} <br />
-                            <strong>ราคาต่อชิ้น:</strong> {formData.price} บาท<br />
-                            <strong>จำนวนสินค้า:</strong> {formData.stock} ชิ้น<br />
-                            <strong>ช่องทางการชำระเงิน:</strong> {formData.paymentMethod} <br />
-                            <strong>ชื่อธนาคาร:</strong> {formData.bankName} <br />
-                            <strong>หมายเลขบัญชี:</strong> {formData.accountNumber} <br />
-                            {formData.image && (
-                                <div>
-                                    <strong>รูปภาพของสินค้า:</strong>
-                                    <br />
-                                    <img
-                                        src={URL.createObjectURL(formData.image)}
-                                        alt="สินค้าของที่ระลึก"
-                                        style={{ maxWidth: "100%", height: "200px", marginTop: "10px" }}
-                                    />
-                                </div>
-                            )}
-                        </div>
+                <Box sx={{ ...style, width: 500 }}>
+                    <Typography id="modal-title" variant="h6" sx={{ mb: 2, textAlign: "center" }}>
+                        ตรวจสอบข้อมูลสินค้า
                     </Typography>
+                    <div style={{ marginBottom: "20px" }}>
+                        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                            <tbody>
+                                <tr>
+                                    <td style={{ fontWeight: "bold", padding: "8px", borderBottom: "1px solid #ddd" }}>ชื่อสินค้า:</td>
+                                    <td style={{ padding: "8px", borderBottom: "1px solid #ddd" }}>{formData.productName}</td>
+                                </tr>
+                                <tr>
+                                    <td style={{ fontWeight: "bold", padding: "8px", borderBottom: "1px solid #ddd" }}>รายละเอียด:</td>
+                                    <td style={{ padding: "8px", borderBottom: "1px solid #ddd" }}>{formData.description}</td>
+                                </tr>
+                                <tr>
+                                    <td style={{ fontWeight: "bold", padding: "8px", borderBottom: "1px solid #ddd" }}>ราคาต่อชิ้น:</td>
+                                    <td style={{ padding: "8px", borderBottom: "1px solid #ddd" }}>{formData.price} บาท</td>
+                                </tr>
+                                <tr>
+                                    <td style={{ fontWeight: "bold", padding: "8px", borderBottom: "1px solid #ddd" }}>จำนวนสินค้า:</td>
+                                    <td style={{ padding: "8px", borderBottom: "1px solid #ddd" }}>{formData.stock} ชิ้น</td>
+                                </tr>
+                                <tr>
+                                    <td style={{ fontWeight: "bold", padding: "8px", borderBottom: "1px solid #ddd" }}>ช่องทางการชำระเงิน:</td>
+                                    <td style={{ padding: "8px", borderBottom: "1px solid #ddd" }}>{formData.paymentMethod}</td>
+                                </tr>
+                                <tr>
+                                    <td style={{ fontWeight: "bold", padding: "8px", borderBottom: "1px solid #ddd" }}>ชื่อธนาคาร:</td>
+                                    <td style={{ padding: "8px", borderBottom: "1px solid #ddd" }}>{formData.bankName}</td>
+                                </tr>
+                                <tr>
+                                    <td style={{ fontWeight: "bold", padding: "8px", borderBottom: "1px solid #ddd" }}>หมายเลขบัญชี:</td>
+                                    <td style={{ padding: "8px", borderBottom: "1px solid #ddd" }}>{formData.accountNumber}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
 
-                    <div style={{ marginTop: '20px', textAlign: 'right' }}>
-                        <Button onClick={handleClose} color="secondary">แก้ไข</Button>
-                        <Button onClick={handleSubmit} color="primary">
+                    {formData.image && (
+                        <div style={{ textAlign: "center", marginBottom: "20px" }}>
+                            <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
+                                รูปภาพของสินค้า
+                            </Typography>
+                            <img
+                                src={URL.createObjectURL(formData.image)}
+                                alt="สินค้าของที่ระลึก"
+                                style={{ maxWidth: "100%", height: "200px", objectFit: "cover", borderRadius: "8px" }}
+                            />
+                        </div>
+                    )}
+
+                    <div style={{ display: "flex", justifyContent: "space-between", marginTop: "20px" }}>
+                        <Button onClick={handleClose} variant="outlined" color="secondary">
+                            แก้ไข
+                        </Button>
+                        <Button onClick={handleSubmit} variant="contained" color="primary">
                             ยืนยันเพิ่มสินค้า
                         </Button>
                     </div>
@@ -422,6 +487,7 @@ function SouvenirRequest() {
             </Modal>
         </div>
     );
+
 }
 
 export default SouvenirRequest;

@@ -11,7 +11,9 @@ function OrderHistory() {
     
     useEffect(() => {
         if (userId) {
-            axios.get(`http://localhost:3001/souvenir/order_history?user_id=${userId}`)
+            axios.get(`http://localhost:3001/souvenir/order_history?user_id=${userId}`,{
+                withCredentials: true
+            })
                 .then(response => {
                     setOrderHistory(response.data);
                     setLoading(false);

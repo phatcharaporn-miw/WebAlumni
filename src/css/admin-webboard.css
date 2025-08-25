@@ -1,0 +1,36 @@
+.card-webboard {
+    border-radius: 10px;
+    transition: transform 0.2s ease-in-out;
+}
+
+.card-webboard:hover {
+    transform: scale(1.02);
+}
+
+.admin-title{
+    /* text-align: center; */
+    color: #0F75BC;
+    font-weight: bold;
+  }
+
+.btn-sm {
+    font-size: 0.9rem;
+}
+
+.webboard-modal {
+  position: fixed;
+  top: 60%;
+  left: 55%;
+  transform: translate(-50%, -50%);
+  width: 70%;
+  max-width: 900px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  padding: 2rem;
+  border-radius: 20px;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  animation: modalSlideIn 0.3s ease-out;
+}

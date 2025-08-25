@@ -1,11 +1,9 @@
 .about-title{
     text-align: center;
-    /* padding: 30px; */
     color: #0F75BC;
     font-weight: bold;
   }
 
- 
 .card-img-top {
     height: 300px;
     object-fit: cover;
@@ -13,8 +11,6 @@
 
 #person-card{
     justify-content: center;
-    /* align-items: center; */
-    /* display: flex; */
 }
 
 
@@ -41,7 +37,6 @@
 
 .contact-item p {
   margin: 0;
-  color: #2d3a3f;
   font-size: 14px;
 }
 
@@ -52,7 +47,6 @@
 .map-container iframe {
   width: 600px;
   height: 300px;
-  
 }
 
 

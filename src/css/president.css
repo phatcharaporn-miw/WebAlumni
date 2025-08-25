@@ -1,0 +1,37 @@
+/* .card-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+} */
+
+.badge {
+  font-size: 0.9rem;
+  padding: 0.4em 0.8em;
+}
+
+.bg-success-subtle {
+  background-color: #e6f4ea !important;
+  color: #237a3b !important;
+}
+.bg-secondary-subtle {
+  background-color: #f0f0f0 !important;
+  color: #6c757d !important;
+}
+
+@keyframes shine {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.card-title {
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 576px) {
+  .card-img-top {
+    height: 150px !important;
+  }
+}

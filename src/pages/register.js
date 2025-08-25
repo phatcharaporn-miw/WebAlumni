@@ -1,311 +1,529 @@
 import React, { useEffect, useState } from 'react';
-import { data, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import "../css/Register.css";
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { useNavigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
-
+import Swal from "sweetalert2";
 
 function Register() {
-  const [error, setError] = useState("");
-  const navigate = useNavigate();
-  const [major, setMajor] = useState([]);
-  const [userData, setUserData] = useState({
-    username: '',
-    password: '',
-    email: '',
-    role: '',
-    full_name: '',
-    nick_name: '',
-    title: '',
-    birthday: '',
-    address: '',
-    phone: '',
-    line: '',
-    major: '',
-    studentId:'',
-    graduation_year:'',
-    degree:[],
-    
-  });
+    const [error, setError] = useState("");
+    const navigate = useNavigate();
+    const [major, setMajor] = useState([]);
+    const [userData, setUserData] = useState({
+        username: '',
+        password: '',
+        email: '',
+        role: '',
+        full_name: '',
+        nick_name: '',
+        title: '',
+        birthday: '',
+        address: '',
+        phone: '',
+        line: '',
+        education: [
+            {
+                degree: '',
+                major: '',
+                studentId: '',
+                graduation_year: '',
+            },
+        ],
 
-  const [selectedFile, setSelectedFile] = useState(null);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-     // แสดงข้อมูลที่กรอกไป
-     console.log("FormData on submit:", userData);
-
-    // ดึงไฟล์จาก input
-    const fileInput = document.getElementById("file-upload");
-    const selectFile = fileInput.files[0]; 
-    
-    const data = new FormData();
-    if (selectedFile) {
-        data.append('image_path', selectedFile); // เพิ่มไฟล์ลงใน FormData
-    }
-
-    Object.entries(userData).forEach(([key, value]) => {
-        if (Array.isArray(value)) {
-            value.forEach((v) => data.append(key, v));
-        } else {
-            data.append(key, value);
-        }
     });
 
-    for (let [key, value] of data.entries()) {
-        console.log(key, value); 
-    } 
-    
-    if (!userData.username || !userData.password || !userData.role) {
-        alert("กรุณากรอกข้อมูลให้ครบถ้วน");
-        return;
-    }
-     // ทำการส่งข้อมูลไป Backend
-     try {
-        const response = await axios.post("http://localhost:3001/add/register", data, {
-            headers: { "Content-Type": "multipart/form-data" },
-        });
-         alert('ลงทะเบียนสำเร็จ!');
-        navigate("/login");
-    //   if (response.data.success) {
-       
-        
-    //   }
-     } catch (error) {
-      alert("เกิดข้อผิดพลาดในการลงทะเบียน");
-     console.error("Register error:", error);
-     }
-  };
-  
-  // ดึงข้อมูลสาขามาแสดงใน dropdown 
-  useEffect(() => {
-    const fetchMajors = async () => {
-      try {
-        const response = await axios.get('http://localhost:3001/add/major');
-        // console.log("Fetched majors:", response.data);
-        setMajor(response.data);
-      } catch (err) {
-        setError("ไม่สามารถดึงข้อมูลสาขาได้");
-        console.error("Error fetching majors:", err);
-      }
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [passwordError, setPasswordError] = useState('');
+
+    //ตรวจสอบรหัสผ่าน
+    const validatePassword = (password) => {
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]+$/;
+        return passwordRegex.test(password);
     };
-    fetchMajors();
-  }, []);
+
+    // ตรวจสอบการเลือกบทบาท
+    const handleRoleSelection = (roleValue) => {
+        setUserData(prev => ({
+            ...prev,
+            role: roleValue
+        }));
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        const data = new FormData();
+
+        if ((userData.role === '3' || userData.role === '4') && Array.isArray(userData.education) && userData.education.length > 0) {
+            const educationData = userData.education.map((edu) => {
+                if (userData.role === '3') {
+                    return {
+                        degree: edu.degree,
+                        major: edu.major,
+                        studentId: edu.studentId,
+                        graduation_year: edu.graduation_year,
+                    };
+                } else if (userData.role === '4') {
+                    return {
+                        degree: edu.degree,
+                        major: edu.major,
+                        studentId: edu.studentId,
+                        student_year: edu.student_year,
+                    };
+                }
+            });
+            data.append("education", JSON.stringify(educationData));
+        }
+
+        Object.entries(userData).forEach(([key, value]) => {
+            if (key !== "education" && value) {
+                data.append(key, value);
+            }
+        });
+
+        if (selectedFile) {
+            data.append("image_path", selectedFile);
+        }
+
+        try {
+            const response = await axios.post("http://localhost:3001/add/register", data, { withCredentials: true });
+            Swal.fire({
+                icon: "success",
+                title: "ลงทะเบียนสำเร็จ!",
+                confirmButtonText: "ตกลง",
+            }).then(() => navigate("/login"));
+        } catch (error) {
+            console.error("Register error:", error);
+            Swal.fire({
+                icon: "error",
+                title: "เกิดข้อผิดพลาด",
+                text: error.response?.data?.message || "ไม่สามารถลงทะเบียนได้ กรุณาลองใหม่อีกครั้ง",
+                confirmButtonText: "ตกลง",
+            });
+        }
+    };
+
+    useEffect(() => {
+        const fetchMajors = async () => {
+            try {
+                const response = await axios.get('http://localhost:3001/add/major', {
+                    withCredentials: true
+                });
+                setMajor(response.data.major);
+            } catch (err) {
+                setError("ไม่สามารถดึงข้อมูลสาขาได้");
+                console.error("Error fetching majors:", err);
+            }
+        };
+        fetchMajors();
+    }, []);
 
 
-  const handleInputChange = (e) => {
-    const {name, value, checked, type} = e.target;
+    const handleInputChange = (e) => {
+        const { name, value, checked, type } = e.target;
 
-    if (type === 'checkbox' && name === 'degree') {
-        const updatedDegrees = checked
-          ? [...userData.degree, parseInt(value)]  // true => ใช้การกระจายค่าเพื่อเพิ่ม degree_id ใหม่เข้าไปในอาร์เรย์ userData.degree และแปลงค่า string->int
-          : userData.degree.filter((item) => item !== parseInt(value)); // false =>  ลบค่า degree_id จาก array ที่ถูกคลิก
-        
-        setUserData((prevState) => ({ ...prevState, degree: updatedDegrees })); //prevState ใช้เข้าถึงสถานะก่อนหน้า เก็บค่าของ prevState ไว้ทั้งหมด และอัปเดตค่าใหม่
-      } else {
-        setUserData((prevState) => ({ ...prevState, [name]: value })); //ถ้าเป็น input หรือฟอร์มชนิดอื่นจะอัปเดตค่าของ [name]: value
-      }
-    // setFormData({
-    //   ...formData,[name]: value, 
-    // });
-  };
+        if (name === 'password') {
+            if (!validatePassword(value)) {
+                setPasswordError('รหัสผ่านต้องมีอักขระพิมพ์ใหญ่ พิมพ์เล็ก และตัวเลข และห้ามใช้อักขระพิเศษ');
+            } else {
+                setPasswordError('');
+            }
+        }
+
+        if (type === 'checkbox' && name === 'degree') {
+            const updatedDegrees = checked
+                ? [...userData.degree, parseInt(value)]
+                : userData.degree.filter((item) => item !== parseInt(value));
+
+            setUserData((prevState) => ({ ...prevState, degree: updatedDegrees }));
+        } else {
+            setUserData((prevState) => ({ ...prevState, [name]: value }));
+        }
+    };
+
+    const handleEducationChange = (index, field, value) => {
+        const updatedEducation = [...userData.education];
+        updatedEducation[index][field] = value;
+        if (field === "degree") {
+            updatedEducation[index][field] = parseInt(value); // degree_id
+        }
+        if (field === "major") {
+            updatedEducation[index][field] = parseInt(value); // major_id
+        }
+
+        setUserData((prevState) => ({ ...prevState, education: updatedEducation }));
+
+        console.log("Selected major ID:", updatedEducation[index].major);
+
+    };
+
+    const addEducation = () => {
+        setUserData((prevState) => ({
+            ...prevState,
+            education: [...prevState.education, { degree: '', major: '', studentId: '', graduation_year: '' }],
+        }));
+    };
+
+    const removeEducation = (index) => {
+        const updatedEducation = userData.education.filter((_, i) => i !== index);
+        setUserData((prevState) => ({ ...prevState, education: updatedEducation }));
+    };
+
+
 
     return (
-        <div className="register-page">
+        <div className="register-page container">
             <img className="register-logo" src="./image/สมาคม-logo.png" alt="Logo" />
             <div className="content-register">
-                <div className="upImage">
-                    <div className="image-profile">
-                        <img className="profile" src={selectedFile ? URL.createObjectURL(selectedFile) : "default-image.png"}  alt="Profile" />
-                        <br />
-                        <label htmlFor="file-upload" className="upFile">อัพโหลดรูปภาพ</label>
-                        <input type="file" id="file-upload" className="upFile-input" name="file-upload"  onChange={(e) => {const file = e.target.files[0];
-                            if (file) {
-                                setSelectedFile(file);
-                            } 
-                        }}/>
-                    </div>
-                </div>
-
-
-                <div className="form-regis-bg">
+                <div className="form-regis-bg ">
                     <div className="form-regis">
                         <form onSubmit={handleSubmit}>
                             <h2>ลงทะเบียน</h2>
+                            <div className="upImage">
+                                <div className="image-profile">
+                                    <img className="profile" src={selectedFile ? URL.createObjectURL(selectedFile) : "http://localhost:3001/uploads/default-profile.png"} alt="Profile" />
+                                    <br />
+                                    <label htmlFor="file-upload" className="upFile">อัพโหลดรูปภาพ</label>
+                                    <input type="file" id="file-upload" className="upFile-input" name="file-upload" onChange={(e) => {
+                                        const file = e.target.files[0];
+                                        if (file) {
+                                            setSelectedFile(file);
+                                        }
+                                    }} />
+                                </div>
+                            </div>
+                            <div className="role-selection">
+                                <legend className="legend-title">ประเภทผู้ใช้</legend>
+                                <div className="role-buttons">
+                                    <button
+                                        type="button"
+                                        className={`role-btn ${userData.role === '3' ? 'active' : userData.role === '4' ? 'inactive' : ''}`}
+                                        onClick={() => handleRoleSelection('3')}
+                                    >
+                                        ศิษย์เก่า
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className={`role-btn ${userData.role === '4' ? 'active' : userData.role === '3' ? 'inactive' : ''}`}
+                                        onClick={() => handleRoleSelection('4')}
+                                    >
+                                        ศิษย์ปัจจุบัน
+                                    </button>
+                                </div>
+                            </div>
                             <fieldset>
-                            <label className="form-label">เลือกประเภทผู้ใช้:</label>
-                                <select  name="role" value={userData.role} onChange={(e) => handleInputChange({ target: { name: 'role', value: e.target.value } })} className="form-control">
-                                    <option value="">เลือกบทบาท</option>
-                                    <option value="1">แอดมิน</option>
-                                    <option value="2">นายกสมาคม</option>
-                                    <option value="3">ศิษย์เก่า</option>
-                                    <option value="4">ศิษย์ปัจจุบัน</option>
-                                </select>
                                 <legend className="legend-title">สร้างบัญชีผู้ใช้</legend>
                                 <div className="group">
                                     <div className="form-group">
                                         <label>ชื่อผู้ใช้งาน<span className="importent">*</span></label><br />
-                                        <input type="text" className="form-control" id="username" name="username" placeholder='ชื่อผู้ใช้งาน'
-                                        value={userData.username}
-                                        onChange={handleInputChange}
-                                        required
+                                        <input type="text" className="form-control w-100" id="username" name="username" placeholder='ชื่อผู้ใช้งาน'
+                                            value={userData.username}
+                                            onChange={handleInputChange}
+                                            required
                                         />
                                     </div>
-                                    <div className="form-group">
+                                </div>
+                                <div className="form-group">
                                         <label>สร้างรหัสผ่าน<span className="importent">*</span></label><br />
-                                        <input type="password" className="form-control" id="password" name="password" placeholder='รหัสผ่าน'
-                                        value={userData.password}
-                                        onChange={handleInputChange}
-                                        required
+                                        <input
+                                            type="password"
+                                            className="form-control"
+                                            id="password"
+                                            name="password"
+                                            placeholder="รหัสผ่านต้องมีอักขระพิมพ์ใหญ่ พิมพ์เล็ก และตัวเลข"
+                                            title="รหัสผ่านต้องมีอักขระพิมพ์ใหญ่ พิมพ์เล็ก และตัวเลข และห้ามใช้อักขระพิเศษ"
+                                            value={userData.password}
+                                            onChange={handleInputChange}
+                                            required
                                         />
                                     </div>
-                            
-                                </div>
                             </fieldset>
 
-                            {userData.role === "3" && ( 
-                            <>
-                            <fieldset>
-                                <legend className="legend-title">ข้อมูลส่วนตัว</legend>
-                                <div className="form-group">
-                                    <label>คำนำหน้า<span className="importent">*</span></label>
-                                    <select name="title" value={userData.title} onChange={handleInputChange}>
-                                        <option value="">คำนำหน้า</option>
-                                        <option value="นาย">นาย</option>
-                                        <option value="นาง">นาง</option>
-                                        <option value="นางสาว">นางสาว</option>
-                                    </select>
-                                </div>
-
-                                <div className="form-group">
-                                    <label>ชื่อ-สกุล<span className="importent">*</span></label>
-                                    <input type="text" className="form-control" id="full_name" name="full_name" placeholder='ชื่อ-สกุล'
-                                    value={userData.full_name}
-                                    onChange={handleInputChange}
-                                    required
-                                    />
-                                </div>
-
-                                <div className="form-group">
-                                    <label>ชื่อเล่น<span className="importent">*</span></label>
-                                     <input type="text" className="form-control" id="nick_name" name="nick_name" placeholder='ชื่อเล่น'
-                                    value={userData.nick_name}
-                                    onChange={handleInputChange}
-                                    />
-                                </div>
-
-                                <div className="form-group">
-                                    <label>อีเมล<span className="importent">*</span></label>
-                                    <input type="email" className="form-control" id="email" name="email" placeholder='อีเมล'
-                                    value={userData.email}
-                                    onChange={handleInputChange}
-                                    required
-                                    />
-                                </div>
-
-                                <div className="form-group">
-                                    <label>ที่อยู่<span className="importent">*</span></label>
-                                    <input type="text" className="form-control" id="address" name="address" placeholder='ที่อยู่'
-                                    value={userData.address}
-                                    onChange={handleInputChange}
-                                    />
-                                </div>
-                               
-                                <div className="form-group">
-                                    <label>วัน/เดือน/ปีเกิด<span className="importent">*</span></label>
-                                    <input type="date" className="form-control" id="birthday" name="birthday" 
-                                    value={userData.birthday}
-                                    onChange={handleInputChange}
-                                    required
-                                    />
-                                </div>
-
-                                <div className="form-group">
-                                    <label>เบอร์โทร<span className="importent">*</span></label>
-                                    <input type="number" className="form-control" id="phone" name="phone" placeholder='เบอร์โทร'
-                                    value={userData.phone}
-                                    onChange={handleInputChange}
-                                    required
-                                    />
-                                </div>
-
-                                <div className="form-group">
-                                    <label>โซเชียล<span className="importent">*</span></label>
-                                    <input type="text" className="form-control" id="line" name="line" placeholder='โซเชียล'
-                                    value={userData.line}
-                                    onChange={handleInputChange}
-                                    />
-                                </div>
-                            </fieldset>
-
-                            <fieldset>
-                                <legend className="legend-title">ระดับการศึกษาที่จบจาก CP</legend>
-                                <div className="education-grid">
-                                    <div className="form-group">
-                                        <label>ระดับการศึกษา<span className="importent">*</span></label>
-                                        <div className='education-row'>
-                                            <div className="education-item">
-                                                <label>
-                                                <input type="checkbox" name="degree" value="1" onChange={handleInputChange} />
-                                                ป.ตรี
-                                                </label>
-                                            </div>
-                                            <div className="education-item">
-                                                <label>
-                                                <input type="checkbox" name="degree" value="2" onChange={handleInputChange} />
-                                                ป.โท
-                                                </label>
-                                            </div>
-                                            <div className="education-item">
-                                                <label>
-                                                <input type="checkbox" name="degree" value="3" onChange={handleInputChange} />
-                                                ป.เอก
-                                                </label>
-                                            </div>
+                            {userData.role === "3" && (
+                                <>
+                                    <fieldset>
+                                        <legend className="legend-title">ข้อมูลส่วนตัว</legend>
+                                        <div className="form-group">
+                                            <label>คำนำหน้า<span className="importent">*</span></label>
+                                            <select name="title" value={userData.title} onChange={handleInputChange} required>
+                                                <option value="">คำนำหน้า</option>
+                                                <option value="นาย">นาย</option>
+                                                <option value="นาง">นาง</option>
+                                                <option value="นางสาว">นางสาว</option>
+                                            </select>
                                         </div>
-                                    </div>
 
-                                    <div className="form-group">
-                                        <label>รหัสนักศึกษา<span className="importent">*</span></label>
-                                        <input type="text" className="form-control" id="studentId" name="studentId" placeholder='รหัสนักศึกษา'
-                                            value={userData.studentId}
-                                            onChange={handleInputChange}
-                                            required
-                                        />
-                                    </div>
+                                        <div className="form-group">
+                                            <label>ชื่อ-สกุล<span className="importent">*</span></label>
+                                            <input type="text" className="form-control" id="full_name" name="full_name" placeholder='ชื่อ-สกุล'
+                                                value={userData.full_name}
+                                                onChange={handleInputChange}
+                                                required
+                                            />
+                                        </div>
 
-                                    <div className="form-group">
-                                        <label>ปีการศึกษาที่จบ<span className="importent">*</span></label>
-                                        <input type="text" className="form-control" id="graduation_year" name="graduation_year" placeholder='ปีการศึกษาที่จบ'
-                                            value={userData.graduation_year}
-                                            onChange={handleInputChange}
-                                            required
-                                        />
-                                    </div>
+                                        <div className="form-group">
+                                            <label>ชื่อเล่น<span className="importent">*</span></label>
+                                            <input type="text" className="form-control" id="nick_name" name="nick_name" placeholder='ชื่อเล่น'
+                                                value={userData.nick_name}
+                                                onChange={handleInputChange}
+                                            />
+                                        </div>
 
-                                    <div className="form-group">
-                                        <label>สาขา<span className="importent">*</span></label>
-                                        <select
-                                            name="major"
-                                            value={userData.major}
-                                            onChange={(e) => handleInputChange({ target: { name: 'major', value: e.target.value } })}
-                                            >
-                                            <option value="">เลือกสาขา</option>
-                                            {major.map((majorItem) => (
-                                                <option key={majorItem.major_id} value={majorItem.major_id}>
-                                                {majorItem.major_name}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>                                  
-                                </div>
-                            </fieldset>
+                                        <div className="form-group">
+                                            <label>อีเมล<span className="importent">*</span></label>
+                                            <input type="email" className="form-control" id="email" name="email" placeholder='อีเมล'
+                                                value={userData.email}
+                                                onChange={handleInputChange}
+                                                required
+                                            />
+                                        </div>
 
-                            </>
+                                        <div className="form-group">
+                                            <label>ที่อยู่</label>
+                                            <input type="text" className="form-control" id="address" name="address" placeholder='ที่อยู่'
+                                                value={userData.address}
+                                                onChange={handleInputChange}
+                                            />
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>วัน/เดือน/ปีเกิด<span className="importent">*</span></label>
+                                            <input type="date" className="form-control" id="birthday" name="birthday"
+                                                value={userData.birthday}
+                                                onChange={handleInputChange}
+                                                required
+                                            />
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>เบอร์โทร<span className="importent">*</span></label>
+                                            <input type="number" className="form-control" id="phone" name="phone" placeholder='เบอร์โทร'
+                                                value={userData.phone}
+                                                onChange={handleInputChange}
+                                                required
+                                            />
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>ไลน์</label>
+                                            <input type="text" className="form-control" id="line" name="line" placeholder='ไลน์'
+                                                value={userData.line}
+                                                onChange={handleInputChange}
+                                            />
+                                        </div>
+                                    </fieldset>
+
+                                    <fieldset>
+                                        <legend className="legend-title">ข้อมูลการศึกษา</legend>
+                                        {userData.education.map((edu, index) => (
+                                            <div key={index} className="education-item mb-4">
+                                                <div className="form-group">
+                                                    <label>ระดับการศึกษา<span className="importent">*</span></label>
+                                                    <select
+                                                        name="degree"
+                                                        value={edu.degree}
+                                                        onChange={(e) => handleEducationChange(index, 'degree', e.target.value)}
+                                                        className="form-control"
+                                                        required
+                                                    >
+                                                        <option value="">เลือกระดับการศึกษา</option>
+                                                        <option value="1">ป.ตรี</option>
+                                                        <option value="2">ป.โท</option>
+                                                        <option value="3">ป.เอก</option>
+                                                    </select>
+                                                </div>
+
+                                                <div className="form-group">
+                                                    <label>สาขา<span className="importent">*</span></label>
+                                                    <select
+                                                        name="major"
+                                                        value={edu.major}
+                                                        onChange={(e) => handleEducationChange(index, 'major', e.target.value)}
+                                                        className="form-control"
+                                                        required
+                                                    >
+                                                        <option value="">เลือกสาขา</option>
+                                                        {major.length > 0 ? (
+                                                            major.map((majorItem) => (
+                                                                <option key={majorItem.major_id} value={majorItem.major_id}>
+                                                                    {majorItem.major_name}
+                                                                </option>
+                                                            ))
+                                                        ) : (
+                                                            <option value="">ไม่มีข้อมูลสาขา</option>
+                                                        )}
+                                                    </select>
+                                                </div>
+
+                                                <div className="form-group">
+                                                    <label>รหัสนักศึกษา<span className="importent">*</span></label>
+                                                    <input
+                                                        type="text"
+                                                        className="form-control"
+                                                        name="studentId"
+                                                        placeholder="รหัสนักศึกษา"
+                                                        value={edu.studentId}
+                                                        onChange={(e) => handleEducationChange(index, 'studentId', e.target.value)}
+                                                        required
+                                                    />
+                                                </div>
+
+                                                <div className="form-group">
+                                                    <label>ปีที่เข้าศึกษา</label>
+                                                    <input
+                                                        type="text"
+                                                        className="form-control"
+                                                        name="admission_year"
+                                                        placeholder="ปีที่เข้าศึกษา"
+                                                        value={edu.admission_year}
+                                                        onChange={(e) => handleEducationChange(index, 'admission_year', e.target.value)}
+                                                    />
+                                                </div>
+
+                                                <div className="form-group">
+                                                    <label>ปีการศึกษาที่จบ</label>
+                                                    <input
+                                                        type="text"
+                                                        className="form-control"
+                                                        name="graduation_year"
+                                                        placeholder="ปีการศึกษาที่จบ"
+                                                        value={edu.graduation_year}
+                                                        onChange={(e) => handleEducationChange(index, 'graduation_year', e.target.value)}
+                                                    />
+                                                </div>
+
+                                                {userData.education.length > 1 && (
+                                                    <button
+                                                        type="button"
+                                                        className="btn btn-danger mt-2"
+                                                        onClick={() => removeEducation(index)}
+                                                    >
+                                                        ลบรายการ
+                                                    </button>
+                                                )}
+
+                                                <hr />
+                                            </div>
+                                        ))}
+
+                                        <button type="button" className="btn btn-primary mt-3" onClick={addEducation}>
+                                            เพิ่มข้อมูลการศึกษา
+                                        </button>
+                                    </fieldset>
+                                </>
+                            )}
+
+                            {userData.role === "4" && (
+                                <>
+                                    <fieldset>
+                                        <legend className="legend-title">ข้อมูลส่วนตัว</legend>
+                                        <div className="form-group">
+                                            <label>คำนำหน้า<span className="importent">*</span></label>
+                                            <select name="title" value={userData.title} onChange={handleInputChange} required>
+                                                <option value="">คำนำหน้า</option>
+                                                <option value="นาย">นาย</option>
+                                                <option value="นาง">นาง</option>
+                                                <option value="นางสาว">นางสาว</option>
+                                            </select>
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>ชื่อ-สกุล<span className="importent">*</span></label>
+                                            <input type="text" className="form-control" id="full_name" name="full_name" placeholder='ชื่อ-สกุล'
+                                                value={userData.full_name}
+                                                onChange={handleInputChange}
+                                                required
+                                            />
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>อีเมล<span className="importent">*</span></label>
+                                            <input type="email" className="form-control" id="email" name="email" placeholder='อีเมล'
+                                                value={userData.email}
+                                                onChange={handleInputChange}
+                                                required
+                                            />
+                                        </div>
+                                    </fieldset>
+
+                                    <fieldset>
+                                        <legend className="legend-title">ข้อมูลการศึกษา</legend>
+                                        {userData.education.map((edu, index) => (
+                                            <div key={index} className="education-item mb-4">
+                                                <div className="form-group">
+                                                    <label>ระดับการศึกษา<span className="importent">*</span></label>
+                                                    <select
+                                                        name="degree"
+                                                        value={edu.degree}
+                                                        onChange={(e) => handleEducationChange(index, 'degree', e.target.value)}
+                                                        className="form-control"
+                                                        required
+                                                    >
+                                                        <option value="">เลือกระดับการศึกษา</option>
+                                                        <option value="1">ป.ตรี</option>
+                                                        <option value="2">ป.โท</option>
+                                                        <option value="3">ป.เอก</option>
+                                                    </select>
+                                                </div>
+                                                <div className="form-group">
+                                                    <label>สาขา<span className="importent">*</span></label>
+                                                    <select
+                                                        name="major"
+                                                        value={edu.major}
+                                                        onChange={(e) => handleEducationChange(index, 'major', e.target.value)}
+                                                        className="form-control"
+                                                        required
+                                                    >
+                                                        <option value="">เลือกสาขา</option>
+                                                        {major.length > 0 ? (
+                                                            major.map((majorItem) => (
+                                                                <option key={majorItem.major_id} value={majorItem.major_id}>
+                                                                    {majorItem.major_name}
+                                                                </option>
+                                                            ))
+                                                        ) : (
+                                                            <option value="">ไม่มีข้อมูลสาขา</option>
+                                                        )}
+                                                    </select>
+                                                </div>
+                                                <div className="form-group">
+                                                    <label>รหัสนักศึกษา<span className="importent">*</span></label>
+                                                    <input
+                                                        type="text"
+                                                        className="form-control"
+                                                        name="studentId"
+                                                        placeholder="รหัสนักศึกษา"
+                                                        value={edu.studentId}
+                                                        onChange={(e) => handleEducationChange(index, 'studentId', e.target.value)}
+                                                        required
+                                                    />
+                                                </div>
+                                                <div className="form-group">
+                                                    <label>ปีที่เรียน<span className="importent">*</span></label>
+                                                    <select
+                                                        name="student_year"
+                                                        value={edu.student_year || ''}
+                                                        onChange={(e) => handleEducationChange(index, 'student_year', e.target.value)}
+                                                        className="form-control"
+                                                        required
+                                                    >
+                                                        <option value="">เลือกปีที่เรียน</option>
+                                                        <option value="1">ปี 1</option>
+                                                        <option value="2">ปี 2</option>
+                                                        <option value="3">ปี 3</option>
+                                                        <option value="4">ปี 4</option>
+                                                        <option value="5">ปี 5</option>
+                                                        <option value="อื่นๆ">อื่นๆ</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </fieldset>
+                                </>
                             )}
                             <div className="button-group">
                                 <div>
@@ -322,7 +540,6 @@ function Register() {
                     </div>
                 </div>
             </div>
-
         </div>
     );
 }

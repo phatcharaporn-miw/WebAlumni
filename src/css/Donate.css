@@ -26,7 +26,7 @@
     color: white;
     padding: 12px 30px;
     border-radius: 10px;
-    font-size: 16px;
+    /* font-size: 16px; */
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -35,6 +35,9 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
+    margin: 0;
+    font-size: 24px;
+    font-weight: bold;
 }
 
 .donate-bt-request:hover {
@@ -59,6 +62,17 @@
     font-size: 14px;
 }
 
+.donate-button {
+    position: absolute;
+    top: 52%;
+    left: 50%;
+    width: 30%;
+    transform: translate(-50%, -50%);
+    padding: 12px 20px;
+    font-size: 18px;
+    background-color: #0F75BC;
+}
+
 .filter-select:focus {
     border-color: #007bff;
     box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
@@ -74,12 +88,40 @@
 /* Results Summary */
 .results-summary {
     margin: 20px 0;
+}
+.content-donate {
+    display: grid;
+    grid-template-columns: auto auto;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 40px;
+    background-color: #f8f9fa;
+}
+
+/* เนื้อหาแสดงรายการบริจาค */
+.donate-content {
     text-align: center;
 }
 
 .results-summary p {
     margin: 0;
     font-size: 14px;
+}
+.no-projects {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+    font-size: 18px;
+    color: #666;
+}
+
+.donate-content-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
+    margin: 40px 0;
+    padding: 0 20px;
 }
 
 /* Title */
@@ -110,24 +152,32 @@
 
 /* Individual Project Card */
 .item-detail {
-    background: white;
-    border-radius: 15px;
-    overflow: hidden;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
+    width: 100%;
+    height: 550px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background-color: white;
     display: flex;
     flex-direction: column;
-    height: 100%;
-    border: 1px solid #f0f0f0;
+    position: relative;
+    overflow: hidden;
 }
 
 .item-detail:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
-/* Image Section */
 .image-frame {
+    width: 100%;
+    height: 280px; /* เพิ่มความสูงรูปภาพ */
+    overflow: hidden;
+    border-radius: 12px 12px 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     position: relative;
     height: 200px;
     overflow: hidden;
@@ -182,6 +232,20 @@
 
 /* Tag and Date Container */
 .tag-date-container {
+.donate-discription {
+    color: black;
+    margin: 20px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    /* gap: 15px; */
+}
+
+.tag-date-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
     margin-bottom: 10px;
 }
 
@@ -273,6 +337,88 @@
     height: 8px;
     background-color: #e9ecef;
     border-radius: 10px;
+    border-radius: px;
+    font-size: 15px;
+    padding: 8px 0px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.tagDonante.fundraising {
+    color: #28A745;
+}
+
+.tagDonante.unlimited {
+    color: #FFC107;
+}
+
+.tagDonante.things {
+    color: #6610F2;
+}
+
+.donate-discription-date {
+    font-size: 12px;
+    color: #9c9b9b;
+    text-align: right;
+    line-height: 1.2;
+}
+
+.project-title {
+    height: 40px; /* ลดความสูงเพื่อให้มีที่ว่างสำหรับรูป */
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.project-title h5 {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.3;
+    color: #333;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.project-description {
+    height: 70px; /* ลดความสูงเพื่อให้มีที่ว่างสำหรับรูป */
+    margin-bottom: 15px;
+}
+
+.project-description p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.4;
+    color: #666;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.progress-section {
+    margin-bottom: 15px;
+    min-height: 30px; /* กำหนดความสูงขั้นต่ำ */
+}
+
+.progress-text {
+    display: block;
+    background-color: transparent;
+    color: #0F75BC;
+    text-align: end;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.progress-bar-container {
+    position: relative;
+    width: 100%;
+    height: 12px;
+    background-color: #e0e0e0;
+    border-radius: 6px;
     overflow: hidden;
 }
 
@@ -350,6 +496,75 @@
 }
 
 /* Button Container */
+    height: 100%;
+    background-color: #0F75BC;
+    border-radius: 6px;
+    transition: width 0.5s ease-in-out;
+    position: relative;
+}
+
+.progress-percent {
+    position: absolute;
+    top: -25px;
+    right: 0;
+    font-size: 10px;
+    color: #333;
+    font-weight: bold;
+}
+
+/* รายละเอียดการบริจาค */
+.donate-details {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: #085A9C;
+    margin-bottom: 10px;
+    min-height: 60px; /* กำหนดความสูงขั้นต่ำ */
+}
+
+.details-amount1,
+.details-amount2 {
+    flex: 1;
+}
+
+.details-amount1 {
+    padding-right: 10px;
+}
+
+.details-amount2 {
+    padding-left: 10px;
+}
+
+.details-amount-title {
+    font-weight: bold;
+    color: #28A745;
+    font-size: 15px;
+}
+
+.donate-detail-discription-day {
+    margin-top: auto;
+    margin-bottom: 15px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.donate-detail-discription-day .expired {
+    color: #dc3545;
+    /* background-color: #f8d7da; */
+    /* padding: 8px 12px; */
+    /* border-radius: 20px; */
+    /* border: 1px solid #f5c6cb; */
+}
+
+.donate-detail-discription-day .remaining {
+    color: #28a745;
+    background-color: #d4edda;
+    padding: 8px 12px;
+    border-radius: 20px;
+    border: 1px solid #c3e6cb;
+}
+
 .button-container {
     padding: 0 20px 20px 20px;
     margin-top: auto;
@@ -412,6 +627,7 @@
 .no-projects p {
     color: #6c757d;
     margin-bottom: 20px;
+    padding: 0 20px;
 }
 
 /* Loading Container */
@@ -472,6 +688,68 @@
 }
 
 /* Tablet */
+.donate-bt {
+    padding: 12px 20px;
+    width: 100%;
+    background-color: #0F75BC;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.donate-bt:hover {
+    background-color: #073C6B;
+}
+
+.donate-filter {
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    gap: 10px;
+}
+
+.donate-filter label {
+    font-size: 16px;
+    font-weight: 500;
+    color: #333;
+}
+
+.filter-select {
+    padding: 12px 16px;
+    font-size: 14px;
+    border-radius: 8px;
+    border: 1px solid #085A9C;
+    background-color: #fff;
+    color: #333;
+    cursor: pointer;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.filter-select:focus {
+    border-color: #0F75BC;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(15, 117, 188, 0.2);
+}
+
+@media (max-width: 1200px) {
+    .donate-content-grid {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+    }
+    
+    .item-detail {
+        height: 620px; 
+    }
+    
+    .image-frame {
+        height: 250px;
+    }
+}
+
 @media (max-width: 768px) {
     .head-donate {
         height: 200px;
@@ -484,6 +762,9 @@
 
     .donate-filter {
         padding: 20px 15px;
+        grid-template-columns: 1fr;
+        gap: 20px;
+        text-align: center;
     }
 
     .donate-content-grid {
@@ -509,6 +790,23 @@
     .details-amount1,
     .details-amount2 {
         text-align: center;
+        padding: 0 10px;
+    }
+
+    .item-detail {
+        height: 580px; 
+    }
+    
+    .image-frame {
+        height: 200px;
+    }
+    
+    .project-title {
+        height: 35px;
+    }
+    
+    .project-description {
+        height: 60px;
     }
 }
 
@@ -697,5 +995,50 @@
     .head-donate {
         height: auto;
         max-height: 200px;
+        height: 550px;
+    }
+    
+    .image-frame {
+        height: 180px;
+    }
+    
+    .donate-discription {
+        margin: 15px;
+        gap: 10px;
+    }
+    
+    .project-title {
+        height: 30px;
+    }
+    
+    .project-description {
+        height: 50px;
+    }
+    
+    .donate-details {
+        flex-direction: column;
+        gap: 10px;
+        min-height: 80px;
+    }
+    
+    .details-amount1,
+    .details-amount2 {
+        padding: 0;
+    }
+}
+
+@media (min-width: 1400px) {
+    .donate-content-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 40px;
+}
+
+    
+    .item-detail {
+        height: 680px; /* คืนค่าเดิม */
+    }
+    
+    .image-frame {
+        height: 300px;
     }
 }

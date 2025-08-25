@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useOutletContext, useNavigate, useLocation, Link } from 'react-router-dom';
+import { useOutletContext } from "react-router-dom";
+import { useNavigate, useLocation } from 'react-router-dom';
 import Swal from "sweetalert2";
+import { Link } from "react-router-dom";
+// css
 import '../../css/profile.css';
+// import '../../css/activity.css';
+// bootstrap
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
@@ -10,12 +15,15 @@ function AlumniProfileRequest() {
     const [pendingDonations, setPendingDonations] = useState([]);
     const [profile, setProfile] = useState({});
     const { handleLogout } = useOutletContext();
+    const [activity, setActivity] = useState([]);
     const [selectedStatus, setSelectedStatus] = useState('activity');
     const [previewImage, setPreviewImage] = useState(null);
     const [pendingRequests, setPendingRequests] = useState([]);
     const [loadingRequests, setLoadingRequests] = useState(true);
     const navigate = useNavigate();
+    const location = useLocation();
 
+    // ดึงข้อมูลโปรไฟล์
     useEffect(() => {
         axios.get('http://localhost:3001/users/profile', {
             withCredentials: true
@@ -26,17 +34,17 @@ function AlumniProfileRequest() {
                 }
             })
             .catch((error) => {
-                console.error('เกิดข้อผิดพลาดในการดึงข้อมูลโปรไฟล์:', error.response?.data?.message || error.message);
+                console.error('เกิดข้อผิดพลาดในการดึงข้อมูลโปรไฟล์:', error.response ? error.response.data.message : error.message);
             });
     }, []);
 
+    // ดึงข้อมูลคำร้องที่รออนุมัติ
     useEffect(() => {
         axios.get("http://localhost:3001/souvenir/pending-requests", { withCredentials: true })
             .then(res => {
                 setPendingRequests(res.data || []);
             })
             .catch(err => {
-                console.error('Error fetching pending requests:', err);
                 setPendingRequests([]);
             })
             .finally(() => setLoadingRequests(false));
@@ -86,28 +94,12 @@ function AlumniProfileRequest() {
 };
 
 
+    // อัปโหลดรูปภาพ
     const handleImageChange = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
 
-        if (file.size > 5 * 1024 * 1024) {
-            Swal.fire({
-                icon: 'error',
-                title: 'ไฟล์ใหญ่เกินไป',
-                text: 'กรุณาเลือกไฟล์ที่มีขนาดไม่เกิน 5MB'
-            });
-            return;
-        }
-
-        if (!profile.userId) {
-            Swal.fire({
-                icon: 'error',
-                title: 'ไม่พบผู้ใช้',
-                text: 'ไม่สามารถอัปโหลดรูปได้เนื่องจากไม่พบข้อมูลผู้ใช้'
-            });
-            return;
-        }
-
+        // แสดง preview รูปก่อนอัปโหลด
         setPreviewImage(URL.createObjectURL(file));
 
         const formData = new FormData();
@@ -116,33 +108,25 @@ function AlumniProfileRequest() {
 
         try {
             const res = await axios.post("http://localhost:3001/users/update-profile-image", formData, {
-                headers: { "Content-Type": "multipart/form-data" },
-                withCredentials: true
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
             });
 
             if (res.status === 200) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'สำเร็จ',
-                    text: 'อัปโหลดรูปสำเร็จ',
-                    timer: 1500,
-                    showConfirmButton: false
-                });
-                setProfile(prev => ({ ...prev, profilePicture: res.data.newImagePath }));
+                alert("อัปโหลดรูปสำเร็จ");
+
+                // อัปเดตรูปโปรไฟล์ใน state
+                setProfile((prev) => ({
+                    ...prev,
+                    profilePicture: res.data.newImagePath,
+                }));
             } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'เกิดข้อผิดพลาด',
-                    text: res.data.message || "เกิดข้อผิดพลาด"
-                });
+                alert(res.data.message || "เกิดข้อผิดพลาด");
             }
         } catch (err) {
             console.error(err);
-            Swal.fire({
-                icon: 'error',
-                title: 'เกิดข้อผิดพลาด',
-                text: 'ไม่สามารถอัปโหลดรูปได้'
-            });
+            alert("ไม่สามารถอัปโหลดรูปได้");
         }
     };
 
@@ -154,11 +138,10 @@ function AlumniProfileRequest() {
         <section className='container py-4'>
             <div className='alumni-profile-page'>
                 <div className="row justify-content-center g-4">
-                    {/* Sidebar */}
                     <div className="col-12 col-md-3 mb-4">
                         <div className="bg-white rounded-4 shadow-sm text-center p-4">
                             <img
-                                src={previewImage || profile.profilePicture || "/default-avatar.png"}
+                                src={previewImage || profile.profilePicture}
                                 alt="Profile"
                                 style={{
                                     width: "130px",
@@ -167,44 +150,49 @@ function AlumniProfileRequest() {
                                     objectFit: "cover",
                                     marginBottom: 16,
                                     border: '3px solid #eee'
-                                }}
-                                className="img-fluid mb-2"
+                            }}
+                            className="img-fluid mb-2"
+                        />
+                        <div className="mt-2 mb-3">
+                            <label
+                                htmlFor="upload-profile-pic"
+                                className="btn btn-sm btn-outline-secondary"
+                                style={{ cursor: "pointer" }}
+                            >
+                                เปลี่ยนรูป
+                            </label>
+                            <input
+                                type="file"
+                                id="upload-profile-pic"
+                                className="d-none"
+                                accept="image/*"
+                                onChange={handleImageChange}
                             />
-                            <div className="mt-2 mb-3">
-                                <label htmlFor="upload-profile-pic" className="btn btn-sm btn-outline-secondary" style={{ cursor: "pointer" }}>
-                                    เปลี่ยนรูป
-                                </label>
-                                <input
-                                    type="file"
-                                    id="upload-profile-pic"
-                                    className="d-none"
-                                    accept="image/*"
-                                    onChange={handleImageChange}
-                                />
-                            </div>
-                            <hr className="w-100" />
-                            <div className="menu d-block mt-3 w-100">
-                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile")}>ข้อมูลส่วนตัว</div>
-                                <div className="menu-item active py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-request")}>คำร้องขอ</div>
-                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-profile-webboard")}>กระทู้ที่สร้าง</div>
-                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/donation-history")}>ประวัติการบริจาค</div>
-                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-profile-activity")}>ประวัติการเข้าร่วมกิจกรรม</div>
-                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-profile-souvenir")}>ประวัติการสั่งซื้อ</div>
-                                <div className="menu-item py-2 rounded" onClick={handleLogout}>ออกจากระบบ</div>
-                            </div>
+                        </div>
+                        <hr className="w-100" />
+                        <div className="menu d-block mt-3 w-100">
+                            <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile")}>โปรไฟล์ของฉัน</div>
+                            <div className="menu-item active py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-request")}>คำร้องขอ</div>
+                            <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-manage-orders")}>จัดการคำสั่งซื้อของที่ระลึก</div>
+                            <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-profile-webboard")}>กระทู้ที่สร้าง</div>
+                            <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-profile-donation")}>ประวัติการบริจาค</div>
+                            <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-profile-activity")}>ประวัติการเข้าร่วมกิจกรรม</div>
+                            <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-profile-souvenir")}>ประวัติการสั่งซื้อของที่ระลึก</div>
+                            <div className="menu-item py-2 rounded" onClick={handleLogout}>ออกจากระบบ</div>
                         </div>
                     </div>
-
-                    {/* Main Content */}
-                    <div className="col-12 col-md-8">
-                        <div className="bg-white rounded-4 shadow-sm p-4 border-0">
-                            <div className="d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom">
+                </div>
+                {/* Main Content */}
+                <div className="col-12 col-md-8">
+                        {/* Header Section */}
+                        <div className="bg-white rounded-4 shadow-sm p-4 mb-4">
+                            <div className="d-flex justify-content-between align-items-center">
                                 <div className="d-flex align-items-center">
-                                    <div className="bg-warning bg-opacity-10 rounded-circle p-2 me-3">
-                                        <i className="fas fa-clock text-warning fs-5"></i>
+                                    <div className="bg-primary bg-opacity-10 rounded-circle p-2 me-3">
+                                        <i className="fas fa-comment-dots text-primary fs-5"></i>
                                     </div>
                                     <div>
-                                        <h4 className="fw-bold mb-1 text-dark">รายการคำร้องที่รออนุมัติ</h4>
+                                        <h4 className="fw-bold mb-1">รายการคำร้องที่รออนุมัติ</h4>
                                         <p className="text-muted mb-0 small">รายการที่ส่งเพื่อพิจารณาอนุมัติ</p>
                                     </div>
                                 </div>

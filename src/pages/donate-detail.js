@@ -240,6 +240,7 @@ function DonateDetail() {
             .catch(err => console.error("Error fetching profile:", err));
     }, []);
 
+    // Load project data with error handling
     useEffect(() => {
         if (userId) {
             setFormData((prev) => ({
@@ -1013,6 +1014,7 @@ function DonateDetail() {
                             className={`styled-input ${errors.amount ? "error" : ""}`}
                             type="text"
                             name="amount"
+                            id="amount"
                             value={formData.amount}
                             onChange={handleInputChange}
                             placeholder="กรอกจำนวน เช่น 1000"

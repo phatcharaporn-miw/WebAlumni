@@ -1,101 +1,365 @@
+.content {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
 
-  .news-card img {
-    width: 100%;
-    height: auto;
-    border-bottom: 4px solid #004F9F; 
-  }
-  
-  .news-card .card-body {
+}
+
+.background-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
+}
+
+.news-card .card-body {
     padding: 20px;
   }
 
   .card-homeweb {
-    max-height: 300px;
-    max-width: 80%; 
+    height: 280px; 
     overflow: hidden;
     margin-bottom: 5%;
     background-color: #fff;
   }
 
-  #head-text{
-    text-align: center;
-    margin: 40px;
-    color: #0F75BC;
-    font-weight: bold;
-  }
-  
-  .card {
-    height: 100%;
-  }
-  
-  .card-title{
-    font-weight: bold;
-  }
-
-  .content{
-    margin-bottom: 100px;
-  }
-
-  .home-about{
-    margin: 0 100px ;
-  }
-
-  .content {
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed; 
-    background-size: cover;
-    min-height: 100vh;
+.news-card img {
+  object-fit: cover;
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  border-bottom: 4px solid #004F9F; 
 }
 
+.btn-news-home,
+.card-homeweb,
+.news-card {
+  will-change: transform;
+}
 
-.news-title {
-  font-weight: bold;
+#head-text {
+  text-align: center;
+  margin: 30px;
+  padding: 30px;
   color: #0F75BC;
-  text-align: left;
-  margin-bottom: 20px;
+  font-size: 2rem;
+  font-weight: 700;
 }
 
-
-.news-item {
-  background-color: #fff;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  padding: 15px;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  align-items: center;
+.activity-title {
+  color: #0F75BC;
 }
 
-
-.news-date {
-  background-color: #0F75BC;
-  color: #fff;
-  padding: 10px 15px;
-  border-radius: 8px;
-  min-width: 80px;
+.title-icon {
+  font-size: 1.5rem;
+  margin-right: 10px;
 }
 
-.news-date .day {
-  font-size: 1.8rem;
-  font-weight: bold;
-  line-height: 1;
+.title-underline {
+  width: 60px;
+  height: 4px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  margin: 10px auto;
+  border-radius: 2px;
 }
 
-.news-date .month-year {
-  font-size: 0.8rem;
-  line-height: 1.2;
+.card-hover:hover {
+  transform: translateY(-8px) !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important;
 }
 
-.news-content h5 {
-  font-weight: bold;
-  color: #333;
-  margin: 0;
-  font-size: 1.2rem;
+.image-container {
+  position: relative;
+  overflow: hidden;
 }
 
-.news-content p {
-  color: #666;
-  margin-top: 5px;
+.card-hover:hover .news-image-home {
+  transform: scale(1.05);
+}
+
+.image-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.card-hover:hover .image-overlay {
+  opacity: 1;
+}
+
+.overlay-content {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+}
+
+.news-badge {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+}
+
+.btn-news-home {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-news-home::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.btn-news-home:hover::before {
+  left: 100%;
+}
+
+.btn-arrow {
+  margin-left: 8px;
+  transition: transform 0.3s ease;
+}
+
+.btn-news-home:hover .btn-arrow {
+  transform: translateX(4px);
+}
+
+.empty-state {
+  padding: 40px 20px;
+  color: #6c757d;
+}
+
+.empty-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.empty-title {
+  color: #495057;
+  margin-bottom: 0.5rem;
+}
+
+.empty-text {
+  color: #6c757d;
   font-size: 0.9rem;
+}
+
+.activity-title {
+  color: #2c3e50;
+  font-size: 1.3rem;
+  text-align: center;
+  position: relative;
+}
+
+.activity-icon {
+  font-size: 1.2rem;
+  margin-right: 8px;
+}
+
+.date-shine {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s;
+}
+
+.activity-link:hover .date-shine {
+  left: 100%;
+}
+
+.activity-link:hover .activity-arrow span {
+  transform: translateX(4px);
+}
+
+.loading-item {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 15px;
+  padding: 16px;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.act-date-skeleton {
+  width: 70px;
+  height: 70px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #dee2e6 0%, #ced4da 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.skeleton-day {
+  width: 30px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 4px;
+  margin-bottom: 4px;
+}
+
+.skeleton-month {
+  width: 40px;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 4px;
+}
+
+.act-content-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.skeleton-title {
+  width: 60%;
+  height: 20px;
+  background: #dee2e6;
+  border-radius: 4px;
+}
+
+.skeleton-text {
+  width: 80%;
+  height: 16px;
+  background: #dee2e6;
+  border-radius: 4px;
+}
+
+.empty-activity {
+  color: #6c757d;
+}
+
+.empty-activity-icon {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.empty-activity-title {
+  color: #495057;
+  margin-bottom: 0.5rem;
+}
+
+.empty-activity-text {
+  color: #6c757d;
+  font-size: 0.85rem;
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* ส่วนของการ์ดโครงการบริจาค */
+
+.donate-content-home-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    margin: 40px 0;
+    padding: 0 20px;
+}
+
+.item-detail-home {
+    width: 100%;
+    /* height: 550px; */
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    /* overflow: hidden; */
+}
+
+.item-detail:hover {
+    transform: translateY(-5px); 
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.image-donate-frame {
+    width: 100%;
+    height: 280px;
+    /* overflow: hidden; */
+    border-radius: 12px 12px 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.image-donate-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+@media (max-width: 768px) {
+  .section-title {
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .activity-section {
+    margin-top: 2rem;
+  }
+
+  .activity-link {
+    padding: 12px !important;
+  }
+
+  .act-date {
+    min-width: 60px !important;
+    padding: 8px !important;
+  }
+
+  .day {
+    font-size: 1.2rem !important;
+  }
+
+  .home-about {
+    margin: 0 20px;
+  }
+
+  .card-homeweb {
+    height: auto;
+    margin-bottom: 30px;
+  }
+
+  .act-home-item {
+    padding: 10px;
+  }
+
+  .act-date {
+    width: auto;
+    display: inline-block;
+  }
 }

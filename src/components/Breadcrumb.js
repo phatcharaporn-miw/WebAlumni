@@ -7,7 +7,7 @@ import '../css/breadcrumb.css';
 
 function Breadcrumb() {
   const location = useLocation();
-  const { activityId, newsId, categoryId, webboardId ,projectId } = useParams(); 
+  const { activityId, newsId, categoryId, webboardId, projectId, productId, userId } = useParams(); 
   const [breadcrumb, setBreadcrumb] = useState({}); 
 
   // ดึงข้อมูล breadcrumb หากมี activityId, newsId หรือ categoryId
@@ -49,22 +49,46 @@ function Breadcrumb() {
         });
     }
     if (projectId) {
-      axios.get(`http://localhost:3001/donate/${projectId}`)
+      axios.get(`http://localhost:3001/donate/donatedetail/${projectId}`)
         .then(response => {
-          setBreadcrumb(prev => ({ ...prev, news: response.data.donateIdTitle })); 
+          setBreadcrumb(prev => ({ ...prev, DonateDetail: response.data.project_name }));
         })
         .catch(error => {
-          console.error("Error fetching news breadcrumb:", error);
+          console.error("Error fetching category breadcrumb:", error);
         });
     }
-  }, [activityId, newsId, categoryId, webboardId,projectId]);
+    if (productId) {
+      axios.get(`http://localhost:3001/souvenir/souvenirDetail/${productId}`)
+        .then(response => {
+          setBreadcrumb(prev => ({ ...prev, souvenirDetail: response.data.product_name }));
+        })
+        .catch(error => {
+          console.error("Error fetching category breadcrumb:", error);
+        });
+    }
+    if (userId) {
+      axios.get(`http://localhost:3001/alumni/${userId}`)
+        .then(response => {
+          setBreadcrumb(prev => ({ ...prev, alumniProfile: response.data.fullName }));
+        })
+        .catch(error => {
+          console.error("Error fetching category breadcrumb:", error);
+        });
+    }
+  }, [activityId, newsId, categoryId, webboardId, projectId, productId, userId]);
 
   // แยก path ตาม '/'
-  const pathnames = location.pathname.split('/').filter((item) => item);
+  const pathnames = location.pathname
+  .split('/')
+  .filter((item) =>
+    item &&
+    item !== 'alumni-home' &&
+    item !== 'president-home' &&
+    item !== 'student-home'
+  );
 
-   
-  // ซ่อน breadcrumb ในหน้า Login และ Register
-  const hiddenPaths = ["/login", "/register", "/forgotPassword"];
+  // ซ่อน breadcrumb 
+  const hiddenPaths = ["/login", "/register", "/forgotPassword", "/change-password"];
   if (hiddenPaths.includes(location.pathname)) {
     return null; 
   }
@@ -88,6 +112,12 @@ function Breadcrumb() {
             translatedText = breadcrumb.category;
           } else if (value === webboardId?.toString() && breadcrumb.webboard) {
             translatedText = breadcrumb.webboard;
+          }else if (value === projectId?.toString() && breadcrumb.DonateDetail) {
+            translatedText = breadcrumb.DonateDetail;
+          }else if (value === productId?.toString() && breadcrumb.souvenirDetail) {
+            translatedText = breadcrumb.souvenirDetail;
+          }else if (value === userId?.toString() && breadcrumb.alumniProfile) {
+            translatedText = breadcrumb.alumniProfile;
           }
 
           return (

@@ -1,72 +1,138 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import '../css/major-detail.css';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
 
 function MajorDetail() {
-    const studentList = [
-        { name: "นายอภิชาติ ศรีลอย", graduationYear: "2563", generation: "รุ่นที่ 5" },
-        { name: "นางสาวพัชราพร นิลพงษ์", graduationYear: "2564", generation: "รุ่นที่ 6" },
-        { name: "นายกรกช เจริญสุข", graduationYear: "2562", generation: "รุ่นที่ 4" },
-        { name: "นางสาวจุฑามาศ ศรีบุญ", graduationYear: "2565", generation: "รุ่นที่ 7" },
-        { name: "นายณัฐวุฒิ สุขสม", graduationYear: "2563", generation: "รุ่นที่ 5" }
+    const { major } = useParams(); 
+    const [students, setStudents] = useState([]);
+    const [filteredStudents, setFilteredStudents] = useState([]);
+    const [activeTab, setActiveTab] = useState("ป.ตรี"); // ค่าเริ่มต้นเป็นแท็บ ป.ตรี
+    const [searchTerm, setSearchTerm] = useState("");
+
+    const majors = [
+        { title: "วิทยาการคอมพิวเตอร์", slug: "cs" },
+        { title: "เทคโนโลยีสารสนเทศ", slug: "it" },
+        { title: "ภูมิสารสนเทศศาสตร์", slug: "gis" },
+        { title: "ความปลอดภัยไซเบอร์", slug: "cy" },
+        { title: "ปัญญาประดิษฐ์", slug: "ai" },
     ];
+    const displayMajor = majors.find((m) => m.slug === major)?.title || major;
 
-    const [selectedYear, setSelectedYear] = useState("");
-    const [filteredStudents, setFilteredStudents] = useState(studentList);
+    useEffect(() => {
+        axios.get(`http://localhost:3001/alumni/major/${major}`)
+            .then(res => {
+                // แปลง degree_id เป็นข้อความ
+                const updatedData = res.data.map(student => ({
+                    ...student,
+                    degree: mapDegreeIdToText(student.degree_id) 
+                }));
 
-    const filterByYear = (year) => {
-        setSelectedYear(year);
-        if (year === "") {
-            setFilteredStudents(studentList);
-        } else {
-            setFilteredStudents(studentList.filter(student => student.graduationYear === year));
+                setStudents(updatedData);
+                setFilteredStudents(updatedData.filter(student => student.degree === "ป.ตรี")); 
+            })
+            .catch(err => console.error(err));
+    }, [major]);
+
+    const handleTabChange = (degree) => {
+        setActiveTab(degree);
+        const filteredByDegree = students.filter(student => student.degree === degree);
+        const filteredBySearch = searchTerm === "" ? filteredByDegree : filteredByDegree.filter(student =>
+            student.full_name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        setFilteredStudents(filteredBySearch);
+    };
+
+    const handleSearch = (term) => {
+    setSearchTerm(term);
+
+    const filteredBySearch = term === "" ? students : students.filter(student => {
+        const lowerTerm = term.toLowerCase();
+        return (
+            student.full_name.toLowerCase().includes(lowerTerm) ||
+            student.graduation_year?.toString().includes(lowerTerm) ||
+            student.entry_year?.toString().includes(lowerTerm) ||
+            student.studentId?.toString().includes(lowerTerm)
+        );
+    });
+
+    const filteredByDegree = filteredBySearch.filter(student => student.degree === activeTab);
+        setFilteredStudents(filteredByDegree);
+    };
+
+    const mapDegreeIdToText = (degreeId) => {
+        switch (degreeId) {
+            case 1:
+                return "ป.ตรี";
+            case 2:
+                return "ป.โท";
+            case 3:
+                return "ป.เอก";
+            default:
+                return "ไม่ทราบระดับการศึกษา";
         }
     };
 
     return (
         <section className="container my-5">
             <div className="major-detail">
-                {/*หัวข้อของหน้า*/}
-                <h3 className="text-center mb-4">รายชื่อศิษย์เก่า</h3>
+                <h3 className="text-center mb-4">รายชื่อศิษย์เก่า - สาขา{displayMajor}</h3>
 
-                <div className="students  d-flex justify-content-between align-items-center">
-                    <h4>รายชื่อศิษย์เก่า ประจำปี {selectedYear}</h4>
-                    <div className="filter-container">
-                        <label htmlFor="yearSelect" className="form-label d-none">กรองตามปีที่จบการศึกษา</label>
-                        <select
-                            id="yearSelect"
-                            className="form-select"
-                            value={selectedYear}
-                            onChange={(e) => filterByYear(e.target.value)}
-                        >
-                            <option value="">ทั้งหมด</option>
-                            <option value="2563">2563</option>
-                            <option value="2564">2564</option>
-                            <option value="2565">2565</option>
-                        </select>
-                    </div>
+                <ul className="nav nav-tabs mb-4">
+                    {["ป.ตรี", "ป.โท", "ป.เอก"].map((degree) => (
+                        <li className="nav-item" key={degree}>
+                            <button
+                                className={`nav-link ${activeTab === degree ? "active" : ""}`}
+                                onClick={() => handleTabChange(degree)}
+                            >
+                                {degree}
+                            </button>
+                        </li>
+                    ))}
+                </ul>
+
+                <div className="search-box mb-4">
+                    <input
+                        type="text"
+                        className="form-control w-25"
+                        placeholder="ค้นหา..."
+                        value={searchTerm}
+                        onChange={(e) => handleSearch(e.target.value)}
+                    />
                 </div>
 
-                <div className="students ">
+                <div className="students">
                     <table className="table table-bordered">
                         <thead>
                             <tr>
                                 <th scope="col">ลำดับ</th>
                                 <th scope="col">ชื่อนักศึกษา</th>
+                                <th scope="col">รหัสนักศึกษา</th>
+                                <th scope="col">ปีที่เข้าศึกษา</th>
                                 <th scope="col">ปีที่จบการศึกษา</th>
-                                <th scope="col">รุ่นที่</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredStudents.map((student, index) => (
-                                <tr key={index}>
-                                    <th scope="row">{index + 1}</th>
-                                    <td>{student.name}</td>
-                                    <td>{student.graduationYear}</td>
-                                    <td>{student.generation}</td>
+                            {filteredStudents.length > 0 ? (
+                                filteredStudents.map((student, index) => (
+                                    <tr key={index}>
+                                        <th scope="row">{index + 1}</th>
+                                        <td>{student.full_name}</td>
+                                        <td>{student.studentId}</td>
+                                        <td>{student.entry_year}</td>
+                                        <td>{student.graduation_year}</td>
+                                        
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="5" className="text-center text-muted">
+                                        ยังไม่มีรายชื่อ
+                                    </td>
                                 </tr>
-                            ))}
+                            )}
                         </tbody>
                     </table>
                 </div>

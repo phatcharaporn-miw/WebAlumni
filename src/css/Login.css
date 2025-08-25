@@ -11,77 +11,176 @@ body {
 
 .all-form {
     display: grid; 
-    justify-content: center; 
+    justify-content: center;
+    z-index: 2;
+    position: relative;
+    margin-bottom: 20px;
 }
 
 .form-login-bg {
-    background-color: #F5F5F5;
-    border-radius: 9px;
-    padding: 20px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 40px;
     height: fit-content;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+    animation: slideUp 0.6s ease;
 }
 
+/* Form Container */
 .form-login {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     width: 100%;
+    animation: fadeIn 0.8s ease 0.2s both;
 }
 
 .form-login p {
-    margin: 10px 0;
+    margin: 15px 0;
+    width: 100%;
 }
 
+/* Labels */
 .form-login label {
     font-size: 16px;
     color: #0F75BC;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
+    font-weight: 500;
+    display: block;
+    transition: color 0.3s ease;
 }
-.form-login input{
+
+
+/* Input Fields */
+.form-login input {
     flex: 1;
-    padding: 10px 20px;
+    padding: 15px 20px;
     font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    border: 2px solid #e1e5e9;
+    border-radius: 12px;
     box-sizing: border-box;
     width: 400px;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.8);
+    font-family: 'Prompt', sans-serif;
+    position: relative;
 }
+
 .form-login input:focus {
     border-color: #0F75BC;
-    box-shadow: 0 0 5px rgba(15, 117, 188, 0.3);
+    box-shadow: 0 0 20px rgba(15, 117, 188, 0.2);
+    outline: none;
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 1);
 }
+
+.form-login input:hover {
+    border-color: #0F75BC;
+    transform: translateY(-1px);
+}
+
+.form-login input::placeholder {
+    color: #999;
+    transition: all 0.3s ease;
+}
+
+.form-login input:focus::placeholder {
+    opacity: 0;
+    transform: translateY(-10px);
+}
+
 .form-login h2 {
-    font-size: 30px;
+    font-size: 32px;
     text-align: center;
     color: #0F75BC;
+    margin-bottom: 30px;
+    font-weight: 600;
+    position: relative;
+    animation: fadeIn 0.8s ease 0.4s both;
+}
+
+.form-login h2::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50px;
+    height: 3px;
+    background: linear-gradient(90deg, #0F75BC, #4A90E2);
+    border-radius: 2px;
 }
 
 .login-bt {
-    background-color: #0F75BC;
+    background: linear-gradient(135deg, #0F75BC 0%, #4A90E2 100%);
     color: white;
+    position: relative;
+    overflow: hidden;
 }
+
+.login-bt::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.login-bt:hover::before {
+    left: 100%;
+}
+
+
 .regist-bt {
-    background-color: #ccc;
-    color: rgb(0, 0, 0);
-    border: none;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    color: #495057;
+    border: 2px solid #dee2e6;
 }
+
+.regist-bt:hover {
+    background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+    border-color: #0F75BC;
+    color: #0F75BC;
+}
+
 .login-bt, .regist-bt {
     font-size: 16px;
     width: 100%;
     border: none;
     cursor: pointer;
-    padding: 10px 20px;
-    border-radius: 5px;
+    padding: 15px 20px;
+    border-radius: 12px;
     box-sizing: border-box;
     text-align: center;
-    transition: background-color 0.3s ease;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    font-family: 'Prompt', sans-serif;
+    position: relative;
+    overflow: hidden;
+}
+
+.login-bt:hover, .regist-bt:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.login-bt:active, .regist-bt:active {
+    transform: translateY(-1px);
 }
 
 .button-group {
     display: grid;
     grid-template-columns: 1fr 1fr; 
-    gap: 10px;
+    gap: 15px;
+    width: 100%;
+    animation: fadeIn 0.8s ease 0.6s both;
 }
 
 .fn-login{
@@ -96,29 +195,109 @@ button:hover {
 }
 
 .important {
-    color: red;
+    color: #e74c3c;
+    font-weight: 500;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
 }
 
 .error-message {
-    color: red;
+    color: #e74c3c;
     font-size: 14px;
     margin-top: 10px;
-  }
+    padding: 10px;
+    background: rgba(231, 76, 60, 0.1);
+    border-radius: 8px;
+    border-left: 4px solid #e74c3c;
+    animation: shake 0.5s ease;
+}
 
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+.success-message {
+    color: #27ae60;
+    font-size: 14px;
+    margin-top: 10px;
+    padding: 10px;
+    background: rgba(39, 174, 96, 0.1);
+    border-radius: 8px;
+    border-left: 4px solid #27ae60;
+    animation: slideIn 0.5s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
 
 @media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+    
     .form-login-logo {
-        width: 350px;
-        height: 120px;
+        width: 300px;
+        height: 100px;
     }
 
-    .form-login {
+    .form-login-bg {
+        padding: 30px 20px;
+        border-radius: 15px;
+    }
+
+    .form-login input {
         width: 100%;
     }
+
     .button-group {
         grid-template-columns: 1fr;
+        gap: 10px;
     }
-    button {
+
+    .form-login h2 {
+        font-size: 28px;
+    }
+}
+
+@media (max-width: 468px) {
+    .form-login-logo {
+        width: 280px;
+        height: 90px;
+    }
+
+    .form-login input {
+        width: 100% !important;
+        padding: 12px 15px;
+    }
+
+    .form-login-bg {
+        padding: 20px 15px;
         width: 100%;
+        max-width: 100%;
+        margin: 0 10px;
+    }
+
+    .form-login h2 {
+        font-size: 24px;
+    }
+    
+    .login-bt, .regist-bt {
+        padding: 12px 15px;
+        font-size: 14px;
     }
 }

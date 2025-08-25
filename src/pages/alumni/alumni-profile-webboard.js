@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useOutletContext } from "react-router-dom";
-import { useNavigate, useLocation} from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { SlHeart } from "react-icons/sl";
 import { MdDelete } from "react-icons/md";
 import { BiSolidComment } from "react-icons/bi";
@@ -19,6 +19,7 @@ function AlumniProfileWebboard() {
     const [profile, setProfile] = useState({});
     const { handleLogout } = useOutletContext();
     const [sortOrder, setSortOrder] = useState("latest");
+    const [previewImage, setPreviewImage] = useState(null); // สำหรับแสดงรูปภาพก่อนอัปโหลด
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -60,7 +61,7 @@ function AlumniProfileWebboard() {
     });
 
     const handleEdit = (webboardId) => {
-        navigate(`/edit-webboard/${webboardId}`);
+        navigate(`/alumni-profile/alumni-profile-webboard/edit-webboard/${webboardId}`);
     };
 
     const handleDelete = (webboardId) => {
@@ -98,70 +99,125 @@ function AlumniProfileWebboard() {
         return `hsl(${hue}, 70%, 60%)`;
     };
 
-     // ตรวจสอบว่าเมนูใดควรเป็น active
-     const isActive = (path) => location.pathname === path;
+    const handleClick = (path) => {
+        navigate(path);
+    };
+
+    // อัปโหลดรูปภาพ
+    const handleImageChange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // แสดง preview รูปก่อนอัปโหลด
+        setPreviewImage(URL.createObjectURL(file));
+
+        const formData = new FormData();
+        formData.append("image_path", file);
+        formData.append("user_id", profile.userId);
+
+        try {
+            const res = await axios.post("http://localhost:3001/users/update-profile-image", formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+
+            if (res.status === 200) {
+                alert("อัปโหลดรูปสำเร็จ");
+
+                // อัปเดตรูปโปรไฟล์ใน state
+                setProfile((prev) => ({
+                    ...prev,
+                    profilePicture: res.data.newImagePath,
+                }));
+            } else {
+                alert(res.data.message || "เกิดข้อผิดพลาด");
+            }
+        } catch (err) {
+            console.error(err);
+            alert("ไม่สามารถอัปโหลดรูปได้");
+        }
+    };
 
     return (
-        <section className='container'>
+        <section className='container py-4'>
             <div className='alumni-profile-page'>
-                <h3 className="alumni-title text-center">กระทู้ที่สร้าง</h3>
-                <div className="row justify-content-between">
-                    <div className="col-4 bg-light rounded text-center">
-                        <img
-                            src={`${profile.profilePicture}`}
-                            alt="Profile"
-                            style={{ width: '140px', height: '140px', borderRadius: '50%' }}
-                        />
-                        <p className="mt-3 fw-bold">{profile.fullName}</p>
-                        <div className="menu mt-4">
-                        <div
-                                className={`menu-item py-2 mb-2 rounded ${isActive('/alumni-profile') ? 'active' : ''}`}
-                                onClick={() => navigate('/alumni-profile')}
-                            >
-                                ข้อมูลส่วนตัว
+                <div className="row justify-content-center g-4">
+                    {/* Sidebar/Profile */}
+                    <div className="col-12 col-md-3 mb-4">
+                        <div className="bg-white rounded-4 shadow-sm text-center p-4">
+                            <img
+                                src={previewImage || profile.profilePicture}
+                                alt="Profile"
+                                style={{ width: "130px", height: "130px", borderRadius: "50%", objectFit: "cover", marginBottom: 16, border: '3px solid #eee' }}
+                                className="img-fluid mb-2"
+                            />
+                            <div className="mt-2 mb-3">
+                                <label
+                                    htmlFor="upload-profile-pic"
+                                    className="btn btn-sm btn-outline-secondary"
+                                    style={{ cursor: "pointer" }}
+                                >
+                                    เปลี่ยนรูป
+                                </label>
+                                <input
+                                    type="file"
+                                    id="upload-profile-pic"
+                                    className="d-none"
+                                    accept="image/*"
+                                    onChange={handleImageChange}
+                                />
                             </div>
-                            <div
-                                className={`menu-item py-2 mb-2 rounded ${isActive('/alumni-profile/alumni-profile-webboard') ? 'active' : ''}`}
-                                onClick={() => navigate('/alumni-profile/alumni-profile-webboard')}
-                            >
-                                กระทู้ที่สร้าง
-                            </div>
-                            <div
-                                className={`menu-item py-2 mb-2 rounded ${isActive('/profile/donations') ? 'active' : ''}`}
-                                onClick={() => navigate('/profile/donations')}
-                            >
-                                ประวัติการบริจาค
-                            </div>
-
-                            <div
-                                className={`menu-item py-2 mb-2 rounded ${isActive('/alumni-profile/alumni-profile-activity') ? 'active' : ''}`}
-                                onClick={() => navigate('/alumni-profile/alumni-profile-activity')}
-                            >
-                                ประวัติการเข้าร่วมกิจกรรม
-                            </div>
-                            <div
-                                className={`menu-item py-2 mb-2 rounded ${isActive('/profile/orders') ? 'active' : ''}`}
-                                onClick={() => navigate('/profile/orders')}
-                            >
-                                ประวัติการสั่งซื้อ
-                            </div>
-                            <div className="menu-item py-2 rounded" onClick={handleLogout}>
-                                ออกจากระบบ
+                            <hr className="w-100" />
+                            <div className="menu d-block mt-3 w-100">
+                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile")}>โปรไฟล์ของฉัน</div>
+                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-request")}>คำร้องขอ</div>
+                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-manage-orders")}>จัดการคำสั่งซื้อของที่ระลึก</div>
+                                <div className="menu-item active py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-profile-webboard")}>กระทู้ที่สร้าง</div>
+                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-profile-donation")}>ประวัติการบริจาค</div>
+                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-profile-activity")}>ประวัติการเข้าร่วมกิจกรรม</div>
+                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-profile-souvenir")}>ประวัติการสั่งซื้อของที่ระลึก</div>
+                                <div className="menu-item py-2 rounded" onClick={handleLogout}>ออกจากระบบ</div>
                             </div>
                         </div>
                     </div>
+                    {/* Main Content */}
+                    <div className="col-12 col-md-8">
+                        {/* Header Section */}
+                        <div className="bg-white rounded-4 shadow-sm p-4 mb-4">
+                            <div className="d-flex justify-content-between align-items-center">
+                                <div className="d-flex align-items-center">
+                                    <div className="bg-primary bg-opacity-10 rounded-circle p-2 me-3">
+                                        <i className="fas fa-comment-dots text-primary fs-5"></i>
+                                    </div>
+                                    <div>
+                                        <h4 className="fw-bold mb-1">กระทู้ที่คุณสร้าง</h4>
+                                        <p className="text-muted mb-0 small">รวบรวมกระทู้ที่คุณเขียนไว้ทั้งหมด</p>
+                                    </div>
+                                </div>
+                                {webboard.length > 0 && (
+                                    <div className="d-flex align-items-center">
+                                        <span className="badge bg-primary text-white px-3 py-2 rounded-pill">
+                                            {webboard.length} กระทู้
+                                        </span>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
 
-                    <div className="col-8">
-                        <div className="row">
+                        {/* Posts Grid */}
+                        <div className="row g-4">
                             {webboard.length > 0 ? (
                                 sortedPosts.map(post => (
-                                    <div key={post.webboard_id} className="col-md-6 col-lg-6 mb-4">
-                                        <div className="card shadow-sm p-3 border rounded-4">
-                                            <div className="d-flex justify-content-between">
-                                                <span className="badge px-3 py-2" style={{ backgroundColor: getCategoryColor(post?.category_id || 0), color: "white" }}>
+                                    <div key={post.webboard_id} className="col-md-6 col-lg-6">
+                                        <div className="card shadow-sm border-0 rounded-4 h-100 d-flex flex-column post-card">
+                                            {/* Category Badge and Actions */}
+                                            <div className="d-flex justify-content-between align-items-center p-3 pb-2">
+                                                <span className="badge px-3 py-2 rounded-pill"
+                                                    style={{ backgroundColor: getCategoryColor(post?.category_id || 0), color: "white" }}>
                                                     {post.category_name || "ไม่มีหมวดหมู่"}
                                                 </span>
-                                                <div>
+                                                <div className="action-buttons">
                                                     <IoMdCreate
                                                         className="fs-5 text-primary me-2"
                                                         style={{ cursor: "pointer" }}
@@ -174,21 +230,45 @@ function AlumniProfileWebboard() {
                                                     />
                                                 </div>
                                             </div>
-                                            <div className="card-body">
-                                                <h5 className="card-title">{post.title}</h5>
-                                                <p className="card-text">
+
+                                            {/* Post Content */}
+                                            <div className="card-body p-3 pt-0 flex-grow-1">
+                                                <h5 className="card-title mb-2 fw-bold text-dark line-clamp-2">{post.title}</h5>
+                                                <p className="card-text text-muted line-clamp-3 mb-3" style={{ minHeight: 'auto' }}>
                                                     {post.content.length > 100 ? post.content.substring(0, 100) + "..." : post.content}
                                                 </p>
                                             </div>
-                                            <div className="d-flex justify-content-between">
-                                                <span><BiSolidComment /> {post.comments_count || 0} ความคิดเห็น</span>
-                                                <span><FaEye /> {post.viewCount || 0} ครั้ง</span>
+
+                                            {/* Post Stats */}
+                                            <div className="card-footer bg-light border-0 p-3">
+                                                <div className="d-flex justify-content-between align-items-center small text-muted">
+                                                    <div className="d-flex align-items-center">
+                                                        <i className="fas fa-comment me-1 text-primary"></i>
+                                                        <span className="me-3">{post.comments_count || 0} ความคิดเห็น</span>
+                                                    </div>
+                                                    <div className="d-flex align-items-center">
+                                                        <i className="fas fa-eye me-1 text-success"></i>
+                                                        <span>{post.viewCount || 0} ครั้ง</span>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 ))
                             ) : (
-                                <p>ไม่มีโพสต์</p>
+                                <div className="col-12">
+                                    <div className="text-center py-5">
+                                        <div className="bg-light rounded-circle p-4 d-inline-block mb-3">
+                                            <i className="fas fa-comment-slash text-muted" style={{ fontSize: '3rem' }}></i>
+                                        </div>
+                                        <h5 className="text-muted mb-2">ยังไม่มีกระทู้ที่คุณสร้าง</h5>
+                                        <p className="text-muted mb-4">เริ่มต้นสร้างกระทู้แรกของคุณได้เลย!</p>
+                                        <button className="btn btn-primary rounded-pill px-4 py-2"
+                                            onClick={() => navigate('/createPost')}>
+                                            <i className="fas fa-plus me-2"></i> สร้างกระทู้ใหม่
+                                        </button>
+                                    </div>
+                                </div>
                             )}
                         </div>
                     </div>
@@ -196,6 +276,7 @@ function AlumniProfileWebboard() {
             </div>
         </section>
     );
+
 }
 
 export default AlumniProfileWebboard;
