@@ -41,13 +41,6 @@
     gap: 10px;
 }
 
-.sort-options{
-    display: grid;
-    grid-template-columns: auto auto;
-    align-items: center;
-    gap: 10px;
-}
-
 .nav-tabs {
     border-bottom: 2px solid #ddd;
 }
@@ -56,7 +49,7 @@
     /* border: 1px solid #ddd; */
     border-radius: 1px;
     padding: 10px 15px;
-    color: #085a9c;
+    color: #1A8DDD;
 }
 
 .tab-content {
@@ -147,6 +140,11 @@ table td button:hover {
     margin-bottom: 0;
 }
 
+
+.statusProduct-label{
+    margin-bottom: 0;
+}
+  
 .souvenir-bt-add {
     background-color: #4CAF50; 
     color: white;
@@ -219,14 +217,45 @@ table td button:hover {
     color: white;
 }
 
+.souvenir-bt-approve:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .souvenir-bt-approve-unavailable {
     background-color: red;
     color: white;
 }
+.souvenir-bt-group{
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+}
+.souvenir-bt-group button{
+    height: 50px;
+}
+.image-product img{
+    width:70px;
+    height:70px;
+    
+}
+
+.souvenir-bt-manage {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
 
 
-
-/* Responsive Styles */
+/*Responsive*/
 @media (max-width: 768px) {
     .souvenir-item-group {
         grid-template-columns: 1fr 1fr;

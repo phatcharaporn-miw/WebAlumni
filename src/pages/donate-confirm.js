@@ -17,7 +17,7 @@ function DonateConfirm() {
     const userId = localStorage.getItem("userId");
     const location = useLocation();
     const navigate = useNavigate();
-    const [Data, setProjectData] = useState({});
+    // const [Data, setProjectData] = useState({});
     const { formData, projectId, showTaxForm } = location.state || {};
     
     const startDate = Data?.start_date ? new Date(Data.start_date) : null;
