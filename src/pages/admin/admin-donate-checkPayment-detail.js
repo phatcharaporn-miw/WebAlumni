@@ -30,7 +30,7 @@ function AdminCheckPaymentDonateDetail() {
         try {
             await axios.put(`http://localhost:3001/admin/check-payment-donate/approve/${id}`);
             alert("อนุมัติเรียบร้อยแล้ว");
-            navigate("/admin/check-payment-donate");
+            navigate("/admin/donations/check-payment-donate");
         } catch {
             alert("เกิดข้อผิดพลาด");
         }
@@ -41,7 +41,7 @@ function AdminCheckPaymentDonateDetail() {
         try {
             await axios.put(`http://localhost:3001/admin/check-payment-donate/reject/${id}`);
             alert("ปฏิเสธเรียบร้อยแล้ว");
-            navigate("/admin/check-payment-donate");
+            navigate("/admin/donations/check-payment-donate");
         } catch {
             alert("เกิดข้อผิดพลาด");
         }
@@ -118,7 +118,7 @@ function AdminCheckPaymentDonateDetail() {
             )}
 
             <div className="mt-4">
-                <Link to="/admin/check-payment-donate" className="btn btn-secondary">
+                <Link to="/admin/donations/check-payment-donate" className="btn btn-secondary">
                     ย้อนกลับ
                 </Link>
             </div>

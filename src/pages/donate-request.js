@@ -149,7 +149,7 @@ function DonateRequest() {
                             <input
                                 type="radio"
                                 name="donationType"
-                                value="บริจาคแบบระดมทุน"
+                                value="fundraising"
                                 onChange={handleChange}
                                 checked={formData.donationType === "fundraising"}
                                 required
@@ -158,7 +158,7 @@ function DonateRequest() {
                             <input
                                 type="radio"
                                 name="donationType"
-                                value="บริจาคแบบไม่จำกัดจำนวน"
+                                value="unlimited"
                                 onChange={handleChange}
                                 checked={formData.donationType === "unlimited"}
                             /> บริจาคแบบไม่จำกัดจำนวน
@@ -172,7 +172,7 @@ function DonateRequest() {
                             /> บริจาคสิ่งของ
                         </p>
 
-                        {formData.donationType === "บริจาคแบบระดมทุน" && (
+                        {formData.donationType === "fundraising" && (
                             <p>
                                 <label htmlFor="targetAmount">เป้าหมายยอดบริจาค<span className="important">*</span></label><br />
                                 <input

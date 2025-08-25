@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -11,6 +11,7 @@ function AdminEditProject() {
     const [error, setError] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
     const [originalImage, setOriginalImage] = useState(null);
+    const location = useLocation();
 
     const [formData, setFormData] = useState({
         project_name: '',
@@ -24,7 +25,11 @@ function AdminEditProject() {
         account_number: '',
         number_promtpay: '',
         image: null,
-        status: '0'
+        status: '1',
+        account_name: '',
+        type_things: '',
+        quantity_things: '',
+        for_things: ''
     });
 
     // ดึงข้อมูลโครงการที่จะแก้ไข
@@ -45,9 +50,13 @@ function AdminEditProject() {
                     current_amount: project.current_amount || '0',
                     bank_name: project.bank_name || '',
                     account_number: project.account_number || '',
+                    account_name: project.account_name || '',
                     number_promtpay: project.number_promtpay || '',
                     image: null,
-                    status: project.status || '0'
+                    status: project.status || '1',
+                    type_things: project.type_things || '',
+                    quantity_things: project.quantity_things || '',
+                    for_things: project.for_things || ''
                 });
 
                 if (project.image_path) {
@@ -125,29 +134,23 @@ function AdminEditProject() {
             alert('กรุณากรอกชื่อโครงการ');
             return;
         }
-
         if (!formData.description.trim()) {
             alert('กรุณากรอกรายละเอียดโครงการ');
             return;
         }
-
         if (formData.donation_type === 'money' && !formData.target_amount) {
             alert('กรุณากรอกเป้าหมายเงินบริจาค');
             return;
         }
-
         if (!formData.start_date || !formData.end_date) {
             alert('กรุณาเลือกวันที่เริ่มต้นและสิ้นสุด');
             return;
         }
-
         if (new Date(formData.start_date) >= new Date(formData.end_date)) {
             alert('วันที่เริ่มต้นต้องก่อนวันที่สิ้นสุด');
             return;
         }
-
         setSaving(true);
-
         try {
             const submitData = new FormData();
             submitData.append('project_name', formData.project_name);
@@ -161,6 +164,7 @@ function AdminEditProject() {
             submitData.append('current_amount', formData.current_amount || 0);
             submitData.append('bank_name', formData.bank_name);
             submitData.append('account_number', formData.account_number);
+            submitData.append('account_name', formData.account_name);
             submitData.append('number_promtpay', formData.number_promtpay);
 
             if (formData.image) {
@@ -185,294 +189,369 @@ function AdminEditProject() {
         }
     };
 
-    if (loading) {
-        return (
-            <div className="container mt-5">
-                <div className="text-center">
-                    <div className="spinner-border" role="status">
-                        <span className="visually-hidden">กำลังโหลด...</span>
-                    </div>
-                    <p className="mt-2">กำลังโหลดข้อมูลโครงการ...</p>
-                </div>
-            </div>
-        );
-    }
-
-    if (error) {
-        return (
-            <div className="container mt-5">
-                <div className="alert alert-danger" role="alert">
-                    <h4 className="alert-heading">เกิดข้อผิดพลาด!</h4>
-                    <p>{error}</p>
-                    <button
-                        className="btn btn-outline-danger"
-                        onClick={() => navigate('/admin/donations')}
-                    >
-                        กลับหน้าจัดการโครงการ
-                    </button>
-                </div>
-            </div>
-        );
-    }
-
     return (
-        <div className="container mt-4">
-            <div className="row justify-content-center">
-                <div className="col-md-10">
-                    <div className="card shadow">
-                        <div className="card-header bg-warning text-white">
-                            <h4 className="mb-0">
-                                <i className="fas fa-edit"></i> แก้ไขโครงการ
-                            </h4>
-                        </div>
-                        <div className="card-body">
-                            <form onSubmit={handleSubmit}>
-                                {/* รูปภาพปัจจุบันและเลือกใหม่ */}
-                                <div className="mb-3">
-                                    <label className="form-label">รูปภาพประกอบโครงการ</label>
-                                    {imagePreview && (
-                                        <div className="mb-2">
-                                            <img
-                                                src={imagePreview}
-                                                alt="Preview"
-                                                className="img-thumbnail"
-                                                style={{ maxHeight: '200px' }}
-                                            />
-                                            <button
-                                                type="button"
-                                                className="btn btn-sm btn-danger mt-2"
-                                                onClick={handleRemoveImage}
-                                            >
-                                                ลบรูปภาพ
-                                            </button>
-                                        </div>
-                                    )}
-                                    <input
-                                        type="file"
-                                        className="form-control"
-                                        id="imageInput"
-                                        accept="image/*"
-                                        onChange={handleImageChange}
-                                    />
-                                </div>
+        <div className="donate-activity-container">
+            <div className="mb-4">
+                <nav className="nav Adminnav-tabs">
+                    <Link
+                        className={`adminnav-link ${location.pathname.startsWith('/admin/donations') ? 'active' : ''}`}
+                        to="/admin/donations"
+                    >
+                        <i className="fas fa-project-diagram me-2"></i>
+                        การจัดการโครงการบริจาค
+                    </Link>
 
-                                <div className="row">
-                                    {/* ชื่อโครงการ */}
-                                    <div className="col-md-6 mb-3">
-                                        <label className="form-label">
-                                            ชื่อโครงการ <span className="text-danger">*</span>
-                                        </label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            name="project_name"
-                                            value={formData.project_name}
-                                            onChange={handleInputChange}
-                                            placeholder="กรอกชื่อโครงการ"
-                                            required
-                                        />
-                                    </div>
+                    <Link
+                        className={`adminnav-link ${location.pathname === '/admin/donations/check-payment-donate' ? 'active' : ''}`}
+                        to="/admin/donations/check-payment-donate"
+                    >
+                        <i className="fas fa-credit-card me-2"></i>
+                        การจัดการตรวจสอบการชำระเงินบริจาค
+                    </Link>
+                </nav>
+            </div>
+            <div className="container mt-4">
+                <div className="row justify-content-center">
+                    <div className="px-0">
+                        <div className="card shadow">
+                            <div className="card-header-editDonate text-white">
+                                <h4 className="mb-0">
+                                    <i className="fas fa-edit"></i> แก้ไขโครงการ
+                                </h4>
+                            </div>
+                            <div className="card-body">
+                                <form onSubmit={handleSubmit}>
+                                    <div className="data-AdminEditDonate">
+                                        {/* รูปภาพปัจจุบันและเลือกใหม่ */}
+                                        <div className="mb-3">
+                                            <label className="data-AdminEditDonate-label">
+                                                <i className="fas fa-image me-2"></i> รูปภาพประกอบโครงการ
+                                            </label>
+                                            <div className="upload-image-box p-3 border rounded bg-light text-center">
+                                                {imagePreview ? (
+                                                    <div>
+                                                        <img
+                                                            src={imagePreview}
+                                                            alt="Preview"
+                                                            className="img-fluid rounded shadow-sm mb-2"
+                                                            style={{ maxHeight: '250px', objectFit: 'cover' }}
+                                                        />
+                                                        <div>
+                                                            <button
+                                                                type="button"
+                                                                className="btn btn-outline-danger btn-sm"
+                                                                onClick={handleRemoveImage}
+                                                            >
+                                                                <i className="fas fa-trash-alt"></i> ลบรูปภาพ
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <div className="text-muted mb-2">
+                                                        <i className="fas fa-cloud-upload-alt fa-2x mb-2"></i>
+                                                        <p className="m-0">ยังไม่ได้เลือกรูปภาพ</p>
+                                                    </div>
+                                                )}
 
-                                    {/* ประเภทการบริจาค */}
-                                    <div className="col-md-6 mb-3">
-                                        <label className="form-label">
-                                            ประเภทการบริจาค <span className="text-danger">*</span>
-                                        </label>
-                                        <select
-                                            className="form-select"
-                                            name="donation_type"
-                                            value={formData.donation_type}
-                                            onChange={handleInputChange}
-                                            required
-                                        >
-                                            <option value="things">สิ่งของ</option>
-                                            <option value="fundraising">บริจาคแบบระดมทุน</option>
-                                            <option value="unlimited">บริจาคแบบไม่จำกัดจำนวน</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                {/* รายละเอียดโครงการ */}
-                                <div className="mb-3">
-                                    <label className="form-label">
-                                        รายละเอียดโครงการ <span className="text-danger">*</span>
-                                    </label>
-                                    <textarea
-                                        className="form-control"
-                                        name="description"
-                                        rows="5"
-                                        value={formData.description}
-                                        onChange={handleInputChange}
-                                        placeholder="กรอกรายละเอียดโครงการ"
-                                        required
-                                    />
-                                </div>
-
-                                <div className="row">
-                                    {/* เป้าหมายเงิน */}
-                                    <div className="col-md-6 mb-3">
-                                        <label className="form-label">
-                                            เป้าหมายเงินบริจาค (บาท) <span className="text-danger">*</span>
-                                        </label>
-                                        <input
-                                            type="number"
-                                            className="form-control"
-                                            name="target_amount"
-                                            value={formData.target_amount}
-                                            onChange={handleInputChange}
-                                            placeholder="กรอกเป้าหมายเงินบริจาค"
-                                            min="1"
-                                            required
-                                        />
-                                    </div>
-
-                                    {/* ยอดปัจจุบัน */}
-                                    <div className="col-md-6 mb-3">
-                                        <label className="form-label">
-                                            ยอดบริจาคปัจจุบัน (บาท)
-                                        </label>
-                                        <input
-                                            type="number"
-                                            className="form-control"
-                                            name="current_amount"
-                                            value={formData.current_amount}
-                                            onChange={handleInputChange}
-                                            placeholder="ยอดบริจาคปัจจุบัน"
-                                            min="0"
-                                            readOnly
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="row">
-                                    {/* แสดงข้อความเตือนถ้าโครงการสิ้นสุดแล้ว */}
-                                    {formData.status === '3' && (
-                                        <div className="col-12 mb-3">
-                                            <div className="alert alert-warning">
-                                                โครงการนี้ได้สิ้นสุดลงแล้ว ไม่สามารถแก้ไขวันที่สิ้นสุดได้
+                                                <input
+                                                    type="file"
+                                                    className="form-control mt-3"
+                                                    id="imageInput"
+                                                    accept="image/*"
+                                                    onChange={handleImageChange}
+                                                />
                                             </div>
                                         </div>
-                                    )}
 
-                                    {/* วันที่เริ่มต้น */}
-                                    <div className="col-md-6 mb-3">
-                                        <label className="form-label">
-                                            วันที่เริ่มต้น <span className="text-danger">*</span>
-                                        </label>
-                                        <input
-                                            type="date"
-                                            className="form-control"
-                                            name="start_date"
-                                            value={formData.start_date}
-                                            onChange={handleInputChange}
-                                            required
-                                        />
                                     </div>
 
-                                    {/* วันที่สิ้นสุด */}
-                                    <div className="col-md-6 mb-3">
-                                        <label className="form-label">
-                                            วันที่สิ้นสุด <span className="text-danger">*</span>
-                                        </label>
-                                        <input
-                                            type="date"
-                                            className="form-control"
-                                            name="end_date"
-                                            value={formData.end_date}
-                                            onChange={handleInputChange}
-                                            required
-                                            disabled={formData.status === '3'} // ปิดการแก้ไข
-                                        />
+                                    <div className="data-AdminEditDonate">
+                                        {/* ชื่อโครงการ */}
+
+                                        <p>
+                                            <label className="data-AdminEditDonate-label">
+                                                ชื่อโครงการ <span className="text-danger">*</span>
+                                            </label>
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                name="project_name"
+                                                value={formData.project_name}
+                                                onChange={handleInputChange}
+                                                placeholder="กรอกชื่อโครงการ"
+                                                required
+                                            />
+                                        </p>
+                                        <p>
+                                            <label className="data-AdminEditDonate-label">
+                                                รายละเอียดโครงการ <span className="text-danger">*</span>
+                                            </label>
+                                            <textarea
+                                                className="form-control"
+                                                name="description"
+                                                rows="5"
+                                                value={formData.description}
+                                                onChange={handleInputChange}
+                                                placeholder="กรอกรายละเอียดโครงการ"
+                                                required
+                                            />
+                                        </p>
+                                        {/* ประเภทการบริจาค */}
+                                        <div className="col-md-12 mb-3">
+                                            <label className="data-AdminEditDonate-label">
+                                                ประเภทการบริจาค <span className="text-danger">*</span>
+                                            </label>
+                                            <select
+                                                className="form-select"
+                                                name="donation_type"
+                                                value={formData.donation_type}
+                                                onChange={handleInputChange}
+                                                required
+                                            >
+                                                <option value="things">สิ่งของ</option>
+                                                <option value="fundraising">บริจาคแบบระดมทุน</option>
+                                                <option value="unlimited">บริจาคแบบไม่จำกัดจำนวน</option>
+                                            </select>
+                                        </div>
+                                        {(formData.donation_type === 'fundraising' || formData.donation_type === 'unlimited') && (
+                                            <div className="row">
+                                                {/* เป้าหมายเงิน */}
+                                                <div className="col-md-6 mb-3">
+                                                    <label className="data-AdminEditDonate-label">
+                                                        เป้าหมายเงินบริจาค (บาท) <span className="text-danger">*</span>
+                                                    </label>
+                                                    <input
+                                                        type="number"
+                                                        className="form-control"
+                                                        name="target_amount"
+                                                        value={formData.target_amount}
+                                                        onChange={handleInputChange}
+                                                        placeholder="กรอกเป้าหมายเงินบริจาค"
+                                                        // min="1"
+                                                        required
+                                                    />
+                                                </div>
+
+                                                {/* ยอดปัจจุบัน */}
+                                                <div className="col-md-6 mb-3">
+                                                    <label className="data-AdminEditDonate-label">
+                                                        ยอดบริจาคปัจจุบัน (บาท)
+                                                    </label>
+                                                    <input
+                                                        type="number"
+                                                        className="form-control"
+                                                        name="current_amount"
+                                                        value={formData.current_amount}
+                                                        onChange={handleInputChange}
+                                                        placeholder="ยอดบริจาคปัจจุบัน"
+                                                        min="0"
+                                                        readOnly
+                                                    />
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/*เป็นสิ่งของ*/}
+                                        {formData.donation_type === 'things' && (
+                                            <>
+                                                <div className="mb-3">
+                                                    <label className="data-AdminEditDonate-label">
+                                                        รายการสิ่งของที่ต้องการ <span className="text-danger">*</span>
+                                                    </label>
+                                                    <select
+                                                        className="form-select"
+                                                        name="type_things"
+                                                        value={formData.type_things}
+                                                        onChange={handleInputChange}
+                                                        required
+                                                    >
+                                                        <option value="อุปกรณ์การเรียน">อุปกรณ์การเรียน</option>
+                                                        <option value="เครื่องคอมพิวเตอร์">เครื่องคอมพิวเตอร์</option>
+                                                    </select>
+                                                </div>
+
+                                                <div className="row">
+                                                    <div className="col-md-6 mb-3">
+                                                        <label className="data-AdminEditDonate-label">
+                                                            จำนวนสิ่งของ <span className="text-danger">*</span>
+                                                        </label>
+                                                        <input
+                                                            type="number"
+                                                            className="form-control"
+                                                            name="quantity_things"
+                                                            value={formData.quantity_things}
+                                                            onChange={handleInputChange}
+                                                            placeholder="จำนวนสิ่งของที่ต้องการ"
+                                                            min="0"
+                                                        />
+                                                    </div>
+
+                                                    <div className="col-md-6 mb-3">
+                                                        <label className="data-AdminEditDonate-label">
+                                                            บริจาคให้กับ <span className="text-danger">*</span>
+                                                        </label>
+                                                        <input
+                                                            type="text"
+                                                            className="form-control"
+                                                            name="for_things"
+                                                            value={formData.for_things}
+                                                            onChange={handleInputChange}
+                                                            placeholder="ชื่อผู้รับบริจาค"
+                                                            required
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </>
+                                        )}
+
+                                        <div className="row">
+                                            {/* แสดงข้อความเตือนถ้าโครงการสิ้นสุดแล้ว */}
+                                            {formData.status === '3' && (
+                                                <div className="col-12 mb-3">
+                                                    <div className="alert alert-warning">
+                                                        โครงการนี้ได้สิ้นสุดลงแล้ว ไม่สามารถแก้ไขวันที่สิ้นสุดได้
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* วันที่เริ่มต้น */}
+                                            <div className="col-md-6 mb-3">
+                                                <label className="data-AdminEditDonate-label">
+                                                    วันที่เริ่มต้น <span className="text-danger">*</span>
+                                                </label>
+                                                <input
+                                                    type="date"
+                                                    className="form-control"
+                                                    name="start_date"
+                                                    value={formData.start_date}
+                                                    onChange={handleInputChange}
+                                                    required
+                                                />
+                                            </div>
+
+                                            {/* วันที่สิ้นสุด */}
+                                            <div className="col-md-6 mb-3">
+                                                <label className="data-AdminEditDonate-label">
+                                                    วันที่สิ้นสุด
+                                                </label>
+                                                <input
+                                                    type="date"
+                                                    className="form-control"
+                                                    name="end_date"
+                                                    value={formData.end_date}
+                                                    onChange={handleInputChange}
+                                                    required
+                                                    disabled={formData.status === '3'} // ปิดการแก้ไข
+                                                />
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
 
+                                    <div className="data-AdminEditDonate">
+                                        {/* ข้อมูลธนาคาร */}
+                                        <div className="row">
+                                            <div className="col-md-6 mb-3">
+                                                <label className="data-AdminEditDonate-label">
+                                                    ชื่อธนาคาร
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    name="bank_name"
+                                                    value={formData.bank_name}
+                                                    onChange={handleInputChange}
+                                                    placeholder="กรอกชื่อธนาคาร"
+                                                    required
+                                                />
+                                            </div>
 
-                                {/* ข้อมูลธนาคาร */}
-                                <div className="row">
-                                    <div className="col-md-6 mb-3">
-                                        <label className="form-label">
-                                            ชื่อธนาคาร <span className="text-danger">*</span>
-                                        </label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            name="bank_name"
-                                            value={formData.bank_name}
-                                            onChange={handleInputChange}
-                                            placeholder="กรอกชื่อธนาคาร"
-                                            required
-                                        />
+                                            <div className="col-md-6 mb-3">
+                                                <label className="data-AdminEditDonate-label">
+                                                    ชื่อบัญชีธนาคาร
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    name="account_name"
+                                                    value={formData.account_name}
+                                                    onChange={handleInputChange}
+                                                    placeholder="กรอกชื่อธนาคาร"
+                                                    required
+                                                />
+                                            </div>
+
+                                            <div className="col-md-6 mb-3">
+                                                <label className="data-AdminEditDonate-label">
+                                                    เลขบัญชี
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    name="account_number"
+                                                    value={formData.account_number}
+                                                    onChange={handleInputChange}
+                                                    placeholder="กรอกเลขบัญชี"
+                                                    required
+                                                />
+                                            </div>
+
+                                            <div className="col-md-6 mb-3">
+                                                <label className="data-AdminEditDonate-label">
+                                                    หมายเลข PromptPay
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    name="number_promtpay"
+                                                    value={formData.number_promtpay}
+                                                    onChange={handleInputChange}
+                                                    placeholder="กรอกหมายเลข PromptPay (ถ้ามี)"
+                                                />
+                                            </div>
+                                        </div>
                                     </div>
 
-                                    <div className="col-md-6 mb-3">
-                                        <label className="form-label">
-                                            เลขบัญชี <span className="text-danger">*</span>
-                                        </label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            name="account_number"
-                                            value={formData.account_number}
-                                            onChange={handleInputChange}
-                                            placeholder="กรอกเลขบัญชี"
-                                            required
-                                        />
+                                    <div className="data-AdminEditDonate">
+                                        {/* สถานะโครงการ */}
+                                        <div className="mb-3">
+                                            <label className="data-AdminEditDonate-label">สถานะโครงการ</label>
+                                            <select
+                                                className="form-select"
+                                                name="status"
+                                                value={formData.status}
+                                                onChange={handleInputChange}
+                                                required
+                                            >
+                                                <option value="0">ยังไม่อนุมัติ</option>
+                                                <option value="1">อนุมัติแล้ว</option>
+                                                <option value="3">สิ้นสุด</option>
+                                            </select>
+                                        </div>
                                     </div>
-                                </div>
 
-                                {/* หมายเลข PromptPay */}
-                                <div className="mb-3">
-                                    <label className="form-label">
-                                        หมายเลข PromptPay
-                                    </label>
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        name="number_promtpay"
-                                        value={formData.number_promtpay}
-                                        onChange={handleInputChange}
-                                        placeholder="กรอกหมายเลข PromptPay (ถ้ามี)"
-                                    />
-                                </div>
-
-                                {/* สถานะโครงการ */}
-                                {/* <div className="mb-3">
-                                    <label className="form-label">สถานะโครงการ</label>
-                                    <select
-                                        className="form-select"
-                                        name="status"
-                                        value={formData.status}
-                                        onChange={handleInputChange}
-                                        required
-                                    >
-                                        <option value="0">ยังไม่อนุมัติ</option>
-                                        <option value="1">อนุมัติแล้ว</option>
-                                        <option value="3">สิ้นสุด</option>
-                                    </select>
-                                </div> */}
-
-                                {/* ปุ่มจัดการ */}
-                                <div className="d-flex gap-2 justify-content-end">
-                                    <button
-                                        type="button"
-                                        className="btn btn-secondary"
-                                        onClick={handleCancel}
-                                    >
-                                        <i className="fas fa-times"></i> ยกเลิก
-                                    </button>
-                                    <button
-                                        type="submit"
-                                        className="btn btn-success"
-                                    >
-                                        <i className="fas fa-save"></i> บันทึกการแก้ไข
-                                    </button>
-                                </div>
-                            </form>
+                                    {/* ปุ่มจัดการ */}
+                                    <div className="group-donate-btAdmin" >
+                                        <button
+                                            type="button"
+                                            className="cancle-button-editAdmin"
+                                            onClick={handleCancel}
+                                        >
+                                            <i className="fas fa-times"></i> ยกเลิก
+                                        </button>
+                                        <button
+                                            type="submit"
+                                            className="submit-button-editAdmin"
+                                        >
+                                            <i className="fas fa-save"></i> บันทึกการแก้ไข
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 }
 

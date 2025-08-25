@@ -12,7 +12,8 @@ export const breadcrumbMapping = {
     "/category": "หมวดหมู่",
     "/souvenir": "ของที่ระลึก",
     "/donate": "บริจาค",
-    "/donate-detail": "รายละเอียดการบริจาค",
+    "/donate/donatedetail": "รายละเอียดการบริจาค",
+    "/donate/donatedetail/donateconfirm": "ยืนยันการบริจาค",
 
     // ส่วนของผู้ใช้
     "/alumni-profile": "โปรไฟล์",

@@ -149,17 +149,17 @@ function AdminDonate() {
         <div className="donate-activity-container">
             {/* Top Menu Navigation */}
             <div className="mb-4">
-                <nav className="nav nav-tabs">
+                <nav className="nav Adminnav-tabs">
                     <Link 
-                        className={`nav-link ${location.pathname === '/admin/donations' ? 'active' : ''}`}
+                        className={`adminnav-link ${location.pathname === '/admin/donations' ? 'active' : ''}`}
                         to="/admin/donations"
                     >
                         <i className="fas fa-project-diagram me-2"></i>
                         การจัดการโครงการบริจาค
                     </Link>
                     <Link 
-                        className={`nav-link ${location.pathname === '/admin/check-payment-donate' ? 'active' : ''}`}
-                        to="/admin/check-payment-donate"
+                        className={`adminnav-link ${location.pathname === '/admin/donations/check-payment-donate' ? 'active' : ''}`}
+                        to="/admin/donations/check-payment-donate"
                     >
                         <i className="fas fa-credit-card me-2"></i>
                         การจัดการตรวจสอบการชำระเงินบริจาค
@@ -170,7 +170,7 @@ function AdminDonate() {
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <h2 className="donate-activity-title">การจัดการโครงการบริจาค</h2>
                 <div className="d-flex gap-2">
-                    <Link to="/donaterequest" className="btn btn-primary">
+                    <Link to="/admin/donations/donate-request" className="btn-admin-donate-request">
                         <i className="fas fa-plus"></i> เพิ่มโครงการใหม่
                     </Link>
                 </div>
@@ -370,7 +370,7 @@ function AdminDonate() {
                                                                 </button>
                                                             )}
                                                             <Link
-                                                                to={`/admin/edit/${project.project_id}`}
+                                                                to={`/admin/donations/edit/${project.project_id}`}
                                                                 className="btn fasfa-edit btn-sm"
                                                             >
                                                                 <i className="fas fa-edit"></i> แก้ไข
@@ -382,7 +382,7 @@ function AdminDonate() {
                                                                 <i className="fas fa-trash"></i> ลบ
                                                             </button>
                                                             <Link
-                                                                to={`/admin/donatedetail/${project.project_id}`}
+                                                                to={`/admin/donations/donatedetail/${project.project_id}`}
                                                                 className="btn fasfa-info btn-sm"
                                                             >
                                                                 <i className="fas fa-eye"></i> ดูรายละเอียด

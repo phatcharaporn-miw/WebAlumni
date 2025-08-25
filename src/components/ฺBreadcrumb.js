@@ -7,7 +7,7 @@ import '../css/breadcrumb.css';
 
 function Breadcrumb() {
   const location = useLocation();
-  const { activityId, newsId, categoryId, webboardId } = useParams(); 
+  const { activityId, newsId, categoryId, webboardId ,projectId } = useParams(); 
   const [breadcrumb, setBreadcrumb] = useState({}); 
 
   // ดึงข้อมูล breadcrumb หากมี activityId, newsId หรือ categoryId
@@ -48,7 +48,16 @@ function Breadcrumb() {
           console.error("Error fetching category breadcrumb:", error);
         });
     }
-  }, [activityId, newsId, categoryId, webboardId]);
+    if (projectId) {
+      axios.get(`http://localhost:3001/donate/${projectId}`)
+        .then(response => {
+          setBreadcrumb(prev => ({ ...prev, news: response.data.donateIdTitle })); 
+        })
+        .catch(error => {
+          console.error("Error fetching news breadcrumb:", error);
+        });
+    }
+  }, [activityId, newsId, categoryId, webboardId,projectId]);
 
   // แยก path ตาม '/'
   const pathnames = location.pathname.split('/').filter((item) => item);

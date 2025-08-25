@@ -56,7 +56,7 @@ import AdminEditProject from './pages/admin/admin-donate-edit';
 import AdminDonateDetail from './pages/admin/admin-donate-detail';
 import AdminDonateCheckPayment from './pages/admin/admin-donate-checkPayment';
 import AdminDonateCheckPaymentDetail from './pages/admin/admin-donate-checkPayment-detail';
-
+import AdminDonateRequest from './pages/admin/admin-donate-request';
 
 function App() {
 
@@ -103,9 +103,12 @@ function App() {
             <Route path="/alumni-profile" element={<Profile />} />
             <Route path="/alumni-profile/alumni-profile-webboard" element={<AlumniProfileWebboard />} />
             <Route path="/alumni-profile/alumni-profile-activity" element={<AlumniProfileActivity />} />
+            <Route path="/alumni-profile/alumni-request" element={<AlumniProfileRequest />} />
+            <Route path="/alumni-profile/donation-history" element={<AlumniProfileDonation />} />
             <Route path="/alumni-profile-souvenir" element={<AlumniProfileSouvenir />} />
             <Route path="/alumni/major-detail" element={<AlumniMajor />} />
           </Route>
+          
 
           {/* Admin Section */}
           <Route element={<Admin />}>
@@ -115,12 +118,14 @@ function App() {
             <Route path="/admin/activities/admin-create-news" element={<CreateNews />} />
             <Route path="/admin/activities/admin-create-activity" element={<CreateActivity />} />
             <Route path="/admin/souvenir/souvenir_request" element={<SouvenirRequest />} />
+           
+           {/* ส่วนการบริจาค */}
             <Route path="/admin/donations" element={<AdminDonate />} />
-            <Route path="/admin/edit/:id" element={<AdminEditProject />} />
-            <Route path="/admin/donatedetail/:id" element={<AdminDonateDetail />} />
-            <Route path="/admin/check-payment-donate" element={<AdminDonateCheckPayment />} />
-            <Route path="/admin/check-payment-donate-detail/:id" element={<AdminDonateCheckPaymentDetail />} />
-
+            <Route path="/admin/donations/edit/:id" element={<AdminEditProject />} />
+            <Route path="/admin/donations/donatedetail/:id" element={<AdminDonateDetail />} />
+            <Route path="/admin/donations/check-payment-donate" element={<AdminDonateCheckPayment />} />
+            <Route path="/admin/donations/check-payment-donate-detail/:id" element={<AdminDonateCheckPaymentDetail />} />
+            <Route path="/admin/donations/donate-request" element={<AdminDonateRequest />} />
           </Route>
         </Routes>
       </BrowserRouter>
