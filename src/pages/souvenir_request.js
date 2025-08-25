@@ -3,16 +3,16 @@ import { Button, Modal, Box, Typography } from '@mui/material';
 import "../css/Souvenir_request.css";
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
-import Swal from "sweetalert2";
+import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
+
 
 function SouvenirRequest() {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         productName: "",
         description: "",
-        image: null,
-        price: "",
-        stock: "",
+        variants: [],
         paymentMethod: "",
         bankName: "",
         accountNumber: "",
@@ -90,6 +90,30 @@ function SouvenirRequest() {
         }
         return true;
     };
+
+    // ตัวเลือกของสินค้า
+    const handleChangeVariant = (index, field, value) => {
+        const newVariants = [...formData.variants];
+        newVariants[index][field] = value;
+        setFormData(prev => ({ ...prev, variants: newVariants }));
+    };
+    const addVariant = () => {
+        setFormData(prev => ({
+            ...prev,
+            variants: [...prev.variants, { color: "", size: "", price: "", stock: "", image: null }]
+        }));
+    };
+    const handleVariantFileChange = (index, file) => {
+        const newVariants = [...formData.variants];
+        newVariants[index].image = file;
+        setFormData(prev => ({ ...prev, variants: newVariants }));
+    };
+
+    const removeVariant = (index) => {
+        const newVariants = formData.variants.filter((_, i) => i !== index);
+        setFormData(prev => ({ ...prev, variants: newVariants }));
+    };
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -176,8 +200,6 @@ function SouvenirRequest() {
         boxShadow: 24,
         p: 4,
     };
-
-
     return (
         <div>
             <h3 className="alumni-title text-center">เพิ่มสินค้าของที่ระลึก</h3>
@@ -198,7 +220,6 @@ function SouvenirRequest() {
                                 required
                             />
                         </div>
-
                         <div>
                             <label htmlFor="description">รายละเอียดสินค้า<span className="important">*</span></label><br />
                             <textarea
@@ -210,9 +231,8 @@ function SouvenirRequest() {
                                 required
                             />
                         </div>
-
                         <div>
-                            <label htmlFor="image">รูปสินค้า<span className="important">*</span></label><br />
+                            <label htmlFor="image">รูปหลักสินค้า<span className="important">*</span></label><br />
                             <input
                                 className="data-requestSouvenir-input"
                                 type="file"
@@ -247,8 +267,74 @@ function SouvenirRequest() {
                                 required
                             />
                         </div>
-                    </div>
 
+                        <div className="data-requestSouvenir">
+                            <p className="data-requestSouvenir-title">ตัวเลือกสินค้า (สี, ขนาด, ราคา, จำนวน)</p>
+                            <Button
+                                variant="outlined"
+                                onClick={addVariant}
+                                startIcon={<AddIcon />}
+                                sx={{ mt: 2 }}
+                            >
+                                เพิ่มตัวเลือกสินค้า
+                            </Button>
+                            {formData.variants.length > 0 && formData.variants.map((variant, index) => (
+                                <div key={index} className="variant-box">
+                                    {/* ปุ่มลบอยู่มุมขวาบน */}
+                                    {formData.variants.length > 1 && (
+                                        <Button
+                                            className="variant-remove-btn"
+                                            onClick={() => removeVariant(index)}
+                                            color="error"
+                                            size="small"
+                                        >
+                                            <DeleteIcon fontSize="small" />
+                                        </Button>
+                                    )}
+
+                                    <label>สี</label>
+                                    <input
+                                        className="data-requestSouvenir-input"
+                                        type="text"
+                                        value={variant.color}
+                                        onChange={e => handleChangeVariant(index, 'color', e.target.value)}
+                                    />
+
+                                    <label>ขนาด</label>
+                                    <input
+                                        className="data-requestSouvenir-input"
+                                        type="text"
+                                        value={variant.size}
+                                        onChange={e => handleChangeVariant(index, 'size', e.target.value)}
+                                    />
+
+                                    <label>ราคา</label>
+                                    <input
+                                        className="data-requestSouvenir-input"
+                                        type="text"
+                                        value={variant.price}
+                                        onChange={e => handleChangeVariant(index, 'price', e.target.value)}
+                                    />
+
+                                    <label>สต็อก</label>
+                                    <input
+                                        className="data-requestSouvenir-input"
+                                        type="text"
+                                        value={variant.stock}
+                                        onChange={e => handleChangeVariant(index, 'stock', e.target.value)}
+                                    />
+
+                                    <label>รูปภาพตัวเลือก</label>
+                                    <input
+                                        className="data-requestSouvenir-input"
+                                        type="file"
+                                        onChange={e => handleVariantFileChange(index, e.target.files[0])}
+                                    />
+                                </div>
+                            ))}
+                        </div>
+
+                    </div>
                     {/* ช่องทางการชำระเงิน */}
                     <div className="payment-info">
                         <p className="data-requestSouvenir-title">ช่องทางการชำระเงิน</p>
@@ -265,7 +351,6 @@ function SouvenirRequest() {
                                 <option value="พร้อมเพย์">พร้อมเพย์</option>
                             </select>
                         </div>
-
 
                         <div>
                             <label htmlFor="bankName">ชื่อธนาคาร<span className="important">*</span></label><br />

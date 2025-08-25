@@ -60,6 +60,18 @@ function AdminCheckPaymentDonate() {
         }
     };
 
+    const deletePayment = async (donationId) => {
+        if (!window.confirm("คุณต้องการลบรายการนี้หรือไม่? การลบไม่สามารถกู้คืนได้")) return;
+        try {
+            await axios.delete(`http://localhost:3001/admin/check-payment-donate/${donationId}`);
+            setPayments(payments.filter(p => p.donation_id !== donationId));
+            alert("ลบรายการสำเร็จ");
+        } catch {
+            alert("เกิดข้อผิดพลาดในการลบ");
+        }
+    };
+
+
     const keyword = searchQuery.trim().toLowerCase();
     const filteredPayments = payments.filter(payment => {
         const matchesSearch =
@@ -160,7 +172,7 @@ function AdminCheckPaymentDonate() {
                     <table className="table table-bordered align-middle">
                         <thead>
                             <tr>
-                                <th>หมายเลขคำสั่งซื้อ</th>
+                                <th>หมายเลขบริจาค</th>
                                 <th>ชื่อผู้บริจาค</th>
                                 <th>ชื่อโครงการ</th>
                                 <th>จำนวนเงิน (บาท)</th>
@@ -181,31 +193,54 @@ function AdminCheckPaymentDonate() {
                                     <td>{payment.donor_name || "-"}</td>
                                     <td>{payment.project_name || "-"}</td>
                                     <td>{payment.amount ? Number(payment.amount).toLocaleString() : "-"}</td>
-                                    <td>{payment.created_at ? new Date(payment.created_at).toLocaleDateString("th-TH") : "-"}</td>
+                                    <td>
+                                        {payment.created_at
+                                            ? new Date(payment.created_at).toLocaleDateString("th-TH")
+                                            : payment.start_date
+                                                ? new Date(payment.start_date).toLocaleDateString("th-TH")
+                                                : "-"}
+                                    </td>
+
                                     <td>{getStatusBadge(payment.payment_status)}</td>
                                     <td>
                                         {payment.proof_image ? (
                                             <img
-                                                src={`http://localhost:3001/uploads/${payment.proof_image}`}
+                                                src={`http://localhost:3001/uploads/${payment.proof_image}?t=${Date.now()}`}
                                                 alt="หลักฐานชำระเงิน"
                                                 style={{ maxWidth: "150px", maxHeight: "100px", objectFit: "contain" }}
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    window.open(`http://localhost:3001/uploads/${payment.proof_image}`, "_blank");
-                                                }}
+                                                onError={(e) => { e.target.src = "/images/default-slip.png"; }}
                                             />
+
                                         ) : "ไม่มี"}
                                     </td>
                                     <td>
-                                        <div onClick={(e) => e.stopPropagation()}>
-                                            {payment.payment_status === "pending" ? (
+                                        <div className="d-flex flex-wrap gap-1" onClick={(e) => e.stopPropagation()}>
+                                            {payment.payment_status === "pending" && (
                                                 <>
-                                                    <button className="btn btn-success btn-sm me-1" onClick={() => approvePayment(payment.donation_id)}>อนุมัติ</button>
-                                                    <button className="btn btn-danger btn-sm" onClick={() => rejectPayment(payment.donation_id)}>ปฏิเสธ</button>
+                                                    <button
+                                                        className="btn btn-success btn-sm"
+                                                        onClick={() => approvePayment(payment.donation_id)}
+                                                    >
+                                                        อนุมัติ
+                                                    </button>
+                                                    <button
+                                                        className="btn btn-danger btn-sm"
+                                                        onClick={() => rejectPayment(payment.donation_id)}
+                                                    >
+                                                        ปฏิเสธ
+                                                    </button>
                                                 </>
-                                            ) : <span className="text-muted">-</span>}
+                                            )}
+                                            <button
+                                                className="btn btn-outline-danger btn-sm"
+                                                onClick={() => deletePayment(payment.donation_id)}
+                                            >
+                                                ลบ
+                                            </button>
                                         </div>
                                     </td>
+
+
                                 </tr>
                             ))}
                         </tbody>

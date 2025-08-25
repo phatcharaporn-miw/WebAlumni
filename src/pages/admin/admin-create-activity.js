@@ -42,7 +42,6 @@ function CreateActivity() {
         setMinDate(today);
     }, []);
 
-  // ฟังก์ชันจัดการการเปลี่ยนแปลงของฟอร์ม
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     if (type === 'checkbox') {
@@ -58,7 +57,6 @@ function CreateActivity() {
     }
   };
 
-  // ฟังก์ชันจัดการการอัพโหลดไฟล์
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files); // ต้องแปลงก่อนใช้
     console.log("อัปโหลดรูป:", files);

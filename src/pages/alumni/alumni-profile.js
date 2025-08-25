@@ -22,8 +22,7 @@ function Profile() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState(null); // สำหรับแสดงรูปภาพก่อนอัปโหลด
   const navigate = useNavigate();
- //แก้ไขข้อมูลส่วนตัว
- const [editing, setEditing] = useState(false); //สลับโหมดการแก้ไข
+ const [editing, setEditing] = useState(false); 
  
   
   useEffect(() => {
