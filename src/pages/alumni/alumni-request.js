@@ -13,7 +13,6 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 function AlumniProfileRequest() {
     const [pendingDonations, setPendingDonations] = useState([]);
-    const [pendingDonations, setPendingDonations] = useState([]);
     const [profile, setProfile] = useState({});
     const { handleLogout } = useOutletContext();
     // const [activity, setActivity] = useState([]);

@@ -16,12 +16,6 @@ function DonateConfirm() {
     const [error, setError] = useState(null);
     const [isDataValid, setIsDataValid] = useState(false);
     const userId = localStorage.getItem("userId");
-    const [userData, setUserData] = useState({});
-    const [loading, setLoading] = useState(false);
-    const [projectData, setProjectData] = useState({});
-    const [error, setError] = useState(null);
-    const [isDataValid, setIsDataValid] = useState(false);
-    const userId = localStorage.getItem("userId");
     const location = useLocation();
     const navigate = useNavigate();
 
