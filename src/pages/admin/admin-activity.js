@@ -48,12 +48,14 @@ function AdminActivity() {
         }
     }, [activeTab]);
 
-    // แปลงวันที่เป็นรูปแบบไทย
-    const formatDate = (isoDateString) => {
-        const date = new Date(isoDateString);
-        const options = { day: 'numeric', month: 'long', year: 'numeric' };
-        return date.toLocaleDateString('th-TH', options);
-      };
+    const formatDate = (dateStr) => {
+        if (!dateStr || dateStr === "0000-00-00") return "ไม่ระบุวันที่";
+        const date = new Date(dateStr);
+        const day = date.getDate();
+        const month = date.getMonth() + 1; // เดือนเป็นเลข
+        const year = date.getFullYear() + 543; // ปีไทย
+        return `${day}/${month}/${year}`;
+    };
       
     // แปลงเวลาเป็นรูปแบบ 24 ชั่วโมง
     const formatTime = (start, end) => {

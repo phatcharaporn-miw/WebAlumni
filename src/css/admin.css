@@ -254,6 +254,27 @@ table td button:hover {
     align-items: center;
 }
 
+/* Modal Content */
+/* .modal-content-souvenir{
+  max-height: 70vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #0F75BC #f1f1f1;
+}
+
+.modal-content-souvenir::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-content-souvenir::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.modal-content-souvenir::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #0F75BC, #4A90E2);
+  border-radius: 10px;
+} */
 
 /*Responsive*/
 @media (max-width: 768px) {

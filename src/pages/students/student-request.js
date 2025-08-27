@@ -140,7 +140,7 @@ function StudentProfileRequest() {
                     {/* Main Content */}
                     <div className="col-12 col-md-8">
                             {/* Header Section */}
-                            <div className="bg-white rounded-4 shadow-sm p-4 mb-4">
+                        <div className="bg-white rounded-4 shadow-sm p-4 mb-4">
                             <div className="d-flex justify-content-between align-items-center">
                                 <div className="d-flex align-items-center">
                                     <div className="bg-primary bg-opacity-10 rounded-circle p-2 me-3">
@@ -239,9 +239,7 @@ function StudentProfileRequest() {
                                                                 <i className="fas fa-eye me-1"></i>
                                                                 ดูรายละเอียด
                                                             </button>
-                                                            {/* <button className="btn btn-outline-secondary btn-sm">
-                                                            <i className="fas fa-edit"></i>
-                                                        </button> */}
+                                                            
                                                         </div>
                                                     </div>
                                                 </div>
@@ -250,7 +248,6 @@ function StudentProfileRequest() {
                                     ))}
                                 </div>
                             )}
-                      
                     </div>
                 </div>
             </div>

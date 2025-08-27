@@ -269,7 +269,6 @@ function PresidentManageOrders() {
                                                             >
                                                                 <span className="d-none d-sm-inline">จัดการ</span>
                                                                 <span className="d-sm-none">
-                                                                    <i className="fas fa-edit"></i>
                                                                 </span>
                                                             </button>
                                                         </div>
@@ -349,7 +348,6 @@ function PresidentManageOrders() {
                                                         {/* Update Section */}
                                                         <div className="border-top pt-3">
                                                             <h6 className="text-muted mb-3 d-flex align-items-center">
-                                                                <i className="fas fa-edit me-2"></i>
                                                                 อัปเดตข้อมูล
                                                             </h6>
 
@@ -377,9 +375,6 @@ function PresidentManageOrders() {
                                                                 <div className="col-md-5 mb-3">
                                                                     <label className="form-label small fw-bold text-muted">หมายเลขพัสดุ</label>
                                                                     <div className="input-group input-group-sm">
-                                                                        <span className="input-group-text">
-                                                                            <i className="fas fa-barcode"></i>
-                                                                        </span>
                                                                         <input
                                                                             type="text"
                                                                             className="form-control"
@@ -404,7 +399,6 @@ function PresidentManageOrders() {
                                                                                 handleUpdate();
                                                                             }}
                                                                         >
-                                                                            <i className="fas fa-save me-1"></i>
                                                                             อัปเดต
                                                                         </button>
                                                                     )}
@@ -416,15 +410,10 @@ function PresidentManageOrders() {
                                                         <div className="border-top pt-2 mt-3">
                                                             <div className="d-flex justify-content-between align-items-center">
                                                                 <small className="text-muted">
-                                                                    <i className="fas fa-clock me-1"></i>
                                                                     อัปเดตล่าสุด
                                                                 </small>
                                                                 <small className="text-muted">
-                                                                    {new Date().toLocaleDateString('th-TH', {
-                                                                        day: '2-digit',
-                                                                        month: 'short',
-                                                                        year: 'numeric'
-                                                                    })}
+                                                                    { format(new Date(), 'dd/MM/yyyy')}
                                                                 </small>
                                                             </div>
                                                         </div>
@@ -436,11 +425,6 @@ function PresidentManageOrders() {
                                 </div>
                             ) : (
                                 <div className="text-center py-5">
-                                    <div className="mb-4">
-                                        <div className="bg-light rounded-circle mx-auto mb-3" style={{ width: "80px", height: "80px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                                            <i className="fas fa-shopping-cart fa-2x text-muted"></i>
-                                        </div>
-                                    </div>
                                     <h5 className="text-muted mb-3">ไม่มีคำสั่งซื้อ</h5>
                                     <p className="text-muted">
                                         ยังไม่มีคำสั่งซื้อที่คุณเป็นผู้ขาย

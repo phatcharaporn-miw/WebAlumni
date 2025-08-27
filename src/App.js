@@ -47,6 +47,7 @@ import AlumniProfileDonation from './pages/alumni/alumni-profile-donation';
 import AlumniManageOrders from './pages/alumni/alumni-manage-orders';
 import RegistrationForm from './pages/test-regis';
 import CheckStudentId from './pages/check-studentId';
+import DonateConfirm from './pages/donate-confirm';
 
 
 // test import
@@ -91,8 +92,11 @@ import AdminNewsDetail from './pages/admin/admin-newDetail';
 import AdminDonate from './pages/admin/admin-donate';
 import AdminOrderManager from './pages/admin/admin-manage-orders';
 import AdminCheckPaymentDonateDetail from './pages/admin/admin-donate-checkPayment-detail';
-import AdminCheckPaymentDonate from './pages/admin/admin-donate-checkPayment';
+// import AdminCheckPaymentDonate from './pages/admin/admin-donate-checkPayment';
 import AdminEditProject from './pages/admin/admin-donate-edit';
+import AdminDonateRequest from './pages/admin/admin-donate-request';
+import AdminProjectDetail from './pages/admin/admin-donate-detail';
+
 
 //import ของนายกสมาคม
 import ParticipantsPage from './pages/admin/participants';
@@ -157,6 +161,8 @@ function App() {
                   <Route path="/alumni/:userId" element={<HomeAlumniProfile />} />
                   <Route path="/createPost" element={<CreatePost />} />
                   <Route path="/check-studentId" element={<CheckStudentId />} />
+                  <Route path="/donate/donatedetail/donateconfirm/:id" element={<DonateConfirm />} />
+                  
 
                   {/* ลองทำไว้ก่อน */}
                   <Route path="/change-password" element={<ChangePassword />} />
@@ -227,13 +233,15 @@ function App() {
                   <Route path="/admin/admin-alumni" element={<AdminOnly><AdminAlumni /></AdminOnly>} />
                   <Route path="/admin/admin-alumni/admin-alumniView/:major" element={<AdminOnly><AdminAlumniView /></AdminOnly>} />
                   <Route path="/admin/donations" element={<AdminOnly><AdminDonate /></AdminOnly>} />
-                  <Route path="/admin/donations/check-payment-donate" element={<AdminOnly><AdminCheckPaymentDonate /></AdminOnly>} />     
-                  <Route path="/admin/donations/detail/:projectId" element={<AdminOnly><DonateDetail /></AdminOnly>} />
-                  <Route path="/admin/donations/create-project" element={<AdminOnly><DonateRequest /></AdminOnly>} />
-                  <Route path="/admin/donations/edit-project/:projectId" element={<AdminOnly><DonateRequest /></AdminOnly>} />
+                  {/* <Route path="/admin/donations/check-payment-donate" element={<AdminOnly><AdminCheckPaymentDonate /></AdminOnly>} />      */}
+                  {/* <Route path="/admin/donations/detail/:id" element={<AdminOnly><DonateDetail /></AdminOnly>} /> */}
+                  {/* <Route path="/admin/donations/create-project" element={<AdminOnly><DonateRequest /></AdminOnly>} /> */}
+                  {/* <Route path="/admin/donations/edit-project/:projectId" element={<AdminOnly><DonateRequest /></AdminOnly>} /> */}
                   <Route path="/admin/admin-manage-orders" element={<AdminOnly><AdminOrderManager /></AdminOnly>} />
                   <Route path="/admin/donations/check-payment-donate/detail/:id" element={<AdminOnly><AdminCheckPaymentDonateDetail /></AdminOnly>} />
-                  <Route path="/admin/donations/edit-donate/:projectId" element={<AdminOnly><AdminEditProject /></AdminOnly>} />
+                  <Route path="/admin/donations/edit/:id" element={<AdminOnly><AdminEditProject /></AdminOnly>} />
+                  <Route path="/admin/donations/donate-request" element={<AdminOnly><AdminDonateRequest /></AdminOnly>} />
+                  <Route path="/admin/donations/donate-detail/:id" element={<AdminOnly><AdminProjectDetail /></AdminOnly>} />
 
                 </Route>
               </Routes>

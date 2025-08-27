@@ -117,120 +117,152 @@ function EditActivity() {
     }
 
     return (
-        <div className="container mt-4">
-            {/* <button className="btn btn-secondary mb-3" onClick={() => navigate(-1)}>ย้อนกลับ</button> */}
-            <h3 className="mb-4 text-center">แก้ไขกิจกรรม</h3>
+        <div className="container py-5">
             <div className="row justify-content-center">
-                <div className="col-lg-7 col-md-10">             
-                    <form onSubmit={handleSubmit} className="p-4 border rounded shadow-sm bg-white">
-                        <div className="mb-3">
-                            <label htmlFor="activity_name" className="form-label">ชื่อกิจกรรม</label>
-                            <input
-                                type="text"
-                                className="form-control w-100"
-                                id="activity_name"
-                                name="activity_name"
-                                value={formData.activity_name}
-                                onChange={handleChange}
-                                required
-                            />
+                <div className="col-lg-8 col-md-10">
+                    <div className="card shadow-lg border-0 rounded-4">
+                        <div className="card-header bg-primary text-white text-center py-3 rounded-top-4">
+                            <h3 className="mb-0">แก้ไขกิจกรรม</h3>
                         </div>
-                        <div className="mb-3">
-                            <label htmlFor="activity_date" className="form-label">วันที่จัดกิจกรรม</label>
-                            <input
-                                type="date"
-                                className="form-control w-100"
-                                id="activity_date"
-                                name="activity_date"
-                                value={formData.activity_date}
-                                onChange={handleChange}
-                                required
-                                min={new Date().toISOString().split("T")[0]} // เพิ่มบรรทัดนี้
-                            />
+                        <div className="card-body p-4 bg-light rounded-bottom-4">
+                            <form onSubmit={handleSubmit} className="row g-3">
+
+                                {/* ชื่อกิจกรรม */}
+                                <div className="col-12">
+                                    <label htmlFor="activity_name" className="form-label fw-bold">ชื่อกิจกรรม</label>
+                                    <input
+                                        type="text"
+                                        className="form-control w-100"
+                                        id="activity_name"
+                                        name="activity_name"
+                                        value={formData.activity_name}
+                                        onChange={handleChange}
+                                        required
+                                    />
+                                </div>
+
+                                {/* วันที่จัด */}
+                                <div className="col-md-6">
+                                    <label htmlFor="activity_date" className="form-label fw-bold">วันที่จัดกิจกรรม</label>
+                                    <input
+                                        type="date"
+                                        className="form-control w-100"
+                                        id="activity_date"
+                                        name="activity_date"
+                                        value={formData.activity_date}
+                                        onChange={handleChange}
+                                        required
+                                        min={new Date().toISOString().split("T")[0]}
+                                    />
+                                </div>
+
+                                {/* วันที่สิ้นสุด */}
+                                <div className="col-md-6">
+                                    <label htmlFor="end_date" className="form-label fw-bold">วันที่สิ้นสุด</label>
+                                    <input
+                                        type="date"
+                                        className="form-control w-100"
+                                        id="end_date"
+                                        name="end_date"
+                                        value={formData.end_date}
+                                        onChange={handleChange}
+                                        min={new Date().toISOString().split("T")[0]}
+                                    />
+                                </div>
+
+                                {/* เวลาเริ่ม */}
+                                <div className="col-md-6">
+                                    <label htmlFor="start_time" className="form-label fw-bold">เวลาเริ่ม</label>
+                                    <input
+                                        type="time"
+                                        className="form-control w-100"
+                                        id="start_time"
+                                        name="start_time"
+                                        value={formData.start_time}
+                                        onChange={handleChange}
+                                        required
+                                    />
+                                </div>
+
+                                {/* เวลาสิ้นสุด */}
+                                <div className="col-md-6">
+                                    <label htmlFor="end_time" className="form-label fw-bold">เวลาสิ้นสุด</label>
+                                    <input
+                                        type="time"
+                                        className="form-control w-100"
+                                        id="end_time"
+                                        name="end_time"
+                                        value={formData.end_time}
+                                        onChange={handleChange}
+                                        required
+                                    />
+                                </div>
+
+                                {/* รายละเอียด */}
+                                <div className="col-12">
+                                    <label htmlFor="description" className="form-label fw-bold">รายละเอียดกิจกรรม</label>
+                                    <textarea
+                                        className="form-control w-100"
+                                        id="description"
+                                        name="description"
+                                        rows="4"
+                                        value={formData.description}
+                                        onChange={handleChange}
+                                        required
+                                    ></textarea>
+                                </div>
+
+                                {/* อัปโหลดรูป */}
+                                <div className="col-12">
+                                    <label htmlFor="images" className="form-label fw-bold">รูปภาพกิจกรรม</label>
+                                    <input
+                                        type="file"
+                                        className="form-control w-100"
+                                        id="images"
+                                        name="images"
+                                        multiple
+                                        onChange={handleChange}
+                                    />
+                                </div>
+
+                                {/* สถานะ */}
+                                <div className="col-12">
+                                    <label htmlFor="status" className="form-label fw-bold">สถานะ</label>
+                                    <select
+                                        className="form-select"
+                                        id="status"
+                                        name="status"
+                                        value={formData.status}
+                                        onChange={handleChange}
+                                        required
+                                    >
+                                        <option value={0}>กำลังจะจัดขึ้น</option>
+                                        <option value={1}>เสร็จสิ้นแล้ว</option>
+                                        <option value={2}>กำลังดำเนินการ</option>
+                                    </select>
+                                </div>
+
+                                {/* ปุ่ม */}
+                                <div className="col-12 d-flex justify-content-end mt-3">
+                                    <button
+                                        type="button"
+                                        className="btn btn-outline-secondary px-4 shadow-sm"
+                                        onClick={() => navigate('/admin/activities')}
+                                    >
+                                        ยกเลิก
+                                    </button>
+                                    <button type="submit" className="btn btn-primary px-4 me-2 shadow-sm">
+                                        บันทึก
+                                    </button>
+                                </div>
+                            </form>
                         </div>
-                        <div className="mb-3">
-                            <label htmlFor="end_date" className="form-label">วันที่สิ้นสุด</label>
-                            <input
-                                type="date"
-                                className="form-control w-100"
-                                id="end_date"
-                                name="end_date"
-                                value={formData.end_date}
-                                onChange={handleChange}
-                                min={new Date().toISOString().split("T")[0]}  // ป้องกันย้อนหลังและไม่ให้ก่อนวันเริ่ม
-                            />
-                        </div>
-                        <div className="mb-3">
-                            <label htmlFor="start_time" className="form-label">เวลาเริ่ม</label>
-                            <input
-                                type="time"
-                                className="form-control w-100"
-                                id="start_time"
-                                name="start_time"
-                                value={formData.start_time}
-                                onChange={handleChange}
-                                required
-                            />
-                        </div>
-                        <div className="mb-3">
-                            <label htmlFor="end_time" className="form-label">เวลาสิ้นสุด</label>
-                            <input
-                                type="time"
-                                className="form-control w-100"
-                                id="end_time"
-                                name="end_time"
-                                value={formData.end_time}
-                                onChange={handleChange}
-                                required
-                            />
-                        </div>
-                        <div className="mb-3">
-                            <label htmlFor="description" className="form-label">รายละเอียดกิจกรรม</label>
-                            <textarea
-                                className="form-control w-100"
-                                id="description"
-                                name="description"
-                                rows="4"
-                                value={formData.description}
-                                onChange={handleChange}
-                                required
-                            ></textarea>
-                        </div>
-                        <div className="mb-3">
-                            <label htmlFor="images" className="form-label">รูปภาพกิจกรรม</label>
-                            <input
-                                type="file"
-                                className="form-control w-100"
-                                id="images"
-                                name="images"
-                                multiple
-                                onChange={handleChange}
-                            />
-                        </div>
-                        <div className="mb-3">
-                            <label htmlFor="status" className="form-label">สถานะ</label>
-                            <select
-                                className="form-select"
-                                id="status"
-                                name="status"
-                                value={formData.status}
-                                onChange={handleChange}
-                                required
-                            >
-                                <option value={0}>กำลังจะจัดขึ้น</option>
-                                <option value={1}>เสร็จสิ้นแล้ว</option>
-                                <option value={2}>กำลังดำเนินการ</option>
-                            </select>
-                        </div>
-                        <div className="d-flex justify-content-end g-3">
-                            <button type="submit" className="btn btn-primary">บันทึกการแก้ไข</button>
-                            <button type="button" className="btn btn-secondary ms-2" onClick={() => navigate('/admin/activities')}>ยกเลิก</button>
-                        </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
     );
+
 }
 
 export default EditActivity;

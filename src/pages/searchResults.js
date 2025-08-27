@@ -29,6 +29,16 @@ function SearchResult() {
         }
     }, [query]);
 
+    // Pagination logic
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 6; // จำนวนหน้า
+    const totalPages = Math.ceil(results.length / itemsPerPage);
+    const paginatedResults = results.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+    const handlePageChange = (page) => {
+        if (page >= 1 && page <= totalPages) setCurrentPage(page);
+    };
+
     if (loading) {
         return (
             <div className="container">
@@ -69,15 +79,12 @@ function SearchResult() {
                     {/* Results Section */}
                     {results.length === 0 ? (
                         <div className="no-results text-center py-5">
-                            <div className="mb-4">
-                                <i className="fas fa-search-minus display-1 text-muted"></i>
-                            </div>
                             <h4 className="text-muted mb-3">ไม่พบข้อมูลที่ค้นหา</h4>
                             <p className="text-muted">ลองค้นหาด้วยคำอื่น หรือตรวจสอบการสะกดอีกครั้ง</p>
                         </div>
                     ) : (
                         <div className="results-container">
-                            {results.map((item, idx) => (
+                            {paginatedResults.map((item, idx) => (
                                 <div key={idx} className="result-item mb-3">
                                     <Link to={getLink(item)} className="text-decoration-none">
                                         <div className="card border-0 shadow-sm result-card h-100">
@@ -114,6 +121,25 @@ function SearchResult() {
                     )}
                 </div>
             </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+                <nav className="d-flex justify-content-center mt-4">
+                    <ul className="pagination">
+                        <li className={`page-item${currentPage === 1 ? ' disabled' : ''}`}>
+                            <button className="page-link" onClick={() => handlePageChange(currentPage - 1)}>&laquo;</button>
+                        </li>
+                        {Array.from({ length: totalPages }, (_, i) => (
+                            <li key={i + 1} className={`page-item${currentPage === i + 1 ? ' active' : ''}`}>
+                                <button className="page-link" onClick={() => handlePageChange(i + 1)}>{i + 1}</button>
+                            </li>
+                        ))}
+                        <li className={`page-item${currentPage === totalPages ? ' disabled' : ''}`}>
+                            <button className="page-link" onClick={() => handlePageChange(currentPage + 1)}>&raquo;</button>
+                        </li>
+                    </ul>
+                </nav>
+            )}
         </div>
     );
 }
@@ -145,7 +171,7 @@ function getTypeBadgeClass(type) {
         case "news":
             return "bg-primary bg-opacity-10 text-primary";
         case "webboard":
-            return "bg-success bg-opacity-10 text-success"; 
+            return "bg-success bg-opacity-10 text-success";
         case "activity":
             return "bg-warning bg-opacity-10 text-warning";
         case "donationproject":

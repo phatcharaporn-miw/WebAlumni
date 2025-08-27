@@ -13,8 +13,8 @@ function AdminActivityDetail() {
 
     // ดึงข้อมูลกิจกรรม
     useEffect(() => {
-        axios.get(`http://localhost:3001/activity/${activityId}`, { 
-            withCredentials: true 
+        axios.get(`http://localhost:3001/activity/${activityId}`, {
+            withCredentials: true
         })
             .then((response) => {
                 if (response.data.success) {
@@ -34,8 +34,8 @@ function AdminActivityDetail() {
     // ฟังก์ชันลบกิจกรรม
     const handleDeleteActivity = () => {
         if (window.confirm("คุณต้องการลบกิจกรรมนี้หรือไม่?")) {
-            axios.delete(`http://localhost:3001/activity/delete-activity/${activityId}`, { 
-                withCredentials: true 
+            axios.delete(`http://localhost:3001/activity/delete-activity/${activityId}`, {
+                withCredentials: true
             })
                 .then((response) => {
                     if (response.data.success) {
@@ -51,11 +51,13 @@ function AdminActivityDetail() {
         }
     };
 
-    // แปลงวันที่เป็นรูปแบบไทย
-    const formatDate = (isoDateString) => {
-        const date = new Date(isoDateString);
-        const options = { day: 'numeric', month: 'long', year: 'numeric' };
-        return date.toLocaleDateString('th-TH', options);
+    const formatDate = (dateStr) => {
+        if (!dateStr || dateStr === "0000-00-00") return "ไม่ระบุวันที่";
+        const date = new Date(dateStr);
+        const day = date.getDate();
+        const month = date.getMonth() + 1; // เดือนเป็นเลข
+        const year = date.getFullYear() + 543; // ปีไทย
+        return `${day}/${month}/${year}`;
     };
 
     // แปลงเวลาเป็นรูปแบบ 24 ชั่วโมง
@@ -73,11 +75,10 @@ function AdminActivityDetail() {
     }
 
     return (
-        <div className="container mt-4">
-            {/* <button className="btn btn-secondary mb-3" onClick={() => navigate(-1)}>ย้อนกลับ</button> */}
+        <div className="container p-5">
             <div className="card shadow-lg">
-                <div className="card-header bg-primary text-white text-center">
-                    <h2 className="card-title">{activity.activity_name}</h2>
+                <div className="card-header bg-primary text-center ">
+                    <h2 className="card-title text-white pt-2">{activity.activity_name}</h2>
                 </div>
                 <div className="card-body">
                     {activity.image_path && (
@@ -111,7 +112,7 @@ function AdminActivityDetail() {
                                     <strong>สถานะ:</strong> {activity.status === 0 ? "กำลังจะจัดขึ้น" : activity.status === 1 ? "เสร็จสิ้นแล้ว" : "กำลังดำเนินการ"}
                                 </li>
                                 <li className="list-group-item">
-                                    <strong>ผู้เข้าร่วม:</strong> {activity.current_participants}/{activity.max_participants || "ไม่จำกัด"} คน       
+                                    <strong>ผู้เข้าร่วม:</strong> {activity.current_participants}/{activity.max_participants || "ไม่จำกัด"} คน
                                 </li>
                             </ul>
                         </div>

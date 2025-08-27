@@ -110,14 +110,12 @@ function AdminOrderManager() {
             <h3 className="admin-title">จัดการคำสั่งซื้อ</h3>
             <div className="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
                 <span className="badge bg-primary fs-6">
-                    <i className="fas fa-shopping-cart me-1"></i>
                     {orders.length} รายการ
                 </span>
             </div>
 
             {orders.length === 0 ? (
                 <div className="text-center py-5 my-5">
-                    <i className="fas fa-inbox fa-4x text-muted opacity-50 mb-4"></i>
                     <h5 className="text-muted mb-3">ไม่มีคำสั่งซื้อ</h5>
                     <p className="text-muted mb-4">ยังไม่มีคำสั่งซื้อในระบบ รอลูกค้าสั่งซื้อสินค้า</p>
                     <button onClick={fetchOrders} className="btn btn-outline-primary">
@@ -207,7 +205,6 @@ function AdminOrderManager() {
                                         <strong>เลขพัสดุ:</strong>
                                         <div className="input-group input-group-sm mt-1">
                                             <span className="input-group-text">
-                                                <i className="fas fa-barcode text-muted"></i>
                                             </span>
                                             <input
                                                 type="text"
@@ -382,9 +379,6 @@ function AdminOrderManager() {
                                 {/* Tracking */}
                                 {selectedOrder.tracking_number && (
                                     <div className="p-3 bg-light rounded-3 mb-3 d-flex align-items-start">
-                                        {/* <div className="bg-white rounded-circle p-2 me-3 shadow-sm">
-                                            📮
-                                        </div> */}
                                         <div>
                                             <small className="text-muted">เลขพัสดุ</small>
                                             <div className="fw-bold text-primary font-monospace">

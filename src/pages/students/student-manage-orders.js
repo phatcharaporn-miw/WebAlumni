@@ -380,9 +380,6 @@ function StudentManageOrders() {
                                                                 <div className="col-md-5 mb-3">
                                                                     <label className="form-label small fw-bold text-muted">หมายเลขพัสดุ</label>
                                                                     <div className="input-group input-group-sm">
-                                                                        <span className="input-group-text">
-                                                                            <i className="fas fa-barcode"></i>
-                                                                        </span>
                                                                         <input
                                                                             type="text"
                                                                             className="form-control"
@@ -407,7 +404,6 @@ function StudentManageOrders() {
                                                                                 handleUpdate();
                                                                             }}
                                                                         >
-                                                                            <i className="fas fa-save me-1"></i>
                                                                             อัปเดต
                                                                         </button>
                                                                     )}
@@ -419,15 +415,10 @@ function StudentManageOrders() {
                                                         <div className="border-top pt-2 mt-3">
                                                             <div className="d-flex justify-content-between align-items-center">
                                                                 <small className="text-muted">
-                                                                    <i className="fas fa-clock me-1"></i>
                                                                     อัปเดตล่าสุด
                                                                 </small>
                                                                 <small className="text-muted">
-                                                                    {new Date().toLocaleDateString('th-TH', {
-                                                                        day: '2-digit',
-                                                                        month: 'short',
-                                                                        year: 'numeric'
-                                                                    })}
+                                                                    { format(new Date(), 'dd/MM/yyyy')}
                                                                 </small>
                                                             </div>
                                                         </div>

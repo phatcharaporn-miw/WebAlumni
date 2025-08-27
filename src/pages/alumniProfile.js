@@ -25,6 +25,15 @@ function HomeAlumniProfile() {
     fetchUser();
   }, [userId]);
 
+  const formatDate = (dateStr) => {
+        if (!dateStr || dateStr === "0000-00-00") return "ไม่ระบุวันที่";
+        const date = new Date(dateStr);
+        const day = date.getDate();
+        const month = date.getMonth() + 1; // เดือนเป็นเลข
+        const year = date.getFullYear() + 543; // ปีไทย
+        return `${day}/${month}/${year}`;
+  };
+
   if (!alumni) {
     return <p className="text-center mt-4">กำลังโหลดข้อมูล...</p>;
   }
@@ -181,24 +190,14 @@ function HomeAlumniProfile() {
                               <h6 className="fw-bold text-dark mb-2">{act.activity_name}</h6>
                               <p className="text-muted mb-2">
                                 <i className="far fa-calendar me-2"></i>
-                                {new Date(act.activity_date).toLocaleDateString('th-TH', {
-                                  year: 'numeric',
-                                  month: 'long',
-                                  day: 'numeric'
-                                })}
+                                {formatDate(act.activity_date)}
                               </p>
                               <span className={`badge px-3 py-2 rounded-pill ${
-                                act.status === 1 ? "bg-success" :
-                                act.status === 0 ? "bg-warning text-dark" :
-                                act.status === 2 ? "bg-primary" :
+                                act.status === 1 ? "bg-success bg-opacity-10 text-success" :
+                                act.status === 0 ? "bg-warning bg-opacity-10 text-warning" :
+                                act.status === 2 ? "bg-primary bg-opacity-10 text-primary" :
                                 "bg-secondary"
                               }`}>
-                                <i className={`fas ${
-                                  act.status === 1 ? "fa-check-circle" :
-                                  act.status === 0 ? "fa-clock" :
-                                  act.status === 2 ? "fa-play-circle" :
-                                  "fa-question-circle"
-                                } me-1`}></i>
                                 {act.status === 1 ? "เสร็จสิ้นแล้ว" : 
                                  act.status === 0 ? "ยังไม่เริ่ม" : 
                                  act.status === 2 ? "กำลังดำเนินการ" : "ไม่ทราบสถานะ"}
@@ -236,13 +235,7 @@ function HomeAlumniProfile() {
                               <h6 className="fw-bold text-dark mb-2">{post.title}</h6>
                               <small className="text-muted">
                                 <i className="far fa-clock me-1"></i>
-                                โพสต์เมื่อ: {new Date(post.created_at).toLocaleDateString('th-TH', {
-                                  year: 'numeric',
-                                  month: 'long',
-                                  day: 'numeric',
-                                  hour: '2-digit',
-                                  minute: '2-digit'
-                                })}
+                                โพสต์เมื่อ: {formatDate(post.created_at)}
                               </small>
                             </div>
                           </div>

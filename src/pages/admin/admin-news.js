@@ -37,8 +37,8 @@ function AdminNews() {
             cancelButtonText: "ยกเลิก",
         }).then((result) => {
             if (result.isConfirmed) {
-                axios.delete(`http://localhost:3001/news/delete-news/${newsId}`, { 
-                    withCredentials: true 
+                axios.delete(`http://localhost:3001/news/delete-news/${newsId}`, {
+                    withCredentials: true
                 })
                     .then((response) => {
                         if (response.data.success) {
@@ -56,6 +56,26 @@ function AdminNews() {
         });
     };
 
+
+    const formatDate = (dateStr) => {
+        if (!dateStr || dateStr === "0000-00-00") return "ไม่ระบุวันที่";
+        const date = new Date(dateStr);
+        const day = date.getDate();
+        const month = date.getMonth() + 1; // เดือนเป็นเลข
+        const year = date.getFullYear() + 543; // ปีไทย
+        return `${day}/${month}/${year}`;
+    };
+
+    // Pagination logic
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 6; // จำนวนกิจกรรมต่อหน้า
+    const totalPages = Math.ceil(news.length / itemsPerPage);
+    const paginatedNews = news.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+    const handlePageChange = (page) => {
+        if (page >= 1 && page <= totalPages) setCurrentPage(page);
+    };
+
     return (
         <div className="news-container p-5">
             <h3 className="admin-title">ข่าวสารและประชาสัมพันธ์</h3>
@@ -67,12 +87,12 @@ function AdminNews() {
                 </div>
             </div>
             <div className="row">
-                {news.length === 0 ? (
+                {paginatedNews.length === 0 ? (
                     <div className="d-flex flex-column align-items-center justify-content-center my-5">
                         <p className="text-center text-muted fs-5">ยังไม่มีข่าวประชาสัมพันธ์</p>
                     </div>
                 ) : (
-                    news.map((item) => (
+                    paginatedNews.map((item) => (
                         <div key={item.news_id} className="col-md-4 col-sm-12 mb-4">
                             <div className="card shadow-sm border-15 h-100">
                                 <img
@@ -86,7 +106,7 @@ function AdminNews() {
                                     <h5 className="card-title">{item.title}</h5>
                                     <p className="card-text text-muted">
                                         <MdDateRange className="me-2" />
-                                        {new Date(item.created_at).toLocaleDateString()}
+                                        {formatDate(item.created_at)}
                                     </p>
                                     <p className="news-text flex-grow-1">
                                         {item.content ? item.content.substring(0, 100) + "..." : "ไม่มีเนื้อหา"}
@@ -123,6 +143,24 @@ function AdminNews() {
                     ))
                 )}
             </div>
+            {/* Pagination */}
+            {totalPages > 1 && (
+                <nav className="d-flex justify-content-center mt-4">
+                    <ul className="pagination">
+                        <li className={`page-item${currentPage === 1 ? ' disabled' : ''}`}>
+                            <button className="page-link" onClick={() => handlePageChange(currentPage - 1)}>&laquo;</button>
+                        </li>
+                        {Array.from({ length: totalPages }, (_, i) => (
+                            <li key={i + 1} className={`page-item${currentPage === i + 1 ? ' active' : ''}`}>
+                                <button className="page-link" onClick={() => handlePageChange(i + 1)}>{i + 1}</button>
+                            </li>
+                        ))}
+                        <li className={`page-item${currentPage === totalPages ? ' disabled' : ''}`}>
+                            <button className="page-link" onClick={() => handlePageChange(currentPage + 1)}>&raquo;</button>
+                        </li>
+                    </ul>
+                </nav>
+            )}
         </div>
     );
 }

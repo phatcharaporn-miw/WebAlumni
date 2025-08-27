@@ -268,7 +268,6 @@
   max-height: 70vh;
   overflow-y: auto;
   padding-right: 15px;
-  /* Custom scrollbar */
   scrollbar-width: thin;
   scrollbar-color: #0F75BC #f1f1f1;
 }

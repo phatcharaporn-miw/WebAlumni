@@ -350,7 +350,7 @@ function Souvenir() {
                 role="dialog"
             >
                 <div className="modal-dialog modal-lg" role="document">
-                    <div className="modal-content">
+                    <div className="modal-content p-0">
                         <div className="modal-header bg-primary text-white">
                             <h5 className="modal-title fw-bold">
                                 <FaRegEdit className="me-2" />
@@ -388,12 +388,11 @@ function Souvenir() {
                                     <div className="row">
                                         <div className="col-md-6 mb-3">
                                             <label className="form-label fw-semibold">
-                                                <i className="bi bi-tag me-2"></i>
                                                 ชื่อสินค้า
                                             </label>
                                             <input
                                                 type="text"
-                                                className="form-control"
+                                                className="form-control w-100"
                                                 value={selectedProduct.product_name}
                                                 onChange={(e) => setSelectedProduct({
                                                     ...selectedProduct,
@@ -405,7 +404,6 @@ function Souvenir() {
 
                                         <div className="col-md-6 mb-3">
                                             <label className="form-label fw-semibold">
-                                                <i className="bi bi-currency-dollar me-2"></i>
                                                 ราคา (บาท)
                                             </label>
                                             <div className="input-group">
@@ -427,12 +425,11 @@ function Souvenir() {
 
                                         <div className="col-md-6 mb-3">
                                             <label className="form-label fw-semibold">
-                                                <i className="bi bi-box me-2"></i>
                                                 จำนวนในคลัง
                                             </label>
                                             <input
                                                 type="number"
-                                                className="form-control"
+                                                className="form-control w-100"
                                                 value={selectedProduct.stock}
                                                 onChange={(e) =>
                                                     setSelectedProduct({
@@ -447,7 +444,6 @@ function Souvenir() {
 
                                         <div className="col-md-6 mb-3">
                                             <label className="form-label fw-semibold">
-                                                <i className="bi bi-check-circle me-2"></i>
                                                 สถานะสินค้า
                                             </label>
                                             <select
@@ -467,18 +463,17 @@ function Souvenir() {
                             </div>
                         )}
 
-                        <div className="modal-footer bg-light">
+                        <div className="modal-footer bg-light d-flex justify-content-center gap-2 pt-3">
                             <button
                                 type="button"
-                                className="btn btn-outline-secondary"
+                                className="btn btn-outline-secondary px-4 rounded-3"
                                 onClick={handleClose}
                             >
-                                <i className="bi bi-x-circle me-2"></i>
                                 ยกเลิก
                             </button>
                             <button
-                                type="button"
-                                className="btn btn-primary"
+                                type="submit"
+                                className="btn btn-primary px-4 rounded-3 shadow-sm"
                                 onClick={() => {
                                     axios.put(`http://localhost:3001/admin/editSouvenir/${selectedProduct.product_id}`, selectedProduct)
                                         .then(response => {
@@ -497,7 +492,6 @@ function Souvenir() {
                                         });
                                 }}
                             >
-                                <i className="bi bi-check-lg me-2"></i>
                                 บันทึกข้อมูล
                             </button>
                         </div>

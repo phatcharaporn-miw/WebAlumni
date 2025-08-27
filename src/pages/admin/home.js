@@ -22,6 +22,13 @@ function AdminHome() {
     totalDonations: 0,
   });
 
+  const formatCurrency = (amount) => {
+      return new Intl.NumberFormat("th-TH", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }).format(amount || 0);
+    };
+
   const [alumniCount, setAlumniCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -30,23 +37,10 @@ function AdminHome() {
     datasets: [],
   });
 
-  const [pieData, setPieData] = useState({
-    labels: ['โครงการศึกษา', 'โครงการสาธารณสุข', 'โครงการสิ่งแวดล้อม'],
-    datasets: [{
-      data: [45, 30, 25],
-      backgroundColor: [
-        'rgba(40, 167, 69, 0.8)',
-        'rgba(111, 66, 193, 0.8)',
-        'rgba(255, 193, 7, 0.8)'
-      ],
-      borderColor: [
-        'rgba(40, 167, 69, 1)',
-        'rgba(111, 66, 193, 1)',
-        'rgba(255, 193, 7, 1)'
-      ],
-      borderWidth: 2,
-      hoverOffset: 8,
-    }],
+ 
+ const [pieData, setPieData] = useState({
+      labels: [],
+      datasets: [],
   });
 
   useEffect(() => {
@@ -76,19 +70,22 @@ function AdminHome() {
         }
       });
 
-    // Donation statistics for pie chart
-    // axios.get("http://localhost:3001/admin/donation-statistics")
-    //   .then((res) => {
-    //     const labels = res.data.map(item => item.category);
-    //     const data = res.data.map(item => item.total_amount);
-    //     setPieData({
-    //       labels,
-    //       datasets: [{
-    //         data,
-    //         backgroundColor: ['#28a745', '#6f42c1', '#ffc107'], // example colors
-    //       }],
-    //     });
-    //   });
+    // สถิติการบริจาค
+    axios.get("http://localhost:3001/admin/donation-stats")
+      .then((res) => {
+        const labels = res.data.map(item => item.donation_type);
+        const data = res.data.map(item => item.total);
+        setPieData({
+          labels,
+          datasets: [{
+            data,
+            backgroundColor: ['#98d662ff', '#6f42c1', '#241f12ff'], 
+            borderColor: ['#98d662ff', '#6f42c1', '#241f12ff'],
+            borderWidth: 2,
+          }],
+        });
+      });
+
 
     // Total alumni count
     axios.get("http://localhost:3001/admin/total-alumni")
@@ -238,10 +235,14 @@ function AdminHome() {
         padding: 12,
         callbacks: {
           label: function (tooltipItem) {
-            const value = tooltipItem.raw;
+            const value = tooltipItem.raw; // ยอดเงินของ slice นั้น
             const total = tooltipItem.dataset.data.reduce((a, b) => a + b, 0);
             const percent = ((value / total) * 100).toFixed(1);
-            return `${tooltipItem.label}: ${percent}%`;
+
+            // format number ให้มี , คั่นหลักพัน
+            const formattedValue = value.toLocaleString();
+
+            return `${tooltipItem.label}: ฿${formattedValue} (${percent}%)`;
           },
         },
       },
@@ -252,7 +253,7 @@ function AdminHome() {
     <div className="container-fluid p-5" style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
       <div className="row mb-5">
         <div className="col-12">
-          <h3 className="admin-title">Dashboard</h3>
+          <h3 className="admin-title">แดชบอร์ด</h3>
           <div className="d-flex justify-content-end">
             <small className="text-muted">อัปเดตล่าสุด: {new Date().toLocaleDateString('th-TH')}</small>
           </div>
@@ -262,7 +263,7 @@ function AdminHome() {
       {/* Stats Cards */}
       <div className="row mb-5">
         <CardInfo
-          title="จำนวนผู้เข้าร่วมกิจกรรมทั้งหมด"
+          title="ผู้เข้าร่วมกิจกรรมทั้งหมด"
           value={`${stats.totalParticipants.toLocaleString()} คน`}
           type="activity"
           icon={MdPeople}
@@ -275,7 +276,7 @@ function AdminHome() {
         />
         <CardInfo
           title="ยอดบริจาครวมทั้งหมด"
-          value={`${stats.totalDonations.toLocaleString()} บาท`}
+          value={`${formatCurrency(stats.totalDonations)} บาท`}
           type="donation"
           icon={MdVolunteerActivism}
         />

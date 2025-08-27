@@ -453,7 +453,6 @@ function Activity() {
                             {/* แสดงปีการศึกษา/ระดับการศึกษา */}
                             {userRole === '4' ? ( // ถ้าเป็นศิษย์ปัจจุบัน
                                 <>
-
                                     <div className="mb-3">
                                         <label htmlFor="education_level" className="form-label">ระดับการศึกษา</label>
                                         <select

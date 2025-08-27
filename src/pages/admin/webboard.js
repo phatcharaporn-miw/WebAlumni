@@ -50,6 +50,7 @@ function AdminWebboard() {
         return 0;
     });
 
+
     // Function to delete post
     const handleDeletePost = (postId) => {
         Swal.fire({
@@ -87,6 +88,25 @@ function AdminWebboard() {
         });
     };
 
+    const formatDate = (dateStr) => {
+        if (!dateStr || dateStr === "0000-00-00") return "ไม่ระบุวันที่";
+        const date = new Date(dateStr);
+        const day = date.getDate();
+        const month = date.getMonth() + 1; // เดือนเป็นเลข
+        const year = date.getFullYear() + 543; // ปีไทย
+        return `${day}/${month}/${year}`;
+    };
+
+    // Pagination logic
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 6; // จำนวนกิจกรรมต่อหน้า
+    const totalPages = Math.ceil(sortedPosts.length / itemsPerPage);
+    const paginatedPosts = sortedPosts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+    const handlePageChange = (page) => {
+        if (page >= 1 && page <= totalPages) setCurrentPage(page);
+    };
+
     return (
         <div className="webboard-container p-5">
             <h3 className="admin-title">การจัดการเว็บบอร์ด</h3>
@@ -99,8 +119,8 @@ function AdminWebboard() {
             </div>
 
             <div className="row">
-                {webboard.length > 0 ? (
-                    sortedPosts.map(post => (
+                {paginatedPosts.length > 0 ? (
+                    paginatedPosts.map(post => (
                         <div key={post.webboard_id} className="col-md-4 mb-4 d-flex">
                             <div className="card-webboard shadow-sm border w-100 d-flex flex-column">
                                 <div className="card-body d-flex flex-column justify-content-between h-100">
@@ -108,7 +128,7 @@ function AdminWebboard() {
                                     <p className="card-text text-muted">
                                         หมวดหมู่: <strong>{post.category_name || "ไม่ระบุหมวดหมู่"}</strong> <br />
                                         จากคุณ {post.full_name || "ไม่ระบุชื่อ"} <br />
-                                        วันที่โพสต์: {new Date(post.created_at).toLocaleDateString()} <br />
+                                        วันที่โพสต์: {formatDate(post.created_at)} <br />
                                         {post.liked_users && (
                                             <button
                                                 className="btn btn-link btn-sm text-decoration-none "
@@ -163,6 +183,25 @@ function AdminWebboard() {
                     </div>
                 )}
             </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+                <nav className="d-flex justify-content-center mt-4">
+                    <ul className="pagination">
+                        <li className={`page-item${currentPage === 1 ? ' disabled' : ''}`}>
+                            <button className="page-link" onClick={() => handlePageChange(currentPage - 1)}>&laquo;</button>
+                        </li>
+                        {Array.from({ length: totalPages }, (_, i) => (
+                            <li key={i + 1} className={`page-item${currentPage === i + 1 ? ' active' : ''}`}>
+                                <button className="page-link" onClick={() => handlePageChange(i + 1)}>{i + 1}</button>
+                            </li>
+                        ))}
+                        <li className={`page-item${currentPage === totalPages ? ' disabled' : ''}`}>
+                            <button className="page-link" onClick={() => handlePageChange(currentPage + 1)}>&raquo;</button>
+                        </li>
+                    </ul>
+                </nav>
+            )}
 
             {/* Modal สำหรับแสดงรายชื่อผู้กดใจ */}
             <Modal isOpen={modalIsOpen} onRequestClose={closeModal} className="webboard-modal" style={{ overlay: { backgroundColor: 'rgba(0, 0, 0, 0.75)' } }}>

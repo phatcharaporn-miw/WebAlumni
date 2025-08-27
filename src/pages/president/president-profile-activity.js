@@ -80,14 +80,14 @@ function PresidentProfileActivity() {
     }
   };
 
-  const formatDate = (dateStr) => {
-    if (!dateStr || dateStr === "0000-00-00") return "ไม่ระบุวันที่"; // กรณีไม่มีวันที่
-    const date = new Date(dateStr);
-    const day = date.getDate();
-    const month = date.toLocaleString('default', { month: 'long' });
-    const year = date.getFullYear() + 543; // เพิ่ม 543 ปีเพื่อให้ตรงกับปีไทย
-    return `${day} ${month} ${year}`;
-  };
+const formatDate = (dateStr) => {
+  if (!dateStr || dateStr === "0000-00-00") return "ไม่ระบุวันที่";
+  const date = new Date(dateStr);
+  const day = date.getDate();
+  const month = date.getMonth() + 1; // เดือนเป็นเลข
+  const year = date.getFullYear() + 543; // ปีไทย
+  return `${day}/${month}/${year}`;
+};
 
   const formatTime = (startTime, endTime) => {
     if (!startTime && !endTime) return "";

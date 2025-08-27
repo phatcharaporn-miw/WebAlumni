@@ -92,67 +92,98 @@ function EditNews() {
             });
     }
 
-    return(
-        <div className="container p-5">
-            <div className="row justify-content-center">
-                    <h3 className="mb-4 admin-title">แก้ไขข่าวประชาสัมพันธ์</h3>
+return (
+    <div className="container py-5">
+        <div className="row justify-content-center">
+            <div className="col-lg-8 col-md-10">
+                <div className="card shadow-lg border-0 rounded-4">                
+                    <div className="card-header bg-primary text-white text-center py-3 rounded-top-4">
+                        <h3 className="mb-0">แก้ไขข่าวประชาสัมพันธ์</h3>
+                    </div>         
                 {loading ? (
-                    <p className="text-center mt-5">กำลังโหลดข้อมูล...</p>
+                    <p className="text-center mt-5 text-muted">กำลังโหลดข้อมูล...</p>
                 ) : news ? (
-                    <div className="card shadow-lg border-0 col-7">
-                        <div className="card-body ">
-                            <form onSubmit={handleSubmit}>
+                        <div className="card-body p-4">
+                            <form onSubmit={handleSubmit} className="needs-validation">
+                                {/* หัวข้อข่าว */}
                                 <div className="mb-3">
-                                    <label htmlFor="title" className="form-label">หัวข้อข่าว <span className="text-danger">*</span></label>
+                                    <label htmlFor="title" className="form-label fw-semibold">
+                                        หัวข้อข่าว <span className="text-danger">*</span>
+                                    </label>
                                     <input
                                         type="text"
-                                        className="form-control w-100"
+                                        className="form-control rounded-3 w-100"
                                         id="title"
                                         name="title"
-                                        placeholder="หัวข้อข่าว"
+                                        placeholder="พิมพ์หัวข้อข่าว"
                                         value={formData.title}
                                         onChange={handleChange}
                                         required
                                     />
                                 </div>
+
+                                {/* เนื้อหาข่าว */}
                                 <div className="mb-3">
-                                    <label htmlFor="content" className="form-label">เนื้อหาข่าว <span className="text-danger">*</span></label>
+                                    <label htmlFor="content" className="form-label fw-semibold">
+                                        เนื้อหาข่าว <span className="text-danger">*</span>
+                                    </label>
                                     <textarea
-                                        className="form-control w-100"
+                                        className="form-control rounded-3 w-100"
                                         id="content"
                                         name="content"
-                                        rows="5"
-                                        placeholder="เนื้อหาข่าว"
+                                        rows="6"
+                                        placeholder="พิมพ์เนื้อหาข่าว..."
                                         value={formData.content}
                                         onChange={handleChange}
                                         required
                                     ></textarea>
                                 </div>
-                                <div className="mb-3">
-                                    <label htmlFor="images" className="form-label">อัปโหลดภาพ (ถ้ามี)</label>
+
+                                {/* อัปโหลดภาพ */}
+                                <div className="mb-4">
+                                    <label htmlFor="images" className="form-label fw-semibold">
+                                        อัปโหลดภาพ (ถ้ามี)
+                                    </label>
                                     <input
                                         type="file"
-                                        className="form-control w-100"
+                                        className="form-control rounded-3 w-100"
                                         id="images"
                                         name="images"
                                         multiple
                                         accept="image/*"
                                         onChange={handleFileChange}
                                     />
+                                    <small className="text-muted">รองรับไฟล์ .jpg, .png, .jpeg</small>
                                 </div>
-                                <div className="d-flex justify-content-end g-3">
-                                    <button type="submit" className="btn btn-primary">บันทึกการแก้ไข</button>
-                                    <button type="button" className="btn btn-secondary" onClick={() => navigate('/admin/news')}>ยกเลิก</button>
+
+                                {/* ปุ่ม */}
+                                <div className="d-flex justify-content-end gap-2">
+                                    <button
+                                        type="button"
+                                        className="btn btn-outline-secondary px-4 rounded-3"
+                                        onClick={() => navigate('/admin/news')}
+                                    >
+                                        ยกเลิก
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className="btn btn-primary px-4 rounded-3 shadow-sm"
+                                    >
+                                        บันทึกการแก้ไข
+                                    </button>
                                 </div>
                             </form>
                         </div>
-                    </div>
                 ) : (
-                    <p className="text-center mt-5">ไม่พบข้อมูลข่าว</p>
+                    <p className="text-center mt-5 text-muted">ไม่พบข้อมูลข่าว</p>
                 )}
-            </div>            
+            </div>
         </div>
-    );
+    </div>
+    </div>
+);
+
+
 }
 
 export default EditNews;

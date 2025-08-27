@@ -1,206 +1,575 @@
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import "../css/Donate-detail.css";
-import { MdDateRange } from "react-icons/md";
-import { ImUser } from "react-icons/im";
-import { IoInformationCircleOutline } from "react-icons/io5";
+import "../css/Donate-confirm.css";
+import { MdDateRange, MdAttachMoney, MdReceipt } from "react-icons/md";
+import { IoInformationCircleOutline, IoCheckmarkCircleOutline, IoWarningOutline } from "react-icons/io5";
+import { FaUser, FaIdCard, FaPhone, FaEnvelope, FaBuilding, FaFileImage } from "react-icons/fa";
+import Swal from "sweetalert2";
+
+const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:3001";
 
 function DonateConfirm() {
-
+    const [userData, setUserData] = useState({});
+    const [loading, setLoading] = useState(false);
+    const [projectData, setProjectData] = useState({});
+    const [error, setError] = useState(null);
+    const [isDataValid, setIsDataValid] = useState(false);
+    const userId = localStorage.getItem("userId");
     const location = useLocation();
     const navigate = useNavigate();
-    const [Data, setProjectData] = useState({});
-    const { formData, projectId, showTaxForm } = location.state || {};
 
-    const startDate = Data?.start_date ? new Date(Data.start_date) : null;
-    const endDate = Data?.end_date ? new Date(Data.end_date) : null;
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    const { formData, file: initialFile, filePreview, showTaxForm, projectData: passedProjectData } = location.state || {};
+    const projectId = formData.project_id;
+    const [file, setFile] = useState(initialFile || null);
 
-    const formattedStartDate = startDate ? startDate.toLocaleDateString('th-TH', options) : "-";
-    const formattedEndDate = endDate ? endDate.toLocaleDateString('th-TH', options) : "-";
+    const useTax = showTaxForm && (formData.type_tax === "individual" || formData.type_tax === "corporate");
+    const taxType = formData?.tax_type || formData?.type_tax;
+    useEffect(() => {
+        const validateData = () => {
+            if (!formData || Object.keys(formData).length === 0 || !projectId) {
+                setIsDataValid(false);
+                setError("ไม่มีข้อมูลการบริจาค กรุณาเริ่มต้นใหม่");
+                return;
+            }
 
-    const countDay = startDate && endDate ? (endDate - startDate) / (1000 * 3600 * 24) : 0;
+            // ตรวจสอบหลักฐานการโอน
+            const hasProof = file || formData.slipText;
+            if (!hasProof) {
+                setIsDataValid(false);
+                setError("กรุณาอัปโหลดหลักฐานการโอนเงิน");
+                return;
+            }
+
+            const required = [formData.amount, projectId, userId, hasProof];
+
+            // ฟิลด์ใบกำกับภาษี ตรวจสอบเฉพาะเมื่อ showTaxForm = true
+            let taxRequired = [];
+            if (showTaxForm && formData.type_tax) {
+                if (taxType === "individual") {
+                    taxRequired = [formData.name, formData.tax_number];
+                } else if (taxType === "corporate") {
+                    taxRequired = [formData.company_name, formData.tax_number];
+                }
+            }
+
+            // ตรวจสอบความครบถ้วน
+            const allValid = [...required, ...taxRequired].every(
+                item => item !== undefined && item !== null && item !== ""
+            );
+
+            setIsDataValid(allValid);
+
+            if (!allValid && showTaxForm) {
+                setError("กรุณากรอกข้อมูลให้ครบถ้วน");
+            } else {
+                setError(null);
+            }
+
+        };
+
+        validateData();
+    }, [formData, projectId, showTaxForm, taxType, userId, file]);
+
+    // console.log("isDataValid:", isDataValid);
 
     useEffect(() => {
         window.scrollTo(0, 0);
-        axios.get(`http://localhost:3001/donate/donatedetail/${projectId}`)
-            .then(response => {
-                console.log("Project Data:", response.data);
-                setProjectData(response.data);
-            })
-            .catch(error => {
-                console.error('Error fetching project data:', error);
-                alert("เกิดข้อผิดพลาดในการโหลดข้อมูลโครงการ");
-            });
-    }, [projectId]);
+    }, []);
 
-    const extractAmountFromText = (text) => {
-        if (!text) return null;
-        const match = text.match(/(\d{1,3}(,\d{3})*|\d+)(\.\d{1,2})?/);
-        return match ? match[0].replace(/,/g, "") : null;
-    };
-
-    const extractDateFromText = (text) => {
-        if (!text) return null;
-        const isoDate = text.match(/\d{4}[-\/]\d{1,2}[-\/]\d{1,2}/);
-        if (isoDate) return isoDate[0];
-        const dmyDate = text.match(/\d{1,2}\/\d{1,2}\/\d{4}/);
-        return dmyDate ? dmyDate[0] : null;
-    };
-
+    // โหลดข้อมูลผู้ใช้
     useEffect(() => {
-        console.log("OCR Text:", formData?.ocrText);
-        if (formData?.ocrText) {
-            const parsed = parseOcrText(formData.ocrText);
-            console.log("Parsed OCR:", parsed);
-            setOcrParsed(parsed);
-            setOcrAmount(extractAmountFromText(formData.ocrText));
-            setOcrDate(extractDateFromText(formData.ocrText));
+        const fetchUserProfile = async () => {
+            try {
+                const response = await fetch(`${API_BASE_URL}/users/profile`, {
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                if (data.success) {
+                    setUserData(data.user);
+                }
+            } catch (error) {
+                console.error('Error fetching user profile:', error);
+            }
+        };
+
+        fetchUserProfile();
+    }, []);
+
+    // ใช้ข้อมูลโครงการที่ส่งมาจาก DonateDetail หรือโหลดใหม่
+    useEffect(() => {
+        if (passedProjectData) {
+            setProjectData(passedProjectData);
+        } else if (projectId && !error) {
+            const fetchProjectData = async () => {
+                try {
+                    setLoading(true);
+                    const response = await axios.get(`${API_BASE_URL}/donate/donatedetail/${projectId}`);
+                    setProjectData(response.data);
+                } catch (error) {
+                    console.error('Error fetching project data:', error);
+                    setError("เกิดข้อผิดพลาดในการโหลดข้อมูลโครงการ");
+                } finally {
+                    setLoading(false);
+                }
+            };
+            fetchProjectData();
         }
-    }, [formData]);
+    }, [projectId, passedProjectData, error]);
 
+    // คำนวณวันที่เหลือ
+    const daysLeft = projectData.end_date
+        ? Math.max(0, Math.ceil((new Date(projectData.end_date) - new Date()) / (1000 * 3600 * 24)))
+        : 0;
 
-    if (!formData) {
-        return <p>ไม่มีข้อมูล กรุณากลับไปกรอกฟอร์ม</p>;
-    }
+    // จัดรูปแบบวันที่
+    const formatDate = (dateString) => {
+        if (!dateString) return "-";
+        try {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('th-TH', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        } catch (error) {
+            return "-";
+        }
+    };
 
+    // จัดรูปแบบเวลา
+    const formatDateTime = () => {
+        const now = new Date();
+        return now.toLocaleString('th-TH', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    };
+
+    // ฟังก์ชันยืนยันการบริจาค
     const handleConfirm = async () => {
-        const Data = new FormData();
-        Data.append("amount", formData.amount);
-        Data.append("userId", formData.user_id || "1");
-        Data.append("projectId", projectId);
-
-        if (formData.file) {
-            Data.append("slip", formData.file);
-        } else {
-            alert("กรุณาเลือกไฟล์รูปภาพ");
+        if (!isDataValid) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'ข้อมูลไม่ครบถ้วน',
+                text: 'กรุณาตรวจสอบข้อมูลให้ครบถ้วนก่อนยืนยันการบริจาค',
+            });
             return;
         }
 
-        const form = new FormData();
-        form.append("amount", formData.amount);
-        form.append("userId", formData.user_id);
-        form.append("projectId", projectId);
-        form.append("slip", formData.file);
-
-        if (showTaxForm) {
-            Data.append("name", formData.name);
-            Data.append("address", formData.address);
-            Data.append("taxId", formData.taxId);
-        } else {
-            Data.append("name", "");
-            Data.append("address", "");
-            Data.append("taxId", "");
+        if (!userId) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'กรุณาเข้าสู่ระบบ',
+                text: 'กรุณาเข้าสู่ระบบก่อนทำการบริจาค',
+            });
+            navigate("/login");
+            return;
         }
 
+        if (daysLeft <= 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'หมดเขตการบริจาค',
+                text: 'โครงการนี้หมดเขตการบริจาคแล้ว ไม่สามารถดำเนินการต่อได้',
+            });
+            return;
+        }
+
+        
+            const confirmMessage = `คุณต้องการยืนยันการบริจาค จำนวน ${new Intl.NumberFormat('th-TH').format(formData.amount)} บาท ให้โครงการ "${projectData.project_name}" หรือไม่?`;
+
+            const result = await Swal.fire({
+                title: 'ยืนยันการบริจาค',
+                text: confirmMessage,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'ยืนยัน',
+                cancelButtonText: 'ยกเลิก',
+                reverseButtons: true,
+            });
+
+            if (!result.isConfirmed) return;
+        
+
+        setLoading(true);
+
         try {
-            await axios.post('http://localhost:3001/donate/donation/', Data, {
+            const donationData = new FormData();
+            donationData.append("amount", formData.amount);
+            donationData.append("userId", userId); // <-- แก้จาก formData.userId
+            donationData.append("projectId", projectId);
+
+            if (file) {
+                donationData.append("slip", file); // Multer จะรับได้
+            }
+
+            if (useTax) {
+                donationData.append("useTax", "1");
+                donationData.append("type_tax", formData.type_tax);
+
+                if (formData.useExistingTax && formData.taxId) {
+                    // ใช้ tax record ที่มีอยู่
+                    donationData.append("useExistingTax", "1");
+                    donationData.append("taxId", formData.taxId);
+                } else {
+                    // สร้าง tax record ใหม่
+                    donationData.append("useExistingTax", "0");
+                    if (formData.type_tax === "individual") {
+                        donationData.append("name", formData.name || ""); // backend ใช้ field name
+                        donationData.append("tax_number", formData.tax_number || "");
+                        donationData.append("phone", formData.phone || "");
+                        donationData.append("email", formData.email || "");
+                    } else if (formData.type_tax === "corporate") {
+                        donationData.append("name", formData.company_name || "");
+                        donationData.append("tax_number", formData.tax_number || "");
+                        donationData.append("phone", formData.phone || "");
+                        donationData.append("email", formData.email || "");
+                    }
+                }
+            } else {
+                donationData.append("useTax", "0");
+            }
+
+            if (formData.useExistingTax && formData.taxId) {
+                donationData.append("useExistingTax", "1");
+                donationData.append("taxId", formData.taxId);
+            }
+
+            const response = await axios.post(`http://localhost:3001/donate/donation`, donationData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
-            alert("ขอบคุณสำหรับการบริจาคของคุณ!");
-            navigate("/alumni-profile/donation-history");
-            
+
+            if (response.data?.donationId) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'บริจาคสำเร็จ',
+                    text: 'ขอบคุณสำหรับการบริจาคของคุณ! ระบบได้บันทึกการบริจาคเรียบร้อยแล้ว',
+                });
+                localStorage.removeItem("donationFormData");
+                navigate("/alumni-profile/alumni-profile-donation");
+            } else {
+                throw new Error(response.data?.message || "การบริจาคไม่สำเร็จ");
+            }
+
         } catch (error) {
-            alert(error.response?.data?.error || "เกิดข้อผิดพลาดในการส่งข้อมูล");
+            console.error('Donation error:', error);
+            let errorMessage = error.response?.data?.error || error.message || "เกิดข้อผิดพลาดในการส่งข้อมูล";
+            alert(`เกิดข้อผิดพลาด: ${errorMessage}`);
         } finally {
             setLoading(false);
         }
     };
 
-
-    const progressPercent = projectData.target_amount
-        ? (projectData.current_amount / projectData.target_amount) * 100
+    // คำนวณเปอร์เซ็นต์ความคืบหน้า
+    const progressPercent = projectData.target_amount && projectData.current_amount
+        ? Math.min(100, (projectData.current_amount / projectData.target_amount) * 100)
         : 0;
 
+    // แสดงข้อผิดพลาด
+    if (error) {
+        return (
+            <div className="error-container">
+                <IoWarningOutline size={48} color="#ff4444" />
+                <h3>เกิดข้อผิดพลาด</h3>
+                <p>{error}</p>
+                <button onClick={() => navigate(-1)} className="back-button">
+                    กลับ
+                </button>
+            </div>
+        );
+    }
+
+    // ไม่มีข้อมูล
+    if (!formData || !projectId) {
+        return (
+            <div className="no-data-container">
+                <IoWarningOutline size={48} color="#ffa500" />
+                <h3>ไม่มีข้อมูล</h3>
+                <p>ไม่มีข้อมูลการบริจาค กรุณากลับไปกรอกฟอร์มใหม่</p>
+                <Link to="/donate" className="back-link">
+                    กลับไปหน้าบริจาค
+                </Link>
+            </div>
+        );
+    }
+
     return (
-        <>
-            <h3>ยืนยันการบริจาค</h3>
-            <div className="donate-confirm-content">
-                <div className="donate-confirm-content-item">
-                    <h5>{projectData.project_name}</h5>
-                    <img
-                        src={`http://localhost:3001/uploads/${projectData.image_path}`}
-                        alt="กิจกรรม"
-                        onError={(e) => {
-                            e.target.src = `${process.env.PUBLIC_URL}/image/default.png`;
-                        }}
-                    />
+        <div className="donate-confirm-container">
+            {/* Header */}
+            <div className="confirm-header">
+                <h2>ยืนยันข้อมูลการบริจาค</h2>
+                <p className="confirm-subtitle">กรุณาตรวจสอบข้อมูลให้ถูกต้องก่อนยืนยัน</p>
+            </div>
 
-                    <div className="donate-detail-bar">
-                        <div className="donate-detail-progress-bar-container">
-                            <div
-                                className="donate-detail-progress-bar"
-                                style={{ width: `${progressPercent}%` }}
-                            ></div>
-                            <span className="donate-detail-progress-percent">
-                                {`${progressPercent.toFixed(0)}%`}
-                            </span>
-                        </div>
-                    </div>
-
-                    <div className="donate-detail-details">
-                        <span>ยอดบริจาคปัจจุบัน:{" "}
-                            <span className="donate-detail-details-bold">
-                                {new Intl.NumberFormat().format(projectData.current_amount)} บาท
-                            </span>
-                        </span>
-                        <span>เป้าหมาย:{" "}
-                            <span className="donate-detail-details-bold">
-                                {new Intl.NumberFormat().format(projectData.target_amount)} บาท
-                            </span>
-                        </span>
-                    </div>
-
-                    <div className="donate-detail-discription-day">
-                        <span>เหลืออีก {daysLeft} วัน</span>
-                    </div>
-
-                    <div className="donate-detail-discription">
-                        <div className="donate-detail-header">
-                            <IoInformationCircleOutline className="custom-icon" />
-                            <p>รายละเอียดโครงการ</p>
-                        </div>
-                        <p className="donate-detail-informations">{projectData.description}</p>
-                    </div>
-
-                    <div className="donate-detail-discription">
-                        <div className="donate-detail-header">
-                            <MdDateRange className="custom-icon" />
-                            <p>ระยะเวลาระดมทุน</p>
-                        </div>
-                        <p className="donate-detail-informations">
-                            {formattedStartDate} - {formattedEndDate}
-                        </p>
-                    </div>
-
-                    <div className="donate-detail-discription">
-                        <div className="donate-detail-header">
-                            <ImUser className="custom-icon" />
-                            <p>ผู้รับผิดชอบโครงการ</p>
-                        </div>
-                        <p className="donate-detail-informations">{projectData.user_id}</p>
-                    </div>
-                </div>
-
-                {/* ส่วนยืนยัน */}
-                <div className="donate-confirm-content-item">
-                    <p><strong>จำนวนเงิน (จากแบบฟอร์ม):</strong> {formData.amount} บาท</p>
-
-                    {formData.file && (
-                        <img src={URL.createObjectURL(formData.file)} alt="สลิป" width="200" />
+            {/* Status Banner */}
+            <div className={`status-banner ${isDataValid ? 'valid' : 'invalid'}`}>
+                <div className="status-content">
+                    {isDataValid ? (
+                        <>
+                            <IoCheckmarkCircleOutline size={20} />
+                            <span>ข้อมูลครบถ้วน พร้อมยืนยันการบริจาค</span>
+                        </>
+                    ) : (
+                        <>
+                            <IoWarningOutline size={20} />
+                            <span>ข้อมูลไม่ครบถ้วน กรุณาตรวจสอบ</span>
+                        </>
                     )}
-
-                    <button className="cancle-button" onClick={() => navigate(-1)} disabled={loading}>
-                        ยกเลิก
-                    </button>
-                    <button onClick={handleConfirm} disabled={loading}>
-                        {loading ? "กำลังยืนยัน..." : "ยืนยันการบริจาค"}
-                    </button>
+                </div>
+                <div className="confirmation-time">
+                    <small>เวลาที่ยืนยัน: {formatDateTime()}</small>
                 </div>
             </div>
-        </>
+
+            <div className="donate-confirm-content">
+                {/* ข้อมูลการบริจาค - ส่วนหลัก */}
+                <div className="confirmation-section main-donation-info">
+                    <div className="section-header">
+                        <MdAttachMoney className="section-icon" />
+                        <h3>ข้อมูลการบริจาค</h3>
+                    </div>
+
+                    <div className="info-grid">
+                        <div className="info-item highlight-amount">
+                            <label>จำนวนเงินที่บริจาค</label>
+                            <div className="amount-display">
+                                <span className="amount-number">
+                                    {formData.amount ? new Intl.NumberFormat('th-TH').format(formData.amount) : "0"}
+                                </span>
+                                <span className="currency">บาท</span>
+                            </div>
+                        </div>
+
+                        <div className="info-item">
+                            <label>โครงการที่บริจาค</label>
+                            <div className="project-name">
+                                {projectData.project_name || "กำลังโหลด..."}
+                            </div>
+                        </div>
+
+                        <div className="info-item">
+                            <label>รหัสโครงการ</label>
+                            <div className="project-id">#{projectId}</div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* ข้อมูลใบกำกับภาษี */}
+                {useTax && showTaxForm && (
+                    <div className="confirmation-section tax-info-section">
+                        <div className="section-header">
+                            <MdReceipt className="section-icon" />
+                            {taxType === "individual" && (
+                                <h3>ข้อมูลใบกำกับภาษี (บุคคลธรรมดา) </h3>
+                            )}
+                            {taxType === "corporate" && (
+                                <h3>ข้อมูลใบกำกับภาษี (นิติบุคคล) </h3>
+                            )}
+                        </div>
+
+                        <div className="info-grid">
+                            {taxType === "individual" && (
+                                <div className="info-item">
+                                    <label>
+                                        <FaUser className="input-icon" />
+                                        ชื่อ-นามสกุล
+                                    </label>
+                                    <div className="info-value">
+                                        {formData.name || <span className="missing-data">ไม่ระบุ</span>}
+                                    </div>
+                                </div>
+                            )}
+
+                            {taxType === "corporate" && (
+                                <div className="info-item">
+                                    <label>
+                                        <FaBuilding className="input-icon" />
+                                        ชื่อบริษัท
+                                    </label>
+                                    <div className="info-value">
+                                        {formData.company_name || <span className="missing-data">ไม่ระบุ</span>}
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="info-item">
+                                <label>
+                                    <FaIdCard className="input-icon" />
+                                    เลขประจำตัวผู้เสียภาษี
+                                </label>
+                                <div className="info-value">
+                                    {formData.tax_number || <span className="missing-data">ไม่ระบุ</span>}
+                                </div>
+                            </div>
+
+                            {formData.phone && (
+                                <div className="info-item">
+                                    <label>
+                                        <FaPhone className="input-icon" />
+                                        หมายเลขโทรศัพท์
+                                    </label>
+                                    <div className="info-value">{formData.phone}</div>
+                                </div>
+                            )}
+
+                            {formData.email && (
+                                <div className="info-item">
+                                    <label>
+                                        <FaEnvelope className="input-icon" />
+                                        อีเมล
+                                    </label>
+                                    <div className="info-value">{formData.email}</div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
+
+                {/* หลักฐานการโอนเงิน */}
+                <div className="confirmation-section slip-section">
+                    <div className="section-header">
+                        <FaFileImage className="section-icon" />
+                        <h3>หลักฐานการโอนเงิน</h3>
+                    </div>
+
+                    {filePreview ? (
+                        <div className="slip-preview">
+                            <img
+                                src={filePreview}
+                                alt="สลิปการโอนเงิน"
+                                className="slip-image"
+                                style={{ maxWidth: "300px", maxHeight: "300px", objectFit: "contain", cursor: "pointer" }}
+                            />
+                        </div>
+                    ) : (
+                        <div className="no-file-warning">
+                            <IoWarningOutline size={24} />
+                            <span>ไม่มีไฟล์หลักฐานการโอนเงิน</span>
+                        </div>
+                    )}
+                </div>
+
+                {/* รายละเอียดโครงการ */}
+                <div className="confirmation-section project-details">
+                    <div className="section-header">
+                        <IoInformationCircleOutline className="section-icon" />
+                        <h3>รายละเอียดโครงการ</h3>
+                    </div>
+
+                    <div className="project-summary">
+                        {projectData.image_path && (
+                            <img
+                                src={`${API_BASE_URL}/uploads/${projectData.image_path}`}
+                                alt="รูปโครงการ"
+                                className="project-image"
+                                onError={(e) => {
+                                    e.target.src = `${process.env.PUBLIC_URL}/image/default.png`;
+                                }}
+                            />
+                        )}
+
+                        <div className="project-info">
+                            <div className="progress-section-confirm">
+                                <div className="progress-info-item">
+                                    {/* <label>โครงการที่บริจาค</label> */}
+                                    <div className="project-name">
+                                        {projectData.project_name || "กำลังโหลด..."}
+                                    </div>
+                                </div>
+                                <div className="progress-bar-container">
+                                    <div
+                                        className="progress-bar-confirm"
+                                        style={{ width: `${progressPercent}%` }}
+                                    ></div>
+                                    <span className="progress-percent">
+                                        {progressPercent.toFixed(0)}%
+                                    </span>
+                                </div>
+                                <div className="progress-details">
+                                    <span>ยอดปัจจุบัน: <strong>{new Intl.NumberFormat('th-TH').format(projectData.current_amount || 0)} บาท</strong></span>
+                                    <span>เป้าหมาย: <strong>{new Intl.NumberFormat('th-TH').format(projectData.target_amount || 0)} บาท</strong></span>
+                                </div>
+                            </div>
+
+                            <div className="project-description">
+                                <p>{projectData.description || "ไม่มีรายละเอียด"}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* สรุปและการดำเนินการ */}
+                <div className="confirmation-section action-section">
+                    <div className="section-header">
+                        <IoCheckmarkCircleOutline className="section-icon" />
+                        <h3>สรุปการดำเนินการ</h3>
+                    </div>
+
+                    <div className="summary-box">
+                        <h4>คุณกำลังจะบริจาค</h4>
+                        <div className="summary-amount">
+                            {new Intl.NumberFormat('th-TH').format(formData.amount || 0)} บาท
+                        </div>
+                        <p>ให้โครงการ <strong>"{projectData.project_name}"</strong></p>
+
+                        {/* แสดงเฉพาะเมื่อเลือกออกใบกำกับภาษี */}
+                        {showTaxForm && useTax && (
+                            <p className="tax-note">
+                                <MdReceipt size={16} />
+                                พร้อมออกใบกำกับภาษี
+                            </p>
+                        )}
+                    </div>
+
+                    {/* คำเตือน */}
+                    {!isDataValid && (
+                        <div className="warning-box">
+                            <IoWarningOutline size={20} />
+                            <p>กรุณาตรวจสอบข้อมูลให้ครบถ้วนก่อนยืนยันการบริจาค</p>
+                        </div>
+                    )}
+
+                    {daysLeft <= 0 && (
+                        <div className="error-box">
+                            <IoWarningOutline size={20} />
+                            <p>โครงการนี้หมดเขตการบริจาคแล้ว ไม่สามารถดำเนินการต่อได้</p>
+                        </div>
+                    )}
+
+                    {/* ปุ่มดำเนินการ */}
+                    <div className="action-buttons">
+                        <button
+                            className="cancel-button-donate"
+                            onClick={() =>
+                                navigate(`/donate/donatedetail/${projectId}`, {
+                                    state: { fromConfirm: true }
+                                })
+                            }
+                        >
+                            ← กลับไปแก้ไข
+                        </button>
+
+                        <button
+                            className="confirm-button"
+                            onClick={handleConfirm}
+                            disabled={loading || !isDataValid || daysLeft <= 0}
+                        >
+                            {loading ? (
+                                <span>กำลังดำเนินการ...</span>
+                            ) : (
+                                <span>✓ ยืนยันการบริจาค</span>
+                            )}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     );
 }
+
 
 export default DonateConfirm;

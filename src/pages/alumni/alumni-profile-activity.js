@@ -81,14 +81,14 @@ function AlumniProfileActivity() {
   };
 
 
-  const formatDate = (dateStr) => {
-    if (!dateStr || dateStr === "0000-00-00") return "ไม่ระบุวันที่"; // กรณีไม่มีวันที่
-    const date = new Date(dateStr);
-    const day = date.getDate();
-    const month = date.toLocaleString('default', { month: 'long' });
-    const year = date.getFullYear() + 543; // เพิ่ม 543 ปีเพื่อให้ตรงกับปีไทย
-    return `${day} ${month} ${year}`;
-  };
+const formatDate = (dateStr) => {
+  if (!dateStr || dateStr === "0000-00-00") return "ไม่ระบุวันที่";
+  const date = new Date(dateStr);
+  const day = date.getDate();
+  const month = date.getMonth() + 1; // เดือนเป็นเลข
+  const year = date.getFullYear() + 543; // ปีไทย
+  return `${day}/${month}/${year}`;
+};
 
   const formatTime = (startTime, endTime) => {
     if (!startTime && !endTime) return "";
@@ -223,7 +223,6 @@ function AlumniProfileActivity() {
                         {/* Image Overlay */}
                         <div className="image-overlay position-absolute top-0 start-0 w-100 h-100 bg-dark bg-opacity-0 transition-all d-flex align-items-center justify-content-center">
                           <button className="btn btn-light btn-sm rounded-pill px-3 opacity-0 view-detail-btn">
-                            <i className="fas fa-eye me-2"></i>
                             ดูรายละเอียด
                           </button>
                         </div>
@@ -245,7 +244,6 @@ function AlumniProfileActivity() {
                         {activity.check_alumni === 1 && (
                           <div className="position-absolute top-0 end-0 m-3">
                             <span className="badge bg-warning text-dark px-3 py-2 rounded-pill shadow-sm">
-                              <i className="fas fa-graduation-cap me-1"></i>
                               ศิษย์เก่า
                             </span>
                           </div>
@@ -258,7 +256,6 @@ function AlumniProfileActivity() {
 
                         {/* Date Section */}
                         <div className="d-flex align-items-center mb-3 text-muted">
-                          <i className="fas fa-calendar-alt me-2 text-primary"></i>
                           <span className="fw-500 small">
                             {activity.end_date && activity.end_date !== "0000-00-00" && activity.end_date !== activity.activity_date
                               ? `${formatDate(activity.activity_date)} - ${formatDate(activity.end_date)}`
@@ -274,7 +271,6 @@ function AlumniProfileActivity() {
                         {/* Alumni Alert */}
                         {activity.check_alumni === 1 && (
                           <div className="alert alert-warning d-flex align-items-center py-2 px-3 mb-3 small border-0 rounded-3" role="alert">
-                            <i className="fas fa-exclamation-circle me-2"></i>
                             กิจกรรมนี้สำหรับศิษย์เก่าเท่านั้น
                           </div>
                         )}
@@ -284,14 +280,12 @@ function AlumniProfileActivity() {
                       <div className="card-footer bg-light border-0 p-3">
                         <div className="d-flex justify-content-between align-items-center">
                           <div className="d-flex align-items-center text-muted small">
-                            <i className="fas fa-users me-1"></i>
                             <span>เข้าร่วมแล้ว</span>
                           </div>
                           <button
                             className="btn btn-primary btn-sm px-4 rounded-pill"
                             onClick={() => navigate(`/activity/${activity.activity_id}`)}
                           >
-                            <i className="fas fa-arrow-right me-2"></i>
                             ดูรายละเอียด
                           </button>
                         </div>

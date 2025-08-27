@@ -34,6 +34,8 @@ function Alumni() {
         navigate(`/alumni/${userId}`);
     };
 
+    
+
     return (
         <section className="container">
             <div className="alumni-page">

@@ -1,302 +1,678 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useOutletContext } from "react-router-dom";
-import { useNavigate, useLocation } from 'react-router-dom';
-import Swal from "sweetalert2";
-// css
+import { useOutletContext, useNavigate, useLocation } from 'react-router-dom';
+import Swal from 'sweetalert2';
 import '../../css/profile.css';
-// import '../../css/activity.css';
-// bootstrap
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 function PresidentProfileDonation() {
     const [profile, setProfile] = useState({});
-    const { handleLogout } = useOutletContext();
-    const [activity, setActivity] = useState([]);
-    const [selectedStatus, setSelectedStatus] = useState('activity');
+    const [donations, setDonations] = useState([]);
     const [previewImage, setPreviewImage] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [filterStatus, setFilterStatus] = useState('all');
+    const [filterYear, setFilterYear] = useState('all');
+    const [sortOrder, setSortOrder] = useState('desc');
+    const [selectedDonation, setSelectedDonation] = useState(null);
+    const [showModal, setShowModal] = useState(false);
+    const [uploadingSlip, setUploadingSlip] = useState(false);
+    const { handleLogout } = useOutletContext();
     const navigate = useNavigate();
     const location = useLocation();
 
-    // ดึงข้อมูลโปรไฟล์
     useEffect(() => {
-        axios.get('http://localhost:3001/users/profile', {
-            withCredentials: true
-        })
-            .then((response) => {
-                if (response.data.success) {
-                    setProfile(response.data.user);
+        axios.get('http://localhost:3001/users/profile', { withCredentials: true })
+            .then((res) => {
+                if (res.data.success) {
+                    setProfile(res.data.user);
                 }
             })
             .catch((error) => {
-                console.error('เกิดข้อผิดพลาดในการดึงข้อมูลโปรไฟล์:', error.response ? error.response.data.message : error.message);
+                console.error('Error fetching profile:', error);
             });
+
+        fetchDonations();
     }, []);
 
-
-
-    if (!profile) {
-        return <div>ไม่พบข้อมมูลผู้ใช้</div>;
-    }
-
-    const handleClick = (path) => {
-        navigate(path);
+    const fetchDonations = () => {
+        setLoading(true);
+        axios.get('http://localhost:3001/donate/donatePaid', { withCredentials: true })
+            .then((res) => {
+                setDonations(res.data);
+                setLoading(false);
+            })
+            .catch((error) => {
+                console.error('Error fetching donations:', error);
+                setLoading(false);
+            });
     };
 
-    // อัปโหลดรูปภาพ
+    const handleClick = (path) => navigate(path);
+
     const handleImageChange = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
 
-        // แสดง preview รูปก่อนอัปโหลด
+        // Validate file size (5MB max)
+        if (file.size > 5 * 1024 * 1024) {
+            alert('กรุณาเลือกไฟล์ที่มีขนาดไม่เกิน 5MB');
+            return;
+        }
+
         setPreviewImage(URL.createObjectURL(file));
 
         const formData = new FormData();
-        formData.append("image_path", file);
-        formData.append("user_id", profile.userId);
+        formData.append('image_path', file);
+        formData.append('user_id', profile.userId);
 
         try {
-            const res = await axios.post("http://localhost:3001/users/update-profile-image", formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
+            const res = await axios.post('http://localhost:3001/users/update-profile-image', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
             });
 
             if (res.status === 200) {
-                alert("อัปโหลดรูปสำเร็จ");
-
-                // อัปเดตรูปโปรไฟล์ใน state
-                setProfile((prev) => ({
-                    ...prev,
-                    profilePicture: res.data.newImagePath,
-                }));
+                alert('อัปโหลดรูปสำเร็จ');
+                setProfile((prev) => ({ ...prev, profilePicture: res.data.newImagePath }));
             } else {
-                alert(res.data.message || "เกิดข้อผิดพลาด");
+                alert(res.data.message || 'เกิดข้อผิดพลาด');
             }
         } catch (err) {
             console.error(err);
-            alert("ไม่สามารถอัปโหลดรูปได้");
+            setPreviewImage(null);
+            alert('ไม่สามารถอัปโหลดรูปได้');
         }
     };
 
-    return (
-        <section className='container py-4'>
-            <div className='alumni-profile-page'>
-                <div className="row justify-content-center g-4">
-                    {/* Sidebar/Profile */}
-                    <div className="col-12 col-md-3 mb-4">
-                        <div className="bg-white rounded-4 shadow-sm text-center p-4">
-                            <img
-                                src={previewImage || profile.profilePicture}
-                                alt="Profile"
-                                style={{ width: "130px", height: "130px", borderRadius: "50%", objectFit: "cover", marginBottom: 16, border: '3px solid #eee' }}
-                                className="img-fluid mb-2"
-                            />
-                            <div className="mt-2 mb-3">
-                                <label
-                                    htmlFor="upload-profile-pic"
-                                    className="btn btn-sm btn-outline-secondary"
-                                    style={{ cursor: "pointer" }}
-                                >
-                                    เปลี่ยนรูป
-                                </label>
-                                <input
-                                    type="file"
-                                    id="upload-profile-pic"
-                                    className="d-none"
-                                    accept="image/*"
-                                    onChange={handleImageChange}
-                                />
-                            </div>
-                            <hr className="w-100" />
-                            <div className="menu d-block mt-3 w-100">
-                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/president-profile")}>โปรไฟล์ของฉัน</div>
-                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/president-profile/president-manage-orders")}>จัดการคำสั่งซื้อของที่ระลึก</div>
-                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/president-profile/president-profile-webboard")}>กระทู้ที่สร้าง</div>
-                                <div className="menu-item active py-2 mb-2 rounded" onClick={() => handleClick("/president-profile/president-profile-donation")}>ประวัติการบริจาค</div>
-                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/president-profile/president-profile-activity")}>ประวัติการเข้าร่วมกิจกรรม</div>
-                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/president-profile/president-profile-souvenir")}>ประวัติการสั่งซื้อของที่ระลึก</div>
-                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/president-profile/president-approve")}>การอนุมัติ</div>
-                                <div className="menu-item py-2 rounded" onClick={handleLogout}>ออกจากระบบ</div>
-                            </div> 
+    // ฟังก์ชันเปิด Modal แสดงรายละเอียดการบริจาค
+    const handleDonationClick = (donation) => {
+        setSelectedDonation(donation);
+        setShowModal(true);
+    };
+
+    // ฟังก์ชันปิด Modal
+    const handleCloseModal = () => {
+        setShowModal(false);
+        setSelectedDonation(null);
+    };
+
+    // ฟังก์ชันอัพโหลดสลิปใหม่
+    const handleSlipUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Validate file
+        if (file.size > 5 * 1024 * 1024) {
+            Swal.fire({
+                icon: 'error',
+                title: 'ไฟล์ใหญ่เกินไป',
+                text: 'กรุณาเลือกไฟล์ที่มีขนาดไม่เกิน 5MB'
+            });
+            return;
+        }
+
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+        if (!allowedTypes.includes(file.type)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'ประเภทไฟล์ไม่ถูกต้อง',
+                text: 'กรุณาเลือกไฟล์ประเภท JPG, JPEG หรือ PNG เท่านั้น'
+            });
+            return;
+        }
+
+        const result = await Swal.fire({
+            title: 'ยืนยันการอัพโหลดสลิป',
+            text: 'ต้องการอัพโหลดสลิปการชำระเงินใหม่หรือไม่?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'อัพโหลด',
+            cancelButtonText: 'ยกเลิก'
+        });
+
+        if (result.isConfirmed) {
+            setUploadingSlip(true);
+
+            const formData = new FormData();
+            formData.append('slip', file);
+            formData.append('donation_id', selectedDonation.donation_id);
+
+            try {
+                const res = await axios.post('http://localhost:3001/donate/upload-slip', formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' },
+                    withCredentials: true
+                });
+
+                if (res.data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'อัพโหลดสำเร็จ',
+                        text: 'อัพโหลดสลิปการชำระเงินใหม่เรียบร้อยแล้ว รอการตรวจสอบจากเจ้าหน้าที่'
+                    });
+
+                    // รีเฟรชข้อมูลการบริจาค
+                    fetchDonations();
+
+                    // อัพเดตข้อมูลใน selectedDonation
+                    setSelectedDonation({
+                        ...selectedDonation,
+                        slip: res.data.slip,
+                        payment_status: 'pending'
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'เกิดข้อผิดพลาด',
+                        text: res.data.message || 'ไม่สามารถอัพโหลดสลิปได้'
+                    });
+                }
+            } catch (error) {
+                console.error('Error uploading slip:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'เกิดข้อผิดพลาด',
+                    text: 'ไม่สามารถอัพโหลดสลิปได้ กรุณาลองใหม่อีกครั้ง'
+                });
+            } finally {
+                setUploadingSlip(false);
+            }
+        }
+
+        // Reset input
+        e.target.value = '';
+    };
+
+    // ฟังก์ชันกำหนดสีสถานะ
+    const getStatusStyle = (status) => {
+        switch (status) {
+            case "paid":
+                return (
+                    <span className="badge rounded-pill fs-6 px-3 py-2 text-success bg-success bg-opacity-10">
+                        ชำระเงินแล้ว
+                    </span>
+                );
+            case "pending":
+                return (
+                    <span className="badge rounded-pill fs-6 px-3 py-2 text-warning bg-warning bg-opacity-10">
+                        รอดำเนินการ
+                    </span>
+                );
+            case "failed":
+            case "rejected":
+                return (
+                    <span className="badge rounded-pill fs-6 px-3 py-2 text-danger bg-danger bg-opacity-10">
+                        ล้มเหลว/ถูกปฏิเสธ
+                    </span>
+                );
+            default:
+                return (
+                    <span className="badge rounded-pill fs-6 px-3 py-2 bg-secondary text-white">
+                        ไม่ทราบสถานะ
+                    </span>
+                );
+        }
+    };
+
+    // คำนวณสถิติ
+    const totalDonations = donations.reduce((sum, donation) => sum + Number(donation.amount), 0);
+    const successfulDonations = donations.filter(d => d.payment_status?.toLowerCase() === 'paid');
+    const pendingDonations = donations.filter(d => d.payment_status?.toLowerCase() === 'pending');
+
+    // กรองและเรียงลำดับข้อมูล
+    const filteredDonations = donations
+        .filter(donation =>
+            (filterStatus === 'all' || donation.payment_status?.toLowerCase() === filterStatus) &&
+            (filterYear === 'all' || (new Date(donation.created_at).getFullYear() + 543).toString() === filterYear)
+        )
+        .sort((a, b) => {
+            const dateA = new Date(a.created_at);
+            const dateB = new Date(b.created_at);
+            return sortOrder === 'desc' ? dateB - dateA : dateA - dateB;
+        });
+
+    if (loading) {
+        return (
+            <section className='container py-4'>
+                <div className='d-flex justify-content-center align-items-center' style={{ minHeight: '400px' }}>
+                    <div className='text-center'>
+                        <div className='spinner-border text-primary mb-3' role='status' style={{ width: '3rem', height: '3rem' }}>
+                            <span className='visually-hidden'>กำลังโหลด...</span>
                         </div>
+                        <p className='text-muted'>กำลังโหลดข้อมูล...</p>
                     </div>
-                    {/* Main Content */}
-                    <div className="col-12 col-md-8">
-                            {/* Header Section */}
-                            <div className="bg-white rounded-4 shadow-sm p-4 mb-4">
-                                <div className="d-flex justify-content-between align-items-center">
-                                    <div className="d-flex align-items-center">
-                                        <div className="bg-success bg-opacity-10 rounded-circle p-2 me-3">
-                                            <i className="fas fa-calendar-check text-success fs-5"></i>
+                </div>
+            </section>
+        );
+    }
+
+    return (
+        <>
+            <section className='container py-4'>
+                <div className='alumni-profile-page'>
+                    <div className='row justify-content-center g-4'>
+                        <div className='col-12 col-md-3 mb-4'>
+                            <div className='bg-white rounded-4 shadow-sm text-center p-4'>
+                                <img
+                                    src={previewImage || profile.profilePicture}
+                                    alt='Profile'
+                                    style={{ width: 130, height: 130, borderRadius: '50%', objectFit: 'cover', marginBottom: 16, border: '3px solid #eee' }}
+                                    className='img-fluid mb-2'
+                                />
+                                <div className='mt-2 mb-3'>
+                                    <label htmlFor='upload-profile-pic' className='btn btn-sm btn-outline-secondary'>เปลี่ยนรูป</label>
+                                    <input type='file' id='upload-profile-pic' className='d-none' accept='image/*' onChange={handleImageChange} />
+                                </div>
+                                <hr className='w-100' />
+                                <div className='menu d-block mt-3 w-100'>
+                                    {[
+                                        ['โปรไฟล์ของฉัน', '/president-profile'],
+                                        ['จัดการคำสั่งซื้อของที่ระลึก', '/president-profile/president-manage-orders'],
+                                        ['กระทู้ที่สร้าง', '/president-profile/president-profile-webboard'],
+                                        ['ประวัติการบริจาค', '/president-profile/president-profile-donation'],
+                                        ['ประวัติการเข้าร่วมกิจกรรม', '/president-profile/president-profile-activity'],
+                                        ['ประวัติการสั่งซื้อของที่ระลึก', '/president-profile/president-profile-souvenir'],
+                                        ['การอนุมัติ', '/president-profile/president-approve'],
+                                    ].map(([label, path], i) => (
+                                        <div key={i} className={`menu-item py-2 mb-2 rounded ${location.pathname === path ? 'active' : ''}`} onClick={() => handleClick(path)}>{label}</div>
+                                    ))}
+                                    <div className='menu-item py-2 rounded' onClick={handleLogout}>ออกจากระบบ</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Main Content */}
+                        <div className='col-12 col-md-8'>
+                            <div className='bg-white rounded-4 shadow-sm p-4 mb-4'>
+                                <div className='d-flex align-items-center'>
+                                    <div className='bg-success bg-opacity-10 rounded-circle p-2 me-3'>
+                                        <i className='fas fa-calendar-check text-success fs-5'></i>
+                                    </div>
+                                    <div>
+                                        <h4 className='fw-bold mb-1'>ประวัติการบริจาค</h4>
+                                        <p className='text-muted mb-0 small'>รวบรวมโครงการที่คุณบริจาคทั้งหมด</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Statistics Cards */}
+                            <div className='row g-3 mb-4'>
+                                <div className='col-md-4'>
+                                    <div className='bg-white rounded-4 shadow-sm p-4 h-100'>
+                                        <div className='d-flex align-items-center'>
+                                            <div className='bg-success bg-opacity-10 rounded-circle p-3 me-3'>
+                                                <i className='fas fa-donate text-success fs-5'></i>
+                                            </div>
+                                            <div>
+                                                <h5 className='fw-bold mb-0'>{totalDonations.toLocaleString()}</h5>
+                                                <p className='text-muted mb-0 small'>บาท ยอดรวมทั้งหมด</p>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <h4 className="fw-bold mb-1">ประวัติการบริจาค</h4>
-                                            <p className="text-muted mb-0 small">รวบรวมโครงการที่คุณบริจาคทั้งหมด</p>
+                                    </div>
+                                </div>
+                                <div className='col-md-4'>
+                                    <div className='bg-white rounded-4 shadow-sm p-4 h-100'>
+                                        <div className='d-flex align-items-center'>
+                                            <div className='bg-primary bg-opacity-10 rounded-circle p-3 me-3'>
+                                                <i className='fas fa-check-circle text-primary fs-5'></i>
+                                            </div>
+                                            <div>
+                                                <h5 className='fw-bold mb-0'>{successfulDonations.length}</h5>
+                                                <p className='text-muted mb-0 small'>ครั้ง การบริจาคสำเร็จ</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className='col-md-4'>
+                                    <div className='bg-white rounded-4 shadow-sm p-4 h-100'>
+                                        <div className='d-flex align-items-center'>
+                                            <div className='bg-warning bg-opacity-10 rounded-circle p-3 me-3'>
+                                                <i className='fas fa-clock text-warning fs-5'></i>
+                                            </div>
+                                            <div>
+                                                <h5 className='fw-bold mb-0'>{pendingDonations.length}</h5>
+                                                <p className='text-muted mb-0 small'>ครั้ง รอดำเนินการ</p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Activities Grid */}
-                            <div className="row g-4">
+                            {/* Filter and Sort Controls */}
+                            <div
+                                className='bg-white rounded-4 shadow-sm p-4 mb-4 d-flex align-items-center'
+                                style={{ minHeight: '100px' }}
+                            >
+                                <div className="row w-100 g-3 align-items-center">
+                                    {/* กรองสถานะ */}
+                                    <div className="col-md-4 col-12">
+                                        <div className="d-flex align-items-center justify-content-between">
+                                            <label className="form-label mb-0 me-2">สถานะ:</label>
+                                            <select
+                                                className="form-select form-select-sm"
+                                                value={filterStatus}
+                                                onChange={(e) => setFilterStatus(e.target.value)}
+                                                style={{ maxWidth: '180px' }}
+                                            >
+                                                <option value="all">ทั้งหมด</option>
+                                                <option value="paid">ชำระเงินแล้ว</option>
+                                                <option value="pending">รอดำเนินการ</option>
+                                                <option value="failed">ล้มเหลว/ยกเลิก</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    {/* กรองปีที่บริจาค */}
+                                    <div className="col-md-4 col-12">
+                                        <div className="d-flex align-items-center justify-content-between">
+                                            <label className="form-label mb-0 me-2">ปี:</label>
+                                            <select
+                                                className="form-select form-select-sm"
+                                                value={filterYear}
+                                                onChange={(e) => setFilterYear(e.target.value)}
+                                                style={{ maxWidth: '180px' }}
+                                            >
+                                                <option value="all">ทั้งหมด</option>
+                                                {Array.from(new Set(donations.map(d => new Date(d.created_at).getFullYear())))
+                                                    .sort((a, b) => b - a)
+                                                    .map(year => (
+                                                        <option key={year} value={year + 543}>{year + 543}</option>
+                                                    ))}
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    {/* เรียงลำดับ */}
+                                    <div className="col-md-4 col-12">
+                                        <div className="d-flex align-items-center justify-content-between">
+                                            <label className="form-label mb-0 me-2">ลำดับ:</label>
+                                            <select
+                                                className="form-select form-select-sm"
+                                                value={sortOrder}
+                                                onChange={(e) => setSortOrder(e.target.value)}
+                                                style={{ maxWidth: '150px' }}
+                                            >
+                                                <option value="desc">ใหม่ → เก่า</option>
+                                                <option value="asc">เก่า → ใหม่</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Donations List */}
+                            <div className='row g-4'>
+                                {filteredDonations.map((donation, index) => (
+                                    <div key={index} className='col-12'>
+                                        <div
+                                            className='bg-white rounded-4 shadow-sm p-4 hover-shadow donation-item'
+                                            style={{ transition: 'all 0.3s ease', cursor: 'pointer' }}
+                                            onClick={() => handleDonationClick(donation)}
+                                        >
+                                            <div className='row align-items-center'>
+                                                <div className='col-md-8'>
+                                                    <div className='d-flex align-items-start'>
+                                                        <div className='flex-grow-1'>
+                                                            <h5 className='fw-bold mb-2 text-primary'>
+                                                                {donation.project_name || 'ไม่ระบุชื่อโครงการ'}
+                                                            </h5>
+                                                            <div className='mb-2'>
+                                                                <span className='badge bg-light text-dark border me-2'>
+                                                                    <i className='fas fa-coins me-1'></i>
+                                                                    {Number(donation.amount).toLocaleString()} บาท
+                                                                </span>
+                                                                {getStatusStyle(donation.payment_status)}
+                                                            </div>
+                                                            <p className='text-muted mb-0 small'>
+                                                                <i className='fas fa-calendar-alt me-2'></i>
+                                                                {new Date(donation.created_at).toLocaleString('th-TH', {
+                                                                    year: 'numeric',
+                                                                    month: 'long',
+                                                                    day: 'numeric',
+                                                                    hour: '2-digit',
+                                                                    minute: '2-digit',
+                                                                })}
+                                                            </p>
+
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className='col-md-4 text-md-end mt-3 mt-md-0'>
+                                                    <div className='text-end'>
+                                                        <div className='h4 fw-bold text-success mb-0'>
+                                                            ฿{Number(donation.amount).toLocaleString()}
+                                                        </div>
+                                                        <small className='text-muted'>ยอดบริจาค</small>
+                                                        <div className='mt-2'>
+                                                            <i className='fas fa-eye text-primary me-1'></i>
+                                                            <small className='text-primary'>คลิกเพื่อดูรายละเอียด</small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
 
                             </div>
-                        
 
+                            {/* Pagination or Load More (if needed) */}
+                            {filteredDonations.length > 0 && (
+                                <div className='text-center mt-4'>
+                                    <p className='text-muted small'>
+                                        แสดง {filteredDonations.length} รายการจาก {donations.length} รายการทั้งหมด
+                                    </p>
+                                </div>
+                            )}
+                        </div>
                     </div>
-
-                    {/* Enhanced CSS Styles */}
-                    <style jsx>{`
-    .activity-card {
-        transition: all 0.3s ease;
-        cursor: pointer;
-    }
-    
-    .activity-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 15px 35px rgba(0,0,0,0.1) !important;
-    }
-    
-    .image-overlay {
-        transition: all 0.3s ease;
-    }
-    
-    .activity-card:hover .image-overlay {
-        background-color: rgba(0,0,0,0.3) !important;
-    }
-    
-    .view-detail-btn {
-        transition: all 0.3s ease;
-    }
-    
-    .activity-card:hover .view-detail-btn {
-        opacity: 1 !important;
-        transform: translateY(0);
-    }
-    
-    .view-detail-btn {
-        transform: translateY(10px);
-    }
-    
-    .line-clamp-2 {
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        line-height: 1.4;
-        max-height: 2.8em;
-    }
-    
-    .line-clamp-3 {
-        display: -webkit-box;
-        -webkit-line-clamp: 3;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        line-height: 1.5;
-        max-height: 4.5em;
-    }
-    
-    .transition-all {
-        transition: all 0.3s ease;
-    }
-    
-    .bg-opacity-0 {
-        background-color: rgba(0,0,0,0) !important;
-    }
-    
-    .bg-opacity-10 {
-        background-color: rgba(var(--bs-success-rgb), 0.1) !important;
-    }
-    
-    .fw-500 {
-        font-weight: 500;
-    }
-    
-    .rounded-3 {
-        border-radius: 0.375rem !important;
-    }
-    
-    .rounded-4 {
-        border-radius: 0.5rem !important;
-    }
-    
-    .rounded-pill {
-        border-radius: 50rem !important;
-    }
-    
-    /* Status Badge Colors */
-    .status-upcoming {
-        background-color: #ffc107 !important;
-        color: #000 !important;
-    }
-    
-    .status-completed {
-        background-color: #28a745 !important;
-        color: #fff !important;
-    }
-    
-    .status-ongoing {
-        background-color: #007bff !important;
-        color: #fff !important;
-    }
-    
-    .status-unknown {
-        background-color: #6c757d !important;
-        color: #fff !important;
-    }
-    
-    /* Enhanced Button Styles */
-    .btn-primary {
-        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-        border: none;
-        font-weight: 500;
-        transition: all 0.3s ease;
-    }
-    
-    .btn-primary:hover {
-        background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(0,123,255,0.4);
-    }
-    
-    .alert-warning {
-        background-color: rgba(255,193,7,0.1) !important;
-        border: 1px solid rgba(255,193,7,0.3) !important;
-        color: #856404 !important;
-    }
-    
-    .badge {
-        font-weight: 500;
-        letter-spacing: 0.5px;
-    }
-    
-    .card-footer {
-        background-color: rgba(248,249,250,0.8) !important;
-    }
-    
-    .overflow-hidden {
-        overflow: hidden;
-    }
-    
-    .opacity-0 {
-        opacity: 0 !important;
-    }
-    
-    .fs-5 {
-        font-size: 1.25rem !important;
-    }
-    
-    .text-decoration-none {
-        text-decoration: none !important;
-    }
-`}</style>
                 </div>
-            </div>
-        </section>
+            </section>
+
+            {/* Modal แสดงรายละเอียดการบริจาค */}
+            {showModal && selectedDonation && (
+                <div className='modal fade show' style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)' }} onClick={handleCloseModal}>
+                    <div className='modal-dialog modal-lg modal-dialog-centered' onClick={(e) => e.stopPropagation()}>
+                        <div className='modal-content p-0'>
+                            <div className='modal-header border-0'>
+                                <h5 className='modal-title fw-bold'>
+                                    รายละเอียดการบริจาค
+                                </h5>
+                                <button type='button' className='btn-close' onClick={handleCloseModal}></button>
+                            </div>
+                            <div className='modal-body'>
+                                <div className='row g-4'>
+                                    {/* ข้อมูลการบริจาค */}
+                                    <div className='col-md-6'>
+                                        <div className='bg-light rounded-3 p-4 h-100'>
+                                            <h6 className='fw-bold mb-3'>
+                                                <i className='fas fa-info-circle text-primary me-2'></i>
+                                                ข้อมูลการบริจาค
+                                            </h6>
+                                            <div className='mb-3'>
+                                                <label className='text-muted small'>ชื่อโครงการ:</label>
+                                                <div className='fw-bold'>{selectedDonation.project_name || 'ไม่ระบุชื่อโครงการ'}</div>
+                                            </div>
+                                            <div className='mb-3'>
+                                                <label className='text-muted small'>จำนวนเงินบริจาค:</label>
+                                                <div className='fw-bold text-success fs-5'>
+                                                    ฿{Number(selectedDonation.amount).toLocaleString()}
+                                                </div>
+                                            </div>
+                                            <div className='mb-3'>
+                                                <label className='text-muted small'>สถานะ:</label>
+                                                <div>{getStatusStyle(selectedDonation.payment_status)}</div>
+                                            </div>
+                                            <div className='mb-3'>
+                                                <label className='text-muted small'>วันที่บริจาค:</label>
+                                                <div className='fw-bold'>
+                                                    {new Date(selectedDonation.created_at).toLocaleString('th-TH', {
+                                                        year: 'numeric',
+                                                        month: 'long',
+                                                        day: 'numeric',
+                                                        hour: '2-digit',
+                                                        minute: '2-digit',
+                                                    })}
+                                                </div>
+                                            </div>
+                                            {selectedDonation.transaction_id && (
+                                                <div className='mb-3'>
+                                                    <label className='text-muted small'>เลขที่ธุรกรรม:</label>
+                                                    <div className='fw-bold font-monospace'>{selectedDonation.transaction_id}</div>
+                                                </div>
+                                            )}
+                                            {selectedDonation.admin_note && (
+                                                <div className='mb-3'>
+                                                    <label className='text-muted small'>หมายเหตุจากเจ้าหน้าที่:</label>
+                                                    <div className='alert alert-info mb-0 small'>
+                                                        <i className='fas fa-comment-dots me-2'></i>
+                                                        {selectedDonation.admin_note}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* สลิปการชำระเงิน */}
+                                    <div className='col-md-6'>
+                                        <div className='bg-light rounded-3 p-4 h-100'>
+                                            <h6 className='fw-bold mb-3'>
+                                                <i className='fas fa-image text-primary me-2'></i>
+                                                สลิปการชำระเงิน
+                                            </h6>
+
+                                            {selectedDonation.slip ? (
+                                                <div className='text-center'>
+                                                    <img
+                                                        src={`http://localhost:3001/uploads/${selectedDonation.slip}`}
+                                                        alt='สลิปการชำระเงิน'
+                                                        className='img-fluid rounded-3 mb-3'
+                                                        style={{ maxHeight: '300px', objectFit: 'contain' }}
+                                                    />
+                                                    <div className='d-grid gap-2'>
+                                                        {/* <a 
+                                                            href={`http://localhost:3001/uploads/${selectedDonation.slip}`} 
+                                                            target='_blank' 
+                                                            rel='noopener noreferrer'
+                                                            className='btn btn-outline-primary btn-sm'
+                                                        >
+                                                            <i className='fas fa-external-link-alt me-2'></i>
+                                                            ดูรูปภาพขนาดเต็ม
+                                                        </a> */}
+
+                                                        {/* ปุ่มอัพโหลดสลิปใหม่ (แสดงเมื่อสถานะเป็น failed/rejected) */}
+                                                        {(selectedDonation.payment_status?.toLowerCase() === 'failed' ||
+                                                            selectedDonation.payment_status?.toLowerCase() === 'rejected') && (
+                                                                <div>
+                                                                    <hr />
+                                                                    <div className='alert alert-warning small mb-3'>
+                                                                        <i className='fas fa-exclamation-triangle me-2'></i>
+                                                                        การบริจาคของคุณถูกปฏิเสธ กรุณาอัพโหลดสลิปใหม่
+                                                                    </div>
+                                                                    <input
+                                                                        type='file'
+                                                                        id='upload-new-slip'
+                                                                        className='d-none'
+                                                                        accept='image/*'
+                                                                        onChange={handleSlipUpload}
+                                                                    />
+                                                                    <label
+                                                                        htmlFor='upload-new-slip'
+                                                                        className={`btn btn-warning btn-sm w-100 ${uploadingSlip ? 'disabled' : ''}`}
+                                                                    >
+                                                                        {uploadingSlip ? (
+                                                                            <>
+                                                                                <div className='spinner-border spinner-border-sm me-2' role='status'>
+                                                                                    <span className='visually-hidden'>กำลังอัพโหลด...</span>
+                                                                                </div>
+                                                                                กำลังอัพโหลด...
+                                                                            </>
+                                                                        ) : (
+                                                                            <>
+                                                                                <i className='fas fa-upload me-2'></i>
+                                                                                อัพโหลดสลิปใหม่
+                                                                            </>
+                                                                        )}
+                                                                    </label>
+                                                                </div>
+                                                            )}
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className='text-center text-muted py-5'>
+                                                    <i className='fas fa-image fs-1 mb-3 opacity-25'></i>
+                                                    <p className='mb-0'>ไม่พบสลิปการชำระเงิน</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* ข้อมูลเพิ่มเติม */}
+                                {(selectedDonation.donor_name || selectedDonation.donor_phone) && (
+                                    <div className='row mt-4'>
+                                        <div className='col-12'>
+                                            <div className='bg-light rounded-3 p-4'>
+                                                <h6 className='fw-bold mb-3'>
+                                                    <i className='fas fa-user text-primary me-2'></i>
+                                                    ข้อมูลผู้บริจาค
+                                                </h6>
+                                                <div className='row'>
+                                                    {selectedDonation.donor_name && (
+                                                        <div className='col-md-6 mb-2'>
+                                                            <label className='text-muted small'>ชื่อผู้บริจาค:</label>
+                                                            <div className='fw-bold'>{selectedDonation.donor_name}</div>
+                                                        </div>
+                                                    )}
+                                                    {selectedDonation.donor_phone && (
+                                                        <div className='col-md-6 mb-2'>
+                                                            <label className='text-muted small'>เบอร์โทรศัพท์:</label>
+                                                            <div className='fw-bold'>{selectedDonation.donor_phone}</div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            <style jsx>{`
+                .sticky-top {
+                    z-index: 100;
+                }
+                
+                .bg-gradient {
+                    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%) !important;
+                }
+
+                .donation-item:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+                }
+
+                .modal {
+                    z-index: 1050;
+                }
+
+                @media (max-width: 768px) {
+                    .sticky-top {
+                        position: relative !important;
+                        top: auto !important;
+                    }
+                    
+                    .modal-dialog {
+                        margin: 1rem;
+                    }
+                }
+            `}</style>
+        </>
     );
 }
 

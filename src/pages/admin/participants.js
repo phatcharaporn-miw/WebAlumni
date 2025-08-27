@@ -79,7 +79,7 @@ function ParticipantsPage() {
     return (
         <div className="container mt-4">         
             
-        <h4>รายชื่อผู้เข้าร่วม: {activityName}</h4>
+        <h3 id="head-text">รายชื่อผู้เข้าร่วม: {activityName}</h3>
             <div className="mb-3 d-flex justify-content-end">
                 <button className="btn btn-outline-success" onClick={exportToCSV}>
                     ดาวน์โหลดรายชื่อ

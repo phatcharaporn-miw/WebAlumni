@@ -71,6 +71,11 @@ function Header({ user, handleLogout }) {
       .catch((error) => console.error("เกิดข้อผิดพลาดในการเปลี่ยนสถานะ:", error));
   };
 
+  const markAllAsRead = () => {
+  const unreadNotifications = notifications.filter(n => n.status === "ยังไม่อ่าน");
+  unreadNotifications.forEach(n => markAsRead(n.notification_id));
+};
+
   //ลบแจ้งเตือน
   const deleteNotification = (notificationId) => {
     axios.delete(`http://localhost:3001/notice/notification/${notificationId}`)
@@ -107,8 +112,11 @@ function Header({ user, handleLogout }) {
 
   //ฟังก์ชันแสดง/ซ่อนแจ้งเตือน
   const toggleNotifications = () => {
-    setShowNotifications(!showNotifications);
-  };
+  setShowNotifications(!showNotifications);
+  if (!showNotifications && notifications.some(n => n.status === "ยังไม่อ่าน")) {
+    markAllAsRead();
+  }
+};
 
   // ป้องกันการปิด Dropdown เมื่อคลิกภายนอก
   useEffect(() => {
@@ -134,7 +142,7 @@ function Header({ user, handleLogout }) {
       getCartCount(userId);
     }
   }, []); // เรียกครั้งเดียวเมื่อ component mount
-  
+
   // ฟังก์ชันเพิ่มสินค้าลงตะกร้าสำหรับใช้ในส่วนอื่นๆ ของ Header (ถ้ามี)
   const handleAddToCartFromHeader = async (productId, quantity, total) => {
     // ตรวจสอบจาก user prop แทน localStorage
@@ -276,17 +284,25 @@ function Header({ user, handleLogout }) {
   };
 
   const handleSuggestionClick = (suggestion) => {
-  const config = typeConfig[suggestion.type];
-  let path = "/";
-  if (config) {
-    path = config.path(suggestion);
-  } else {
-    path = `/search?query=${encodeURIComponent(suggestion.title)}`;
-  }
-  navigate(path);
-  setShowSuggestions(false);
-};
+    const config = typeConfig[suggestion.type];
+    let path = "/";
+    if (config) {
+      path = config.path(suggestion);
+    } else {
+      path = `/search?query=${encodeURIComponent(suggestion.title)}`;
+    }
+    navigate(path);
+    setShowSuggestions(false);
+  };
 
+  const formatDate = (dateStr) => {
+    if (!dateStr || dateStr === "0000-00-00") return "ไม่ระบุวันที่";
+    const date = new Date(dateStr);
+    const day = date.getDate();
+    const month = date.getMonth() + 1; // เดือนเป็นเลข
+    const year = date.getFullYear() + 543; // ปีไทย
+    return `${day}/${month}/${year}`;
+  };
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -313,7 +329,7 @@ function Header({ user, handleLogout }) {
   //       Swal.fire('ไม่สามารถเปิดหน้าที่เกี่ยวข้องได้', '', 'warning');
   //   }
   // };
-  
+
   return (
     <header className="header">
       <div className="header-top">
@@ -387,7 +403,7 @@ function Header({ user, handleLogout }) {
                         >
                           <p className="message">{notification.message}</p>
                           <p className="notification-date">
-                            {new Date(notification.send_date).toLocaleString()}
+                            {formatDate(notification.send_date).toLocaleString()}
                           </p>
                           <button
                             className="delete-btn"
@@ -410,13 +426,13 @@ function Header({ user, handleLogout }) {
               {/* รูปโปรไฟล์ - เพิ่มการจัดการ error ของรูป */}
               <NavLink
                 to={
-                  user.role === 1 
+                  user.role === 1
                     ? "/admin-profile"
                     : user.role === 2
-                    ? "/president-profile"
-                    : user.role === 4
-                      ? "/student-profile"
-                      : "/alumni-profile"
+                      ? "/president-profile"
+                      : user.role === 4
+                        ? "/student-profile"
+                        : "/alumni-profile"
                 }
                 className="profile-container"
               >

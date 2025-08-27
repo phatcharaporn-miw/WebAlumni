@@ -410,7 +410,18 @@ function Category() {
           <option value="latest">ล่าสุด</option>
           <option value="oldest">เก่าสุด</option>
         </select>
-        <div id="box-category">
+        {/* <div className="d-flex align-items-center mb-3 ms-3">
+          <input
+            type="checkbox"
+            id="showFavorites"
+            checked={showFavorites}
+            onChange={() => setShowFavorites(!showFavorites)}
+            className="me-2"
+          />
+          <label htmlFor="showFavorites" className="mb-0">แสดงเฉพาะกระทู้ที่ถูกใจ</label>
+        </div> */}
+
+        <div className="row justify-content-center">
           <div className="col-md-7 mb-4">
             {webboard.length > 0 ? (
               sortedPosts

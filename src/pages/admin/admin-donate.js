@@ -53,8 +53,8 @@ function AdminDonate() {
         const confirmDelete = window.confirm("คุณแน่ใจหรือไม่ว่าต้องการลบโครงการนี้?");
         if (confirmDelete) {
             try {
-                await axios.delete('http://localhost:3001/admin/donate/${projectId}');
-                    setProjects(projects.filter((project) => project.project_id !== projectId));
+                await axios.delete(`http://localhost:3001/admin/donate/${projectId}`);
+                setProjects(projects.filter((project) => project.project_id !== projectId));
                 alert("ลบโครงการสำเร็จ");
             } catch (error) {
                 alert("เกิดข้อผิดพลาดในการลบโครงการ");
@@ -65,12 +65,12 @@ function AdminDonate() {
     //ฟังก์ชันสำหรับอนุมัติโครงการ
     const Approve = async (projectId) => {
         try {
-            await axios.put('http://localhost:3001/admin/approveDonate/${projectId}');
-                setProjects(projects.map(project =>
-                    project.project_id === projectId
-                        ? { ...project, status: "1" }
-                        : project
-                ));
+            await axios.put(`http://localhost:3001/admin/approveDonate/${projectId}`);
+            setProjects(projects.map(project =>
+                project.project_id === projectId
+                    ? { ...project, status: "1" }
+                    : project
+            ));
             alert("อนุมัติโครงการสำเร็จ");
         } catch (error) {
             alert("เกิดข้อผิดพลาดในการอนุมัติโครงการ");
@@ -118,13 +118,13 @@ function AdminDonate() {
     const getStatusBadge = (status) => {
         switch (status) {
             case "0":
-                return <span className="badge bg-warning">รอการอนุมัติ</span>;
+                return <span className="badge bg-warning bg-opacity-10 text-warning">รอการอนุมัติ</span>;
             case "1":
-                return <span className="badge bg-success">อนุมัติแล้ว</span>;
+                return <span className="badge bg-success bg-opacity-10 text-success">อนุมัติแล้ว</span>;
             case "2":
-                return <span className="badge bg-danger">ไม่อนุมัติ</span>;
+                return <span className="badge bg-danger bg-opacity-10 text-danger">ไม่อนุมัติ</span>;
             case "3":
-                return <span className="badge bg-danger">โครงการสิ้นสุดแล้ว</span>;
+                return <span className="badge bg-danger bg-opacity-10 text-danger">โครงการสิ้นสุดแล้ว</span>;
             default:
                 return <span className="badge bg-secondary">ไม่ระบุ</span>;
         }
@@ -150,38 +150,34 @@ function AdminDonate() {
             {/* Top Menu Navigation */}
             <div className="mb-4">
                 <nav className="nav Adminnav-tabs">
-                    <Link
+                    <Link 
                         className={`adminnav-link ${location.pathname === '/admin/donations' ? 'active' : ''}`}
                         to="/admin/donations"
                     >
                         <i className="fas fa-project-diagram me-2"></i>
                         การจัดการโครงการบริจาค
                     </Link>
-                    <Link
-                        className={`adminnav-link ${location.pathname === '/admin/donations/check-payment-donate' ? 'active' : ''}`}
-                        to="/admin/donations/check-payment-donate"
+
+                    <Link 
+                        className={`adminnav-link ${location.pathname === '/admin/donations/donate-request' ? 'active' : ''}`}
+                        to="/admin/donations/donate-request"
                     >
-                        <i className="fas fa-credit-card me-2"></i>
-                        การจัดการตรวจสอบการชำระเงินบริจาค
+                        <i className="fas fa-project-diagram me-2"></i>
+                        เพิ่มโครงการใหม่
                     </Link>
                 </nav>
             </div>
 
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <h2 className="donate-activity-title">การจัดการโครงการบริจาค</h2>
-                <div className="d-flex gap-2">
-                    <Link to="/admin/donations/donate-request" className="btn-admin-donate-request">
-                        <i className="fas fa-plus"></i> เพิ่มโครงการใหม่
-                    </Link>
-                </div>
             </div>
 
             <div className="row mb-4">
                 <div className="col-md-4">
                     <div className="input-group">
-                        <span className="input-group-text">
+                        {/* <span className="input-group-text">
                             <i className="fas fa-search"></i>
-                        </span>
+                        </span> */}
                         <input
                             type="text"
                             className="form-control"
@@ -272,7 +268,7 @@ function AdminDonate() {
                                                     <div className="col-md-3">
                                                         <div className="donate-admin-item-image-frame">
                                                             <img
-                                                                src={'http://localhost:3001/uploads/${project.image_path}'}
+                                                                src={`http://localhost:3001/uploads/${project.image_path}`}
                                                                 alt={project.project_name}
                                                                 className="img-fluid rounded"
                                                                 onError={(e) => {
@@ -292,7 +288,7 @@ function AdminDonate() {
                                                             {getStatusBadge(project.status)}
                                                         </div>
 
-                                                        <div className="tag-date-container">
+                                                        <div className="tag-date-container fw-bold">
                                                             <p className={`tagDonante ${project.donation_type || "default"}`}>
                                                                 <i className="fas fa-tag"></i> {getFilterTitle(project.donation_type)}
                                                             </p>
@@ -329,9 +325,9 @@ function AdminDonate() {
                                                                         className="progress-bar"
                                                                         role="progressbar"
                                                                         style={{ width: `${progress}%` }}
-                                                                    aria-valuenow={progress}
-                                                                    aria-valuemin="0"
-                                                                    aria-valuemax="100"
+                                                                        aria-valuenow={progress}
+                                                                        aria-valuemin="0"
+                                                                        aria-valuemax="100"
                                                                     />
                                                                 </div>
                                                             </div>
@@ -373,19 +369,19 @@ function AdminDonate() {
                                                                 to={`/admin/donations/edit/${project.project_id}`}
                                                                 className="btn fasfa-edit btn-sm"
                                                             >
-                                                                <i className="fas fa-edit"></i> แก้ไข
+                                                                แก้ไข
                                                             </Link>
                                                             <button
                                                                 className="btn fasfa-delete btn-sm"
                                                                 onClick={() => Delete(project.project_id)}
                                                             >
-                                                                <i className="fas fa-trash"></i> ลบ
+                                                                ลบ
                                                             </button>
                                                             <Link
-                                                                to={`/admin/donations/donatedetail/${project.project_id}`}
+                                                                to={`/admin/donations/donate-detail/${project.project_id}`}
                                                                 className="btn fasfa-info btn-sm"
                                                             >
-                                                                <i className="fas fa-eye"></i> ดูรายละเอียด
+                                                                ดูรายละเอียด
                                                             </Link>
                                                         </div>
                                                     </div>

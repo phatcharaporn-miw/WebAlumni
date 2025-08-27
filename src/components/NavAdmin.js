@@ -97,7 +97,6 @@ function NavAdmin() {
         return () => clearInterval(interval);
     }, [userId]);
 
-
     const markAsRead = (notificationId) => {
         axios.put(`http://localhost:3001/notice/read/${notificationId}`)
             .then(() => {
@@ -113,6 +112,11 @@ function NavAdmin() {
             .catch((error) => console.error("เกิดข้อผิดพลาดในการเปลี่ยนสถานะ:", error));
     };
 
+    const markAllAsRead = () => {
+        const unreadNotifications = notifications.filter(n => n.status === "ยังไม่อ่าน");
+        unreadNotifications.forEach(n => markAsRead(n.notification_id));
+    };
+
     //ลบแจ้งเตือน
     const deleteNotification = (notificationId) => {
         axios.delete(`http://localhost:3001/notice/notification/${notificationId}`)
@@ -126,6 +130,9 @@ function NavAdmin() {
     //ฟังก์ชันแสดง/ซ่อนแจ้งเตือน
     const toggleNotifications = () => {
         setShowNotifications(!showNotifications);
+        if (!showNotifications && notifications.some(n => n.read_status === "ยังไม่อ่าน")) {
+            markAllAsRead();
+        }
     };
 
     // ป้องกันการปิด Dropdown เมื่อคลิกภายนอก
@@ -232,8 +239,8 @@ function NavAdmin() {
                 {/* Menu Items */}
                 <div className="nav flex-column nav-pills">
                     {[
-                        { to: "/admin-home", label: "Dashboard" },
-                        { to: "/admin/verify", label: "ตรวจสอบการโอนเงิน" },
+                        { to: "/admin-home", label: "แดชบอร์ด" },
+                        { to: "/admin/verify", label: "ตรวจสอบสลิปการโอนเงิน" },
                         { to: "/admin/activities", label: "กิจกรรมและการเข้าร่วม" },
                         { to: "/admin/donations", label: "การบริจาคและโครงการ" },
                         { to: "/admin/webboard", label: "การจัดการเว็บบอร์ด" },

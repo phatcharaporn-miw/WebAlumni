@@ -28,9 +28,9 @@ function CheckStudentId() {
 
     });
 
-    const [studentSearchStep, setStudentSearchStep] = useState(true);
+    // const [studentSearchStep, setStudentSearchStep] = useState(true);
     const [isSearching, setIsSearching] = useState(false);
-    const [studentFound, setStudentFound] = useState(null);
+    // const [studentFound, setStudentFound] = useState(null);
     const [studentId, setStudentId] = useState('');
     const [result, setResult] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -50,17 +50,12 @@ function CheckStudentId() {
                     message: res.data.message,
                     student: res.data.data,
                 });
-            } else {
-                setResult({
-                    found: false,
-                    message: res.data.message,
-                });
-            }
+            } 
         } catch (error) {
             console.error(error);
             setResult({
                 found: false,
-                message: 'เกิดข้อผิดพลาดในการตรวจสอบ',
+                message: 'ไม่พบข้อมูลในระบบ กรุณาลงทะเบียน',
             });
         } finally {
             setLoading(false);

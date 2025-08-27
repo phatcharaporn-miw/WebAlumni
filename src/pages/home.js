@@ -17,6 +17,7 @@ import Swal from "sweetalert2";
 import { format } from 'date-fns';
 import { th } from 'date-fns/locale';
 import { MdVolunteerActivism, MdEvent, MdPeople, MdTrendingUp } from "react-icons/md";
+import { FaSearch, FaRegClock, FaArrowRight, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { Bar, Pie } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -119,29 +120,21 @@ function Home() {
     totalDonations: 0,
   });
 
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat("th-TH", {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount || 0);
+  };
+
   const [alumniCount, setAlumniCount] = useState(0);
   const [barData, setBarData] = useState({
     labels: [],
     datasets: [],
   });
-
   const [pieData, setPieData] = useState({
-    labels: ['โครงการศึกษา', 'โครงการสาธารณสุข', 'โครงการสิ่งแวดล้อม'],
-    datasets: [{
-      data: [45, 30, 25],
-      backgroundColor: [
-        'rgba(40, 167, 69, 0.8)',
-        'rgba(111, 66, 193, 0.8)',
-        'rgba(255, 193, 7, 0.8)'
-      ],
-      borderColor: [
-        'rgba(40, 167, 69, 1)',
-        'rgba(111, 66, 193, 1)',
-        'rgba(255, 193, 7, 1)'
-      ],
-      borderWidth: 2,
-      hoverOffset: 8,
-    }],
+    labels: [],
+    datasets: [],
   });
 
   useEffect(() => {
@@ -171,19 +164,19 @@ function Home() {
         }
       });
 
-    // Donation statistics for pie chart
-    // axios.get("http://localhost:3001/admin/donation-statistics")
-    //   .then((res) => {
-    //     const labels = res.data.map(item => item.category);
-    //     const data = res.data.map(item => item.total_amount);
-    //     setPieData({
-    //       labels,
-    //       datasets: [{
-    //         data,
-    //         backgroundColor: ['#28a745', '#6f42c1', '#ffc107'], // example colors
-    //       }],
-    //     });
-    //   });
+    // สถิติการบริจาค
+    axios.get("http://localhost:3001/admin/donation-stats")
+      .then((res) => {
+        const labels = res.data.map(item => item.donation_type);
+        const data = res.data.map(item => item.total);
+        setPieData({
+          labels,
+          datasets: [{
+            data,
+            backgroundColor: ['#98d662ff', '#6f42c1', '#241f12ff'], // example colors
+          }],
+        });
+      });
 
     // Total alumni count
     axios.get("http://localhost:3001/admin/total-alumni")
@@ -332,15 +325,20 @@ function Home() {
         padding: 12,
         callbacks: {
           label: function (tooltipItem) {
-            const value = tooltipItem.raw;
+            const value = tooltipItem.raw; // ยอดเงินของ slice นั้น
             const total = tooltipItem.dataset.data.reduce((a, b) => a + b, 0);
             const percent = ((value / total) * 100).toFixed(1);
-            return `${tooltipItem.label}: ${percent}%`;
+
+            // format number ให้มี , คั่นหลักพัน
+            const formattedValue = value.toLocaleString();
+
+            return `${tooltipItem.label}: ฿${formattedValue} (${percent}%)`;
           },
         },
       },
     },
   };
+
 
   //ดึงข้อมูล webboard
   useEffect(() => {
@@ -358,7 +356,7 @@ function Home() {
       });
 
     axios
-      .get("http://localhost:3001/donate", {
+      .get("http://localhost:3001/donate/donate", {
         withCredentials: true
       })
       .then((response) => {
@@ -765,6 +763,29 @@ function Home() {
     return text.substring(0, maxLength) + "...";
   };
 
+  const getProjectStatusBadge = (project) => {
+        const now = new Date();
+        const endDate = project?.end_date ? new Date(project.end_date) : null;
+
+        if (!endDate) return null;
+
+        if (now > endDate) {
+            return <span className="donate-badge donate-badge-expired">สิ้นสุดแล้ว</span>;
+        }
+
+        const daysRemaining = calculateDaysRemaining(endDate);
+        if (daysRemaining <= 5) {
+            return <span className="donate-badge donate-badge-warning">ใกล้สิ้นสุด</span>;
+        }
+
+        return <span className="donate-badge donate-badge-active">กำลังดำเนินการ</span>;
+    };
+
+    const handleTagClick = (type) => {
+        setFilter(type || "all");
+        // setCurrentPage(1);
+    };
+
   return (
     <div className="content">
       <img
@@ -1056,7 +1077,7 @@ function Home() {
             {/* Stats Cards */}
             <div className="row mb-5">
               <CardInfo
-                title="จำนวนผู้เข้าร่วมกิจกรรมทั้งหมด"
+                title="ผู้เข้าร่วมกิจกรรมทั้งหมด"
                 value={`${stats.totalParticipants.toLocaleString()} คน`}
                 type="activity"
                 icon={MdPeople}
@@ -1069,7 +1090,7 @@ function Home() {
               />
               <CardInfo
                 title="ยอดบริจาครวมทั้งหมด"
-                value={`${stats.totalDonations.toLocaleString()} บาท`}
+                value={`${formatCurrency(stats.totalDonations)} บาท`}
                 type="donation"
                 icon={MdVolunteerActivism}
               />
@@ -1463,115 +1484,172 @@ function Home() {
                     const now = new Date();
                     const startDate = project?.start_date ? new Date(project.start_date) : null;
                     const endDate = project?.end_date ? new Date(project.end_date) : null;
-
-                    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-                    const formattedStartDate = startDate ? startDate.toLocaleDateString('th-TH', options) : "-";
-                    const formattedEndDate = endDate ? endDate.toLocaleDateString('th-TH', options) : "-";
-                    const progress = project.target_amount
+                    const formattedStartDate = startDate?.toLocaleDateString("th-TH") || "-";
+                    const formattedEndDate = endDate?.toLocaleDateString("th-TH") || "-";
+                    const progress = project.target_amount > 0
                       ? (project.current_amount / project.target_amount) * 100
                       : 0;
-
-                    const countDay = calculateDaysRemaining(endDate);
+                    const daysRemaining = calculateDaysRemaining(endDate);
+                    const isExpired = endDate && now > endDate;
+                    const isUpcoming = startDate && now < startDate;
 
                     return (
-                      <div className="item-detail-home" key={project.project_id}>
-                        <div className="image-donate-frame">
+                      <div
+                        className={`donate-project-card ${isExpired ? "expired" : ""}`}
+                        key={project.project_id}
+                      >
+                        <div className="donate-project-image">
                           <img
                             src={`http://localhost:3001/uploads/${project.image_path}`}
                             alt={project.project_name}
                             onError={(e) => {
                               e.target.src = "./image/default.jpg";
                             }}
+                            loading="lazy"
                           />
+                          <div className="donate-status-overlay">
+                            {getProjectStatusBadge(project)}
+                          </div>
                         </div>
-                        <div className="donate-discription">
-                          <div className="tag-date-container">
-                            <p className={`tagDonante ${project.donation_type || "default"}`}>
+
+                        <div className="donate-project-content">
+                          <div className="donate-project-header">
+                            <span
+                              className={`donate-tag ${project.donation_type || "default"}`}
+                              onClick={() => handleTagClick(project.donation_type)}
+                            >
                               {getFilterTitle(project.donation_type)}
-                            </p>
-                            <p className="donate-discription-date">{formattedStartDate} - {formattedEndDate}</p>
+                            </span>
+                            <small className="donate-project-date">
+                              <i className="far fa-calendar-alt me-1"></i>
+                              {formattedStartDate} - {formattedEndDate}
+                            </small>
                           </div>
 
-                          <div className="project-title">
-                            <h5><b>{truncateText(project.project_name, 60)}</b></h5>
-                          </div>
+                          <h5 className="donate-project-title">
+                            {truncateText(project.project_name, 60)}
+                          </h5>
 
-                          <div className="project-description">
-                            <p>{truncateText(project.description, 120)}</p>
-                          </div>
+                          <p className="donate-project-description">
+                            {truncateText(project.description, 120)}
+                          </p>
 
-                          <div className="progress-section">
-                            {(project.donation_type !== "unlimited" && project.donation_type !== "things") && (
-                              <>
-                                <div className="progress-text">{`${progress.toFixed(2)}%`}</div>
-                                <div className="progress-bar-container">
-                                  <div
-                                    className="progress-bar"
-                                    style={{ width: `${progress ? progress.toFixed(0) : 0}%` }}
-                                  >
-                                    <span className="progress-percent">
-                                      {`${progress ? progress.toFixed(0) : 0}%`}
-                                    </span>
+                          {/* Progress section */}
+                          <div className="donate-progress-section">
+                            {project.donation_type !== "unlimited" &&
+                              project.donation_type !== "things" &&
+                              project.target_amount > 0 ? (
+                              <div>
+                                <div className="d-flex justify-content-between align-items-center mb-2">
+                                  <small className="text-muted">ความคืบหน้า</small>
+                                  <span className="donate-progress-percentage">
+                                    {Math.round(progress)}%
+                                  </span>
+                                </div>
+                                <div className="bar">
+                                  <div className="progress-bar-container">
+                                    <div
+                                      className="progress-bar"
+                                      style={{ width: `${Math.min(progress, 100)}%` }}
+                                    ></div>
                                   </div>
                                 </div>
-                              </>
-                            )}
-                          </div>
-
-                          <div className="donate-details">
-                            <div className="details-amount1">
-                              <p>ยอดบริจาคปัจจุบัน:<br />
-                                <span className="details-amount-title">
-                                  {project.current_amount ? project.current_amount.toLocaleString() : "0"}
-                                </span> บาท
-                              </p>
-                            </div>
-                            <div className="details-amount2">
-                              {project.donation_type !== "unlimited" && project.donation_type !== "things" && project.target_amount > 0 && (
-                                <p>เป้าหมาย:<br />
-                                  <span className="details-amount-title">
-                                    {project.target_amount ? project.target_amount.toLocaleString() : "0"}
-                                  </span> บาท
-                                </p>
-                              )}
-                            </div>
-                          </div>
-
-                          <div className="donate-detail-discription-day">
-                            {endDate && now > endDate ? (
-                              <span className="expired">โครงการสิ้นสุดแล้ว</span>
+                              </div>
                             ) : (
-                              <span className="remaining">เหลืออีก {countDay} วัน</span>
+                              <div style={{ height: "52px" }}>{/* div เปล่าเพื่อรักษาความสูง */}</div>
+                            )}
+                          </div>
+
+                          {/* Amount details */}
+                          <div className="donate-amounts">
+                            <div className="donate-current-amount">
+                              <small>ยอดบริจาคปัจจุบัน:</small>
+                              <strong className="text-success">
+                                ฿{formatCurrency(project.current_amount || 0)}
+                              </strong>
+                            </div>
+
+                            {(project.donation_type !== "unlimited" &&
+                              project.donation_type !== "things" &&
+                              project.target_amount > 0) && (
+                                <div className="donate-target-amount">
+                                  <small>เป้าหมาย:</small>
+                                  <strong>
+                                    ฿{formatCurrency(project.target_amount || 0)}
+                                  </strong>
+                                </div>
+                              )}
+                          </div>
+
+                          {/* Days remaining */}
+                          <div className="donate-days-remaining">
+                            {isUpcoming ? (
+                              <span className="donate-upcoming">
+                                <FaRegClock className="me-1" />
+                                กำลังจะเริ่มในอีก {Math.ceil((startDate - now) / (1000 * 60 * 60 * 24))} วัน
+                              </span>
+                            ) : isExpired ? (
+                              <span className="donate-expired">
+                                <FaRegClock className="me-1" />
+                                โครงการสิ้นสุดแล้ว
+                              </span>
+                            ) : daysRemaining !== null ? (
+                              <span className={`donate-remaining ${daysRemaining <= 7 ? "warning" : "success"}`}>
+                                <FaRegClock className="me-1" />
+                                เหลืออีก {daysRemaining} วัน
+                              </span>
+                            ) : (
+                              <span className="text-muted">ไม่จำกัดเวลา</span>
                             )}
                           </div>
                         </div>
 
-                        <div className="button-container">
-                          <Link to={`/donate/donatedetail/${project.project_id}`}>
-                            <button className="donate-bt">
-                              ดูรายละเอียด
-                            </button>
-                          </Link>
+                        <div className="donate-project-footer">
+                          <button
+                            className={`btn donate-action-button ${isExpired
+                              ? "btn-detail"
+                              : isUpcoming
+                                ? "btn-secondary"
+                                : "btn-primary"
+                              } rounded-pill px-3`}
+                            disabled={isUpcoming}
+                            onClick={() => {
+                              if (!isUpcoming) {
+                                navigate(`/donate/donatedetail/${project.project_id}`);
+                              }
+                            }}
+                          >
+                            {isExpired
+                              ? "ดูรายละเอียด"
+                              : isUpcoming
+                                ? "กำลังจะเริ่ม"
+                                : <>
+                                  บริจาคเลย
+                                  <FaArrowRight className="ms-2" size={14} />
+                                </>
+                            }
+                          </button>
                         </div>
+
                       </div>
                     );
                   })}
                 </div>
               )}
             </div>
-            
+
             {/* Alternative: Bottom Section with Stats and Button */}
-              {filteredProjects.length > 0 && (
-                <div className="pt-3 border-top">
-                  <div className="row align-items-center">
-                    <div className="col-12 text-end">
-                      <a href="/donate" className="btn btn-outline-primary btn-sm">
-                        ดูโครงการทั้งหมด
-                      </a>
-                    </div>
+            {filteredProjects.length > 0 && (
+              <div className="pt-3 border-top">
+                <div className="row align-items-center">
+                  <div className="col-12 text-end">
+                    <a href="/donate" className="btn btn-outline-primary btn-sm">
+                      ดูโครงการทั้งหมด
+                    </a>
                   </div>
                 </div>
-              )}
+              </div>
+            )}
           </div>
         </ div>
 

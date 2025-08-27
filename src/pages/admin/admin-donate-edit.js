@@ -112,9 +112,9 @@ function AdminEditProject() {
 
     //ยกเลิก
     const handleCancel = () => {
-        if (window.confirm('คุณแน่ใจหรือไม่ที่จะยกเลิกการแก้ไข?')) {
+        // if (window.confirm('คุณแน่ใจหรือไม่ที่จะยกเลิกการแก้ไข?')) {
             navigate('/admin/donations');
-        }
+        // }
     };
 
     const handleSubmit = async (e) => {
@@ -220,51 +220,55 @@ function AdminEditProject() {
             <div className="row justify-content-center">
                 <div className="col-md-10">
                     <div className="card shadow">
+                        {/* Header */}
                         <div className="card-header bg-warning text-white">
                             <h4 className="mb-0">
-                                <i className="fas fa-edit"></i> แก้ไขโครงการ
+                                <i className="fas fa-edit me-2"></i> แก้ไขโครงการ
                             </h4>
                         </div>
+
                         <div className="card-body">
                             <form onSubmit={handleSubmit}>
-                                {/* รูปภาพปัจจุบันและเลือกใหม่ */}
-                                <div className="mb-3">
+                                {/* รูปภาพประกอบโครงการ */}
+                                <div className="mb-4">
                                     <label className="form-label">รูปภาพประกอบโครงการ</label>
                                     {imagePreview && (
-                                        <div className="mb-2">
+                                        <div className="mb-2 text-center">
                                             <img
                                                 src={imagePreview}
                                                 alt="Preview"
                                                 className="img-thumbnail"
                                                 style={{ maxHeight: '200px' }}
                                             />
-                                            <button
-                                                type="button"
-                                                className="btn btn-sm btn-danger mt-2"
-                                                onClick={handleRemoveImage}
-                                            >
-                                                ลบรูปภาพ
-                                            </button>
+                                            <div className="mt-2">
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-sm btn-danger"
+                                                    onClick={handleRemoveImage}
+                                                >
+                                                    ลบรูปภาพ
+                                                </button>
+                                            </div>
                                         </div>
                                     )}
                                     <input
                                         type="file"
-                                        className="form-control"
-                                        id="imageInput"
+                                        className="form-control w-100"
                                         accept="image/*"
                                         onChange={handleImageChange}
                                     />
                                 </div>
 
-                                <div className="row">
-                                    {/* ชื่อโครงการ */}
-                                    <div className="col-md-6 mb-3">
+
+                                {/* ชื่อโครงการ และ ประเภทการบริจาค */}
+                                <div className="row mb-3">
+                                    <div className="col-md-6">
                                         <label className="form-label">
                                             ชื่อโครงการ <span className="text-danger">*</span>
                                         </label>
                                         <input
                                             type="text"
-                                            className="form-control"
+                                            className="form-control w-100"
                                             name="project_name"
                                             value={formData.project_name}
                                             onChange={handleInputChange}
@@ -273,13 +277,12 @@ function AdminEditProject() {
                                         />
                                     </div>
 
-                                    {/* ประเภทการบริจาค */}
-                                    <div className="col-md-6 mb-3">
+                                    <div className="col-md-6">
                                         <label className="form-label">
                                             ประเภทการบริจาค <span className="text-danger">*</span>
                                         </label>
                                         <select
-                                            className="form-select"
+                                            className="form-select w-100 mt-2"
                                             name="donation_type"
                                             value={formData.donation_type}
                                             onChange={handleInputChange}
@@ -293,12 +296,12 @@ function AdminEditProject() {
                                 </div>
 
                                 {/* รายละเอียดโครงการ */}
-                                <div className="mb-3">
+                                <div className="mb-4">
                                     <label className="form-label">
                                         รายละเอียดโครงการ <span className="text-danger">*</span>
                                     </label>
                                     <textarea
-                                        className="form-control"
+                                        className="form-control w-100"
                                         name="description"
                                         rows="5"
                                         value={formData.description}
@@ -308,15 +311,15 @@ function AdminEditProject() {
                                     />
                                 </div>
 
-                                <div className="row">
-                                    {/* เป้าหมายเงิน */}
-                                    <div className="col-md-6 mb-3">
+                                {/* เป้าหมายเงินบริจาค และ ยอดปัจจุบัน */}
+                                <div className="row mb-3">
+                                    <div className="col-md-6">
                                         <label className="form-label">
                                             เป้าหมายเงินบริจาค (บาท) <span className="text-danger">*</span>
                                         </label>
                                         <input
                                             type="number"
-                                            className="form-control"
+                                            className="form-control w-100"
                                             name="target_amount"
                                             value={formData.target_amount}
                                             onChange={handleInputChange}
@@ -326,42 +329,35 @@ function AdminEditProject() {
                                         />
                                     </div>
 
-                                    {/* ยอดปัจจุบัน */}
-                                    <div className="col-md-6 mb-3">
-                                        <label className="form-label">
-                                            ยอดบริจาคปัจจุบัน (บาท)
-                                        </label>
+                                    <div className="col-md-6">
+                                        <label className="form-label">ยอดบริจาคปัจจุบัน (บาท)</label>
                                         <input
                                             type="number"
-                                            className="form-control"
+                                            className="form-control w-100"
                                             name="current_amount"
                                             value={formData.current_amount}
-                                            onChange={handleInputChange}
-                                            placeholder="ยอดบริจาคปัจจุบัน"
-                                            min="0"
                                             readOnly
+                                            min="0"
+                                            placeholder="ยอดบริจาคปัจจุบัน"
                                         />
                                     </div>
                                 </div>
 
-                                <div className="row">
-                                    {/* แสดงข้อความเตือนถ้าโครงการสิ้นสุดแล้ว */}
-                                    {formData.status === '3' && (
-                                        <div className="col-12 mb-3">
-                                            <div className="alert alert-warning">
-                                                โครงการนี้ได้สิ้นสุดลงแล้ว ไม่สามารถแก้ไขวันที่สิ้นสุดได้
-                                            </div>
-                                        </div>
-                                    )}
+                                {/* วันที่เริ่มต้นและวันที่สิ้นสุด */}
+                                {formData.status === '3' && (
+                                    <div className="alert alert-warning">
+                                        โครงการนี้ได้สิ้นสุดลงแล้ว ไม่สามารถแก้ไขวันที่สิ้นสุดได้
+                                    </div>
+                                )}
 
-                                    {/* วันที่เริ่มต้น */}
-                                    <div className="col-md-6 mb-3">
+                                <div className="row mb-3">
+                                    <div className="col-md-6">
                                         <label className="form-label">
                                             วันที่เริ่มต้น <span className="text-danger">*</span>
                                         </label>
                                         <input
                                             type="date"
-                                            className="form-control"
+                                            className="form-control w-100"
                                             name="start_date"
                                             value={formData.start_date}
                                             onChange={handleInputChange}
@@ -369,33 +365,31 @@ function AdminEditProject() {
                                         />
                                     </div>
 
-                                    {/* วันที่สิ้นสุด */}
-                                    <div className="col-md-6 mb-3">
+                                    <div className="col-md-6">
                                         <label className="form-label">
                                             วันที่สิ้นสุด <span className="text-danger">*</span>
                                         </label>
                                         <input
                                             type="date"
-                                            className="form-control"
+                                            className="form-control w-100"
                                             name="end_date"
                                             value={formData.end_date}
                                             onChange={handleInputChange}
                                             required
-                                            disabled={formData.status === '3'} // ปิดการแก้ไข
+                                            disabled={formData.status === '3'}
                                         />
                                     </div>
                                 </div>
 
-
                                 {/* ข้อมูลธนาคาร */}
-                                <div className="row">
-                                    <div className="col-md-6 mb-3">
+                                <div className="row mb-3">
+                                    <div className="col-md-6">
                                         <label className="form-label">
                                             ชื่อธนาคาร <span className="text-danger">*</span>
                                         </label>
                                         <input
                                             type="text"
-                                            className="form-control"
+                                            className="form-control w-100"
                                             name="bank_name"
                                             value={formData.bank_name}
                                             onChange={handleInputChange}
@@ -404,13 +398,13 @@ function AdminEditProject() {
                                         />
                                     </div>
 
-                                    <div className="col-md-6 mb-3">
+                                    <div className="col-md-6">
                                         <label className="form-label">
                                             เลขบัญชี <span className="text-danger">*</span>
                                         </label>
                                         <input
                                             type="text"
-                                            className="form-control"
+                                            className="form-control w-100"
                                             name="account_number"
                                             value={formData.account_number}
                                             onChange={handleInputChange}
@@ -420,14 +414,12 @@ function AdminEditProject() {
                                     </div>
                                 </div>
 
-                                {/* หมายเลข PromptPay */}
-                                <div className="mb-3">
-                                    <label className="form-label">
-                                        หมายเลข PromptPay
-                                    </label>
+                                {/* PromptPay */}
+                                <div className="mb-4">
+                                    <label className="form-label">หมายเลข PromptPay</label>
                                     <input
                                         type="text"
-                                        className="form-control"
+                                        className="form-control w-50"
                                         name="number_promtpay"
                                         value={formData.number_promtpay}
                                         onChange={handleInputChange}
@@ -435,36 +427,17 @@ function AdminEditProject() {
                                     />
                                 </div>
 
-                                {/* สถานะโครงการ */}
-                                {/* <div className="mb-3">
-                                    <label className="form-label">สถานะโครงการ</label>
-                                    <select
-                                        className="form-select"
-                                        name="status"
-                                        value={formData.status}
-                                        onChange={handleInputChange}
-                                        required
-                                    >
-                                        <option value="0">ยังไม่อนุมัติ</option>
-                                        <option value="1">อนุมัติแล้ว</option>
-                                        <option value="3">สิ้นสุด</option>
-                                    </select>
-                                </div> */}
-
                                 {/* ปุ่มจัดการ */}
-                                <div className="d-flex gap-2 justify-content-end">
+                                <div className="d-flex justify-content-end gap-2">
                                     <button
                                         type="button"
                                         className="btn btn-secondary"
                                         onClick={handleCancel}
                                     >
-                                        <i className="fas fa-times"></i> ยกเลิก
+                                        ยกเลิก
                                     </button>
-                                    <button
-                                        type="submit"
-                                        className="btn btn-success"
-                                    >
-                                        <i className="fas fa-save"></i> บันทึกการแก้ไข
+                                    <button type="submit" className="btn btn-success">
+                                        บันทึกการแก้ไข
                                     </button>
                                 </div>
                             </form>
@@ -474,6 +447,7 @@ function AdminEditProject() {
             </div>
         </div>
     );
+
 }
 
 export default AdminEditProject;

@@ -53,6 +53,15 @@ function WebboardDetail() {
         }
     };
 
+    const formatDate = (dateStr) => {
+        if (!dateStr || dateStr === "0000-00-00") return "ไม่ระบุวันที่";
+        const date = new Date(dateStr);
+        const day = date.getDate();
+        const month = date.getMonth() + 1; // เดือนเป็นเลข
+        const year = date.getFullYear() + 543; // ปีไทย
+        return `${day}/${month}/${year}`;
+    };
+
     if (loading) {
         return <p className="text-center mt-5">กำลังโหลดข้อมูล...</p>;
     }
@@ -60,6 +69,7 @@ function WebboardDetail() {
     if (!post) {
         return <p className="text-center mt-5">ไม่พบข้อมูลกระทู้</p>;
     }
+
 
     return (
         <div className="webboard-container p-5">
@@ -69,7 +79,7 @@ function WebboardDetail() {
                     <p className="card-text text-muted">
                         หมวดหมู่: <strong>{post.category_name || "ไม่ระบุหมวดหมู่"}</strong> <br />
                         จากคุณ {post.full_name || "ไม่ระบุชื่อ"} <br />
-                        วันที่โพสต์: {new Date(post.created_at).toLocaleDateString()}
+                        วันที่โพสต์: {formatDate(post.created_at)}
                     </p>
                     <p className="card-text">{post.content}</p>
                 </div>
@@ -87,7 +97,7 @@ function WebboardDetail() {
                             <div>
                                 <h6 className="fw-bold mb-1">{comment.full_name || "ไม่ระบุชื่อ"}</h6>
                                 <p className="mb-1">{comment.comment_detail}</p>
-                                <small className="text-muted">วันที่: {new Date(comment.created_at).toLocaleDateString()}</small>
+                                <small className="text-muted">วันที่: {formatDate(comment.created_at)}</small>
                             </div>
                         </div>
                         <button

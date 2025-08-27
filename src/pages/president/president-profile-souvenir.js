@@ -27,6 +27,12 @@ function PresidentProfileSouvenir() {
     const [isUploading, setIsUploading] = useState(false);
     const userId = localStorage.getItem("userId");
 
+    // สำหรับฟังก์ชันอัปโหลดหลักฐานการสั่งซื้อ
+    const [showProofModal, setShowProofModal] = useState(false);
+    const [proofFile, setProofFile] = useState(null);
+    const [proofOrderId, setProofOrderId] = useState(null);
+    const [isProofUploading, setIsProofUploading] = useState(false);
+
     // ดึงข้อมูลโปรไฟล์
     useEffect(() => {
         axios.get('http://localhost:3001/users/profile', { withCredentials: true })
@@ -56,39 +62,97 @@ function PresidentProfileSouvenir() {
         }
     }, [userId]);
 
-    const confirmReceived = async (orderId) => {
-        try {
-            const res = await axios.put(`/api/orders-confirm/${orderId}`);
-            if (res.data && res.data.success) {
-                await Swal.fire({
-                    icon: 'success',
-                    title: 'ยืนยันสำเร็จ',
-                    text: 'คำสั่งซื้อของคุณ "จัดส่งสำเร็จ" แล้ว',
-                    confirmButtonText: 'ตกลง'
-                });
-                // อัปเดตสถานะในหน้าเว็บ (refresh order history)
-                setOrderHistory(prev =>
-                    prev.map(order =>
-                        order.order_id === orderId
-                            ? { ...order, order_status: "delivered" }
-                            : order
-                    )
+    // const confirmReceived = async (orderId) => {
+    //     try {
+    //         const res = await axios.put(`/api/orders-confirm/${orderId}`);
+    //         if (res.data && res.data.success) {
+    //             await Swal.fire({
+    //                 icon: 'success',
+    //                 title: 'ยืนยันสำเร็จ',
+    //                 text: 'คำสั่งซื้อของคุณ "จัดส่งสำเร็จ" แล้ว',
+    //                 confirmButtonText: 'ตกลง'
+    //             });
+    //             // อัปเดตสถานะในหน้าเว็บ (refresh order history)
+    //             setOrderHistory(prev =>
+    //                 prev.map(order =>
+    //                     order.order_id === orderId
+    //                         ? { ...order, order_status: "delivered" }
+    //                         : order
+    //                 )
+    //             );
+    //         } else {
+    //             Swal.fire({
+    //                 icon: 'error',
+    //                 title: 'เกิดข้อผิดพลาด',
+    //                 text: res.data?.message || 'ไม่สามารถยืนยันได้',
+    //             });
+    //         }
+    //     } catch (err) {
+    //         Swal.fire({
+    //             icon: 'error',
+    //             title: 'เกิดข้อผิดพลาด',
+    //             text: 'ไม่สามารถยืนยันได้',
+    //         });
+    //     }
+    // };
+
+    const handleConfirmReceived = (orderId) => {
+            setProofOrderId(orderId);
+            setShowProofModal(true);
+        };
+    
+        // อัปโหลดหลักฐาน
+        const handleProofFileChange = (e) => {
+            setProofFile(e.target.files[0]);
+        };
+    
+        const handleProofSubmit = async (e) => {
+            if (!proofFile) return;
+            setIsProofUploading(true);
+    
+            try {
+                const formData = new FormData();
+                formData.append("proofImage", proofFile);
+    
+                const res = await axios.post(
+                    `http://localhost:3001/orders/${proofOrderId}/upload-proof`,
+                    formData,
+                    { headers: { "Content-Type": "multipart/form-data" } }
                 );
-            } else {
+    
+                if (res.data && res.data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'อัปโหลดหลักฐานสำเร็จ',
+                        text: 'สินค้าของคุณจัดส่งสำเร็จแล้ว',
+                        confirmButtonText: 'ตกลง'
+                    });
+                    setOrderHistory(prev =>
+                        prev.map(order =>
+                            order.order_id === proofOrderId
+                                ? { ...order, order_status: "delivered" }
+                                : order
+                        )
+                    );
+                    setShowProofModal(false);
+                    setProofFile(null);
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'เกิดข้อผิดพลาด',
+                        text: res.data?.message || 'ไม่สามารถอัปโหลดหลักฐานได้',
+                    });
+                }
+            } catch (err) {
                 Swal.fire({
                     icon: 'error',
                     title: 'เกิดข้อผิดพลาด',
-                    text: res.data?.message || 'ไม่สามารถยืนยันได้',
+                    text: 'ไม่สามารถอัปโหลดหลักฐานได้',
                 });
+            } finally {
+                setIsProofUploading(false);
             }
-        } catch (err) {
-            Swal.fire({
-                icon: 'error',
-                title: 'เกิดข้อผิดพลาด',
-                text: 'ไม่สามารถยืนยันได้',
-            });
-        }
-    };
+        };
 
     const reuploadSlip = (orderId) => {
         // เปิด modal
@@ -124,7 +188,7 @@ function PresidentProfileSouvenir() {
                 showConfirmButton: false,
             });
 
-            // ✅ อัปเดต state ทันทีโดยใช้ค่าจาก backend
+            //อัปเดต state ทันทีโดยใช้ค่าจาก backend
             setOrders(prevOrders =>
                 prevOrders.map(order =>
                     order.order_id === currentOrderId
@@ -249,6 +313,15 @@ function PresidentProfileSouvenir() {
         }
     };
 
+    const formatDate = (dateStr) => {
+        if (!dateStr || dateStr === "0000-00-00") return "ไม่ระบุวันที่";
+        const date = new Date(dateStr);
+        const day = date.getDate();
+        const month = date.getMonth() + 1; // เดือนเป็นเลข
+        const year = date.getFullYear() + 543; // ปีไทย
+        return `${day}/${month}/${year}`;
+    };
+
     if (loading) {
         return <div className="loading-container">กำลังโหลด...</div>;
     }
@@ -348,11 +421,9 @@ function PresidentProfileSouvenir() {
                                                 <h6 className="fw-bold mb-1">รหัสคำสั่งซื้อ #{order.order_id}</h6>
                                                 <small className="text-muted">
                                                     วันที่:{" "}
-                                                    {new Date(order.order_date).toLocaleDateString("th-TH", {
-                                                        year: "numeric",
-                                                        month: "short",
-                                                        day: "numeric",
-                                                    })}
+                                                    {order.order_date
+                                                        ? `${formatDate(order.order_date)}`
+                                                        : "-"}
                                                 </small>
                                             </div>
                                             <div className="d-flex flex-column flex-md-row align-items-md-center gap-2">
@@ -402,11 +473,9 @@ function PresidentProfileSouvenir() {
                                                     <div className="col-md-6 mb-2">
                                                         <small className="text-muted d-block">วันที่สั่งซื้อ</small>
                                                         <span className="fw-semibold">
-                                                            {new Date(order.order_date).toLocaleDateString("th-TH", {
-                                                                year: "numeric",
-                                                                month: "short",
-                                                                day: "numeric",
-                                                            })}
+                                                            {order.order_date
+                                                                ? `${formatDate(order.order_date)}`
+                                                                : "ยังไม่ทราบวันที่สั่งซื้อ"}
                                                         </span>
                                                     </div>
                                                     <div className="col-md-6 mb-2">
@@ -493,7 +562,7 @@ function PresidentProfileSouvenir() {
                                                     {order.order_status === "shipping" && (
                                                         <button
                                                             className="btn btn-success btn-sm px-3"
-                                                            onClick={() => confirmReceived(order.order_id)}
+                                                            onClick={() => handleConfirmReceived(order.order_id)}
                                                         >
                                                             ยืนยันได้รับสินค้าแล้ว
                                                         </button>
@@ -503,7 +572,7 @@ function PresidentProfileSouvenir() {
                                                         {order.order_status === "cancelled" && (
                                                             <button
                                                                 className="btn btn-warning btn-sm px-3"
-                                                                onClick={() => reuploadSlip(order.order_id)}
+                                                                onClick={() => setShowUploadModal(true)}
                                                             >
                                                                 อัปโหลดสลิปใหม่
                                                             </button>
@@ -522,7 +591,7 @@ function PresidentProfileSouvenir() {
                                                                         <button
                                                                             type="button"
                                                                             className="close-btn"
-                                                                            onClick={() => setShowUploadModal(false)}
+                                                                            onClick={() => reuploadSlip(order.order_id)}
                                                                         >
                                                                             ✕
                                                                         </button>
@@ -565,6 +634,7 @@ function PresidentProfileSouvenir() {
                                                                                 {/* ปุ่มกากบาท */}
                                                                                 <button
                                                                                     type="button"
+                                                                                    className="btn-close"
                                                                                     aria-label="Close"
                                                                                     style={{
                                                                                         position: "absolute",
@@ -573,18 +643,12 @@ function PresidentProfileSouvenir() {
                                                                                         background: "white",
                                                                                         borderRadius: "50%",
                                                                                         padding: "4px",
-                                                                                        boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
-                                                                                        border: "none",
-                                                                                        display: "flex",
-                                                                                        alignItems: "center",
-                                                                                        justifyContent: "center",
-                                                                                        cursor: "pointer"
+                                                                                        boxShadow: "0 1px 3px rgba(0,0,0,0.2)"
                                                                                     }}
                                                                                     onClick={() => setSelectedFile(null)}
                                                                                 >
                                                                                     <MdClose size={18} />
                                                                                 </button>
-
 
                                                                                 <div className="d-flex align-items-center gap-2">
                                                                                     <div className="file-icon" style={{ fontSize: "1.5rem" }}>
@@ -635,7 +699,7 @@ function PresidentProfileSouvenir() {
                                                             className="btn btn-primary btn-sm px-3"
                                                             onClick={() => buyAgain(order.order_id)}
                                                         >
-                                                        ซื้ออีกครั้ง
+                                                            ซื้ออีกครั้ง
                                                         </button>
                                                     )}
                                                 </div>
@@ -649,6 +713,37 @@ function PresidentProfileSouvenir() {
                     </div>
                 </div>
             </div>
+
+            {/* Modal อัปโหลดหลักฐาน */}
+            {showProofModal && (
+                <div className="modal-backdrop" onClick={e => { if (e.target.classList.contains("modal-backdrop")) setShowProofModal(false); }}>
+                    <div className="modal-reupload">
+                        <div className="modal-header">
+                            <h5 className="modal-title">อัปโหลดหลักฐานการได้รับสินค้า</h5>
+                            <button type="button" className="close-btn" onClick={() => setShowProofModal(false)}>✕</button>
+                        </div>
+                        <div className="modal-body">
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleProofFileChange}
+                                disabled={isProofUploading}
+                            />
+                            {proofFile && (
+                                <div className="mt-3">
+                                    <img src={URL.createObjectURL(proofFile)} alt="proof" style={{ maxWidth: "100%", maxHeight: "200px" }} />
+                                </div>
+                            )}
+                        </div>
+                        <div className="modal-footer">
+                            <button type="button" className="btn btn-secondary" onClick={() => setShowProofModal(false)} disabled={isProofUploading}>ยกเลิก</button>
+                            <button type="button" className="btn btn-primary" onClick={handleProofSubmit} disabled={!proofFile || isProofUploading}>
+                                {isProofUploading ? "กำลังอัปโหลด..." : "อัปโหลด"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </section>
     );
 }
