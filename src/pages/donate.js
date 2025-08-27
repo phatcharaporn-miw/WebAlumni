@@ -1,10 +1,14 @@
 import React, { useEffect, useState, useMemo } from "react";
 import "../css/Donate.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import Swal from "sweetalert2";
+import { FaSearch, FaRegClock, FaArrowRight, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { IoIosAddCircleOutline } from "react-icons/io";
+import { FaPlus } from "react-icons/fa";
+import { AiOutlineClose } from "react-icons/ai";
+import { IoTimeOutline } from "react-icons/io5";
+import { useNavigate } from "react-router-dom";
 
 function Donate() {
     const [projects, setProjects] = useState([]);
@@ -13,9 +17,9 @@ function Donate() {
     const [searchTerm, setSearchTerm] = useState("");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
-    // Pagination
     const [currentPage, setCurrentPage] = useState(1);
+
+    const navigate = useNavigate();
     const projectsPerPage = 6;
 
     useEffect(() => {
@@ -23,8 +27,8 @@ function Donate() {
             try {
                 setLoading(true);
                 setError(null);
-                const response = await axios.get("http://localhost:3001/donate");
-                setProjects(response.data);
+                const response = await axios.get("http://localhost:3001/donate/donate");
+                setProjects(response.data || []);
             } catch (err) {
                 console.error("เกิดข้อผิดพลาดในการดึงข้อมูล:", err);
                 setError("ไม่สามารถโหลดข้อมูลโครงการได้ กรุณาลองใหม่อีกครั้ง");
@@ -32,7 +36,6 @@ function Donate() {
                 setLoading(false);
             }
         };
-
         fetchProjects();
     }, []);
 
@@ -73,14 +76,13 @@ function Donate() {
         setCurrentPage(1);
     };
 
-    // กรองข้อมูล
+    // Filter projects
     const filteredProjects = useMemo(() => {
         return projects.filter((project) => {
             const now = new Date();
             const endDate = project?.end_date ? new Date(project.end_date) : null;
 
             if (filter !== "all" && project.donation_type !== filter) return false;
-
             if (filterStatus === "active" && endDate && now > endDate) return false;
             if (filterStatus === "expired" && endDate && now <= endDate) return false;
 
@@ -107,16 +109,12 @@ function Donate() {
     };
 
     const getFilterTitle = (donationType) => {
-        switch (donationType) {
-            case "fundraising":
-                return "บริจาคแบบระดมทุน";
-            case "unlimited":
-                return "บริจาคแบบไม่จำกัดจำนวน";
-            case "things":
-                return "บริจาคสิ่งของ";
-            default:
-                return "โครงการบริจาคทั้งหมด";
-        }
+        const titles = {
+            "fundraising": "บริจาคแบบระดมทุน",
+            "unlimited": "บริจาคแบบไม่จำกัดจำนวน",
+            "things": "บริจาคสิ่งของ",
+        };
+        return titles[donationType] || "โครงการบริจาคทั้งหมด";
     };
 
     const truncateText = (text, maxLength) => {
@@ -131,15 +129,15 @@ function Donate() {
         if (!endDate) return null;
 
         if (now > endDate) {
-            return <span className="badge badge-danger">สิ้นสุดแล้ว</span>;
+            return <span className="donate-badge donate-badge-expired">สิ้นสุดแล้ว</span>;
         }
 
         const daysRemaining = calculateDaysRemaining(endDate);
         if (daysRemaining <= 5) {
-            return <span className="badge badge-warning">ใกล้สิ้นสุด</span>;
+            return <span className="donate-badge donate-badge-warning">ใกล้สิ้นสุด</span>;
         }
 
-        return <span className="badge badge-success">กำลังดำเนินการ</span>;
+        return <span className="donate-badge donate-badge-active">กำลังดำเนินการ</span>;
     };
 
     const handleTagClick = (type) => {
@@ -147,22 +145,9 @@ function Donate() {
         setCurrentPage(1);
     };
 
-    // Loading state
-    if (loading) {
-        return (
-            <div className="text-center" style={{ padding: "100px" }}>
-                <div className="spinner-border text-primary" role="status">
-                    <span className="visually-hidden">กำลังโหลด...</span>
-                </div>
-                <p className="mt-3">กำลังโหลดโครงการ...</p>
-            </div>
-        );
-    }
-
-    // Error state
     if (error) {
         return (
-            <div className="alert alert-danger text-center" style={{ margin: "50px" }}>
+            <div className="donate-error">
                 <i className="fas fa-exclamation-triangle fa-2x mb-3"></i>
                 <h5>เกิดข้อผิดพลาด</h5>
                 <p>{error}</p>
@@ -177,21 +162,18 @@ function Donate() {
     }
 
     return (
-        <div>
-            <img src="./image/donation (1).jpg" className="head-donate" alt="donation-image" />
-            <div className="content-donate">
+        <div className="donate-page">
+            <img src="./image/donation (1).jpg" className="donate-header-image" alt="donation" />
 
-                {/* Filter */}
-                <div className="donate-filter">
-                    <div className="row g-3 align-items-stretch mt-0">
-                        {/* ช่องค้นหา */}
-                        <div className="col-12 col-md-4 d-flex flex-column h-100">
-                            <label htmlFor="search" className="form-label">
-                                ค้นหาโครงการ:
-                            </label>
+            <div className="donate-content-wrapper">
+                {/* Filters */}
+                <div className="donate-filters">
+                    <div className="row g-3">
+                        <div className="col-md-4">
+                            <label htmlFor="search" className="form-label">ค้นหาโครงการ:</label>
                             <div className="input-group">
                                 <span className="input-group-text">
-                                    <i className="fas fa-search"></i>
+                                    <FaSearch />
                                 </span>
                                 <input
                                     type="text"
@@ -200,37 +182,30 @@ function Donate() {
                                     placeholder="ค้นหาชื่อโครงการหรือรายละเอียด..."
                                     value={searchTerm}
                                     onChange={handleSearchChange}
-                                    aria-label="ค้นหาโครงการ"
                                 />
                             </div>
                         </div>
 
-                        {/* ช่องประเภทการบริจาค */}
-                        <div className="col-12 col-md-3 d-flex flex-column h-100">
-                            <label htmlFor="donation-type" className="form-label">
-                                ประเภทการบริจาค:
-                            </label>
+                        <div className="col-md-3">
+                            <label htmlFor="donation-type" className="form-label">ประเภทการบริจาค:</label>
                             <select
                                 id="donation-type"
-                                className="form-select filter-select"
+                                className="form-select"
                                 value={filter}
                                 onChange={handleFilterTypeChange}
                             >
-                                <option value="all">โครงการบริจาคทั้งหมด</option>
+                                <option value="all">โครงการทั้งหมด</option>
                                 <option value="fundraising">บริจาคแบบระดมทุน</option>
                                 <option value="unlimited">บริจาคแบบไม่จำกัดจำนวน</option>
                                 <option value="things">บริจาคสิ่งของ</option>
                             </select>
                         </div>
 
-                        {/* ช่องสถานะกิจกรรม */}
-                        <div className="col-12 col-md-3 d-flex flex-column h-100">
-                            <label htmlFor="status-filter" className="form-label">
-                                สถานะกิจกรรม:
-                            </label>
+                        <div className="col-md-3">
+                            <label htmlFor="status-filter" className="form-label">สถานะกิจกรรม:</label>
                             <select
                                 id="status-filter"
-                                className="form-select filter-select"
+                                className="form-select"
                                 value={filterStatus}
                                 onChange={handleFilterChange}
                             >
@@ -240,270 +215,261 @@ function Donate() {
                             </select>
                         </div>
 
-                        {/* ช่องปุ่มล้าง */}
-                        <div className="col-12 col-md-2 d-flex flex-column h-100">
-                            {/* invisible label เพื่อให้ความสูงเท่าช่องอื่น */}
+                        <div className="col-md-2 d-flex flex-column">
                             <label className="form-label invisible">ล้าง</label>
                             <button
-                                className="btn btn-outline-secondary w-100"
+                                className="btn btn-outline-secondary"
                                 onClick={handleClearFilters}
                                 title="ล้างตัวกรอง"
                             >
-                                <i className="fas fa-times me-1"></i>
-                                ล้าง
+                                <AiOutlineClose />ล้าง
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <div className="donate-request">
-                    <Link to={`/donaterequest`}>
-                        <button className="donate-bt-request">
-                            <i className="fas fa-plus me-2"></i>
+                {/* Create donation button */}
+                <div className="donate-create-button-wrapper">
+                    <Link to="/donate/donaterequest">
+                        <button className="donate-create-button">
+                            <FaPlus className="me-2" />
                             สร้างการบริจาค
                         </button>
                     </Link>
                 </div>
 
-                <div className="results-summary">
-                    <p className="text-muted">
-                        แสดง {currentProjects.length} จาก {filteredProjects.length} โครงการ
-                        {searchTerm && ` (ค้นหา: "${searchTerm}")`}
-                    </p>
-                </div>
-            </div>
+                <h2 className="donate-title">
+                    {getFilterTitle(filter)} {filteredProjects.length > 0 && `(${filteredProjects.length})`}
+                </h2>
 
-            <h3 id="title-donate">
-                {getFilterTitle(filter)} {filteredProjects.length > 0 && `(${filteredProjects.length})`}
-            </h3>
-
-            <div className="donate-content">
-                {filteredProjects.length === 0 ? (
-                    <div className="no-projects text-center" style={{ padding: "50px" }}>
-                        <i className="fas fa-search fa-3x text-muted mb-3"></i>
-                        <h5>ไม่พบโครงการที่ตรงกับเงื่อนไข</h5>
-                        <p className="text-muted">
-                            {searchTerm
-                                ? `ไม่พบโครงการที่ตรงกับคำค้นหา "${searchTerm}"`
-                                : "ไม่มีโครงการบริจาคในขณะนี้"}
-                        </p>
-                        {(filter !== "all" || filterStatus !== "all" || searchTerm) && (
-                            <button
-                                className="btn btn-primary mt-3"
-                                onClick={handleClearFilters}
-                            >
-                                แสดงโครงการทั้งหมด
-                            </button>
-                        )}
-                    </div>
-                ) : (
-                    <>
-                        <div className="donate-content-grid">
-                            {currentProjects.map((project) => {
-                                const now = new Date();
-                                const startDate = project?.start_date ? new Date(project.start_date) : null;
-                                const endDate = project?.end_date ? new Date(project.end_date) : null;
-                                const formattedStartDate = startDate?.toLocaleDateString("th-TH") || "-";
-                                const formattedEndDate = endDate?.toLocaleDateString("th-TH") || "-";
-                                const progress =
-                                    project.target_amount > 0
+                <div className="donate-projects-container">
+                    {filteredProjects.length === 0 ? (
+                        <div className="donate-no-projects">
+                            <i className="fas fa-search fa-3x text-muted mb-3"></i>
+                            <h5>ไม่พบโครงการที่ตรงกับเงื่อนไข</h5>
+                            <p className="text-muted">
+                                {searchTerm
+                                    ? `ไม่พบโครงการที่ตรงกับคำค้นหา "${searchTerm}"`
+                                    : "ไม่มีโครงการบริจาคในขณะนี้"}
+                            </p>
+                            {(filter !== "all" || filterStatus !== "all" || searchTerm) && (
+                                <button
+                                    className="btn btn-primary mt-3"
+                                    onClick={handleClearFilters}
+                                >
+                                    แสดงโครงการทั้งหมด
+                                </button>
+                            )}
+                        </div>
+                    ) : (
+                        <>
+                            <div className="donate-projects-grid">
+                                {currentProjects.map((project) => {
+                                    const now = new Date();
+                                    const startDate = project?.start_date ? new Date(project.start_date) : null;
+                                    const endDate = project?.end_date ? new Date(project.end_date) : null;
+                                    const formattedStartDate = startDate?.toLocaleDateString("th-TH") || "-";
+                                    const formattedEndDate = endDate?.toLocaleDateString("th-TH") || "-";
+                                    const progress = project.target_amount > 0
                                         ? (project.current_amount / project.target_amount) * 100
                                         : 0;
-                                const daysRemaining = calculateDaysRemaining(endDate);
-                                const isExpired = endDate && now > endDate;
-                                const isUpcoming = startDate && now < startDate;
+                                    const daysRemaining = calculateDaysRemaining(endDate);
+                                    const isExpired = endDate && now > endDate;
+                                    const isUpcoming = startDate && now < startDate;
 
-                                return (
-                                    <div
-                                        className={`item-detail ${isExpired ? "expired-project" : ""}`}
-                                        key={project.project_id}
-                                    >
-                                        <div className="image-frame">
-                                            <img
-                                                src={`http://localhost:3001/uploads/${project.image_path}`}
-                                                alt={project.project_name}
-                                                onError={(e) => {
-                                                    e.target.src = "./image/default.jpg";
-                                                }}
-                                                loading="lazy"
-                                            />
-                                            <div className="status-badge-overlay">
-                                                {getProjectStatusBadge(project)}
-                                            </div>
-                                        </div>
-
-                                        <div className="donate-discription">
-                                            <div className="tag-date-container">
-                                                <p
-                                                    className={`tagDonante ${project.donation_type || "default"}`}
-                                                    onClick={() => handleTagClick(project.donation_type)}
-                                                    style={{ cursor: "pointer" }}
-                                                >
-                                                    {getFilterTitle(project.donation_type)}
-                                                </p>
+                                    return (
+                                        <div
+                                            className={`donate-project-card ${isExpired ? "expired" : ""}`}
+                                            key={project.project_id}
+                                        >
+                                            <div className="donate-project-image">
+                                                <img
+                                                    src={`http://localhost:3001/uploads/${project.image_path}`}
+                                                    alt={project.project_name}
+                                                    onError={(e) => {
+                                                        e.target.src = "./image/default.jpg";
+                                                    }}
+                                                    loading="lazy"
+                                                />
+                                                <div className="donate-status-overlay">
+                                                    {getProjectStatusBadge(project)}
+                                                </div>
                                             </div>
 
-                                            <p className="donate-discription-date">
-                                                <i className="far fa-calendar-alt me-1"></i>
-                                                {formattedStartDate} - {formattedEndDate}
-                                            </p>
+                                            <div className="donate-project-content">
+                                                <div className="donate-project-header">
+                                                    <span
+                                                        className={`donate-tag ${project.donation_type || "default"}`}
+                                                        onClick={() => handleTagClick(project.donation_type)}
+                                                    >
+                                                        {getFilterTitle(project.donation_type)}
+                                                    </span>
+                                                    <small className="donate-project-date">
+                                                        <i className="far fa-calendar-alt me-1"></i>
+                                                        {formattedStartDate} - {formattedEndDate}
+                                                    </small>
+                                                </div>
 
-                                            <div className="project-title">
-                                                <h5>
-                                                    <b>{truncateText(project.project_name, 60)}</b>
+                                                <h5 className="donate-project-title">
+                                                    {truncateText(project.project_name, 60)}
                                                 </h5>
-                                            </div>
 
-                                            <div className="project-description">
-                                                <p>{truncateText(project.description, 120)}</p>
-                                            </div>
+                                                <p className="donate-project-description">
+                                                    {truncateText(project.description, 120)}
+                                                </p>
 
-                                            {/* Progress */}
-                                            {/* Progress */}
-                                            <div className="progress-section">
-                                                {project.donation_type !== "unlimited" &&
-                                                    project.donation_type !== "things" &&
-                                                    project.target_amount > 0 && (
-                                                        <>
-                                                            {/** แสดง progress เป็นจำนวนเต็ม */}
-                                                            <div className="progress-info d-flex justify-content-between align-items-center mb-2">
+                                                {/* Progress section */}
+                                                <div className="donate-progress-section">
+                                                    {project.donation_type !== "unlimited" &&
+                                                        project.donation_type !== "things" &&
+                                                        project.target_amount > 0 ? (
+                                                        <div>
+                                                            <div className="d-flex justify-content-between align-items-center mb-2">
                                                                 <small className="text-muted">ความคืบหน้า</small>
-                                                                <span className="progress-percentage font-weight-bold">
+                                                                <span className="donate-progress-percentage">
                                                                     {Math.round(progress)}%
                                                                 </span>
                                                             </div>
-                                                            <div className="progress mb-2" style={{ height: "8px" }}>
-                                                                <div
-                                                                    className="progress-bar bg-primary"
-                                                                    role="progressbar"
-                                                                    style={{ width: `${Math.min(Math.round(progress), 100)}%` }}
-                                                                    aria-valuenow={Math.round(progress)}
-                                                                    aria-valuemin="0"
-                                                                    aria-valuemax="100"
-                                                                ></div>
+                                                            <div className="bar">
+                                                                <div className="progress-bar-container">
+                                                                    <div
+                                                                        className="progress-bar"
+                                                                        style={{ width: `${Math.min(progress, 100)}%` }}
+                                                                    ></div>
+                                                                </div>
                                                             </div>
-                                                        </>
+                                                        </div>
+                                                    ) : (
+                                                        <div style={{ height: "52px" }}>{/* div เปล่าเพื่อรักษาความสูง */}</div>
                                                     )}
-                                            </div>
-
-                                            <div className="donate-details d-flex">
-                                                <div className={`details-amount1 ${project.donation_type === "unlimited" || project.donation_type === "things" || !project.target_amount ? "full-width" : ""}`}>
-                                                    <p>
-                                                        <small className="text-muted">ยอดบริจาคปัจจุบัน:</small>
-                                                        <br />
-                                                        <span className="details-amount-title text-success">
-                                                            ฿{formatCurrency(project.current_amount || 0)}
-                                                        </span>
-                                                    </p>
                                                 </div>
 
-                                                {(project.donation_type !== "unlimited" && project.donation_type !== "things" && project.target_amount > 0) && (
-                                                    <div className="details-amount2">
-                                                        <p>
-                                                            <small className="text-muted">เป้าหมาย:</small>
-                                                            <br />
-                                                            <span className="details-amount-title">
-                                                                ฿{formatCurrency(project.target_amount || 0)}
-                                                            </span>
-                                                        </p>
+                                                {/* Amount details */}
+                                                <div className="donate-amounts">
+                                                    <div className="donate-current-amount">
+                                                        <small>ยอดบริจาคปัจจุบัน:</small>
+                                                        <strong className="text-success">
+                                                            ฿{formatCurrency(project.current_amount || 0)}
+                                                        </strong>
                                                     </div>
-                                                )}
+
+                                                    {(project.donation_type !== "unlimited" &&
+                                                        project.donation_type !== "things" &&
+                                                        project.target_amount > 0) && (
+                                                            <div className="donate-target-amount">
+                                                                <small>เป้าหมาย:</small>
+                                                                <strong>
+                                                                    ฿{formatCurrency(project.target_amount || 0)}
+                                                                </strong>
+                                                            </div>
+                                                        )}
+                                                </div>
+
+                                                {/* Days remaining */}
+                                                <div className="donate-days-remaining">
+                                                    {isUpcoming ? (
+                                                        <span className="donate-upcoming">
+                                                            <FaRegClock className="me-1" />
+                                                            กำลังจะเริ่มในอีก {Math.ceil((startDate - now) / (1000 * 60 * 60 * 24))} วัน
+                                                        </span>
+                                                    ) : isExpired ? (
+                                                        <span className="donate-expired">
+                                                            <FaRegClock className="me-1" />
+                                                            โครงการสิ้นสุดแล้ว
+                                                        </span>
+                                                    ) : daysRemaining !== null ? (
+                                                        <span className={`donate-remaining ${daysRemaining <= 7 ? "warning" : "success"}`}>
+                                                            <FaRegClock className="me-1" />
+                                                            เหลืออีก {daysRemaining} วัน
+                                                        </span>
+                                                    ) : (
+                                                        <span className="text-muted">ไม่จำกัดเวลา</span>
+                                                    )}
+                                                </div>
                                             </div>
 
-                                            <div className="page-donate-detail-discription-day">
-                                                {isUpcoming ? (
-                                                    <span className="upcoming ">
-                                                        <i className="fas fa-clock me-1"></i>
-                                                        กำลังจะเริ่มในอีก {Math.ceil((startDate - now) / (1000 * 60 * 60 * 24))} วัน
-                                                    </span>
-                                                ) : isExpired ? (
-                                                    <span className="expired ">
-                                                        <i className="fas fa-clock me-1"></i>
-                                                        โครงการสิ้นสุดแล้ว
-                                                    </span>
-                                                ) : daysRemaining !== null ? (
-                                                    <span className={`remaining ${daysRemaining <= 7 ? "text-warning" : "text-success"}`}>
-                                                        <i className="fas fa-hourglass-half me-1"></i>
-                                                        เหลืออีก {daysRemaining} วัน
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-muted">ไม่จำกัดเวลา</span>
-                                                )}
-                                            </div>
-
-                                        </div>
-
-                                        <div className="button-container">
-                                            <Link to={`/donate/donatedetail/${project.project_id}`}>
+                                            <div className="donate-project-footer">
                                                 <button
-                                                    className={`maindonate-bt ${isExpired ? "btn-outline-secondary" : ""}`}
+                                                    className={`btn donate-action-button ${isExpired
+                                                        ? "btn-detail"
+                                                        : isUpcoming
+                                                            ? "btn-secondary"
+                                                            : "btn-primary"
+                                                        } rounded-pill px-3`}
                                                     disabled={isUpcoming}
+                                                    onClick={() => {
+                                                        if (!isUpcoming) {
+                                                            navigate(`/donate/donatedetail/${project.project_id}`);
+                                                        }
+                                                    }}
                                                 >
-                                                    {isExpired ? "ดูรายละเอียด" : isUpcoming ? "กำลังจะเริ่ม" : "บริจาคเลย"}
-
-                                                    {!isExpired && !isUpcoming && <i className="fas fa-arrow-right ms-1"></i>}
+                                                    {isExpired
+                                                        ? "ดูรายละเอียด"
+                                                        : isUpcoming
+                                                            ? "กำลังจะเริ่ม"
+                                                            : <>
+                                                                บริจาคเลย
+                                                                <FaArrowRight className="ms-2" size={14} />
+                                                            </>
+                                                    }
                                                 </button>
-                                            </Link>
+                                            </div>
+
                                         </div>
+                                    );
+                                })}
+                            </div>
 
-                                    </div>
-                                );
-                            })}
-                        </div>
-
-                        {/* Pagination */}
-                        {totalPages > 1 && (
-                            <nav aria-label="Page navigation" className="d-flex justify-content-center mt-4">
-                                <ul className="pagination">
-                                    <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
-                                        <button
-                                            className="page-link"
-                                            onClick={() => handlePageChange(currentPage - 1)}
-                                            disabled={currentPage === 1}
-                                            aria-label="หน้าก่อนหน้า"
-                                        >
-                                            <i className="fas fa-chevron-left"></i>
-                                        </button>
-                                    </li>
-
-                                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
-                                        <li
-                                            key={number}
-                                            className={`page-item ${number === currentPage ? "active" : ""}`}
-                                        >
+                            {/* Pagination */}
+                            {totalPages > 1 && (
+                                <nav aria-label="Page navigation" className="donate-pagination">
+                                    <ul className="pagination">
+                                        <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
                                             <button
                                                 className="page-link"
-                                                onClick={() => handlePageChange(number)}
-                                                aria-label={`หน้า ${number}`}
+                                                onClick={() => handlePageChange(currentPage - 1)}
+                                                disabled={currentPage === 1}
                                             >
-                                                {number}
+                                                <FaChevronLeft />
                                             </button>
                                         </li>
-                                    ))}
 
-                                    <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
-                                        <button
-                                            className="page-link"
-                                            onClick={() => handlePageChange(currentPage + 1)}
-                                            disabled={currentPage === totalPages}
-                                            aria-label="หน้าถัดไป"
-                                        >
-                                            <i className="fas fa-chevron-right"></i>
-                                        </button>
-                                    </li>
-                                </ul>
-                            </nav>
-                        )}
+                                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
+                                            <li
+                                                key={number}
+                                                className={`page-item ${number === currentPage ? "active" : ""}`}
+                                            >
+                                                <button className="page-link" onClick={() => handlePageChange(number)}>
+                                                    {number}
+                                                </button>
+                                            </li>
+                                        ))}
 
-                        <div className="page-info text-center text-muted mt-3">
-                            <small>
-                                หน้า {currentPage} จาก {totalPages} (แสดง {indexOfFirstProject + 1}-
-                                {Math.min(indexOfLastProject, filteredProjects.length)} จาก{" "}
-                                {filteredProjects.length} โครงการ)
-                            </small>
-                        </div>
-                    </>
-                )}
+                                        <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                                            <button
+                                                className="page-link"
+                                                onClick={() => handlePageChange(currentPage + 1)}
+                                                disabled={currentPage === totalPages}
+                                            >
+                                                <FaChevronRight />
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            )}
+
+
+                            {/* Page info */}
+                            <div className="donate-page-info">
+                                <small>
+                                    หน้า {currentPage} จาก {totalPages} (แสดง {indexOfFirstProject + 1}-
+                                    {Math.min(indexOfLastProject, filteredProjects.length)} จาก{" "}
+                                    {filteredProjects.length} โครงการ)
+                                </small>
+                            </div>
+                        </>
+                    )}
+                </div>
             </div>
         </div>
     );
