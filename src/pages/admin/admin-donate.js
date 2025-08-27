@@ -55,6 +55,8 @@ function AdminDonate() {
             try {
                 await axios.delete(`http://localhost:3001/admin/donate/${projectId}`);
                 setProjects(projects.filter((project) => project.project_id !== projectId));
+                await axios.delete(`http://localhost:3001/admin/donate/${projectId}`);
+                setProjects(projects.filter((project) => project.project_id !== projectId));
                 alert("ลบโครงการสำเร็จ");
             } catch (error) {
                 alert("เกิดข้อผิดพลาดในการลบโครงการ");
@@ -65,6 +67,12 @@ function AdminDonate() {
     //ฟังก์ชันสำหรับอนุมัติโครงการ
     const Approve = async (projectId) => {
         try {
+            await axios.put(`http://localhost:3001/admin/approveDonate/${projectId}`);
+            setProjects(projects.map(project =>
+                project.project_id === projectId
+                    ? { ...project, status: "1" }
+                    : project
+            ));
             await axios.put(`http://localhost:3001/admin/approveDonate/${projectId}`);
             setProjects(projects.map(project =>
                 project.project_id === projectId
@@ -150,6 +158,7 @@ function AdminDonate() {
             {/* Top Menu Navigation */}
             <div className="mb-4">
                 <nav className="nav Adminnav-tabs">
+                    <Link 
                     <Link 
                         className={`adminnav-link ${location.pathname === '/admin/donations' ? 'active' : ''}`}
                         to="/admin/donations"
@@ -269,6 +278,7 @@ function AdminDonate() {
                                                         <div className="donate-admin-item-image-frame">
                                                             <img
                                                                 src={`http://localhost:3001/uploads/${project.image_path}`}
+                                                                src={`http://localhost:3001/uploads/${project.image_path}`}
                                                                 alt={project.project_name}
                                                                 className="img-fluid rounded"
                                                                 onError={(e) => {
@@ -325,6 +335,9 @@ function AdminDonate() {
                                                                         className="progress-bar"
                                                                         role="progressbar"
                                                                         style={{ width: `${progress}%` }}
+                                                                        aria-valuenow={progress}
+                                                                        aria-valuemin="0"
+                                                                        aria-valuemax="100"
                                                                         aria-valuenow={progress}
                                                                         aria-valuemin="0"
                                                                         aria-valuemax="100"

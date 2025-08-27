@@ -1,7 +1,11 @@
 .donate-detail-content {
+.donate-detail-content {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
     gap: 30px;
     max-width: 1200px;
     margin: 0 auto;
@@ -11,8 +15,19 @@
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
     border-radius: 10px;
+
+.donate-detail-content-item {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 10px;
     width: 500px;
     height: fit-content;
+    padding: 30px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 20px;
     padding: 30px;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);
@@ -47,16 +62,50 @@
     border-radius: 10px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
     transition: transform 0.3s ease;
+.donate-detail-content-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #0F75BC, #085A9C, #667eea);
 }
+
+.donate-detail-content-item h5 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a202c;
+    margin-bottom: 20px;
+    text-align: start;
+    line-height: 1.3;
+}
+
+.donate-detail-content img {
+    width: 100%;
+    height: 280px;
+    object-fit: cover;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s ease;
+}
+
+/* Progress Section */
+.donate-detail-progress {
 
 /* Progress Section */
 .donate-detail-progress {
     color: #0F75BC;
     font-size: 16px;
     font-weight: 600;
+    font-size: 16px;
+    font-weight: 600;
     text-align: end;
     /* margin: 15px 0 5px 0; */
+    /* margin: 15px 0 5px 0; */
 }
+
+.progress-bar-container {
 
 .progress-bar-container {
     position: relative;
@@ -64,13 +113,22 @@
     height: 12px;
     background: rgba(15, 117, 188, 0.1);
     border-radius: 25px;
+    height: 12px;
+    background: rgba(15, 117, 188, 0.1);
+    border-radius: 25px;
     overflow: hidden;
+    margin: 10px 0;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
     margin: 10px 0;
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .progress-bar {
+.progress-bar {
     height: 100%;
+    background-color: #085A9C;
+    border-radius: 25px;
+    position: relative;
     background-color: #085A9C;
     border-radius: 25px;
     position: relative;
@@ -85,9 +143,22 @@
     bottom: 0;
 }
 .progress-percent {
+.progress-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+.progress-percent {
     position: absolute;
     top: -25px;
+    top: -25px;
     right: 0;
+    font-size: 12px;
+    color: #0F75BC;
+    font-weight: 600;
     font-size: 12px;
     color: #0F75BC;
     font-weight: 600;
@@ -97,9 +168,14 @@
         justify-content: space-between;
         font-size: 14px;
         color: #085A9C;
+        display: flex;
+        justify-content: space-between;
+        font-size: 14px;
+        color: #085A9C;
         margin: 0 0 5px 0;
 }
 .donate-detail-discription {
+    display: grid; 
     display: grid; 
     text-align: justify;
     gap: 2px; 
@@ -109,7 +185,26 @@
 
 .donate-detail-details span {
     font-weight: 600;
+
+.donate-detail-details span {
+    font-weight: 600;
 }
+
+/* Status indicators */
+.donate-detail-discription-day {
+    text-align: end;
+    font-size: 15px;
+    /* margin: 20px 0 20px 0; */
+    padding: 8px 0;
+    /* border-radius: 20px; */
+    font-weight: 600;
+    /* background-color: #085A9C; */
+}
+
+
+.donate-detail-discription-day .remaining {
+    color: #059669;
+    /* background: rgba(5, 150, 105, 0.1); */
 
 /* Status indicators */
 .donate-detail-discription-day {
@@ -136,8 +231,24 @@
 .donate-detail-discription-day .expired {
     color: #dc2626;
     background: rgba(220, 38, 38, 0.1);
+.donate-detail-discription-day .upcoming {
+    color: #d97706;
+    background: rgba(217, 119, 6, 0.1);
 }
 
+.donate-detail-discription-day .expired {
+    color: #dc2626;
+    background: rgba(220, 38, 38, 0.1);
+}
+
+
+/* Description sections */
+.donate-detail-discription {
+    margin-bottom: 20px;
+    padding: 20px;
+    background: rgba(248, 250, 252, 0.8);
+    border-radius: 10px;
+    border: 1px solid rgba(15, 117, 188, 0.1);
 
 /* Description sections */
 .donate-detail-discription {
@@ -168,10 +279,469 @@
 .donate-detail-header-title {
     margin-bottom: 0;
     color: #085A9C;
+    gap: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a202c;
+    margin-bottom: 10px;
+}
+
+.donate-detail-header-title {
+    margin-bottom: 0;
+    color: #085A9C;
 }
 
 .custom-icon {
     font-size: 20px;
+    color: #0F75BC;
+}
+
+.donate-detail-informations {
+    margin-left: 28px;
+    line-height: 1.6;
+    color: #4a5568;
+    font-size: 14px;
+}
+
+/* Form Styling */
+.donate-detail-content-item form {
+    /* padding: 30px; */
+    border-radius: 10px;
+    /* margin-top: 30px; */
+}
+
+.donate-detail-form-items {
+    background: rgba(248, 250, 252, 0.5);
+    border: 2px solid rgba(15, 117, 188, 0.15);
+    padding: 25px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.donate-detail-form-items label {
+    display: block;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.quick-amount-buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.quick-amount-btn {
+    padding: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #f5f5f5;
+    cursor: pointer;
+    transition: 0.2s;
+    text-align: center;
+    font-size: 14px;
+}
+
+.quick-amount-btn:hover {
+    background-color: #e0e0e0;
+}
+
+
+.styled-input,
+.styled-inputTax,
+.styled-select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px !important;
+    font-size: 14px;
+    background: white;
+    box-sizing: border-box;
+    /* เพิ่มนี้ด้วย */
+}
+
+.styled-input:focus,
+.styled-inputTax:focus,
+.styled-select:focus {
+    outline: none;
+    border-color: #0F75BC;
+    box-shadow: 0 0 0 3px rgba(15, 117, 188, 0.1);
+}
+
+.styled-input.error,
+.styled-inputTax.error {
+    border-color: #ef4444;
+    background: rgba(239, 68, 68, 0.05);
+}
+
+/* QR Code Section */
+.group-promptPay-layout {
+    background: linear-gradient(135deg, rgba(15, 117, 188, 0.05), rgba(8, 90, 156, 0.1));
+    padding: 20px;
+    border-radius: 15px;
+    /* border: 1px solid rgba(15, 117, 188, 0.2); */
+    margin-top: 7px;
+}
+
+.title-promptPay-layout {
+    margin-bottom: 15px;
+}
+
+.title-promptPay-layout p {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: #0F75BC;
+    font-size: 16px;
+}
+
+.promptPay-layout {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* กรณีโครงการหมดเลยวันแล้ว */
+/* Container ตัวเลือกอื่น */
+.expired-options {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+/* Card สำหรับแต่ละตัวเลือก */
+.option-card {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.option-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* หัวข้อใน card */
+.option-card h6 {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+    color: #333333;
+}
+
+/* คำอธิบายใน card */
+.option-card p {
+    font-size: 0.95rem;
+    margin-bottom: 15px;
+    color: #666666;
+}
+
+/* ปุ่มใน card */
+.option-button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.option-button.primary {
+    background-color: #1976d2; /* สีน้ำเงิน */
+    color: white;
+}
+
+.option-button.primary:hover {
+    background-color: #115293;
+}
+
+.option-button.secondary {
+    background-color: #f0f0f0;
+    color: #333333;
+}
+
+.option-button.secondary:hover {
+    background-color: #e0e0e0;
+}
+
+/* ปุ่มกลับ */
+.form-group-btn {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.back-button-donate {
+    padding: 10px 25px;
+    border-radius: 8px;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.back-button-donate.primary {
+    background-color: #1976d2;
+    color: white;
+}
+
+.back-button-donate.primary:hover {
+    background-color: #115293;
+}
+
+/* Container สรุปโครงการ */
+.project-summary-donate {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+}
+
+/* Card สรุปโครงการ */
+.summary-card {
+    width: 100%; /* กว้างเต็ม container */
+    max-width: 100%;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    background-color: #fff;
+    margin: 10px 0;
+}
+
+.donate-action-button.btn-outline-secondary {
+    background-color: transparent;
+    color: #6c757d;
+    border-color: #6c757d;
+}
+
+.summary-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+/* หัวข้อใน card */
+.summary-card h6 {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    color: #333333;
+    text-align: center;
+}
+
+/* Container สถิติ */
+.summary-stats {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.stat-item {
+    flex: 1;
+    text-align: center;
+    margin: 5px 0;
+}
+
+.stat-value {
+    display: block;
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #1976d2; /* สีฟ้า */
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.9rem;
+    color: #666666;
+}
+
+/* Progress Bar */
+.final-progress-bar {
+    height: 12px;
+    width: 100%;
+    background-color: #e0e0e0;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+
+.progress-fill {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 0.5s ease-in-out;
+}
+
+.progress-fill.partial {
+    background-color: #1976d2; /* สีฟ้า */
+}
+
+.progress-fill.complete {
+    background-color: #4caf50; /* สีเขียว */
+}
+
+/* ข้อความสถานะ */
+.success-message, .partial-message {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #333333;
+}
+
+.success-message {
+    color: #4caf50;
+}
+
+.partial-message {
+    color: #1976d2;
+}
+
+/* ไอคอน */
+.check-icon, .PartyPopper-icon {
+    font-size: 1.3rem;
+}
+
+
+.qr-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.qr-container img {
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    border: 3px solid #f8fafc;
+}
+
+.qr-amount {
+    font-weight: 600;
+    color: #0F75BC;
+    font-size: 16px;
+}
+
+.download-qr-btn {
+    background: linear-gradient(135deg, #0F75BC, #085A9C);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.download-qr-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(15, 117, 188, 0.3);
+}
+
+.group-input-fields {
+    margin-top: 10px;
+}
+
+.input-group {
+    margin-bottom: 10px;
+}
+
+.input-group input,
+.input-group textarea {
+    margin-top: 0;
+}
+
+/* Tax form styling */
+.tax-type-options {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    /* margin-left: 1.7rem; */
+}
+
+.tax-options {
+    display: flex;
+    gap: 20px;
+    margin: 10px 0;
+}
+
+.radio-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.radio-option input[type="radio"] {
+    display: none;
+}
+
+.radio-option-bt {
+    color: black;
+    display: flex;
+    align-items: center;
+}
+
+.donate-detail-form-items label {
+    font-size: 16px;
+    color: #085A9C;
+    display: flex;
+    gap: 8px;
+    margin: 0;
+    align-items: center;
+}
+
+.donate-detail-form-items .tax-type-options label {
+    font-size: 15px;
+    font-weight: normal;
+}
+
+.radio-custom {
+    width: 40px;
+    height: 40px;
+    border: 2px solid #cbd5e0;
+    border-radius: 50%;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.radio-option input[type="radio"]:checked+.radio-custom {
+    border-color: #bc0f3d;
+    background: #0F75BC;
+}
+
+.radio-option-custom:has(.tax-type-radio:checked) {
+    border-color: #007bff;
+    background-color: #e7f3ff;
+    color: #007bff;
+}
+
+
+.radio-option input[type="radio"]:checked+.radio-custom::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px;
+    height: 8px;
+    background: white;
+    border-radius: 50%;
+}
+
+.tax-type-radio {
+    width: 18px;
+    height: 18px;
     color: #0F75BC;
 }
 
@@ -666,6 +1236,50 @@
 
 .asterisk {
     color: #ef4444 !important;
+    cursor: pointer;
+    accent-color: #0F75BC;
+    /* ใช้สีเดียวกับธีมของคุณ */
+}
+
+.tax-type-options-btn {
+    display: flex;
+    align-items: center;
+    /* gap: 20px; */
+    margin-bottom: 10px;
+    background-color: #0F75BC;
+    border-radius: 15px;
+}
+
+.tax-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    height: 50px;
+    padding: 10px 16px;
+    color: white;
+    border-radius: 8px;
+    border: none;
+    background: #0F75BC;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.tax-btn:not(.active):hover {
+    background: #085A9C;
+    color: white;
+}
+
+.tax-btn.active {
+    background: white;
+    color: #0F75BC;
+    border: #0F75BC 2px solid;
+}
+
+.asterisk {
+    color: #ef4444 !important;
 }
 
 .donate-detail-tax-form {
@@ -682,7 +1296,27 @@
     background: rgba(34, 197, 94, 0.05);
     border: 1px solid rgba(34, 197, 94, 0.2);
     border-radius: 10px;
+
+.donate-detail-tax-form {
+    margin-top: 10px;
+
 }
+
+/* File preview */
+.file-preview {
+    display: flex;
+    justify-content: center;
+    margin-top: 15px;
+    padding: 15px;
+    background: rgba(34, 197, 94, 0.05);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+    border-radius: 10px;
+}
+
+.file-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 
 .file-info {
     display: flex;
@@ -723,7 +1357,45 @@
     cursor: pointer;
     transition: all 0.3s ease;
     border: none;
+
+.upload-success {
+    color: #22c55e;
+}
+
+.remove-file {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    margin-left: auto;
+}
+
+/* Buttons */
+.form-group-btn {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.cancel-button,
+.donate-bt,
+.cancel-donate-bt {
+    padding: 14px 28px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
     width: 100%;
+}
+
+.donate-bt{
+    background-color: #085A9C;
+    color: white;
 }
 
 .donate-bt{

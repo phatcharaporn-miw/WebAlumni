@@ -1,7 +1,15 @@
 .students {
     display: flex;
-    justify-content: space-between; 
-    align-items: center; 
+    justify-content: space-between; /* จัดตัวกรองให้ไปอยู่ขวา */
+    align-items: center; /* จัดแนวในแนวตั้ง */
+}
+
+.filter-container {
+    width: 200px; /* กำหนดความกว้างของ dropdown */
+}
+
+.filter-container select {
+    width: 100%; /* ให้ select มีความกว้างเต็ม */
 }
 
 .students table {
@@ -18,13 +26,6 @@
 .students h4 {
     font-size: 1.5rem;
     margin-bottom: 15px;
-}
-
-.nav-link {
-    border-radius: 1px;
-    padding: 10px 15px;
-    color: #0F75BC;
-    transition: color 0.2s ease-in-out;
 }
 
 .table {
@@ -102,7 +103,6 @@
 }
 
 .table th {
-    /* background-color: #0F75BC; */
     font-weight: bold;
     color: #ffffff;
 }

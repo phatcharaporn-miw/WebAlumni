@@ -53,7 +53,7 @@ function AlumniProfileActivity() {
 
 
   if (!profile) {
-    return <div>ไม่พบข้อมมูลผู้ใช้</div>;
+    return <div>ไม่พบข้อมูลผู้ใช้</div>;
   }
 
   const handleClick = (path) => {

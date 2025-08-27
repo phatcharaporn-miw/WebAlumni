@@ -4,7 +4,6 @@ import axios from "axios";
 import { breadcrumbMapping } from '../components/breadcrumbMapping';
 // css
 import '../css/breadcrumb.css';
-import DonateDetail from "../pages/donate-detail";
 
 function Breadcrumb() {
   const location = useLocation();

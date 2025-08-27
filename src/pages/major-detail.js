@@ -141,5 +141,4 @@ function MajorDetail() {
     );
 }
 
-
 export default MajorDetail;

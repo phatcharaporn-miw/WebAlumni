@@ -1,5 +1,14 @@
 import { useState, useEffect, } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
+import { AiOutlineDashboard } from "react-icons/ai";
+import { IoCalendarOutline } from "react-icons/io5";
+import { LiaDonateSolid } from "react-icons/lia";
+import { CgWebsite } from "react-icons/cg";
+import { IoNewspaperOutline } from "react-icons/io5";
+import { MdOutlineShoppingCart } from "react-icons/md";
+import { LuUserRoundPen } from "react-icons/lu";
+import { IoSettingsOutline } from "react-icons/io5";
+import { MdLogout } from "react-icons/md";
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { IoMdNotificationsOutline } from "react-icons/io";

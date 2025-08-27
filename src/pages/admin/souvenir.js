@@ -16,6 +16,7 @@ import Swal from "sweetalert2";
 function Souvenir() {
     const [products, setProducts] = useState([]);
     const [open, setOpen] = useState(false);
+    const [detailOpen, setDetailOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [detailProduct, setDetailProduct] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
@@ -34,7 +35,8 @@ function Souvenir() {
         window.scrollTo(0, 0);
         axios.get("http://localhost:3001/admin/souvenir")
             .then((response) => {
-                setProducts(response.data);
+                const sortedProducts = response.data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                setProducts(sortedProducts);
             })
             .catch((error) => {
                 console.error("Error fetching souvenirs:", error);
@@ -45,10 +47,7 @@ function Souvenir() {
         setSelectedProduct(product);
         setOpen(true);
     };
-
-    const handleClose = () => {
-        setOpen(false);
-    };
+    const handleClose = () => setOpen(false);
 
     const handleDetail = (product) => {
         setSelectedProduct(product);
@@ -142,16 +141,9 @@ function Souvenir() {
         });
     };
 
+    const getStatusColor = (status) => status === "1" ? "green" : "red";
 
-    const getStatusColor = (status) => {
-        if (status === "1") {
-            return "green";
-        } else {
-            return "red";
-        }
-    };
-
-    const roleNames = { 1: "แอดมิน", 2: "นายกสมาคม", 3: "ศิษย์เก่า", 4: "ศิษย์ปัจจุบัน" };
+    const roleNames = { 1: "แอดมิน", 2: "นายกสมาคม", 3: "สมาชิกทั่วไป" };
     const statusLabel = (status) => status === "1" ? "กำลังจำหน่าย" : "ยังไม่จำหน่าย";
 
     const filteredProducts = products.filter(product =>
@@ -214,6 +206,7 @@ function Souvenir() {
                         </button>
                     </Link>
                 </div>
+
             </div>
 
             {/* Table Section */}
@@ -242,6 +235,7 @@ function Souvenir() {
                                                 ไม่พบสินค้าที่ค้นหา
                                             </div>
                                         </td>
+
                                     </tr>
                                 ) : (
                                     filteredProducts.map((product) => (
@@ -504,5 +498,16 @@ function Souvenir() {
         </div>
     );
 }
+
+const modalStyle = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    bgcolor: 'background.paper',
+    boxShadow: 24,
+    p: 4,
+    borderRadius: 2,
+};
 
 export default Souvenir;
