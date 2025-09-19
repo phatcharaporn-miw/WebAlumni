@@ -6,7 +6,6 @@ import Swal from "sweetalert2";
 import { Link } from "react-router-dom";
 // css
 import '../../css/profile.css';
-
 // bootstrap
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';

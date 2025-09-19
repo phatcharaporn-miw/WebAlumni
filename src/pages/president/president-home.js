@@ -376,7 +376,6 @@ axios.get("http://localhost:3001/admin/activity-per-month")
     },
   };
 
-
   //ดึงข้อมูล webboard
   useEffect(() => {
     axios.get('http://localhost:3001/web/webboard')
@@ -903,7 +902,6 @@ axios.get("http://localhost:3001/admin/activity-per-month")
             ข่าวประชาสัมพันธ์
             <div className="title-underline"></div>
           </h3>
-
           <div className="container">
             <div className="row g-4 justify-content-center">
               {news.length > 0 ? (
@@ -963,7 +961,6 @@ axios.get("http://localhost:3001/admin/activity-per-month")
                         }}>
                           {item.title}
                         </h5>
-
                         <p className="news-text flex-grow-1 mb-4" style={{
                           color: '#6c757d',
                           lineHeight: '1.6',
@@ -971,7 +968,6 @@ axios.get("http://localhost:3001/admin/activity-per-month")
                         }}>
                           {item.content ? item.content.substring(0, 100) + "..." : "ไม่มีเนื้อหา"}
                         </p>
-
                         <button
                           className="btn-news-home btn-gradient w-100"
                           onClick={() => handleReadMore(item.news_id)}
@@ -1169,7 +1165,6 @@ axios.get("http://localhost:3001/admin/activity-per-month")
                   </div>
                 </div>
               </div>
-
               <div className="col-lg-4 mb-4">
                 <div className="card border-0 shadow-lg h-100">
                   <div className="card-header border-0 bg-gradient" style={{ background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' }}>

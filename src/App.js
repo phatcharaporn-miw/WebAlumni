@@ -114,7 +114,6 @@ import PresidentProfileSouvenir from './pages/president/president-profile-souven
 import PresidentProfileDonation from './pages/president/president-profile-donation';
 import PresidentManageOrders from './pages/president/president-manage-orders';
 
-
 const AlumniMajor = lazy(() => import("./pages/major-detail"));
 const Webboard = lazy(() => import("./pages/webboard"));
 const Home = lazy(() => import("./pages/home"));

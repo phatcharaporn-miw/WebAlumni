@@ -120,6 +120,11 @@ function SouvenirCheckout() {
             return;
         }
 
+        if (!items[0].promptpay_number) {
+            alert("สินค้านี้ไม่มีเลข PromptPay กรุณาติดต่อผู้ดูแล");
+            return;
+        }
+
         setIsGeneratingQR(true);
 
         try {
