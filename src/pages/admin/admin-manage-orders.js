@@ -92,7 +92,6 @@ function AdminOrderManager() {
             });
     };
 
-
     const handleViewDetails = (order) => {
         setSelectedOrder(order);
         fetchOrderDetails(order.order_id);

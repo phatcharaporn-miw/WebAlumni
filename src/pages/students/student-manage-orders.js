@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import Swal from "sweetalert2";
 import { format } from 'date-fns';
 
-
 function StudentManageOrders() {
     const [profile, setProfile] = useState({});
     const { handleLogout } = useOutletContext();

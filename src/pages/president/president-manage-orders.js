@@ -114,7 +114,6 @@ function PresidentManageOrders() {
             alert("ไม่สามารถอัปโหลดรูปได้");
         }
     };
-
     return (
         <section className='container py-4'>
             <div className='alumni-profile-page'>

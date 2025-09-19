@@ -1070,10 +1070,163 @@ function SouvenirRequest() {
                             ยืนยันเพิ่มสินค้า
                         </Button>
                     </div>
-                </Box>
+                {/* </div> */}
+
+                {/* ช่องทางการชำระเงิน */}
+                <div className="payment-info">
+                    <p className="data-requestSouvenir-title">ช่องทางการชำระเงิน</p>
+                    <div>
+                        <label htmlFor="paymentMethod">ช่องทางการชำระเงิน<span className="important">*</span></label><br />
+                        <select
+                            className="data-requestSouvenir-input"
+                            name="paymentMethod"
+                            value={formData.paymentMethod}
+                            onChange={handleChange}
+                            required
+                        >
+                            <option value="" disabled>เลือกช่องทางการชำระเงิน</option>
+                            <option value="พร้อมเพย์">พร้อมเพย์</option>
+                        </select>
+                    </div>
+
+
+                    <div>
+                        <label htmlFor="bankName">ชื่อธนาคาร<span className="important">*</span></label><br />
+                        <input
+                            className="data-requestSouvenir-input"
+                            name="bankName"
+                            placeholder="ชื่อธนาคาร"
+                            type="text"
+                            value={formData.bankName}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+
+                    <div>
+                        <label htmlFor="accountName">ชื่อบัญชี<span className="important">*</span></label><br />
+                        <input
+                            className="data-requestSouvenir-input"
+                            name="accountName"
+                            placeholder="หมายเลขบัญชี"
+                            type="text"
+                            value={formData.accountName}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+
+                    <div>
+                        <label htmlFor="accountNumber">หมายเลขบัญชี<span className="important">*</span></label><br />
+                        <input
+                            className="data-requestSouvenir-input"
+                            name="accountNumber"
+                            placeholder="หมายเลขบัญชี"
+                            type="text"
+                            value={formData.accountNumber}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+
+                    <div>
+                        <label htmlFor="promptpayNumber">หมายเลขพร้อมเพย์<span className="important">*</span></label><br />
+                        <input
+                            className="data-requestSouvenir-input"
+                            name="promptpayNumber"
+                            placeholder="หมายเลขพร้อมเพย์"
+                            type="text"
+                            value={formData.promptpayNumber}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                </div>
+
+                <div className="group-souvenir-bt">
+                    <button className="cancle-button-souvenirRequest" type="button" onClick={handleCancel}>
+                        ยกเลิก
+                    </button>
+                    <button type="button" className="button-souvenirRequest" onClick={handleOpen}>
+                        เพิ่มสินค้าของที่ระลึก
+                    </button>
+                </div>
+            </Box>
+
             </Modal>
         </div>
+
+        // {/* Modal */}
+        // <Modal
+        //     open={open}
+        //     onClose={handleClose}
+        //     aria-labelledby="modal-title"
+        //     aria-describedby="modal-description"
+        // >
+        //     <Box sx={{ ...style, width: 500 }}>
+        //         <Typography id="modal-title" variant="h6" sx={{ mb: 2, textAlign: "center" }}>
+        //             ตรวจสอบข้อมูลสินค้า
+        //         </Typography>
+        //         <div style={{ marginBottom: "20px" }}>
+        //             <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        //                 <tbody>
+        //                     <tr>
+        //                         <td style={{ fontWeight: "bold", padding: "8px", borderBottom: "1px solid #ddd" }}>ชื่อสินค้า:</td>
+        //                         <td style={{ padding: "8px", borderBottom: "1px solid #ddd" }}>{formData.productName}</td>
+        //                     </tr>
+        //                     <tr>
+        //                         <td style={{ fontWeight: "bold", padding: "8px", borderBottom: "1px solid #ddd" }}>รายละเอียด:</td>
+        //                         <td style={{ padding: "8px", borderBottom: "1px solid #ddd" }}>{formData.description}</td>
+        //                     </tr>
+        //                     <tr>
+        //                         <td style={{ fontWeight: "bold", padding: "8px", borderBottom: "1px solid #ddd" }}>ราคาต่อชิ้น:</td>
+        //                         <td style={{ padding: "8px", borderBottom: "1px solid #ddd" }}>{formData.price} บาท</td>
+        //                     </tr>
+        //                     <tr>
+        //                         <td style={{ fontWeight: "bold", padding: "8px", borderBottom: "1px solid #ddd" }}>จำนวนสินค้า:</td>
+        //                         <td style={{ padding: "8px", borderBottom: "1px solid #ddd" }}>{formData.stock} ชิ้น</td>
+        //                     </tr>
+        //                     <tr>
+        //                         <td style={{ fontWeight: "bold", padding: "8px", borderBottom: "1px solid #ddd" }}>ช่องทางการชำระเงิน:</td>
+        //                         <td style={{ padding: "8px", borderBottom: "1px solid #ddd" }}>{formData.paymentMethod}</td>
+        //                     </tr>
+        //                     <tr>
+        //                         <td style={{ fontWeight: "bold", padding: "8px", borderBottom: "1px solid #ddd" }}>ชื่อธนาคาร:</td>
+        //                         <td style={{ padding: "8px", borderBottom: "1px solid #ddd" }}>{formData.bankName}</td>
+        //                     </tr>
+        //                     <tr>
+        //                         <td style={{ fontWeight: "bold", padding: "8px", borderBottom: "1px solid #ddd" }}>หมายเลขบัญชี:</td>
+        //                         <td style={{ padding: "8px", borderBottom: "1px solid #ddd" }}>{formData.accountNumber}</td>
+        //                     </tr>
+        //                 </tbody>
+        //             </table>
+        //         </div>
+
+        //         {formData.image && (
+        //             <div style={{ textAlign: "center", marginBottom: "20px" }}>
+        //                 <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
+        //                     รูปภาพของสินค้า
+        //                 </Typography>
+        //                 <img
+        //                     src={URL.createObjectURL(formData.image)}
+        //                     alt="สินค้าของที่ระลึก"
+        //                     style={{ maxWidth: "100%", height: "200px", objectFit: "cover", borderRadius: "8px" }}
+        //                 />
+        //             </div>
+        //         )}
+
+        //         <div style={{ display: "flex", justifyContent: "space-between", marginTop: "20px" }}>
+        //             <Button onClick={handleClose} variant="outlined" color="secondary">
+        //                 แก้ไข
+        //             </Button>
+        //             <Button onClick={handleSubmit} variant="contained" color="primary">
+        //                 ยืนยันเพิ่มสินค้า
+        //             </Button>
+        //         </div>
+        //     </Box>
+        // </Modal>
     );
+
 }
 
 export default SouvenirRequest;
