@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useOutletContext } from "react-router-dom";
 import { useNavigate, useLocation } from 'react-router-dom';
-import Swal from "sweetalert2";
 // css
 import '../../css/profile.css';
 // import '../../css/activity.css';
