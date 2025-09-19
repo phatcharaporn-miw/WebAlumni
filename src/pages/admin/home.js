@@ -49,26 +49,55 @@ function AdminHome() {
       .then((res) => setStats(res.data))
       .catch((err) => console.error("Error fetching dashboard stats:", err));
 
-    // Activity per year graph
-    axios.get("http://localhost:3001/admin/activity-per-year")
-      .then(res => {
-        if (Array.isArray(res.data)) {
-          const labels = res.data.map(item => `ปี ${item.year + 543}`);
-          const data = res.data.map(item => item.total_activities);
-          setBarData({
-            labels,
-            datasets: [{
-              label: 'จำนวนกิจกรรม',
-              data,
-              backgroundColor: 'rgba(13, 110, 253, 0.8)',
-              borderColor: 'rgba(13, 110, 253, 1)',
-              borderWidth: 2,
-              borderRadius: 6,
-              borderSkipped: false,
-            }],
-          });
-        }
+    // // Activity per year graph
+    // axios.get("http://localhost:3001/admin/activity-per-year")
+    //   .then(res => {
+    //     if (Array.isArray(res.data)) {
+    //       const labels = res.data.map(item => `ปี ${item.year + 543}`);
+    //       const data = res.data.map(item => item.total_activities);
+    //       setBarData({
+    //         labels,
+    //         datasets: [{
+    //           label: 'จำนวนกิจกรรม',
+    //           data,
+    //           backgroundColor: 'rgba(13, 110, 253, 0.8)',
+    //           borderColor: 'rgba(13, 110, 253, 1)',
+    //           borderWidth: 2,
+    //           borderRadius: 6,
+    //           borderSkipped: false,
+    //         }],
+    //       });
+    //     }
+    //   });
+    // Activity per month graph
+axios.get("http://localhost:3001/admin/activity-per-month")
+  .then(res => {
+    if (Array.isArray(res.data)) {
+      // สร้าง labels เป็น "เดือน ปี" (ภาษาไทย)
+      const monthNamesThai = [
+        "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน",
+        "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม",
+        "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
+      ];
+
+      const labels = res.data.map(item => `${monthNamesThai[item.month_number - 1]} ${item.year + 543}`);
+      const data = res.data.map(item => item.total_activities);
+
+      setBarData({
+        labels,
+        datasets: [{
+          label: 'จำนวนกิจกรรม',
+          data,
+          backgroundColor: 'rgba(13, 110, 253, 0.8)',
+          borderColor: 'rgba(13, 110, 253, 1)',
+          borderWidth: 2,
+          borderRadius: 6,
+          borderSkipped: false,
+        }],
       });
+    }
+  });
+
 
     // สถิติการบริจาค
     axios.get("http://localhost:3001/admin/donation-stats")
@@ -235,14 +264,22 @@ function AdminHome() {
         padding: 12,
         callbacks: {
           label: function (tooltipItem) {
-            const value = tooltipItem.raw; // ยอดเงินของ slice นั้น
-            const total = tooltipItem.dataset.data.reduce((a, b) => a + b, 0);
-            const percent = ((value / total) * 100).toFixed(1);
+            const value = Number(tooltipItem.raw); // ยอดเงินของ slice นั้นแต่ละโครงการต้องแปลงเป็นตัวเลขก่อน
+            const dataset = tooltipItem.dataset;
+
+            // console.log('Tooltip Item:', dataset);
+             // บังคับแปลงเป็นตัวเลข
+            const dataValues = dataset.data.map(d => Number(d));
+
+            // คำนวณผลรวมทั้งหมดของ slice
+            const total = dataValues.reduce((acc, val) => acc + val, 0);
+
+            // (ค่า slice ÷ ผลรวมทั้งหมด) × 100
+            const percent = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
 
             // format number ให้มี , คั่นหลักพัน
             const formattedValue = value.toLocaleString();
-
-            return `${tooltipItem.label}: ฿${formattedValue} (${percent}%)`;
+            return `${tooltipItem.label}: ฿${formattedValue} (${percent}%)`; //คืนค่า string ที่จะแสดงใน tooltip
           },
         },
       },
@@ -287,6 +324,19 @@ function AdminHome() {
           icon={MdTrendingUp}
         />
       </div>
+      
+      {/* Alumni Section */}
+      <div className="row">
+        {/* <div className="col-12"> */}
+        <CardInfo
+          title="จำนวนศิษย์เก่าทั้งหมด"
+          value={`${alumniCount.toLocaleString()} คน`}
+          center
+          type="alumni"
+          icon={MdPeople}
+          colClass="col-12"
+        />
+      </div>
 
       {/* Charts Section */}
       <div className="row mb-5">
@@ -294,7 +344,7 @@ function AdminHome() {
           <div className="card border-0 shadow-lg h-100">
             <div className="card-header border-0 bg-gradient" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
               <h5 className="card-title mb-0 fw-bold">
-                จำนวนกิจกรรมในแต่ละปี
+                จำนวนกิจกรรมในแต่ละเดือน
               </h5>
             </div>
             <div className="card-body p-4">
@@ -316,18 +366,7 @@ function AdminHome() {
         </div>
       </div>
 
-      {/* Alumni Section */}
-      <div className="row">
-        {/* <div className="col-12"> */}
-        <CardInfo
-          title="จำนวนศิษย์เก่าทั้งหมด"
-          value={`${alumniCount.toLocaleString()} คน`}
-          center
-          type="alumni"
-          icon={MdPeople}
-          colClass="col-12"
-        />
-      </div>
+      
     </div>
     // </div>
   );

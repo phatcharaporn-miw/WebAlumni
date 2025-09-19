@@ -23,7 +23,7 @@ export const breadcrumbMapping = {
     "/activity/edit" : "แก้ไขกิจกรรม",
     "/change-password" : "เปลี่ยนรหัสผ่านครั้งแรก",
     "/souvenir/checkout" : "ชำระเงิน",
-    "/check-studentId": "ตรวจสอบข้อมูล",
+    "/check-fullName": "ตรวจสอบข้อมูล",
     "/search": "ผลการค้นหา",
 
     // ส่วนของศิษย์เก่า

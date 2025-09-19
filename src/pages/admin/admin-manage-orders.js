@@ -102,7 +102,7 @@ function AdminOrderManager() {
     const closeModal = () => {
         setModalIsOpen(false);
         setSelectedOrder(null);
-        navigate("/admin/admin-manage-orders"); // ปิดแล้วกลับหน้า list
+        navigate("/admin/souvenir/admin-manage-orders"); // ปิดแล้วกลับหน้า list
     };
 
     return (

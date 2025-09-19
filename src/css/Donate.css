@@ -169,7 +169,7 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    backdrop-filter: blur(10px);
+    /* backdrop-filter: blur(10px); */
 }
 
 .donate-badge-active {
@@ -184,6 +184,11 @@
 
 .donate-badge-expired {
     background-color: rgba(220, 53, 69, 0.9);
+    color: white;
+}
+.donate-badge-secondary
+{
+    background-color: rgba(108, 117, 125, 0.9);
     color: white;
 }
 

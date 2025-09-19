@@ -39,6 +39,7 @@ function StudentProfileDonation() {
         setLoading(true);
         axios.get('http://localhost:3001/donate/donatePaid', { withCredentials: true })
             .then((res) => {
+                console.log('Donations fetched:', res.data);
                 setDonations(res.data);
                 setLoading(false);
             })

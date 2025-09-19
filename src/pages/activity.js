@@ -238,6 +238,11 @@ function Activity() {
         if (page >= 1 && page <= totalPages) setCurrentPage(page);
     };
 
+    // Scroll to top on mount
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+
     return (
         <section className="container">
             <div className="activity-page">

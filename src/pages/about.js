@@ -2,6 +2,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import "../css/about.css"
+import {useEffect} from "react";
 
 // import axios from "axios";
 import { IoMdPin, IoMdCall } from "react-icons/io";
@@ -51,6 +52,11 @@ function About() {
       img: "/image/สื่อสารองค์กร.jpg"
     }
   ];
+
+  // Scroll to top on mount
+      useEffect(() => {
+          window.scrollTo(0, 0);
+      }, []);
   
   return (
     <section className="container">

@@ -86,6 +86,11 @@ function News() {
         if (page >= 1 && page <= totalPages) setCurrentPage(page);
     };
 
+    // Scroll to top on mount
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+
     return (
         <section className="news-container">
             <img src="./image/frequency-wave.jpg" className="head-news w-100" alt="news-image" />
@@ -214,3 +219,4 @@ function News() {
 }
 
 export default News;
+

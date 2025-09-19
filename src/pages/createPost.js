@@ -95,6 +95,7 @@ function CreatePost() {
         }
     };
 
+
     const handleFileChange = (event) => {
         setImage(event.target.files[0]); // อัปโหลดไฟล์ภาพ
     };
@@ -197,7 +198,7 @@ function CreatePost() {
                             <div className="form-group mb-3">
                                 <label>รายละเอียดกระทู้ <span className="text-danger">*</span></label>
                                 <textarea
-                                    className="form-control"
+                                    className="form-control w-100"
                                     placeholder="เนื้อหากระทู้"
                                     value={content}
                                     onChange={handleContentChange}
@@ -222,6 +223,8 @@ function CreatePost() {
                                     value={startDate}
                                     onChange={(e) => setStartDate(e.target.value)}
                                     required
+                                    onKeyDown={(e) => e.preventDefault()}
+                                    min={new Date().toISOString().split("T")[0]} // กำหนดวันที่ต่ำสุดเป็นวันนี้
                                 />
                             </div>
 

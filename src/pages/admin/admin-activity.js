@@ -3,7 +3,8 @@ import axios from "axios";
 // import 'bootstrap/dist/css/bootstrap.min.css';
 // import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { useNavigate } from "react-router-dom";
-import { FaFilter, FaPlay, FaCheck, FaClock } from "react-icons/fa"; 
+import { FaFilter, FaPlay, FaCheck, FaClock } from "react-icons/fa";
+import { CiSearch } from "react-icons/ci";
 import "../../css/admin-activity.css";
 
 
@@ -56,13 +57,13 @@ function AdminActivity() {
         const year = date.getFullYear() + 543; // ปีไทย
         return `${day}/${month}/${year}`;
     };
-      
+
     // แปลงเวลาเป็นรูปแบบ 24 ชั่วโมง
     const formatTime = (start, end) => {
         if (!start || !end || start === end) return '-';
         return `${start.substring(0, 5)} - ${end.substring(0, 5)}`;
-      };
-      
+    };
+
     // ฟังก์ชันสำหรับการค้นหากิจกรรม
     const filteredActivities = activityList.filter((activity) => {
         const matchesSearch = activity.activity_name.toLowerCase().includes(searchTerm.toLowerCase());
@@ -121,13 +122,18 @@ function AdminActivity() {
                 <>
                     <div className="d-flex justify-content-between mb-3">
                         <div>
-                            <input
-                                type="text"
-                                className="form-control"
-                                placeholder="ค้นหากิจกรรม..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                            />
+                            <div className="input-group">
+                                <span className="input-group-text bg-light">
+                                    <CiSearch />
+                                </span>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    placeholder="ค้นหากิจกรรม"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
+                            </div>
                         </div>
                         <div className="btn-group">
                             <button
@@ -200,14 +206,14 @@ function AdminActivity() {
                                                         className="btn btn-outline-info btn-sm"
                                                         onClick={() => navigate(`/admin/activities/${act.activity_id}`)}
                                                     >
-                                                    ดูรายละเอียด
+                                                        ดูรายละเอียด
                                                     </button>
                                                     {act.current_participants > 0 && (
                                                         <button
                                                             className="btn btn-outline-primary btn-sm"
                                                             onClick={() => navigate(`/admin/activities/${act.activity_id}/participants`)}
                                                         >
-                                                        ผู้เข้าร่วม
+                                                            ผู้เข้าร่วม
                                                         </button>
                                                     )}
                                                 </div>

@@ -23,6 +23,14 @@ function SouvenirCheckout() {
     const location = useLocation();
     const navigate = useNavigate();
 
+    // กรอกรหัสไปรษณีย์และที่อยู่
+    const [zipcode, setZipcode] = useState("");
+    const [province, setProvince] = useState("");
+    const [district, setDistrict] = useState("");
+    const [subDistricts, setSubDistricts] = useState([]); // array ของตำบล/แขวง
+    const [selectedSubDistrict, setSelectedSubDistrict] = useState("");
+    const [error, setError] = useState("");
+
     // ใช้ selectedItems จาก localStorage หรือ state
     const selectedItems = location.state?.selectedItems || JSON.parse(localStorage.getItem('selectedItems')) || [];
 
@@ -367,21 +375,21 @@ function SouvenirCheckout() {
     //             setFilePreview(null);
     //             return;
     //         }
-    
+
     //         const fileError = validateFile(file);
     //         if (fileError) {
     //             setErrors(prev => ({ ...prev, file: fileError }));
     //             setFilePreview(null);
     //             return;
     //         }
-    
+
     //         setErrors(prev => ({ ...prev, file: "" }));
     //         setFormData(prev => ({
     //             ...prev,
     //             file: file,
     //             slipText: ""
     //         }));
-    
+
     //         // Create file preview
     //         try {
     //             const reader = new FileReader();
@@ -392,7 +400,7 @@ function SouvenirCheckout() {
     //                 setErrors(prev => ({ ...prev, file: "ไม่สามารถอ่านไฟล์ได้" }));
     //             };
     //             reader.readAsDataURL(file);
-    
+
     //             // QR Code detection with better error handling
     //             const qrReader = new FileReader();
     //             qrReader.onload = (event) => {
@@ -401,15 +409,15 @@ function SouvenirCheckout() {
     //                     img.onload = () => {
     //                         const canvas = document.getElementById("canvas");
     //                         if (!canvas) return;
-    
+
     //                         const ctx = canvas.getContext("2d");
     //                         canvas.width = img.width;
     //                         canvas.height = img.height;
     //                         ctx.drawImage(img, 0, 0);
-    
+
     //                         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     //                         const code = jsQR(imageData.data, imageData.width, imageData.height);
-    
+
     //                         if (code) {
     //                             console.log("QR Code Detected:", code.data);
     //                             // Could implement QR validation logic here
@@ -487,9 +495,6 @@ function SouvenirCheckout() {
                                                                         </small>
                                                                     </div>
                                                                     <div>
-                                                                        {/* <span className="badge bg-primary fs-6">
-                                                                            ฿{(item.price * item.quantity).toLocaleString()}
-                                                                        </span> */}
                                                                     </div>
                                                                 </div>
 

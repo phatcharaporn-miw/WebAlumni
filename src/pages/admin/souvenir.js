@@ -155,7 +155,7 @@ function Souvenir() {
             {/* Header Section */}
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <h3 className="admin-title">ของที่ระลึก (สำหรับผู้ดูแล)</h3>
-                <Link to="/admin/admin-manage-orders" className="text-decoration-none">
+                <Link to="/admin/souvenir/admin-manage-orders" className="text-decoration-none">
                     <button className="btn btn-outline-success d-flex align-items-center">
                         <FaRegEdit className="me-2" />
                         จัดการคำสั่งซื้อ
@@ -198,7 +198,7 @@ function Souvenir() {
                     </div>
                 </div>
 
-                <div className="col-md-3 d-flex align-items-end">
+                <div className="col-md-3 d-flex align-items-end mb-2">
                     <Link to="/admin/souvenir/souvenir_request" className="text-decoration-none w-100">
                         <button className="btn btn-primary w-100 d-flex align-items-center justify-content-center">
                             <IoIosAddCircleOutline className="me-2" />
@@ -209,7 +209,7 @@ function Souvenir() {
 
             </div>
 
-            {/* Table Section */}
+            {/* Table Section
             <div className="card shadow-sm">
                 <div className="card-body p-0">
                     <div className="table-responsive">
@@ -272,28 +272,33 @@ function Souvenir() {
                                                 </span>
                                             </td>
                                             <td className="text-center align-middle">
-                                                <span className="fs-6 ">
-                                                    {product.stock} ชิ้น
+                                                <span className="fs-6">
+                                                    {product.stock_remain} ชิ้น
                                                 </span>
+                                                <div className="small text-muted">
+                                                    (ทั้งหมด {product.total_quantity}, ขายแล้ว {product.total_sold}, จอง {product.total_reserved})
+                                                </div>
                                             </td>
+
                                             <td className="text-center align-middle">
                                                 {roleNames[product.role_id]}
                                             </td>
                                             <td className="text-center align-middle">
                                                 <span
                                                     className={`badge fs-7 
-                                                        ${product.stock === 0
+                                                        ${product.stock_remain === 0
                                                             ? "bg-danger bg-opacity-10 text-danger"
                                                             : product.status === "1"
                                                                 ? "bg-success bg-opacity-10 text-success"
                                                                 : "bg-warning bg-opacity-10 text-warning"
                                                         }`}
                                                 >
-                                                    {product.stock === 0
+                                                    {product.stock_remain === 0
                                                         ? "สินค้าหมด"
                                                         : statusLabel(product.status)}
                                                 </span>
                                             </td>
+
                                             <td className="text-center align-middle">
                                                 {new Date(product.created_at).toLocaleDateString("th-TH")}
                                             </td>
@@ -325,6 +330,15 @@ function Souvenir() {
                                                         <MdDelete className="me-1" />
                                                         ลบ
                                                     </button>
+                                                    <Link
+                                                        to={`/admin/souvenir/product-slot/${product.product_id}`}
+                                                        className="btn btn-outline-warning btn-sm"
+                                                        title="เพิ่มสล็อตสินค้า"
+                                                        onClick={e => e.stopPropagation()}
+                                                    >
+                                                        <IoIosAddCircleOutline className="me-1" />
+                                                        เพิ่มสล็อตสินค้า
+                                                    </Link>
                                                 </div>
                                             </td>
                                         </tr>
@@ -334,7 +348,109 @@ function Souvenir() {
                         </table>
                     </div>
                 </div>
+            </div> */}
+
+            <div className="row g-4">
+                {filteredProducts.length === 0 ? (
+                    <div className="col-12 text-center text-muted py-4">
+                        ไม่พบสินค้าที่ค้นหา
+                    </div>
+                ) : (
+                    filteredProducts.map((product) => (
+                        <div
+                            key={product.product_id}
+                            className="col-12 col-sm-6 col-md-4 col-lg-3"
+                            onClick={() => handleDetail(product)}
+                            style={{ cursor: "pointer" }}
+                        >
+                            <div className="card h-100 shadow-sm position-relative">
+                                {/* รูปสินค้า */}
+                                <div className="position-relative">
+                                    <img
+                                        src={`http://localhost:3001/uploads/${product.image}`}
+                                        alt={product.image}
+                                        onError={(e) => (e.target.src = "/image/default.jpg")}
+                                        className="card-img-top"
+                                        style={{ height: "180px", objectFit: "cover" }}
+                                    />
+
+                                    {/* สถานะสินค้า */}
+                                    <span
+                                        className={`badge position-absolute top-0 end-0 m-2 px-2 py-1 
+                                            ${product.stock_remain === 0
+                                                ? "bg-danger"
+                                                : product.status === "1"
+                                                    ? "bg-success "
+                                                    : "bg-warning "
+                                            }`}
+                                        style={{ fontSize: "0.9rem" }}
+                                    >
+                                        {product.stock_remain === 0
+                                            ? "สินค้าหมด"
+                                            : statusLabel(product.status)}
+                                    </span>
+                                </div>
+
+                                {/* เนื้อหา card */}
+                                <div className="card-body d-flex flex-column">
+                                    <h5 className="card-title">{product.product_name}</h5>
+                                    <p className="card-text mb-1">
+                                        <span className="fw-bold text-success">฿{product.price}</span>
+                                    </p>
+                                    <p className="mb-1">
+                                        เหลือ {product.stock_remain} ชิ้น
+                                        <br />
+                                        <small className="text-muted">
+                                            (ทั้งหมด {product.total_quantity}, ขายแล้ว {product.total_sold}, จอง {product.total_reserved})
+                                        </small>
+                                    </p>
+                                    <p className="small text-muted mb-2">
+                                        ผู้ดูแล: {roleNames[product.role_id]}
+                                        <br />
+                                        เพิ่มเมื่อ {new Date(product.created_at).toLocaleDateString("th-TH")}
+                                    </p>
+
+                                    {/* ปุ่มจัดการ */}
+                                    <div
+                                        className="mt-auto btn-group-vertical btn-group-sm gap-1"
+                                        onClick={(e) => e.stopPropagation()}
+                                    >
+                                        {product.status === "0" && (
+                                            <button
+                                                className="btn btn-outline-success btn-sm"
+                                                onClick={() => handleApprove(product.product_id)}
+                                            >
+                                                <BsCheck2Square className="me-1" /> อนุมัติ
+                                            </button>
+                                        )}
+                                        <button
+                                            className="btn btn-outline-primary btn-sm"
+                                            onClick={() => handleOpen(product)}
+                                        >
+                                            <FaRegEdit className="me-1" /> แก้ไข
+                                        </button>
+                                        <button
+                                            className="btn btn-outline-danger btn-sm"
+                                            onClick={() => handleDelete(product.product_id)}
+                                        >
+                                            <MdDelete className="me-1" /> ลบ
+                                        </button>
+                                        <Link
+                                            to={`/admin/souvenir/product-slot/${product.product_id}`}
+                                            className="btn btn-outline-warning btn-sm"
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            <IoIosAddCircleOutline className="me-1" /> เพิ่มสล็อตสินค้า
+                                        </Link>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    ))
+                )}
             </div>
+
+
 
             {/* Modal */}
             <div
@@ -415,25 +531,6 @@ function Souvenir() {
                                                     step="0.01"
                                                 />
                                             </div>
-                                        </div>
-
-                                        <div className="col-md-6 mb-3">
-                                            <label className="form-label fw-semibold">
-                                                จำนวนในคลัง
-                                            </label>
-                                            <input
-                                                type="number"
-                                                className="form-control w-100"
-                                                value={selectedProduct.stock}
-                                                onChange={(e) =>
-                                                    setSelectedProduct({
-                                                        ...selectedProduct,
-                                                        stock: e.target.value
-                                                    })
-                                                }
-                                                placeholder="จำนวน"
-                                                min="0"
-                                            />
                                         </div>
 
                                         <div className="col-md-6 mb-3">

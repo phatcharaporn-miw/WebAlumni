@@ -56,6 +56,39 @@ function EditActivity() {
         }
     };
 
+    //สำหรับจัดการการเปลี่ยนแปลงวันที่
+          const handleChangeDate = (e) => {
+              const { name, value } = e.target;
+              const today = new Date().toISOString().split('T')[0];
+      
+              // ตรวจสอบว่าไม่สามารถเลือกวันที่ย้อนหลังได้
+              if (name === 'startDate' || name === 'endDate') {
+                  if (value < today) {
+                      Swal.fire({
+                          icon: 'warning',
+                          title: "ไม่สามารถเลือกวันที่ย้อนหลังได้",
+                          confirmButtonText: "ตกลง",
+                      });
+                      return;
+                  }
+      
+                  // สำหรับ endDate ต้องไม่เก่ากว่า startDate
+                  if (name === 'endDate' && formData.startDate && value < formData.startDate) {
+                      Swal.fire({
+                          icon: 'warning',
+                          title: 'วันที่สิ้นสุดต้องไม่เก่ากว่าวันที่เริ่มต้น',
+                          confirmButtonText: "ตกลง",
+                      });
+                      return;
+                  }
+              }
+      
+              setFormData(prev => ({
+                  ...prev,
+                  [name]: value
+              }));
+          }
+
     // ฟังก์ชันบันทึกการแก้ไขกิจกรรม
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -150,9 +183,10 @@ function EditActivity() {
                                         id="activity_date"
                                         name="activity_date"
                                         value={formData.activity_date}
-                                        onChange={handleChange}
+                                        onChange={handleChangeDate}
                                         required
                                         min={new Date().toISOString().split("T")[0]}
+                                        onKeyDown={(e) => e.preventDefault()}
                                     />
                                 </div>
 
@@ -165,8 +199,9 @@ function EditActivity() {
                                         id="end_date"
                                         name="end_date"
                                         value={formData.end_date}
-                                        onChange={handleChange}
+                                        onChange={handleChangeDate}
                                         min={new Date().toISOString().split("T")[0]}
+                                        onKeyDown={(e) => e.preventDefault()}
                                     />
                                 </div>
 

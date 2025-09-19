@@ -138,13 +138,13 @@ function EditUserProfile() {
                 <div className="mb-3">
                   <label className="form-label">วุฒิการศึกษา</label>
                   <select
-                    value={edu.degree_id || ""}
-                    onChange={e => handleEduChange(idx, "degree_id", e.target.value)}
+                    value={edu.degree_name || ""}
+                    onChange={e => handleEduChange(idx, "degree_name", e.target.value)}
                     className="form-select"
                   >
                     <option value="">เลือกระดับการศึกษา</option>
                     {degrees.map(degree => (
-                      <option key={degree.degree_id} value={degree.degree_id}>
+                      <option key={degree.degree_name} value={degree.degree_name}>
                         {degree.degree_name}
                       </option>
                     ))}
@@ -154,13 +154,13 @@ function EditUserProfile() {
                 <div className="mb-3">
                   <label className="form-label">สาขา</label>
                   <select
-                    value={edu.major_id || ""}
-                    onChange={e => handleEduChange(idx, "major_id", e.target.value)}
+                    value={edu.major_name || ""}
+                    onChange={e => handleEduChange(idx, "major_name", e.target.value)}
                     className="form-select"
                   >
                     <option value="">เลือกสาขาวิชา</option>
                     {majors.map(major => (
-                      <option key={major.major_id} value={major.major_id}>
+                      <option key={major.major_name} value={major.major_name}>
                         {major.major_name}
                       </option>
                     ))}

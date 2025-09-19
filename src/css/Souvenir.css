@@ -19,15 +19,14 @@
     display: flex;
     justify-content: end;
 }
-.souvenir-item-group {
-    display: grid;
+.souvenir-item-group-home {
+    /* display: grid; */
     grid-template-columns: auto auto auto auto auto;
     margin: 0 5%;
-    gap: 2%;
-    justify-content: left;
+    /* justify-content: left; */
 }
 
-.souvenir-item-group a {
+.souvenir-item-group-home a {
     text-decoration: none;
     color: black;
 }

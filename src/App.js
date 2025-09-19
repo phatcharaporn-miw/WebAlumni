@@ -46,7 +46,7 @@ import ChangePassword from './pages/change-password';
 import AlumniProfileDonation from './pages/alumni/alumni-profile-donation';
 import AlumniManageOrders from './pages/alumni/alumni-manage-orders';
 import RegistrationForm from './pages/test-regis';
-import CheckStudentId from './pages/check-studentId';
+import CheckFullName from './pages/check-fullName';
 import DonateConfirm from './pages/donate-confirm';
 
 
@@ -96,6 +96,8 @@ import AdminCheckPaymentDonateDetail from './pages/admin/admin-donate-checkPayme
 import AdminEditProject from './pages/admin/admin-donate-edit';
 import AdminDonateRequest from './pages/admin/admin-donate-request';
 import AdminProjectDetail from './pages/admin/admin-donate-detail';
+import AddUser from './pages/admin/add-user';
+import ProductSlots from './pages/admin/product-slot';
 
 
 //import ของนายกสมาคม
@@ -111,6 +113,7 @@ import Approve from './pages/president/president-approve';
 import PresidentProfileSouvenir from './pages/president/president-profile-souvenir';
 import PresidentProfileDonation from './pages/president/president-profile-donation';
 import PresidentManageOrders from './pages/president/president-manage-orders';
+
 
 const AlumniMajor = lazy(() => import("./pages/major-detail"));
 const Webboard = lazy(() => import("./pages/webboard"));
@@ -160,7 +163,7 @@ function App() {
                   <Route path="/search" element={<SearchResult />} />
                   <Route path="/alumni/:userId" element={<HomeAlumniProfile />} />
                   <Route path="/createPost" element={<CreatePost />} />
-                  <Route path="/check-studentId" element={<CheckStudentId />} />
+                  <Route path="/check-fullName" element={<CheckFullName />} />
                   <Route path="/donate/donatedetail/donateconfirm/:id" element={<DonateConfirm />} />
                   
 
@@ -233,15 +236,13 @@ function App() {
                   <Route path="/admin/admin-alumni" element={<AdminOnly><AdminAlumni /></AdminOnly>} />
                   <Route path="/admin/admin-alumni/admin-alumniView/:major" element={<AdminOnly><AdminAlumniView /></AdminOnly>} />
                   <Route path="/admin/donations" element={<AdminOnly><AdminDonate /></AdminOnly>} />
-                  {/* <Route path="/admin/donations/check-payment-donate" element={<AdminOnly><AdminCheckPaymentDonate /></AdminOnly>} />      */}
-                  {/* <Route path="/admin/donations/detail/:id" element={<AdminOnly><DonateDetail /></AdminOnly>} /> */}
-                  {/* <Route path="/admin/donations/create-project" element={<AdminOnly><DonateRequest /></AdminOnly>} /> */}
-                  {/* <Route path="/admin/donations/edit-project/:projectId" element={<AdminOnly><DonateRequest /></AdminOnly>} /> */}
-                  <Route path="/admin/admin-manage-orders" element={<AdminOnly><AdminOrderManager /></AdminOnly>} />
+                  <Route path="/admin/souvenir/admin-manage-orders" element={<AdminOnly><AdminOrderManager /></AdminOnly>} />
                   <Route path="/admin/donations/check-payment-donate/detail/:id" element={<AdminOnly><AdminCheckPaymentDonateDetail /></AdminOnly>} />
                   <Route path="/admin/donations/edit/:id" element={<AdminOnly><AdminEditProject /></AdminOnly>} />
                   <Route path="/admin/donations/donate-request" element={<AdminOnly><AdminDonateRequest /></AdminOnly>} />
                   <Route path="/admin/donations/donate-detail/:id" element={<AdminOnly><AdminProjectDetail /></AdminOnly>} />
+                  <Route path="/admin/users/add-user" element={<AdminOnly><AddUser /></AdminOnly>} />
+                  <Route path="/admin/souvenir/product-slot/:productId" element={<AdminOnly><ProductSlots /></AdminOnly>} />
 
                 </Route>
               </Routes>

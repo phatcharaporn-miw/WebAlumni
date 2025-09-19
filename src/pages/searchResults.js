@@ -145,7 +145,7 @@ function SearchResult() {
 }
 
 function getLink(item) {
-    //  console.log("Selected item:", item);
+    // console.log("Selected item:", item);
     switch (item.type) {
         case "news":
             return `/news/${item.id}`;

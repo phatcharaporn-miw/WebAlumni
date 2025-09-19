@@ -3,6 +3,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { FaHeart, FaShoppingCart } from 'react-icons/fa';
 import '../../css/verify.css';
+import { CiSearch } from "react-icons/ci";
 
 function AdminVerifySlip() {
     // การสั่งซื้อ
@@ -300,7 +301,9 @@ function AdminVerifySlip() {
             <div className="row mb-4">
                 <div className="col-md-4">
                     <div className="input-group">
-                        <span className="input-group-text"></span>
+                        <span className="input-group-text bg-light">
+                            <CiSearch />
+                        </span>
                         <input
                             type="text"
                             className="form-control"

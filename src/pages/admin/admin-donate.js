@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "../../css/adminDonate.css";
+import { CiSearch } from "react-icons/ci";
 import axios from "axios";
 import { Link, useLocation } from "react-router-dom";
 
@@ -150,19 +151,19 @@ function AdminDonate() {
             {/* Top Menu Navigation */}
             <div className="mb-4">
                 <nav className="nav Adminnav-tabs">
-                    <Link 
+                    <Link
                         className={`adminnav-link ${location.pathname === '/admin/donations' ? 'active' : ''}`}
                         to="/admin/donations"
                     >
                         <i className="fas fa-project-diagram me-2"></i>
                         การจัดการโครงการบริจาค
                     </Link>
-                    <Link 
-                        className={`adminnav-link ${location.pathname === '/admin/donations/check-payment-donate' ? 'active' : ''}`}
-                        to="/admin/donations/check-payment-donate"
+                    <Link
+                        className={`adminnav-link ${location.pathname === '/admin/donations/donate-request' ? 'active' : ''}`}
+                        to="/admin/donations/donate-request"
                     >
                         <i className="fas fa-credit-card me-2"></i>
-                        การจัดการตรวจสอบการชำระเงินบริจาค
+                        เพิ่มโครงการใหม่
                     </Link>
                 </nav>
             </div>
@@ -170,17 +171,17 @@ function AdminDonate() {
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <h2 className="donate-activity-title">การจัดการโครงการบริจาค</h2>
                 <div className="d-flex gap-2">
-                    <Link to="/admin/donations/donate-request" className="btn-admin-donate-request">
+                    {/* <Link to="/admin/donations/donate-request" className="btn-admin-donate-request">
                         <i className="fas fa-plus"></i> เพิ่มโครงการใหม่
-                    </Link>
+                    </Link> */}
                 </div>
             </div>
 
             <div className="row mb-4">
                 <div className="col-md-4">
                     <div className="input-group">
-                        <span className="input-group-text">
-                            <i className="fas fa-search"></i>
+                        <span className="input-group-text bg-light">
+                            <CiSearch />
                         </span>
                         <input
                             type="text"
@@ -382,7 +383,7 @@ function AdminDonate() {
                                                                 <i className="fas fa-trash"></i> ลบ
                                                             </button>
                                                             <Link
-                                                                to={`/admin/donations/donatedetail/${project.project_id}`}
+                                                                to={`/admin/donations/donate-detail/${project.project_id}`}
                                                                 className="btn fasfa-info btn-sm"
                                                             >
                                                                 <i className="fas fa-eye"></i> ดูรายละเอียด

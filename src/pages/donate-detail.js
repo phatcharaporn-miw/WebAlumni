@@ -174,6 +174,7 @@ function DonateDetail() {
         setHasSavedData(false);
     }, [FORM_DATA_KEY]);
 
+    // Scroll to top on mount
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);

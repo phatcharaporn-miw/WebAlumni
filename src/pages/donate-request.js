@@ -3,6 +3,7 @@ import { Button, Modal, Box, Typography } from '@mui/material';
 import "../css/Donate-request.css";
 import { Link, useNavigate } from "react-router-dom";
 import axios from 'axios';
+import Swal from "sweetalert2";
 
 function DonateRequest() {
     const navigate = useNavigate();
@@ -33,6 +34,39 @@ function DonateRequest() {
         const { name, value } = e.target;
         setFormData(prevData => ({ ...prevData, [name]: value }));
     };
+
+    //สำหรับจัดการการเปลี่ยนแปลงวันที่
+    const handleChangeDate = (e) => {
+        const { name, value } = e.target;
+        const today = new Date().toISOString().split('T')[0];
+
+        // ตรวจสอบว่าไม่สามารถเลือกวันที่ย้อนหลังได้
+        if (name === 'startDate' || name === 'endDate') {
+            if (value < today) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: "ไม่สามารถเลือกวันที่ย้อนหลังได้",
+                    confirmButtonText: "ตกลง",
+                });
+                return;
+            }
+
+            // สำหรับ endDate ต้องไม่เก่ากว่า startDate
+            if (name === 'endDate' && formData.startDate && value < formData.startDate) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'วันที่สิ้นสุดต้องไม่เก่ากว่าวันที่เริ่มต้น',
+                    confirmButtonText: "ตกลง",
+                });
+                return;
+            }
+        }
+
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    }
 
     const handleFileChange = (e) => {
         const { files } = e.target;
@@ -86,13 +120,33 @@ function DonateRequest() {
         try {
             const response = await axios.post('http://localhost:3001/donate/donateRequest', data, {
                 headers: { 'Content-Type': 'multipart/form-data' },
-            },{
+            }, {
                 withCredentials: true
             });
-            alert("เพิ่มโครงการบริจาคสำเร็จ!");
-            // navigate("/donate");
-            navigate("/alumni-profile/alumni-request");
-        } catch (error) {
+            Swal.fire({
+                title: "ส่งคำขอโครงการบริจาคสำเร็จ!",
+                text: "โปรดรอการอนุมัติจากผู้ดูแลระบบ",
+                icon: "success",
+                confirmButtonText: "ตกลง"
+            }).then(() => {
+                setSuccessMessage("ส่งคำขอโครงการบริจาคสำเร็จ! โปรดรอการอนุมัติจากผู้ดูแลระบบ");
+                setErrorMessage("");
+                setIsSubmitting(false);
+
+                const role = localStorage.getItem("userRole");
+
+                if (role === "3") {
+                    navigate("/alumni-profile/alumni-request");
+                } else if (role === "4") {
+                    navigate("/student-profile/student-request");
+                } else if (role === "2") {
+                    navigate("/president-profile/president-request");
+                } else {
+                    navigate("/");
+                }
+            });
+        }
+        catch (error) {
             console.error("Error:", error);
             alert(error.response?.data?.error || "เกิดข้อผิดพลาด");
         }
@@ -245,18 +299,20 @@ function DonateRequest() {
                                     name="startDate"
                                     type="date"
                                     value={formData.startDate}
-                                    onChange={handleChange}
+                                    onChange={handleChangeDate}
                                     required
                                     min={new Date().toISOString().split('T')[0]}
+                                    onKeyDown={(e) => e.preventDefault()}
                                 />
                                 <span className="title-time">สิ้นสุด:</span>
                                 <input
                                     name="endDate"
                                     type="date"
                                     value={formData.endDate}
-                                    onChange={handleChange}
+                                    onChange={handleChangeDate}
                                     required
                                     min={formData.startDate ? formData.startDate : new Date().toISOString().split('T')[0]}
+                                    onKeyDown={(e) => e.preventDefault()}
                                 />
                             </div>
                         </p>
@@ -325,7 +381,7 @@ function DonateRequest() {
                             </Link>
                             <button
                                 className="submit-button-request"
-                                type="button" 
+                                type="button"
                                 onClick={handleOpen}
                             >
                                 เพิ่มโครงการ

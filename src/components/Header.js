@@ -540,7 +540,7 @@ function Header({ user, handleLogout }) {
           <li className="nav-item">
             {!isLoggedIn && (
               <NavLink
-                to="/check-studentId"
+                to="/check-fullName"
                 className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}
               >
                 ตรวจสอบข้อมูล

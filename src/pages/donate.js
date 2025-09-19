@@ -125,6 +125,8 @@ function Donate() {
     const getProjectStatusBadge = (project) => {
         const now = new Date();
         const endDate = project?.end_date ? new Date(project.end_date) : null;
+        const startDate = new Date(project?.start_date);
+        const comingSoonDays = startDate && now < startDate;
 
         if (!endDate) return null;
 
@@ -137,7 +139,21 @@ function Donate() {
             return <span className="donate-badge donate-badge-warning">ใกล้สิ้นสุด</span>;
         }
 
-        return <span className="donate-badge donate-badge-active">กำลังดำเนินการ</span>;
+        if (now < startDate) {
+            return (
+                <span className="donate-badge donate-badge-secondary">
+                    กำลังจะเริ่ม
+                </span>
+            );
+        }
+        if (now > startDate && now <= endDate) {
+            return (
+                <span className="donate-badge donate-badge-active">
+                    กำลังดำเนินการ
+                </span>
+            );
+        }
+
     };
 
     const handleTagClick = (type) => {

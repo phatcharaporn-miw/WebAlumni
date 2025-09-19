@@ -88,13 +88,13 @@ function Souvenir() {
                     <h3 className="titlesouvenir-type ">
                         สินค้าของสมาคมศิษย์เก่า
                     </h3>
-                    <div className="souvenir-item-group row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+                    <div className="souvenir-item-group-home row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3">
                         {products && products.length > 0 ? (
                             products
                                 .filter((product) => [1, 2, 3].includes(product.role_id))
                                 .map((product) => (
                                     <div className="col" key={product.product_id}>
-                                        {product.stock === 0 ? (
+                                        {product.is_sold_out ? (
                                             <div className="souvenir-item card h-100 shadow-sm border-0 position-relative">
                                                 <img
                                                     className="souvenir-item-img card-img-top"
@@ -139,13 +139,13 @@ function Souvenir() {
                     <h3 className="titlesouvenir-type">
                         สินค้าของศิษย์ปัจจุบัน
                     </h3>
-                    <div className="souvenir-item-group row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+                    <div className="souvenir-item-group-home row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3">
                         {products && products.length > 0 ? (
                             products
                                 .filter((product) => product.role_id === 4)
                                 .map((product) => (
                                     <div className="col" key={product.product_id}>
-                                        {product.stock === 0 ? (
+                                        {product.is_sold_out ? (
                                             <div className="souvenir-item card h-100 shadow-sm border-0 position-relative">
                                                 <img
                                                     className="souvenir-item-img card-img-top"

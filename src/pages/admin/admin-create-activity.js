@@ -57,6 +57,39 @@ function CreateActivity() {
     }
   };
 
+  //สำหรับจัดการการเปลี่ยนแปลงวันที่
+      const handleChangeDate = (e) => {
+          const { name, value } = e.target;
+          const today = new Date().toISOString().split('T')[0];
+  
+          // ตรวจสอบว่าไม่สามารถเลือกวันที่ย้อนหลังได้
+          if (name === 'startDate' || name === 'endDate') {
+              if (value < today) {
+                  Swal.fire({
+                      icon: 'warning',
+                      title: "ไม่สามารถเลือกวันที่ย้อนหลังได้",
+                      confirmButtonText: "ตกลง",
+                  });
+                  return;
+              }
+  
+              // สำหรับ endDate ต้องไม่เก่ากว่า startDate
+              if (name === 'endDate' && formData.startDate && value < formData.startDate) {
+                  Swal.fire({
+                      icon: 'warning',
+                      title: 'วันที่สิ้นสุดต้องไม่เก่ากว่าวันที่เริ่มต้น',
+                      confirmButtonText: "ตกลง",
+                  });
+                  return;
+              }
+          }
+  
+          setFormData(prev => ({
+              ...prev,
+              [name]: value
+          }));
+      }
+
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files); // ต้องแปลงก่อนใช้
     console.log("อัปโหลดรูป:", files);
@@ -183,8 +216,9 @@ function CreateActivity() {
                             id="end_date"
                             name="end_date"
                             value={formData.end_date}
-                            onChange={handleChange}
+                            onChange={handleChangeDate}
                             min={formData.activity_date || minDate}
+                            onKeyDown={(e) => e.preventDefault()}
                           />
                         </div>
 
@@ -196,7 +230,8 @@ function CreateActivity() {
                             id="end_time"
                             name="end_time"
                             value={formData.end_time}
-                            onChange={handleChange}
+                            onChange={handleChangeDate}
+                            onKeyDown={(e) => e.preventDefault()}
                           />
                         </div>
 
@@ -265,10 +300,10 @@ function CreateActivity() {
                     {/* การตั้งค่าเพิ่มเติม */}
                     <div className="card mb-4">
                       <div className="card-header bg-info text-white">
-                        <h5>การตั้งค่าเพิ่มเติม</h5>
+                        <h5>เพิ่มเติม</h5>
                       </div>
                       <div className="card-body">
-                        <div className="form-group mb-3">
+                        {/* <div className="form-group mb-3">
                           <label>ต้องการการลงทะเบียน:</label>
                           <input
                             type="checkbox"
@@ -278,7 +313,7 @@ function CreateActivity() {
                             checked={formData.registration_required}
                             onChange={handleChange}
                           />
-                        </div>
+                        </div> */}
 
                         <div className="form-group mb-3">
                           <label>จำนวนผู้เข้าร่วมสูงสุด:</label>

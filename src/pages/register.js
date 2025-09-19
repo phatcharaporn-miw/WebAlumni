@@ -121,7 +121,6 @@ function Register() {
         fetchMajors();
     }, []);
 
-
     const handleInputChange = (e) => {
         const { name, value, checked, type } = e.target;
 
@@ -171,7 +170,6 @@ function Register() {
         const updatedEducation = userData.education.filter((_, i) => i !== index);
         setUserData((prevState) => ({ ...prevState, education: updatedEducation }));
     };
-
 
 
     return (
