@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
 const AuthContext = createContext();
 
@@ -15,140 +17,215 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [notifications, setNotifications] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  // const [redirectPath, setRedirectPath] = useState(false);
+  const [initializing, setInitializing] = useState(true);
+  const navigate = useNavigate();
 
-// ดึงข้อมูลโปรไฟล์ผู้ใช้ (รองรับทั้ง user และ admin)
+  const normalizeUser = (u) => ({
+  user_id: u.userId || u.user_id || u.id,
+  username: u.username || u.full_name || u.nick_name || "",
+  role: Number(u.role || u.role_id),
+  isAdmin: Number(u.role || u.role_id) === 1,
+  isUser: Number(u.role || u.role_id) !== 1,
+  profilePicture: u.profilePicture || u.image_path || "http://localhost:3001/uploads/default-profile.png",
+});
+
+
 const fetchUserProfile = async () => {
-  const userId = localStorage.getItem("userId");
-  const role = localStorage.getItem("userRole");
-  
-  if (!userId || !role) {
-    setUser(null);
-    setLoading(false);
-    return;
-  }
-
+  setLoading(true);
   try {
-    // ใช้ endpoint เดียวกันสำหรับทุก role โดยไม่ส่ง userId ใน URL
-    // เพราะ backend ดึง userId จาก session
-    const endpoint = 'http://localhost:3001/users/profile'; 
-    
-    console.log('Fetching profile for userId:', userId, 'role:', role);
-
-    const response = await axios.get(endpoint, {
-      withCredentials: true, // สำคัญมาก! เพื่อส่ง session cookie
+    console.log('Fetching user profile...');
+    const res = await axios.get("http://localhost:3001/users/profile", { 
+      withCredentials: true,
     });
 
-    console.log('Profile API Response:', response.data);
-
-    if (response.data.success) {
-      setUser({
-        ...response.data.user,
-        userId: response.data.user.userId || userId,
-        role: response.data.user.role || role,
-        isAdmin: role === '1',
-        isUser: role !== '1',
-      });
-    } else {
-      console.log('API returned success: false');
-      setUser(null);
-      localStorage.removeItem('userId');
-      localStorage.removeItem('userRole');
-      localStorage.removeItem('username');
-      localStorage.removeItem('image_path');
-    }
+    if (res.data.success) {
+  const userData = normalizeUser(res.data.user);
+  setUser(userData);
+  sessionStorage.setItem("user", JSON.stringify(userData));
+} else {
+  console.log('No valid session found');
+  setUser(null);
+  sessionStorage.removeItem("user");
+  
+}
   } catch (error) {
-    console.error('เกิดข้อผิดพลาดในการดึงข้อมูลโปรไฟล์:', error);
-    console.error('Error status:', error.response?.status);
-    console.error('Error message:', error.response?.data?.message);
+    console.error('Error fetching profile:', error);
     
-    // ถ้าเป็น 401 (unauthorized) แสดงว่า session หมดอายุ
-    if (error.response?.status === 401) {
-      console.log('Session expired - clearing localStorage');
-      localStorage.removeItem('userId');
-      localStorage.removeItem('userRole');
-      localStorage.removeItem('username');
-      localStorage.removeItem('image_path');
-    }
-    
-    setUser(null);
   } finally {
     setLoading(false);
   }
 };
 
-  // login
-  const handleLogin = async (userId, role, userData = null) => {
-    localStorage.setItem('userId', userId);
-    localStorage.setItem('userRole', role);
-    if (userData) {
-      setUser({
-        ...userData,
-        userId,
-        role,
-        isAdmin: role === '1',
-        isUser: role !== '1',
-      });
-    } else {
+useEffect(() => {
+  // console.log('AuthProvider initializing...');
+  const initializeAuth = async () => {
+    setInitializing(true);
+    try {
+      const savedUser = sessionStorage.getItem("user");
+      if (savedUser) {
+        const userData = JSON.parse(savedUser);
+        console.log('Found saved user:', userData);
+        setUser(userData); // ตั้งค่า user ทันทีเพื่อป้องกัน null
+      }
       await fetchUserProfile();
+    } catch (err) {
+      console.error("Initialize auth error:", err);
+    } finally {
+      setInitializing(false); // ปิดเฉพาะตอน init เสร็จจริง ๆ
     }
   };
 
-  // logout
+  initializeAuth();
+}, []);
+
+
+  const handleLogin = async (username, password) => {
+    try {
+      setLoading(true);
+      console.log('Attempting login...', { username });
+
+      const response = await axios.post("http://localhost:3001/api/login", {
+        username,
+        password
+      }, { withCredentials: true });
+
+      if (response.data.success) {
+  const userData = normalizeUser(response.data);
+  setUser(userData);
+  
+  sessionStorage.setItem("user", JSON.stringify(userData));
+
+  if (!response.data.profilePicture || !response.data.username) {
+    fetchUserProfile();
+  }
+
+  return response.data;
+}
+
+      throw new Error(response.data.message || 'Login failed');
+    } catch (error) {
+      console.error('Login error:', error);
+      setLoading(false);
+      throw error;
+    }
+  };
+
+  // const handleLogout = async () => {
+
+  //   try {
+  //     setIsLoggingOut(true);
+  //     console.log('Starting logout process...');
+      
+  //     window.dispatchEvent(new Event('userLogout'));
+
+  //     await axios.post("http://localhost:3001/api/logout", {}, { withCredentials: true });
+  //     console.log('Server logout successful');
+  //   } catch (error) {
+  //     console.error('Logout error:', error);
+  //   }
+
+  //   // ล้าง state และ storage
+  //   setUser(null);
+  //   setNotifications(0);
+  //   sessionStorage.removeItem("user");
+    
+  //   // ส่ง storage event สำหรับ cross-tab communication
+  //   localStorage.setItem('logout-event', Date.now().toString());
+  //   localStorage.removeItem('logout-event');
+
+  //   setIsLoggingOut(false);
+  //   navigate('/'); // เปลี่ยนจาก window.location.href เป็น navigate('/')
+    
+  //   return true;
+  // };
+
   const handleLogout = async () => {
-    // ล้างข้อมูลใน state ทันที
+  try {
+    setIsLoggingOut(true);
+    console.log('Starting logout process...');
+    
+    // ล้าง state และ storage ก่อน
     setUser(null);
     setNotifications(0);
+    sessionStorage.removeItem("user");
+    
+    // ส่ง storage event สำหรับ cross-tab communication
+    localStorage.setItem('logout-event', Date.now().toString());
+    localStorage.removeItem('logout-event');
+    
+    // เรียก API logout หลังจากล้าง state แล้ว
+    window.dispatchEvent(new Event('userLogout'));
+    await axios.post("http://localhost:3001/api/logout", {}, { withCredentials: true });
+    console.log('Server logout successful');
+    
+  } catch (error) {
+    console.error('Logout error:', error);
+  } finally {
+    setIsLoggingOut(false);
+    navigate('/');
+  }
+  
+  return true;
+};
 
-    // ล้าง localStorage
-    localStorage.removeItem('userId');
-    localStorage.removeItem('userRole');
-    localStorage.removeItem('username');
-    localStorage.removeItem('image_path');
-
-    // ส่ง custom event
-    window.dispatchEvent(new CustomEvent('userLogout'));
-
-    // เรียก API logout (ไม่ต้องสนใจ error)
-    try {
-      await axios.get('http://localhost:3001/api/logout', {
-        withCredentials: true,
-      });
-    } catch (error) {
-      // ไม่ต้องทำอะไร
-    }
-
-    setLoading(false);
-    return true;
-  };
-
-  // เพิ่ม function สำหรับบังคับ refresh state
   const forceRefresh = () => {
     setUser(null);
     setNotifications(0);
-    localStorage.clear();
+    sessionStorage.removeItem("user");
+    fetchUserProfile();
   };
 
+  const setUserFromLoginResponse = (loginData) => {
+    const userData = {
+      id: loginData.userId,
+      username: loginData.username,
+      role: loginData.role,
+      isAdmin: loginData.role === 1,
+      isUser: loginData.role !== 1,
+      profilePicture: loginData.profilePicture || "http://localhost:3001/uploads/default-profile.png",
+    };
+
+    setUser(userData);
+    sessionStorage.setItem("user", JSON.stringify(userData));
+  };
+
+  // เริ่มต้น: ตรวจสอบ sessionStorage ก่อน แล้วค่อย verify กับ server
+
+// useEffect(() => {
+//   const handleStorageChange = (e) => {
+//     if (e.key === 'logout-event') {
+//       console.log('Logout event from another tab');
+//       setUser(null);
+//       setNotifications(0);
+//       sessionStorage.removeItem("user");
+//       setRedirectPath('/login');
+//     }
+//   };
+
+//   const handleLogoutEvent = () => {
+//     console.log('Logout event received');
+//     setUser(null);
+//     setNotifications(0);
+//     sessionStorage.removeItem("user");
+//     setRedirectPath('/login');
+//   };
+
+//   window.addEventListener("storage", handleStorageChange);
+//   window.addEventListener("userLogout", handleLogoutEvent);
+
+//   return () => {
+//     window.removeEventListener("storage", handleStorageChange);
+//     window.removeEventListener("userLogout", handleLogoutEvent);
+//   };
+// }, []);
+
+
+  // Debug user state changes
   useEffect(() => {
-    fetchUserProfile();
-
-    // ฟัง storage event และ custom logout event
-    const handleStorageChange = () => {
-      fetchUserProfile();
-    };
-
-    const handleLogoutEvent = () => {
-      setUser(null);
-      setNotifications(0);
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-    window.addEventListener("userLogout", handleLogoutEvent);
-
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-      window.removeEventListener("userLogout", handleLogoutEvent);
-    };
-  }, []);
+    console.log('User state changed:', user);
+  }, [user]);
 
   return (
     <AuthContext.Provider value={{
@@ -157,13 +234,15 @@ const fetchUserProfile = async () => {
       notifications,
       setNotifications,
       loading,
+      isLoggingOut,
       handleLogin,
       handleLogout,
       refreshUser: fetchUserProfile,
       forceRefresh,
-      // เพิ่ม helper functions
-      isAdmin: user?.role === '1',
-      isUser: user?.role !== '1' && user?.role,
+      setUserFromLoginResponse,
+      // helper functions
+      isAdmin: user?.role === 1,
+      isUser: user?.role !== 1 && user?.role,
       isLoggedIn: !!user,
     }}>
       {children}

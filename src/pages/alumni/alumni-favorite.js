@@ -7,11 +7,13 @@ import { MdFavorite } from "react-icons/md";
 import { BiSolidComment } from "react-icons/bi";
 import { IoIosEye } from "react-icons/io";
 import axios from 'axios';
+import { useAuth } from '../../context/AuthContext';
 
 function WebboardFavorite() {
     const [likedPosts, setLikedPosts] = useState([]); // กระทู้ที่กด
     const [favoritePosts, setFavoritePosts] = useState([]);
-    const [isLoggedin, setIsLoggedin] = useState(false);
+    const {isLoggedin } = useAuth();
+    // const userId = user?.id;
 
     // ดึงข้อมูลกระทู้ที่ถูกกดหัวใจ
     useEffect(() => {
@@ -19,7 +21,7 @@ function WebboardFavorite() {
             .then((response) => {
                 if (response.data.success) {
                     setFavoritePosts(response.data.posts);
-                    setIsLoggedin(true);
+                    isLoggedin(true);
                 }
             })
             .catch((error) => {

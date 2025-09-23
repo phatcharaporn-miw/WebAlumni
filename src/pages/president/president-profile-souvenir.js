@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { FaFolderOpen, FaCheckCircle, FaImage, FaFilePdf } from "react-icons/fa";
 import { MdClose } from "react-icons/md";
 import Swal from "sweetalert2";
+import { useAuth } from '../../context/AuthContext';
 
 // CSS & Bootstrap
 import '../../css/profile.css';
@@ -13,7 +14,6 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 function PresidentProfileSouvenir() {
     const [profile, setProfile] = useState({});
-    const { handleLogout } = useOutletContext();
     const navigate = useNavigate();
     const [orderHistory, setOrderHistory] = useState([]);
     const [previewImage, setPreviewImage] = useState(null);
@@ -25,7 +25,9 @@ function PresidentProfileSouvenir() {
     const [currentOrderId, setCurrentOrderId] = useState(null);
     const [selectedFile, setSelectedFile] = useState(null);
     const [isUploading, setIsUploading] = useState(false);
-    const userId = localStorage.getItem("userId");
+    const { user, handleLogout } = useAuth();
+    const userId = user?.id;
+    // const userId = sessionStorage.getItem("userId");
 
     // สำหรับฟังก์ชันอัปโหลดหลักฐานการสั่งซื้อ
     const [showProofModal, setShowProofModal] = useState(false);
@@ -231,7 +233,7 @@ function PresidentProfileSouvenir() {
 
             // ถ้ามีสินค้าที่พร้อมเพิ่ม
             if (data.availableItems && data.availableItems.length > 0) {
-                let cart = JSON.parse(localStorage.getItem("cart")) || [];
+                let cart = JSON.parse(sessionStorage.getItem("cart")) || [];
 
                 data.availableItems.forEach(item => {
                     const existingIndex = cart.findIndex(c => c.product_id === item.product_id);
@@ -247,7 +249,7 @@ function PresidentProfileSouvenir() {
                     }
                 });
 
-                localStorage.setItem("cart", JSON.stringify(cart));
+                sessionStorage.setItem("cart", JSON.stringify(cart));
 
                 if (data.unavailableItems && data.unavailableItems.length > 0) {
                     alert(`มีสินค้า ${data.unavailableItems.length} รายการที่สต็อกไม่เพียงพอ`);

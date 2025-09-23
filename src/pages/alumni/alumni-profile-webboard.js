@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useOutletContext } from "react-router-dom";
 import { useNavigate, useLocation } from 'react-router-dom';
 import { SlHeart } from "react-icons/sl";
 import { MdDelete } from "react-icons/md";
-import { BiSolidComment } from "react-icons/bi";
-import { FaEye } from "react-icons/fa";
 import { IoMdCreate } from "react-icons/io";
 import Swal from "sweetalert2";
+import { useAuth } from '../../context/AuthContext';
 // css
 import '../../css/profile.css';
 // bootstrap
@@ -17,7 +15,8 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 function AlumniProfileWebboard() {
     const [webboard, setWebboard] = useState([]);
     const [profile, setProfile] = useState({});
-    const { handleLogout } = useOutletContext();
+    const { user, handleLogout } = useAuth();
+    const userId = user?.id;
     const [sortOrder, setSortOrder] = useState("latest");
     const [previewImage, setPreviewImage] = useState(null); // สำหรับแสดงรูปภาพก่อนอัปโหลด
     const navigate = useNavigate();

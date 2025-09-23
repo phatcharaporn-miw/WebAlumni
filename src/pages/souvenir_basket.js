@@ -12,7 +12,7 @@
 //     const [selectedItems, setSelectedItems] = useState([]);
 //     const [updatingItems, setUpdatingItems] = useState(new Set());
 //     const [formData, setFormData] = useState({ amount: 0 });
-//     const userId = localStorage.getItem('userId');
+//     const userId = sessionStorage.getItem('userId');
 //     const navigate = useNavigate();
 
 //     // ใช้ Cart Context
@@ -414,7 +414,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import Swal from "sweetalert2";
 import { useCart } from '../context/CartContext';
-import debounce from 'lodash.debounce';
+import { useAuth } from '../context/AuthContext';
 
 function SouvenirBasket() {
     const [cart, setCart] = useState([]);
@@ -422,12 +422,13 @@ function SouvenirBasket() {
     const [selectedItems, setSelectedItems] = useState([]);
     const [updatingItems, setUpdatingItems] = useState(new Set());
     const [stockInfo, setStockInfo] = useState({});
-    const userId = localStorage.getItem('userId');
+    // const userId = sessionStorage.getItem('userId');
+    const { user } = useAuth();
     const navigate = useNavigate();
     const { getCartCount } = useCart();
-
+    const { setCartCount: setGlobalCartCount } = useCart();
     const fetchCart = useCallback(() => {
-        if (!userId) {
+        if (!user || !user.id) {
             Swal.fire({
                 title: "กรุณาเข้าสู่ระบบ",
                 text: "คุณต้องเข้าสู่ระบบเพื่อดูตะกร้าสินค้า",
@@ -437,7 +438,7 @@ function SouvenirBasket() {
             return;
         }
 
-        axios.get(`http://localhost:3001/souvenir/cart?user_id=${userId}`, {
+        axios.get(`http://localhost:3001/souvenir/cart?user_id=${user.id}`, {
             withCredentials: true,
             headers: { "Cache-Control": "no-cache" }
         })
@@ -468,7 +469,7 @@ function SouvenirBasket() {
                     });
                 }
             });
-    }, [userId, navigate]);
+    }, [user, navigate]);
 
     useEffect(() => {
         fetchCart();
@@ -518,13 +519,13 @@ function SouvenirBasket() {
 
         try {
             const response = await axios.delete(`http://localhost:3001/souvenir/cart/${productId}`, {
-                data: { userId: userId },
+                data: { userId: user.id },
                 withCredentials: true
             });
 
             setCart(prev => prev.filter(item => item.product_id !== productId));
             setSelectedItems(prev => prev.filter(item => item.product_id !== productId));
-            await getCartCount(userId);
+            await getCartCount(user.id);
 
             Swal.fire({
                 title: "ลบสินค้าสำเร็จ",
@@ -545,7 +546,7 @@ function SouvenirBasket() {
     };
 
     // เปลี่ยน handleUpdateQuantity ให้ใช้ delta
-const handleUpdateQuantity = async (productId, delta) => {
+    const handleUpdateQuantity = async (productId, delta) => {
     const cartItem = cart.find(item => item.product_id === productId);
     if (!cartItem) return;
 
@@ -563,27 +564,94 @@ const handleUpdateQuantity = async (productId, delta) => {
         return;
     }
 
+    // ป้องกันการกดซ้ำ
+    if (updatingItems.has(productId)) {
+        console.log('Product is already being updated, skipping...');
+        return;
+    }
+
+    // Update UI ทันที (Optimistic Update)
+    setCart(prev =>
+        prev.map(item =>
+            item.product_id === productId
+                ? { ...item, quantity: newQuantity }
+                : item
+        )
+    );
+
     setUpdatingItems(prev => new Set([...prev, productId]));
 
     try {
-        await axios.put(`http://localhost:3001/souvenir/cart/update`, {
-            user_id: userId,
+        console.log(`Updating cart: Product ${productId}, New quantity: ${newQuantity}`);
+        
+        const res = await axios.put(`http://localhost:3001/souvenir/cart/update`, {
+            user_id: user.id,
             product_id: productId,
             quantity: newQuantity
         }, { withCredentials: true });
 
-        // ดึงข้อมูลตะกร้าใหม่จาก backend เพื่อ sync จำนวนและไอคอน
-        await fetchCart();
-        await getCartCount(userId);
+        console.log('Backend response:', res.data);
+
+        // ใช้ cart_summary.total_items ตาม Backend
+        if (res.data.cart_summary && res.data.cart_summary.total_items !== undefined) {
+            const totalItems = res.data.cart_summary.total_items;
+            
+            // อัปเดต cart count
+            setCartCount(totalItems);
+            setGlobalCartCount(totalItems);
+            
+            console.log(`Cart count updated from cart_summary: ${totalItems}`);
+            
+            // อัปเดต cart items ด้วยข้อมูลล่าสุดจาก backend
+            if (res.data.cart_summary.items) {
+                setCart(res.data.cart_summary.items);
+                // console.log(`Cart items updated from backend`);
+            }
+        } else {
+            console.log('No cart_summary found, using fallback method');
+            // Fallback: fetch ข้อมูลใหม่
+            await Promise.all([
+                fetchCart(),
+                getCartCount(user.id)
+            ]);
+        }
+
+        // อัปเดต stock info ถ้ามี
+        if (res.data.stock_remaining !== undefined) {
+            setStockInfo(prev => ({
+                ...prev,
+                [productId]: {
+                    ...prev[productId],
+                    remaining: res.data.stock_remaining,
+                    reserved: res.data.stock_reserved || prev[productId]?.reserved,
+                }
+            }));
+            console.log(`Stock updated - Product ${productId}: ${res.data.stock_remaining} remaining`);
+        }
+
+        console.log(`Cart update successful!`);
 
     } catch (error) {
-        console.error("Error updating quantity:", error);
+        console.error("❌ Error updating quantity:", error);
+        
         Swal.fire({
             title: "ไม่สามารถอัปเดตจำนวนได้",
             text: error.response?.data?.message || "กรุณาลองใหม่อีกครั้ง",
             icon: "warning",
             confirmButtonText: "ตกลง"
         });
+
+        // Revert กลับถ้า error และ fetch ข้อมูลใหม่
+        console.log('Error occurred, reverting and fetching fresh data...');
+        try {
+            await Promise.all([
+                fetchCart(),
+                getCartCount(user.id)
+            ]);
+        } catch (revertError) {
+            console.error('❌ Error reverting cart data:', revertError);
+        }
+        
     } finally {
         setUpdatingItems(prev => {
             const newSet = new Set(prev);
@@ -593,6 +661,8 @@ const handleUpdateQuantity = async (productId, delta) => {
     }
 };
 
+
+    // ลบสินค้าออกจากตะกร้า
     const handleDeleteSelectedItems = async () => {
         if (selectedItems.length === 0) {
             Swal.fire({
@@ -620,7 +690,7 @@ const handleUpdateQuantity = async (productId, delta) => {
                 for (const item of selectedItems) {
                     try {
                         await axios.delete(`http://localhost:3001/souvenir/cart/${item.product_id}`, {
-                            data: { userId: userId },
+                            data: { userId: user.id },
                             withCredentials: true
                         });
                         deletedCount++;
@@ -631,7 +701,7 @@ const handleUpdateQuantity = async (productId, delta) => {
 
                 setCart(prev => prev.filter(item => !selectedItems.some(selected => selected.product_id === item.product_id)));
                 setSelectedItems([]);
-                await getCartCount(userId);
+                await getCartCount(user.id);
 
                 Swal.fire({
                     title: "ลบสินค้าสำเร็จ",

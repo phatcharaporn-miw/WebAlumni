@@ -1,13 +1,12 @@
 import Header from './Header';
 import Footer from './Footer';
-import Chat from '../components/Chat';
 import "../css/appLayout.css";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import Breadcrumb from './Breadcrumb';
 import { useAuth } from '../context/AuthContext';
 
 function AppLayout() {
-    const { user, setUser, notifications, handleLogin, handleLogout, loading } = useAuth();
+    const { user, setUser, notifications, handleLogin, handleLogout, loading, initializing } = useAuth();
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -16,7 +15,7 @@ function AppLayout() {
     const shouldHideFooter = hideHeaderPaths.includes(location.pathname);
 
     // เพิ่ม loading state
-    if (loading) {
+    if (loading || initializing) {
         return (
             <div className="loading-container">
                 <div className="loading-spinner">กำลังโหลด...</div>
@@ -55,9 +54,6 @@ function AppLayout() {
             </main>
 
             {!shouldHideFooter && <Footer />}
-
-            {/* เพิ่มChat Widget */}
-            <Chat/>
         </div>   
     );
 }

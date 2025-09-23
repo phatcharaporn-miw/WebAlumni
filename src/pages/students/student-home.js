@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useAuth } from '../../context/AuthContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import "../../css/home.css";
@@ -58,18 +59,8 @@ function Home() {
   const [filter, setFilter] = useState("all");
   const [error] = useState(null);
   const [filterStatus, setFilterStatus] = useState("all");
-
-
-  useEffect(() => {
-    const userSession = localStorage.getItem("userId");
-    if (userSession) {
-      setIsLoggedin(true);
-      console.log("ผู้ใช้ล็อกอินแล้ว");
-    } else {
-      setIsLoggedin(false);
-      console.log("ผู้ใช้ยังไม่ได้ล็อกอิน");
-    }
-  }, []);
+  const { user, loading } = useAuth();
+  const userId = user?.id;
 
   // ข่าวประชาสัมพันธ์
   useEffect(() => {
@@ -524,14 +515,14 @@ axios.get("http://localhost:3001/admin/activity-per-month")
       .then((response) => {
         const newComment = response.data.comment; // ปรับตาม response structure
 
-        const userProfileImage = localStorage.getItem("image_path") || "/default-profile.png";
-        const userId = localStorage.getItem("userId");
+        const userProfileImage = user.image_path || "/default-profile.png";
+        const userId = user.id;
 
         const formattedNewComment = {
           ...newComment,
           profile_image: newComment.profile_image || userProfileImage,
           full_name: newComment.full_name, // ใช้ full_name จาก backend
-          user_id: newComment.user_id || userId, // ใช้ user_id จาก backend หรือ localStorage
+          user_id: newComment.user_id || userId, // ใช้ user_id จาก backend หรือ sessionStorage
           created_at: newComment.created_at || new Date().toISOString(),
           comment_detail: newComment.comment_detail || commentText,
           replies: [],
@@ -590,7 +581,7 @@ axios.get("http://localhost:3001/admin/activity-per-month")
       const response = await axios.post(`http://localhost:3001/api/replies`, {
         comment_id: commentId,
         reply_detail: replyText.trim(),
-        user_id: localStorage.getItem("userId")
+        user_id: userId
       }, {
         withCredentials: true
       });
@@ -604,11 +595,11 @@ axios.get("http://localhost:3001/admin/activity-per-month")
               const newReply = {
                 reply_id: response.data.reply_id || Date.now(), // ใช้ ID จาก response หรือ timestamp
                 comment_id: commentId,
-                user_id: localStorage.getItem("userId"),
+                user_id: userId,
                 reply_detail: replyText.trim(),
                 created_at: new Date().toISOString(),
-                full_name: localStorage.getItem("fullName") || "คุณ", // ดึงชื่อจาก localStorage
-                profile_image: localStorage.getItem("profileImage") || "/default-profile.png"
+                full_name: sessionStorage.getItem("fullName") || "คุณ", // ดึงชื่อจาก sessionStorage
+                profile_image: sessionStorage.getItem("profileImage") || "/default-profile.png"
               };
 
               return {
@@ -839,6 +830,15 @@ axios.get("http://localhost:3001/admin/activity-per-month")
         // setCurrentPage(1);
     };
 
+    if (loading) {
+    return <div>กำลังโหลด...</div>;
+  }
+
+  if (!user) {
+    console.log('ผู้ใช้ยังไม่ได้ล็อกอิน');
+    return null; // ProtectedRoute will handle redirect
+  }
+
   return (
     <div className="content">
       <img
@@ -848,7 +848,7 @@ axios.get("http://localhost:3001/admin/activity-per-month")
         width="1920"
         height="1080"
         loading="eager"
-        fetchPriority="high"
+        fetchpriority="high"
       />
 
       <div id="carouselExampleCaptions" className="carousel slide" data-bs-ride="carousel">
@@ -867,7 +867,7 @@ axios.get("http://localhost:3001/admin/activity-per-month")
               width="1280"
               height="720"
               style={{ objectFit: "cover", height: "420px", maxHeight: "80vh" }}
-              fetchPriority="high"
+              fetchpriority="high"
               loading="lazy"
             />
           </div>
@@ -881,7 +881,7 @@ axios.get("http://localhost:3001/admin/activity-per-month")
               width="1280"
               height="720"
               style={{ objectFit: "cover", height: "420px", maxHeight: "80vh" }}
-              fetchPriority="auto"
+              fetchpriority="auto"
               loading="lazy"
             />
           </div>
@@ -931,7 +931,7 @@ axios.get("http://localhost:3001/admin/activity-per-month")
                             transition: 'transform 0.3s ease-in-out'
                           }}
                           loading={index === 0 ? "eager" : "lazy"}
-                          fetchPriority={index === 0 ? "high" : "auto"}
+                          fetchpriority={index === 0 ? "high" : "auto"}
                         />
 
                         {isNew(item.created_at) && (
@@ -1394,7 +1394,7 @@ axios.get("http://localhost:3001/admin/activity-per-month")
                               </div>
                               <div className="d-flex align-items-center mb-2">
                                 <p className="text-muted mb-0 small flex-grow-1">{comment.comment_detail}</p>
-                                {Number(comment.user_id) === Number(localStorage.getItem("userId")) && (
+                                {Number(comment.user_id) === Number(userId) && (
                                   <button
                                     className="btn btn-sm ms-2"
                                     onClick={() => handleDeleteComment(comment.comment_id)}

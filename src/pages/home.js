@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useAuth } from '../context/AuthContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import "../css/home.css";
@@ -28,7 +29,7 @@ import {
   Legend,
   ArcElement,
 } from 'chart.js';
-import { type } from "jquery";
+
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend, ArcElement);
 
@@ -61,16 +62,37 @@ function Home() {
   const [filterStatus, setFilterStatus] = useState("all");
 
 
+  // useEffect(() => {
+  //   const userSession = sessionStorage.getItem("userId");
+  //   if (userSession) {
+  //     setIsLoggedin(true);
+  //     console.log("ผู้ใช้ล็อกอินแล้ว");
+  //   } else {
+  //     setIsLoggedin(false);
+  //     console.log("ผู้ใช้ยังไม่ได้ล็อกอิน");
+  //   }
+  // }, []);
+
   useEffect(() => {
-    const userSession = localStorage.getItem("userId");
-    if (userSession) {
-      setIsLoggedin(true);
-      console.log("ผู้ใช้ล็อกอินแล้ว");
-    } else {
+  const checkUser = async () => {
+    try {
+      const res = await axios.get("http://localhost:3001/users/profile", { withCredentials: true });
+      if (res.data.success) {
+        setIsLoggedin(true);
+        console.log("ผู้ใช้ล็อกอินแล้ว");
+      } else {
+        setIsLoggedin(false);
+        console.log("ผู้ใช้ยังไม่ได้ล็อกอิน");
+      }
+    } catch (err) {
       setIsLoggedin(false);
       console.log("ผู้ใช้ยังไม่ได้ล็อกอิน");
     }
-  }, []);
+  };
+
+  checkUser();
+}, []);
+
 
   // ข่าวประชาสัมพันธ์
   useEffect(() => {
@@ -165,33 +187,33 @@ function Home() {
     //     }
     //   });
     // Activity per month graph
-axios.get("http://localhost:3001/admin/activity-per-month")
-  .then(res => {
-    if (Array.isArray(res.data)) {
-      // สร้าง labels เป็น "เดือน ปี" (ภาษาไทย)
-      const monthNamesThai = [
-        "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน",
-        "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม",
-        "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
-      ];
+    axios.get("http://localhost:3001/admin/activity-per-month")
+      .then(res => {
+        if (Array.isArray(res.data)) {
+          // สร้าง labels เป็น "เดือน ปี" (ภาษาไทย)
+          const monthNamesThai = [
+            "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน",
+            "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม",
+            "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
+          ];
 
-      const labels = res.data.map(item => `${monthNamesThai[item.month_number - 1]} ${item.year + 543}`);
-      const data = res.data.map(item => item.total_activities);
+          const labels = res.data.map(item => `${monthNamesThai[item.month_number - 1]} ${item.year + 543}`);
+          const data = res.data.map(item => item.total_activities);
 
-      setBarData({
-        labels,
-        datasets: [{
-          label: 'จำนวนกิจกรรม',
-          data,
-          backgroundColor: 'rgba(13, 110, 253, 0.8)',
-          borderColor: 'rgba(13, 110, 253, 1)',
-          borderWidth: 2,
-          borderRadius: 6,
-          borderSkipped: false,
-        }],
+          setBarData({
+            labels,
+            datasets: [{
+              label: 'จำนวนกิจกรรม',
+              data,
+              backgroundColor: 'rgba(13, 110, 253, 0.8)',
+              borderColor: 'rgba(13, 110, 253, 1)',
+              borderWidth: 2,
+              borderRadius: 6,
+              borderSkipped: false,
+            }],
+          });
+        }
       });
-    }
-  });
 
 
     // สถิติการบริจาค
@@ -359,7 +381,7 @@ axios.get("http://localhost:3001/admin/activity-per-month")
             const dataset = tooltipItem.dataset;
 
             // console.log('Tooltip Item:', dataset);
-             // บังคับแปลงเป็นตัวเลข
+            // บังคับแปลงเป็นตัวเลข
             const dataValues = dataset.data.map(d => Number(d));
 
             // คำนวณผลรวมทั้งหมดของ slice
@@ -525,14 +547,14 @@ axios.get("http://localhost:3001/admin/activity-per-month")
       .then((response) => {
         const newComment = response.data.comment; // ปรับตาม response structure
 
-        const userProfileImage = localStorage.getItem("image_path") || "/default-profile.png";
-        const userId = localStorage.getItem("userId");
+        const userProfileImage = sessionStorage.getItem("image_path") || "/default-profile.png";
+        const userId = sessionStorage.getItem("userId");
 
         const formattedNewComment = {
           ...newComment,
           profile_image: newComment.profile_image || userProfileImage,
           full_name: newComment.full_name, // ใช้ full_name จาก backend
-          user_id: newComment.user_id || userId, // ใช้ user_id จาก backend หรือ localStorage
+          user_id: newComment.user_id || userId, // ใช้ user_id จาก backend หรือ sessionStorage
           created_at: newComment.created_at || new Date().toISOString(),
           comment_detail: newComment.comment_detail || commentText,
           replies: [],
@@ -591,7 +613,7 @@ axios.get("http://localhost:3001/admin/activity-per-month")
       const response = await axios.post(`http://localhost:3001/api/replies`, {
         comment_id: commentId,
         reply_detail: replyText.trim(),
-        user_id: localStorage.getItem("userId")
+        user_id: sessionStorage.getItem("userId")
       }, {
         withCredentials: true
       });
@@ -605,11 +627,11 @@ axios.get("http://localhost:3001/admin/activity-per-month")
               const newReply = {
                 reply_id: response.data.reply_id || Date.now(), // ใช้ ID จาก response หรือ timestamp
                 comment_id: commentId,
-                user_id: localStorage.getItem("userId"),
+                user_id: sessionStorage.getItem("userId"),
                 reply_detail: replyText.trim(),
                 created_at: new Date().toISOString(),
-                full_name: localStorage.getItem("fullName") || "คุณ", // ดึงชื่อจาก localStorage
-                profile_image: localStorage.getItem("profileImage") || "/default-profile.png"
+                full_name: sessionStorage.getItem("fullName") || "คุณ", // ดึงชื่อจาก sessionStorage
+                profile_image: sessionStorage.getItem("profileImage") || "/default-profile.png"
               };
 
               return {
@@ -802,43 +824,43 @@ axios.get("http://localhost:3001/admin/activity-per-month")
   };
 
   const getProjectStatusBadge = (project) => {
-        const now = new Date();
-        const endDate = project?.end_date ? new Date(project.end_date) : null;
-        const startDate = new Date(project?.start_date);
-        const comingSoonDays = startDate && now < startDate;
+    const now = new Date();
+    const endDate = project?.end_date ? new Date(project.end_date) : null;
+    const startDate = new Date(project?.start_date);
+    const comingSoonDays = startDate && now < startDate;
 
-        if (!endDate) return null;
+    if (!endDate) return null;
 
-        if (now > endDate) {
-            return <span className="donate-badge donate-badge-expired">สิ้นสุดแล้ว</span>;
-        }
+    if (now > endDate) {
+      return <span className="donate-badge donate-badge-expired">สิ้นสุดแล้ว</span>;
+    }
 
-        const daysRemaining = calculateDaysRemaining(endDate);
-        if (daysRemaining <= 5) {
-            return <span className="donate-badge donate-badge-warning">ใกล้สิ้นสุด</span>;
-        }
+    const daysRemaining = calculateDaysRemaining(endDate);
+    if (daysRemaining <= 5) {
+      return <span className="donate-badge donate-badge-warning">ใกล้สิ้นสุด</span>;
+    }
 
-        if (now < startDate) {
-            return (
-                <span className="donate-badge donate-badge-secondary">
-                    กำลังจะเริ่ม
-                </span>
-            );
-        }
-        if (now > startDate && now <= endDate) {
-            return (
-                <span className="donate-badge donate-badge-active">
-                    กำลังดำเนินการ
-                </span>
-            );
-        }
+    if (now < startDate) {
+      return (
+        <span className="donate-badge donate-badge-secondary">
+          กำลังจะเริ่ม
+        </span>
+      );
+    }
+    if (now > startDate && now <= endDate) {
+      return (
+        <span className="donate-badge donate-badge-active">
+          กำลังดำเนินการ
+        </span>
+      );
+    }
 
-    };
+  };
 
-    const handleTagClick = (type) => {
-        setFilter(type || "all");
-        // setCurrentPage(1);
-    };
+  const handleTagClick = (type) => {
+    setFilter(type || "all");
+    // setCurrentPage(1);
+  };
 
   return (
     <div className="content">
@@ -849,7 +871,7 @@ axios.get("http://localhost:3001/admin/activity-per-month")
         width="1920"
         height="1080"
         loading="eager"
-        fetchPriority="high"
+        fetchpriority="high"
       />
 
       <div id="carouselExampleCaptions" className="carousel slide" data-bs-ride="carousel">
@@ -868,7 +890,7 @@ axios.get("http://localhost:3001/admin/activity-per-month")
               width="1280"
               height="720"
               style={{ objectFit: "cover", height: "420px", maxHeight: "80vh" }}
-              fetchPriority="high"
+              fetchpriority="high"
               loading="lazy"
             />
           </div>
@@ -882,7 +904,7 @@ axios.get("http://localhost:3001/admin/activity-per-month")
               width="1280"
               height="720"
               style={{ objectFit: "cover", height: "420px", maxHeight: "80vh" }}
-              fetchPriority="auto"
+              fetchpriority="auto"
               loading="lazy"
             />
           </div>
@@ -933,7 +955,7 @@ axios.get("http://localhost:3001/admin/activity-per-month")
                             transition: 'transform 0.3s ease-in-out'
                           }}
                           loading={index === 0 ? "eager" : "lazy"}
-                          fetchPriority={index === 0 ? "high" : "auto"}
+                          fetchpriority={index === 0 ? "high" : "auto"}
                         />
 
                         {isNew(item.created_at) && (
@@ -1196,8 +1218,15 @@ axios.get("http://localhost:3001/admin/activity-per-month")
                 </div>
               </div>
             </div>
-
-        
+          </div>
+          <div className="pt-3 border-top">
+            <div className="row align-items-center">
+              <div className="col-md-4 text-md-end mt-2 mt-md-0">
+                <a href="/dashboard-static" className="btn btn-outline-primary btn-sm">
+                  ดูข้อมูลเพิ่มเติม
+                </a>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -1401,7 +1430,7 @@ axios.get("http://localhost:3001/admin/activity-per-month")
                               </div>
                               <div className="d-flex align-items-center mb-2">
                                 <p className="text-muted mb-0 small flex-grow-1">{comment.comment_detail}</p>
-                                {Number(comment.user_id) === Number(localStorage.getItem("userId")) && (
+                                {Number(comment.user_id) === Number(sessionStorage.getItem("userId")) && (
                                   <button
                                     className="btn btn-sm ms-2"
                                     onClick={() => handleDeleteComment(comment.comment_id)}

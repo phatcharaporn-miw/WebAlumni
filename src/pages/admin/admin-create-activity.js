@@ -4,7 +4,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-
+import { useAuth } from '../../context/AuthContext';
 
 function CreateActivity() {
   const [formData, setFormData] = useState({
@@ -21,20 +21,10 @@ function CreateActivity() {
     department_restriction: '',
     images: [],
   });
-  const [isLoggedin, setIsLoggedin] = useState(false);
   const [minDate, setMinDate] = useState(''); 
   const navigate = useNavigate();
-
-    useEffect(() => {
-        const userSession = localStorage.getItem("userId");  
-        if (userSession) {
-            setIsLoggedin(true);
-            console.log("ผู้ใช้ล็อกอินแล้ว");
-        } else {
-            setIsLoggedin(false);
-            console.log("ผู้ใช้ยังไม่ได้ล็อกอิน"); 
-        }
-    }, []);
+  const { user} = useAuth();
+  const userId = user?.id;
 
     useEffect(() => {
         // กำหนดวันที่ปัจจุบันในรูปแบบ YYYY-MM-DD
@@ -109,8 +99,7 @@ function CreateActivity() {
 
     const formattedTimeRange = formatTimeRange(formData.start_time, formData.end_time);
 
-    const userSession = localStorage.getItem("userId");
-    if (!userSession) {
+    if (!userId) {
       Swal.fire("กรุณาเข้าสู่ระบบ", "คุณต้องเข้าสู่ระบบก่อนที่จะเพิ่มกิจกรรม", "warning");
       navigate("/login");  
       return;

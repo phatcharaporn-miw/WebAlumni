@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { FaLock, FaEye, FaEyeSlash, FaCheckCircle } from 'react-icons/fa';
+import { useAuth } from '../context/AuthContext';
 
 function ChangePassword() {
     const [newPassword, setNewPassword] = useState('');
@@ -9,7 +10,9 @@ function ChangePassword() {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const navigate = useNavigate();
-    const userId = localStorage.getItem('userId');
+    // const userId = sessionStorage.getItem('userId');
+    const {user} = useAuth();
+    const userId = user?.id;
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 

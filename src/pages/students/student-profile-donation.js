@@ -5,7 +5,7 @@ import Swal from 'sweetalert2';
 import '../../css/profile.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-
+import { useAuth } from '../../context/AuthContext';
 function StudentProfileDonation() {
     const [profile, setProfile] = useState({});
     const [donations, setDonations] = useState([]);
@@ -17,7 +17,8 @@ function StudentProfileDonation() {
     const [selectedDonation, setSelectedDonation] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [uploadingSlip, setUploadingSlip] = useState(false);
-    const { handleLogout } = useOutletContext();
+    const { handleLogout, user } = useAuth();
+    const userId = user?.id;
     const navigate = useNavigate();
     const location = useLocation();
 

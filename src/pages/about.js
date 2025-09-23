@@ -3,7 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import "../css/about.css"
 import {useEffect} from "react";
-
+import { useAuth } from '../context/AuthContext';
 // import axios from "axios";
 import { IoMdPin, IoMdCall } from "react-icons/io";
 import { MdEmail } from "react-icons/md";

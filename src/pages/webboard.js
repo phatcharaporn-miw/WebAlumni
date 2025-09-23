@@ -17,8 +17,7 @@ import { format } from 'date-fns';
 import { th } from 'date-fns/locale';
 import Swal from "sweetalert2";
 import { MdDelete } from "react-icons/md";
-// import { PostAdd } from "@mui/icons-material";
-
+import { useAuth } from "../context/AuthContext";
 Modal.setAppElement('#root');
 
 
@@ -40,18 +39,18 @@ function Webboard() {
   const [replyText, setReplyText] = useState(''); // เก็บข้อความตอบกลับ
   const [recommendedPosts, setRecommendedPosts] = useState([]); //กระทู้ที่แนะนำ
   const [searchTerm, setSearchTerm] = useState("");
+  const { user, isLoggedIn } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const userSession = localStorage.getItem("userId");
-    if (userSession) {
+    if (user && user.id) {
       setIsLoggedin(true);
       // console.log("ผู้ใช้ล็อกอินแล้ว");
     } else {
       setIsLoggedin(false);
       // console.log("ผู้ใช้ยังไม่ได้ล็อกอิน"); 
     }
-  }, []);
+  }, [user]);
 
   //ดึงข้อมูล webboard
   useEffect(() => {
@@ -89,11 +88,11 @@ function Webboard() {
 
   // ดึงข้อมูลกดใจกระทู้เมื่อผู้ใช้เข้าสู่ระบบ
   useEffect(() => {
-    const userId = localStorage.getItem('userId');
+    // const userId = sessionStorage.getItem('userId');
 
-    if (isLoggedin && userId) {
+    if (isLoggedin && user && user.id) {
       axios.get(`http://localhost:3001/web/favorite`, {
-        params: { userId },
+        params: { userId: user.id },
         withCredentials: true,
       })
         .then((response) => {
@@ -110,7 +109,7 @@ function Webboard() {
           setLikedPosts([]);
         });
     }
-  }, [isLoggedin]);
+  }, [isLoggedin, user]);
 
   // ฟังก์ชัน Toggle หัวใจ
   const toggleLike = (postId) => {
@@ -227,14 +226,14 @@ function Webboard() {
       .then((response) => {
         const newComment = response.data.comment; // ปรับตาม response structure
 
-        const userProfileImage = localStorage.getItem("image_path") || "/default-profile.png";
-        const userId = localStorage.getItem("userId");
+        const userProfileImage = user.image_path || "/default-profile.png";
+        const userId = user.id || null;
 
         const formattedNewComment = {
           ...newComment,
           profile_image: newComment.profile_image || userProfileImage,
           full_name: newComment.full_name, // ใช้ full_name จาก backend
-          user_id: newComment.user_id || userId, // ใช้ user_id จาก backend หรือ localStorage
+          user_id: newComment.user_id || userId, // ใช้ user_id จาก backend 
           created_at: newComment.created_at || new Date().toISOString(),
           comment_detail: newComment.comment_detail || commentText,
           replies: [],
@@ -291,7 +290,7 @@ function Webboard() {
         {
           comment_id: commentId,
           reply_detail: replyText.trim(),
-          user_id: localStorage.getItem("userId")
+          user_id: user.id
         },
         {
           withCredentials: true
@@ -310,11 +309,11 @@ function Webboard() {
               const newReply = {
                 reply_id: response.data.reply_id || response.data.data?.reply_id || Date.now(),
                 comment_id: commentId,
-                user_id: parseInt(localStorage.getItem("userId")),
+                user_id: user.id,
                 reply_detail: replyText.trim(),
                 created_at: new Date().toISOString(),
-                full_name: localStorage.getItem("fullName") || "คุณ",
-                profile_image: localStorage.getItem("image_path") || "uploads/default-profile.png"
+                full_name: user.fullName || "คุณ",
+                profile_image: user.image_path || "uploads/default-profile.png"
               };
 
               return {
@@ -736,7 +735,7 @@ function Webboard() {
                           </div>
                           <div className="d-flex align-items-center mb-2">
                             <p className="text-muted mb-0 small flex-grow-1">{comment.comment_detail}</p>
-                            {Number(comment.user_id) === Number(localStorage.getItem("userId")) && (
+                            {Number(comment.user_id) === Number(user.id) && (
                               <button
                                 className="btn btn-sm ms-2"
                                 onClick={() => handleDeleteComment(comment.comment_id)}
@@ -814,7 +813,7 @@ function Webboard() {
                                               : "ไม่ระบุวันที่"}
                                           </small>
                                           {/* ปุ่มลบ reply - แสดงเฉพาะเจ้าของ */}
-                                          {Number(reply.user_id) === Number(localStorage.getItem("userId")) && (
+                                          {Number(reply.user_id) === Number(user.id) && (
                                             <button
                                               className="btn btn-sm"
                                               onClick={() => handleDeleteReply(reply.reply_id, comment.comment_id)}

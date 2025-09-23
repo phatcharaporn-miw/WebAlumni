@@ -6,12 +6,13 @@ import { FaRegEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import { CiSearch } from "react-icons/ci";
 import { BsCheck2Square } from "react-icons/bs";
-import {
-    TextField, FormControl, InputLabel, Select, MenuItem,
-    Button, Typography, Box, Modal, InputAdornment
-} from "@mui/material";
+// import {
+//     TextField, FormControl, InputLabel, Select, MenuItem,
+//     Button, Typography, Box, Modal, InputAdornment
+// } from "@mui/material";
 import "../../css/admin.css";
 import Swal from "sweetalert2";
+import { useAuth } from '../../context/AuthContext';
 
 function Souvenir() {
     const [products, setProducts] = useState([]);
@@ -20,16 +21,8 @@ function Souvenir() {
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [detailProduct, setDetailProduct] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
-
-    // useEffect(() => {
-    //     window.scrollTo(0, 0);
-    //     axios.get("http://localhost:3001/admin/souvenir").then((response) => {
-    //         setProducts(response.data);
-    //     });
-    //     console.log(user_id)
-    // }, []);
-
-    const user_id = localStorage.getItem("userId");
+    const { user} = useAuth();
+    const user_id = user?.id;
 
     useEffect(() => {
         window.scrollTo(0, 0);

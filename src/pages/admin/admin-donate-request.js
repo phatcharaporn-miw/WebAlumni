@@ -4,6 +4,7 @@ import "../../css/adminDonate.css";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from 'axios';
 import Swal from "sweetalert2";
+import { useAuth } from '../../context/AuthContext';
 
 function AdminDonateRequest() {
     const navigate = useNavigate();
@@ -30,6 +31,8 @@ function AdminDonateRequest() {
     const [successMessage, setSuccessMessage] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const { user} = useAuth();
+    const userId = user?.id;
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -87,8 +90,8 @@ function AdminDonateRequest() {
             const data = new FormData();
 
             // ตรวจสอบการเข้าสู่ระบบ
-            const adminId = localStorage.getItem('userId'); // ใช้ userId แทน adminId
-            const userRole = localStorage.getItem('userRole');
+            const adminId = user?.id; // ใช้ userId แทน adminId
+            const userRole = user?.role;
 
             if (!adminId) {
                 alert("กรุณาเข้าสู่ระบบก่อน");
@@ -181,8 +184,8 @@ function AdminDonateRequest() {
             let errorMsg = "เกิดข้อผิดพลาด";
             if (error.response?.status === 401) {
                 errorMsg = "ไม่มีสิทธิ์ในการเข้าถึง กรุณาเข้าสู่ระบบใหม่";
-                localStorage.removeItem('userId');
-                // localStorage.removeItem('userRole');
+                // sessionStorage.removeItem('userId');
+                // sessionStorage.removeItem('userRole');
                 setTimeout(() => navigate("/login"), 1500);
             } else if (error.response?.status === 403) {
                 errorMsg = "คุณไม่มีสิทธิ์ในการดำเนินการนี้";

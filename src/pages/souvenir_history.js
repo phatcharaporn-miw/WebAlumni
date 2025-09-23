@@ -2,11 +2,13 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "../css/OrderHistory.css";
+import {useAuth} from '../context/AuthContext';
 
 function OrderHistory() {
     const [orderHistory, setOrderHistory] = useState([]);
     const [loading, setLoading] = useState(true);
-    const userId = localStorage.getItem("userId");
+    // const userId = sessionStorage.getItem("userId");
+    const {userId} = useAuth();
     const navigate = useNavigate();
     
     useEffect(() => {

@@ -20,6 +20,15 @@ const StyledAdmin = styled('div')`
   display: grid;
   grid-template-columns: 250px 1fr;
   height: 100vh;
+
+  @media (max-width: 768px) {
+  grid-template-columns: 1fr; /* ซ่อน sidebar */
+  
+  & > div:first-of-type {
+    display: none; /* หรือแปลงเป็น hamburger menu */
+  }
+}
+
 `;
 
 export default Admin;

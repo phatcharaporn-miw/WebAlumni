@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useOutletContext } from "react-router-dom";
+import { useAuth } from '../../context/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Swal from "sweetalert2";
 import { Link } from "react-router-dom";
@@ -13,7 +13,8 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 function AlumniProfileRequest() {
     const [pendingDonations, setPendingDonations] = useState([]);
     const [profile, setProfile] = useState({});
-    const { handleLogout } = useOutletContext();
+    const { user, handleLogout } = useAuth();
+    const userId = user?.id;
     // const [activity, setActivity] = useState([]);
     // const [selectedStatus, setSelectedStatus] = useState('activity');
     const [previewImage, setPreviewImage] = useState(null);

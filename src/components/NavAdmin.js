@@ -1,14 +1,5 @@
 import { useState, useEffect, } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { AiOutlineDashboard } from "react-icons/ai";
-import { IoCalendarOutline } from "react-icons/io5";
-import { LiaDonateSolid } from "react-icons/lia";
-import { CgWebsite } from "react-icons/cg";
-import { IoNewspaperOutline } from "react-icons/io5";
-import { MdOutlineShoppingCart } from "react-icons/md";
-import { LuUserRoundPen } from "react-icons/lu";
-import { IoSettingsOutline } from "react-icons/io5";
-import { MdLogout } from "react-icons/md";
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { IoMdNotificationsOutline } from "react-icons/io";
@@ -18,73 +9,62 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { useAuth } from '../context/AuthContext';
 
 function NavAdmin() {
-    const [userInfo, setUserInfo] = useState({
-        fullName: 'User',
-        profilePic: '/default-profile-pic.jpg',
-    });
     const navigate = useNavigate();
     const [notifications, setNotifications] = useState([]);
     const [showNotifications, setShowNotifications] = useState(false);
     const [unreadCount, setUnreadCount] = useState(0);
-    const userId = localStorage.getItem('userId');
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const { user, handleLogout, loading , initialized} = useAuth();
+    
+    const userId = user?.id;
+    const role = user?.role;
+    const username = user?.username;
+    const profilePicture = user?.profilePicture;
 
-    // const toggleMobileMenu = () => {
-    //     setIsMobileMenuOpen(!isMobileMenuOpen);
-    // };
-
-    const { user, handleLogout, isAdmin, isUser, isLoggedIn } = useAuth();
-
-    const onLogout = async () => {
-        Swal.fire({
-            title: 'คุณแน่ใจหรือไม่?',
-            text: 'คุณต้องการออกจากระบบหรือไม่?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'ใช่, ออกจากระบบ!',
-            cancelButtonText: 'ยกเลิก',
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                const success = await handleLogout();
-                if (success) {
-                    Swal.fire('ออกจากระบบสำเร็จ!', 'คุณได้ออกจากระบบเรียบร้อยแล้ว', 'success');
-                    navigate('/');
-                } else {
-                    Swal.fire('เกิดข้อผิดพลาด!', 'ไม่สามารถออกจากระบบได้', 'error');
-                }
-            }
-        });
-    };
-
+    // รอ loading เสร็จก่อนตรวจสอบ authentication
     useEffect(() => {
-        const role = localStorage.getItem('userRole');
-        const username = localStorage.getItem('username');
-        const imagePath = localStorage.getItem('image_path');
-
-        if (!role) {
-            // ถ้าไม่มี role ให้บังคับไป login เลย
+        if (!initialized) return;
+        // if (loading) return; // รอ loading เสร็จก่อน
+        
+        if (!user || !role) {
+            console.log('No user or role, redirecting to login');
             navigate('/login');
             return;
         }
+        
+        console.log("User data:", user);
+        console.log("Profile picture:", profilePicture);
+    }, [loading, user, role, navigate]); // เพิ่ม loading ใน dependency
 
-        const profilePic = imagePath
-            ? `http://localhost:3001/${imagePath.replace(/^\/+/, '')}`
-            : 'http://localhost:3001/uploads/default-profile.png';
+    const onLogout = async () => {
+    const result = await Swal.fire({
+        title: 'คุณแน่ใจหรือไม่?',
+        text: 'คุณต้องการออกจากระบบหรือไม่?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'ใช่, ออกจากระบบ!',
+        cancelButtonText: 'ยกเลิก',
+    });
 
-        if (role === '1') {
-            setUserInfo({
-                fullName: username || 'Admin',
-                profilePic: profilePic,
-            });
-        } else {
+    if (result.isConfirmed) {
+        // handleLogout จะ redirect เอง ไม่ต้องทำอะไรเพิ่ม
+        handleLogout();
+    }
+};
+
+    useEffect(() => {
+        if (!role) {
             navigate('/login');
+            return;
         }
-    }, [navigate]);
+        
+        // console.log("User data:", user);
+        // console.log("Profile picture:", profilePicture);
+    }, [role, user, navigate]);
 
-
-    // ดึงแจ้งเตือนเมื่อผู้ใช้เข้าสู่ระบบ
+    // ส่วนอื่นๆ ของ useEffect ยังเหมือนเดิม...
     useEffect(() => {
         if (!userId) return;
         const fetchNotifications = () => {
@@ -101,11 +81,11 @@ function NavAdmin() {
         };
 
         fetchNotifications();
-
-        const interval = setInterval(fetchNotifications, 30000); // รีเฟรชทุก 30 วินาที
+        const interval = setInterval(fetchNotifications, 30000);
         return () => clearInterval(interval);
     }, [userId]);
 
+    // ฟังก์ชันอื่นๆ ยังเหมือนเดิม...
     const markAsRead = (notificationId) => {
         axios.put(`http://localhost:3001/notice/read/${notificationId}`)
             .then(() => {
@@ -116,7 +96,7 @@ function NavAdmin() {
                             : n
                     )
                 );
-                setUnreadCount((prev) => Math.max(prev - 1, 0)); // ลดจำนวนแจ้งเตือนที่ยังไม่ได้อ่าน
+                setUnreadCount((prev) => Math.max(prev - 1, 0));
             })
             .catch((error) => console.error("เกิดข้อผิดพลาดในการเปลี่ยนสถานะ:", error));
     };
@@ -126,17 +106,15 @@ function NavAdmin() {
         unreadNotifications.forEach(n => markAsRead(n.notification_id));
     };
 
-    //ลบแจ้งเตือน
     const deleteNotification = (notificationId) => {
         axios.delete(`http://localhost:3001/notice/notification/${notificationId}`)
             .then(() => {
                 setNotifications(notifications.filter((n) => n.notification_id !== notificationId));
-                setUnreadCount((prev) => Math.max(prev - 1, 0)); // ลดตัวนับแจ้งเตือน
+                setUnreadCount((prev) => Math.max(prev - 1, 0));
             })
             .catch((error) => console.error("เกิดข้อผิดพลาดในการลบแจ้งเตือน:", error));
     };
 
-    //ฟังก์ชันแสดง/ซ่อนแจ้งเตือน
     const toggleNotifications = () => {
         setShowNotifications(!showNotifications);
         if (!showNotifications && notifications.some(n => n.read_status === "ยังไม่อ่าน")) {
@@ -144,7 +122,6 @@ function NavAdmin() {
         }
     };
 
-    // ป้องกันการปิด Dropdown เมื่อคลิกภายนอก
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (showNotifications && !event.target.closest(".notification-dropdown") && !event.target.closest(".notification-icon")) {
@@ -156,10 +133,36 @@ function NavAdmin() {
         return () => document.removeEventListener("click", handleClickOutside);
     }, [showNotifications]);
 
-    // ป้องกันการปิด Dropdown เมื่อคลิกภายใน
     const handleDropdownClick = (event) => {
         event.stopPropagation();
     };
+
+    if (loading) {
+        return (
+            <div style={{
+                ...navAdminStyles,
+                position: "fixed",
+                top: 0,
+                bottom: 0,
+                zIndex: 1000,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+            }}>
+                <div className="text-center">
+                    <div className="spinner-border text-light" role="status">
+                        <span className="visually-hidden">กำลังโหลด...</span>
+                    </div>
+                    <p className="mt-2 text-light">กำลังโหลด...</p>
+                </div>
+            </div>
+        );
+    }
+
+    // ถ้าไม่มี user หลังจาก loading เสร็จแล้ว ก็ไม่แสดงอะไร (จะ redirect ไปแล้ว)
+    if (!user) {
+        return null;
+    }
 
     return (
         <>
@@ -170,13 +173,12 @@ function NavAdmin() {
                     top: 0,
                     bottom: 0,
                     zIndex: 1000,
-                    // transform: isMobileMenuOpen || window.innerWidth >= 768 ? "translateX(0)" : "translateX(-100%)",
                     transition: "transform 0.3s ease-in-out",
                 }}
                 className="d-block"
             >
                 {/* Notification Icon */}
-                {userInfo && (
+                {user && (
                     <div className="notification" style={{ position: "absolute", top: 20, right: 20, zIndex: 10 }}>
                         <div
                             className="notification-icon-admin"
@@ -185,7 +187,7 @@ function NavAdmin() {
                                 toggleNotifications();
                             }}
                             style={{ cursor: "pointer" }}
-                            tabIndex={0} // ให้สามารถกดด้วยคีย์บอร์ดได้
+                            tabIndex={0}
                             role="button"
                             aria-label="เปิดการแจ้งเตือน"
                             onKeyDown={e => {
@@ -203,9 +205,7 @@ function NavAdmin() {
                                     notifications.map((notification) => (
                                         <div
                                             key={notification.notification_id}
-                                            className={`notification-item ${notification.read_status === "ยังไม่อ่าน" ? "unread" : ""
-                                                }`}
-                                        // onClick={() => goToNotificationDetail(notification)}
+                                            className={`notification-item ${notification.read_status === "ยังไม่อ่าน" ? "unread" : ""}`}
                                         >
                                             <p className="message">{notification.message}</p>
                                             <p className="notification-date">
@@ -230,17 +230,24 @@ function NavAdmin() {
                     </div>
                 )}
 
-                {/* Profile */}
-                {userInfo && (
+                {/* Profile - ใช้ข้อมูลจาก user context โดยตรง */}
+                {user && (
                     <div className="card-body text-center" style={profileContainer}>
                         <img
-                            src={userInfo.profilePic}
-                            alt="avatar"
+                            src={profilePicture || "http://localhost:3001/uploads/default-profile.png"}
+                            alt="profile"
                             className="rounded-circle img-fluid"
                             style={profilePicStyle}
+                            onError={(e) => {
+                                console.error("Failed to load profile picture:", e.target.src);
+                                e.target.src = "http://localhost:3001/uploads/default-profile.png";
+                            }}
+                            onLoad={() => {
+                                console.log("Profile picture loaded successfully:", profilePicture);
+                            }}
                         />
                         <h5 className="my-3" style={{ fontSize: '18px', fontWeight: '500' }}>
-                            ยินดีต้อนรับ {userInfo.fullName}
+                            ยินดีต้อนรับ {username || 'ผู้ดูแลระบบ'}
                         </h5>
                     </div>
                 )}

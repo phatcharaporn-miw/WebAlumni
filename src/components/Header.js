@@ -14,7 +14,7 @@ import axios from "axios";
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 
-function Header({ user, handleLogout }) {
+function Header() {
   const [searchTerm, setSearchTerm] = useState("");
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -23,16 +23,21 @@ function Header({ user, handleLogout }) {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const { cartCount, getCartCount } = useCart();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const userId = localStorage.getItem('userId');
+  // const userId = sessionStorage.getItem('userId');
+  // const { user, handleLogout } = useAuth();
+  const { user, isLoggedIn, handleLogout } = useAuth();
+  const userId = user?.userId;
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
   const { addToCart, clearCart, refreshCartCount } = useCart();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  useEffect(() => {
-    const user = localStorage.getItem('userId');
-    setIsLoggedIn(!!user);
-  }, []);
+  // useEffect(() => {
+  //   const user = sessionStorage.getItem('userId');
+  //   setIsLoggedIn(!!user);
+  // }, []);
+
+  
 
   // ดึงแจ้งเตือนเมื่อผู้ใช้เข้าสู่ระบบ
   useEffect(() => {
@@ -136,16 +141,22 @@ function Header({ user, handleLogout }) {
   };
 
   // ตรวจสอบและโหลดจำนวนตะกร้าเมื่อ component mount หรือเมื่อ user login
+  // useEffect(() => {
+  //    const userId = sessionStorage.getItem('userId');
+  //   if (userId) {
+  //     getCartCount(userId);
+  //   }
+  // }, []); // เรียกครั้งเดียวเมื่อ component mount
+
   useEffect(() => {
-    const userId = localStorage.getItem('userId');
-    if (userId) {
-      getCartCount(userId);
+    if (user?.userId) {
+      getCartCount(user.userId);
     }
-  }, []); // เรียกครั้งเดียวเมื่อ component mount
+  }, [user?.userId, getCartCount]);
 
   // ฟังก์ชันเพิ่มสินค้าลงตะกร้าสำหรับใช้ในส่วนอื่นๆ ของ Header (ถ้ามี)
   const handleAddToCartFromHeader = async (productId, quantity, total) => {
-    // ตรวจสอบจาก user prop แทน localStorage
+    // ตรวจสอบจาก user prop แทน sessionStorage
     if (!user) {
       Swal.fire({
         title: "กรุณาเข้าสู่ระบบ",
@@ -198,7 +209,6 @@ function Header({ user, handleLogout }) {
       refreshCartCount();
     }
   }, [user, refreshCartCount]);
-
 
   // การค้นหา
   const handleSearchChange = (e) => {
@@ -307,6 +317,9 @@ function Header({ user, handleLogout }) {
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
+
+  // fallback image
+  const profileImg = user?.profilePicture || "/default-profile.png";
 
   // const goToNotificationDetail = (notification) => {
   //   markAsRead(notification.notification_id);
@@ -437,7 +450,7 @@ function Header({ user, handleLogout }) {
                 className="profile-container"
               >
                 <img
-                  src={user.profilePicture || "/default-profile.png"}
+                  src={profileImg}
                   alt="User Profile"
                   className="profile-img"
                   loading="lazy"

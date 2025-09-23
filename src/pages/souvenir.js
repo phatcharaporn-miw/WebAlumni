@@ -3,10 +3,12 @@ import "../css/Souvenir.css";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { IoIosAddCircleOutline } from "react-icons/io";
+import {useAuth} from '../context/AuthContext';
 
 function Souvenir() {
     const [products, setProducts] = useState([]);
-    const userId = localStorage.getItem("userId");
+    const {user} = useAuth();
+    // const userId = sessionStorage.getItem("userId");
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -53,7 +55,7 @@ function Souvenir() {
                 </div>
             </div>
             <div className="souvenir-top d-flex justify-content-end mb-3 px-4">
-                {userId && (
+                {user && (
                     <Link to={`/souvenir/souvenir_request`} className="text-decoration-none">
                         <button
                             className="btn btn-gradient d-flex align-items-center gap-2 px-4 py-2 rounded-pill shadow-sm"

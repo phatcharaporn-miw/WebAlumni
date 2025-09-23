@@ -20,8 +20,8 @@
 //         promptpayNumber: "",
 //     });
 
-//     const user_id = localStorage.getItem('userId');
-//     const role = localStorage.getItem('userRole');
+//     const user_id = sessionStorage.getItem('userId');
+//     const role = sessionStorage.getItem('userRole');
 
 //     const [notification, setNotification] = useState({
 //         open: false,
@@ -133,8 +133,8 @@
 //         data.append("promptpayNumber", formData.promptpayNumber);
 //         data.append("status", "0"); // รอการอนุมัติ
 
-//         const role = localStorage.getItem('userRole');
-//         const user_id = localStorage.getItem('userId');
+//         const role = sessionStorage.getItem('userRole');
+//         const user_id = sessionStorage.getItem('userId');
 //         if (user_id) {
 //             data.append("user_id", user_id);
 //         } else {
@@ -202,7 +202,7 @@
 //     };
 
 //         const handleCancel = () => {
-//             const role = localStorage.getItem("userRole"); // หรือ user?.role
+//             const role = sessionStorage.getItem("userRole"); // หรือ user?.role
 //             if (role === "1") {
 //                 navigate("/admin/souvenir");
 //             } else {
@@ -524,6 +524,7 @@ import axios from 'axios';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import Swal from "sweetalert2";
+import { useAuth } from '../context/AuthContext';
 
 function SouvenirRequest() {
     const navigate = useNavigate();
@@ -544,8 +545,9 @@ function SouvenirRequest() {
         image: null
     });
 
-    const user_id = localStorage.getItem('userId');
-    const role = localStorage.getItem('userRole');
+    const { user } = useAuth();
+    const user_id = user?.id;
+    const role = user?.role;
 
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
@@ -1070,88 +1072,88 @@ function SouvenirRequest() {
                             ยืนยันเพิ่มสินค้า
                         </Button>
                     </div>
-                {/* </div> */}
+                    {/* </div> */}
 
-                {/* ช่องทางการชำระเงิน */}
-                <div className="payment-info">
-                    <p className="data-requestSouvenir-title">ช่องทางการชำระเงิน</p>
-                    <div>
-                        <label htmlFor="paymentMethod">ช่องทางการชำระเงิน<span className="important">*</span></label><br />
-                        <select
-                            className="data-requestSouvenir-input"
-                            name="paymentMethod"
-                            value={formData.paymentMethod}
-                            onChange={handleChange}
-                            required
-                        >
-                            <option value="" disabled>เลือกช่องทางการชำระเงิน</option>
-                            <option value="พร้อมเพย์">พร้อมเพย์</option>
-                        </select>
+                    {/* ช่องทางการชำระเงิน */}
+                    <div className="payment-info">
+                        <p className="data-requestSouvenir-title">ช่องทางการชำระเงิน</p>
+                        <div>
+                            <label htmlFor="paymentMethod">ช่องทางการชำระเงิน<span className="important">*</span></label><br />
+                            <select
+                                className="data-requestSouvenir-input"
+                                name="paymentMethod"
+                                value={formData.paymentMethod}
+                                onChange={handleChange}
+                                required
+                            >
+                                <option value="" disabled>เลือกช่องทางการชำระเงิน</option>
+                                <option value="พร้อมเพย์">พร้อมเพย์</option>
+                            </select>
+                        </div>
+
+
+                        <div>
+                            <label htmlFor="bankName">ชื่อธนาคาร<span className="important">*</span></label><br />
+                            <input
+                                className="data-requestSouvenir-input"
+                                name="bankName"
+                                placeholder="ชื่อธนาคาร"
+                                type="text"
+                                value={formData.bankName}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="accountName">ชื่อบัญชี<span className="important">*</span></label><br />
+                            <input
+                                className="data-requestSouvenir-input"
+                                name="accountName"
+                                placeholder="หมายเลขบัญชี"
+                                type="text"
+                                value={formData.accountName}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="accountNumber">หมายเลขบัญชี<span className="important">*</span></label><br />
+                            <input
+                                className="data-requestSouvenir-input"
+                                name="accountNumber"
+                                placeholder="หมายเลขบัญชี"
+                                type="text"
+                                value={formData.accountNumber}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="promptpayNumber">หมายเลขพร้อมเพย์<span className="important">*</span></label><br />
+                            <input
+                                className="data-requestSouvenir-input"
+                                name="promptpayNumber"
+                                placeholder="หมายเลขพร้อมเพย์"
+                                type="text"
+                                value={formData.promptpayNumber}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
                     </div>
 
-
-                    <div>
-                        <label htmlFor="bankName">ชื่อธนาคาร<span className="important">*</span></label><br />
-                        <input
-                            className="data-requestSouvenir-input"
-                            name="bankName"
-                            placeholder="ชื่อธนาคาร"
-                            type="text"
-                            value={formData.bankName}
-                            onChange={handleChange}
-                            required
-                        />
+                    <div className="group-souvenir-bt">
+                        <button className="cancle-button-souvenirRequest" type="button" onClick={handleCancel}>
+                            ยกเลิก
+                        </button>
+                        <button type="button" className="button-souvenirRequest" onClick={handleOpen}>
+                            เพิ่มสินค้าของที่ระลึก
+                        </button>
                     </div>
-
-                    <div>
-                        <label htmlFor="accountName">ชื่อบัญชี<span className="important">*</span></label><br />
-                        <input
-                            className="data-requestSouvenir-input"
-                            name="accountName"
-                            placeholder="หมายเลขบัญชี"
-                            type="text"
-                            value={formData.accountName}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-
-                    <div>
-                        <label htmlFor="accountNumber">หมายเลขบัญชี<span className="important">*</span></label><br />
-                        <input
-                            className="data-requestSouvenir-input"
-                            name="accountNumber"
-                            placeholder="หมายเลขบัญชี"
-                            type="text"
-                            value={formData.accountNumber}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-
-                    <div>
-                        <label htmlFor="promptpayNumber">หมายเลขพร้อมเพย์<span className="important">*</span></label><br />
-                        <input
-                            className="data-requestSouvenir-input"
-                            name="promptpayNumber"
-                            placeholder="หมายเลขพร้อมเพย์"
-                            type="text"
-                            value={formData.promptpayNumber}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-                </div>
-
-                <div className="group-souvenir-bt">
-                    <button className="cancle-button-souvenirRequest" type="button" onClick={handleCancel}>
-                        ยกเลิก
-                    </button>
-                    <button type="button" className="button-souvenirRequest" onClick={handleOpen}>
-                        เพิ่มสินค้าของที่ระลึก
-                    </button>
-                </div>
-            </Box>
+                </Box>
 
             </Modal>
         </div>

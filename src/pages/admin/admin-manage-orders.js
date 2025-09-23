@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import Modal from 'react-modal';
 import { useNavigate } from 'react-router-dom';
-import { FaBarcode, FaCheckCircle, FaEye, FaSave } from "react-icons/fa";
 import '../../css/admin-manage-order.css';
+import Swal from 'sweetalert2';
 
 Modal.setAppElement('#root');
 
@@ -12,6 +12,15 @@ function AdminOrderManager() {
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [orderDetails, setOrderDetails] = useState(null);
     const [modalIsOpen, setModalIsOpen] = useState(false);
+    const [activeTab, setActiveTab] = useState("all");
+
+    // จัดการปัญหา
+    const [issueOrders, setIssueOrders] = useState([]);
+    const [selectedIssue, setSelectedIssue] = useState(null);
+    const [resolutionType, setResolutionType] = useState("");
+    const [resolutionNote, setResolutionNote] = useState("");
+    const [issueModalOpen, setIssueModalOpen] = useState(false);
+
     const navigate = useNavigate();
 
     const fetchOrders = () => {
@@ -53,8 +62,6 @@ function AdminOrderManager() {
             });
     };
 
-
-
     useEffect(() => {
         fetchOrders();
     }, []);
@@ -65,7 +72,7 @@ function AdminOrderManager() {
 
         if (!status) return alert("กรุณาเลือกสถานะ");
 
-        axios.put(`http://localhost:3001/orders/orders-status/${orderId}`, {
+        axios.put(`http://localhost:3001/admin/orders-status/${orderId}`, {
             order_status: status,
             tracking_number: tracking || null,
         })
@@ -92,6 +99,50 @@ function AdminOrderManager() {
             });
     };
 
+
+    // ฟังก์ชันดึงคำสั่งซื้อที่มีปัญหา
+    const fetchIssueOrders = () => {
+        axios.get(`http://localhost:3001/admin/order-issue`,
+            { withCredentials: true })
+            .then(res => {
+                // if (res.data.success) {
+                setIssueOrders(res.data.data);
+                // }
+            })
+            .catch(err => console.error(err));
+    };
+
+    useEffect(() => {
+        fetchOrders();
+        fetchIssueOrders();
+    }, []);
+
+    const handleEditIssue = (issue) => {
+        setSelectedIssue(issue);
+        setResolutionType(issue.resolution_type || "");
+        setResolutionNote(issue.resolution_note || "");
+        setIssueModalOpen(true);
+    };
+
+    // ฟังก์ชันอัปเดตสถานะปัญหา
+    const handleUpdateIssue = async () => {
+        try {
+            const res = await axios.put(
+                `http://localhost:3001/admin/update-issue-status/${selectedIssue.issue_id}`,
+                { resolution_type: resolutionType, resolution_note: resolutionNote },
+                { withCredentials: true }
+            );
+            Swal.fire("สำเร็จ", res.data.message, "success");
+            setIssueModalOpen(false);
+            fetchOrders();
+            fetchIssueOrders();
+        } catch (err) {
+            console.error(err);
+            Swal.fire("ผิดพลาด", err.response?.data?.error || "เกิดข้อผิดพลาด", "error");
+        }
+    };
+
+
     const handleViewDetails = (order) => {
         setSelectedOrder(order);
         fetchOrderDetails(order.order_id);
@@ -108,24 +159,31 @@ function AdminOrderManager() {
         <div className="orders-container p-5">
             <h3 className="admin-title">จัดการคำสั่งซื้อ</h3>
             <div className="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
-                <span className="badge bg-primary fs-6">
-                    {orders.length} รายการ
-                </span>
+                <div className="d-flex gap-2 mb-3">
+                    <button
+                        className={`btn ${activeTab === "all" ? "btn-primary" : "btn-outline-primary"}`}
+                        onClick={() => setActiveTab("all")}
+                    >
+                        ทั้งหมด {orders.length} รายการ
+                    </button>
+                    <button
+                        className={`btn ${activeTab === "issues" ? "btn-danger" : "btn-outline-danger"}`}
+                        onClick={() => setActiveTab("issues")}
+                    >
+                        ปัญหา {issueOrders.length} รายการ
+                    </button>
+                </div>
             </div>
 
-            {orders.length === 0 ? (
-                <div className="text-center py-5 my-5">
-                    <h5 className="text-muted mb-3">ไม่มีคำสั่งซื้อ</h5>
-                    <p className="text-muted mb-4">ยังไม่มีคำสั่งซื้อในระบบ รอลูกค้าสั่งซื้อสินค้า</p>
-                    <button onClick={fetchOrders} className="btn btn-outline-primary">
-                        <i className="fas fa-refresh me-2"></i> รีเฟรช
-                    </button>
+
+            {(activeTab === "all" ? orders : issueOrders).length === 0 ? (
+                <div className="text-center py-5">
+                    <h5 className="text-muted">ไม่มีรายการคำสั่งซื้อ</h5>
                 </div>
             ) : (
                 <div className="accordion" id="ordersAccordion">
-                    {orders.map((order, index) => (
+                    {(activeTab === "all" ? orders : issueOrders).map(order => (
                         <div className="accordion-item" key={order.order_id}>
-                            {/* หัวข้อ Accordion */}
                             <h2 className="accordion-header" id={`heading-${order.order_id}`}>
                                 <button
                                     className="accordion-button collapsed"
@@ -142,7 +200,6 @@ function AdminOrderManager() {
                                 </button>
                             </h2>
 
-                            {/* เนื้อหาที่ขยายได้ */}
                             <div
                                 id={`collapse-${order.order_id}`}
                                 className="accordion-collapse collapse"
@@ -156,49 +213,44 @@ function AdminOrderManager() {
                                     </div>
 
                                     <div className="mb-2">
-                                        <strong>สถานะการสั่งซื้อ: </strong>
-                                        <span
-                                            className={`badge rounded-pill px-2 py-1 ${order.order_status === 'delivered'
-                                                ? "text-success bg-success bg-opacity-10"
-                                                : order.order_status === "shipping"
-                                                    ? "text-primary bg-primary bg-opacity-10"
-                                                    : order.order_status === "processing"
-                                                        ? "text-warning bg-warning bg-opacity-10"
-                                                        : order.order_status === "cancelled"
-                                                            ? "text-danger bg-danger bg-opacity-10"
-                                                            : order.order_status === "pending_verification"
-                                                                ? "text-dark bg-secondary bg-opacity-10"
+                                        <strong>สถานะคำสั่งซื้อ: </strong>
+                                        <span className={`badge rounded-pill px-2 py-1 ${order.order_status === 'delivered' ? "text-success bg-success bg-opacity-10"
+                                                : order.order_status === "shipping" ? "text-primary bg-primary bg-opacity-10"
+                                                    : order.order_status === "processing" ? "text-warning bg-warning bg-opacity-10"
+                                                        : order.order_status === "cancelled" ? "text-danger bg-danger bg-opacity-10"
+                                                            : order.order_status === "pending_verification" ? "text-dark bg-secondary bg-opacity-10"
                                                                 : "bg-secondary text-white"
-                                                }`}
-                                        >
-                                            {order.order_status === "delivered"
-                                                ? "จัดส่งสำเร็จ"
-                                                : order.order_status === "shipping"
-                                                    ? "กำลังจัดส่ง"
-                                                    : order.order_status === "processing"
-                                                        ? "กำลังดำเนินการ"
-                                                        : order.order_status === "cancelled"
-                                                            ? "ยกเลิก"
-                                                            : order.order_status === "pending_verification"
-                                                                ? "รอตรวจสอบการชำระเงิน"
+                                            }`}>
+                                            {order.order_status === "delivered" ? "จัดส่งสำเร็จ"
+                                                : order.order_status === "shipping" ? "กำลังจัดส่ง"
+                                                    : order.order_status === "processing" ? "กำลังดำเนินการ"
+                                                        : order.order_status === "cancelled" ? "ยกเลิก"
+                                                            : order.order_status === "pending_verification" ? "รอตรวจสอบการชำระเงิน"
                                                                 : "รอชำระเงิน"}
                                         </span>
                                     </div>
 
-                                    {/* <div className="mb-2">
-                                        <strong>สถานะการชำระเงิน:</strong>
-                                        <span
-                                            className={`ms-2 badge ${order.payment_status === 'paid' ? 'bg-success' :
-                                                    order.payment_status === 'pending' ? 'bg-info' :
-                                                        order.payment_status === 'rejected' ? 'bg-danger' : 'bg-secondary'
-                                                }`}
-                                        >
-                                            {order.payment_status === 'paid' && 'ชำระเงินแล้ว'}
-                                            {order.payment_status === 'pending' && 'รอชำระเงิน'}
-                                            {order.payment_status === 'rejected' && 'ปฏิเสธการชำระเงิน'}
-                                            {!['paid', 'pending', 'rejected'].includes(order.payment_status) && 'ไม่ทราบสถานะ'}
-                                        </span>
-                                    </div> */}
+                                    {activeTab !== "all" && (
+                                        <>
+                                            <div className="mb-2">
+                                                <strong>ประเภทปัญหา:</strong> {order.issue_type}
+                                            </div>
+                                            <div className="mb-2">
+                                                <strong>รายละเอียด:</strong> {order.description || '-'}
+                                            </div>
+                                            {order.evidence_path && (
+                                                <div className="mb-2">
+                                                    <strong>หลักฐาน:</strong><br />
+                                                    <img
+                                                        src={`http://localhost:3001/uploads/${order.evidence_path} `}
+                                                        alt="หลักฐานปัญหา"
+                                                        className="img-thumbnail"
+                                                        style={{ maxWidth: '200px' }}
+                                                    />
+                                                </div>
+                                            )}
+                                        </>
+                                    )}
 
                                     <div className="mb-2">
                                         <strong>เลขพัสดุ:</strong>
@@ -239,7 +291,6 @@ function AdminOrderManager() {
                         </div>
                     ))}
                 </div>
-
             )}
             <Modal
                 isOpen={modalIsOpen}
@@ -436,7 +487,49 @@ function AdminOrderManager() {
                                             </div>
                                         </div>
                                     )}
+
+                                {issueModalOpen && selectedIssue && (
+                                    <div className="modal-backdrop">
+                                        <div className="modal-report p-4">
+                                            <h5>ตรวจสอบ Issue #{selectedIssue.issue_id}</h5>
+                                            <p>Order ID: {selectedIssue.order_id}</p>
+                                            <p>ประเภทปัญหา: {selectedIssue.issue_type}</p>
+                                            <p>รายละเอียด: {selectedIssue.description}</p>
+
+                                            {selectedIssue.evidence_path && (
+                                                <div className="mb-3">
+                                                    <a href={`http://localhost:3001/uploads/${selectedIssue.evidence_path}`} target="_blank" rel="noreferrer">
+                                                        📎 ดูหลักฐานแนบ
+                                                    </a>
+                                                </div>
+                                            )}
+
+                                            <div className="mb-3">
+                                                <label>สถานะการแก้ไข</label>
+                                                <select className="form-select" value={resolutionType} onChange={(e) => setResolutionType(e.target.value)}>
+                                                    <option value="">-- เลือก --</option>
+                                                    <option value="refund">คืนเงิน</option>
+                                                    <option value="replacement">ส่งสินค้าใหม่</option>
+                                                    <option value="rejected">ปฏิเสธ</option>
+                                                </select>
+                                            </div>
+
+                                            <div className="mb-3">
+                                                <label>หมายเหตุ / เหตุผล</label>
+                                                <textarea className="form-control" rows="3" value={resolutionNote} onChange={(e) => setResolutionNote(e.target.value)} />
+                                            </div>
+
+                                            <div className="d-flex justify-content-end gap-2">
+                                                <button className="btn btn-secondary" onClick={() => setIssueModalOpen(false)}>ยกเลิก</button>
+                                                <button className="btn btn-success" onClick={handleUpdateIssue}>บันทึก</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+
                             </div>
+
                         ) : (
                             <p className="text-muted text-center">
                                 กรุณาเลือกคำสั่งซื้อเพื่อดูรายละเอียด

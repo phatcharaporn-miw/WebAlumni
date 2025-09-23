@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import '../css/SouvenirCheckout.css';
+import { useAuth } from '../context/AuthContext';
 import Swal from 'sweetalert2';
 import jsQR from "jsqr";
 
@@ -19,7 +20,8 @@ function SouvenirCheckout() {
     const [orderDetails, setOrderDetails] = useState(null);
     const [qrCode, setQrCode] = useState(null);
 
-    const userId = localStorage.getItem("userId");
+    // const userId = sessionStorage.getItem("userId");
+    const {user} = useAuth();
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -31,12 +33,12 @@ function SouvenirCheckout() {
     const [selectedSubDistrict, setSelectedSubDistrict] = useState("");
     const [error, setError] = useState("");
 
-    // ใช้ selectedItems จาก localStorage หรือ state
-    const selectedItems = location.state?.selectedItems || JSON.parse(localStorage.getItem('selectedItems')) || [];
+    // ใช้ selectedItems จาก sessionStorage หรือ state
+    const selectedItems = location.state?.selectedItems || JSON.parse(sessionStorage.getItem('selectedItems')) || [];
 
     useEffect(() => {
-        if (userId) {
-            axios.get(`http://localhost:3001/souvenir/cart?user_id=${userId}`, {
+        if (user && user.id) {
+            axios.get(`http://localhost:3001/souvenir/cart?user_id=${user.id}`, {
                 withCredentials: true
             })
                 .then(response => {
@@ -47,7 +49,7 @@ function SouvenirCheckout() {
                     setCheckoutCart([]);
                 });
         }
-    }, [userId]);
+    }, [user]);
 
     // Timer for QR Code expiry
     useEffect(() => {
@@ -314,7 +316,7 @@ function SouvenirCheckout() {
 
             // Create FormData for file upload
             const formData = new FormData();
-            formData.append('user_id', userId);
+            formData.append('user_id', user.id);
             formData.append('order_id', generateOrderId());
             formData.append('products', JSON.stringify(items.map(item => ({
                 product_id: item.product_id,
@@ -344,12 +346,12 @@ function SouvenirCheckout() {
                 confirmButtonText: 'ตกลง'
             });
 
-            localStorage.removeItem('selectedItems');
+            sessionStorage.removeItem('selectedItems');
 
             // ดึงข้อมูลสินค้าใหม่ (optional ถ้าอยู่หน้าเดิม)
 
             // ไปหน้าประวัติหรือหน้าหลัก
-            const userRole = localStorage.getItem("userRole");
+            const userRole = sessionStorage.getItem("userRole");
             if (userRole === "3") {
                 navigate("/alumni-profile/alumni-profile-souvenir");
             } else if (userRole === "4") {

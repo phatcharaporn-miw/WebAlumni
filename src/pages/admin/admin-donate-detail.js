@@ -16,7 +16,7 @@ function AdminProjectDetail() {
     useEffect(() => {
         const fetchProject = async () => {
             try {
-                console.log('Fetching project with ID:', id);
+                // console.log('Fetching project with ID:', id);
                 const response = await axios.get(`http://localhost:3001/admin/donatedetail/${id}`);
                 setProject(response.data);
                 setLoading(false);

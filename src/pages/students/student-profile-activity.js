@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useOutletContext } from "react-router-dom";
 import { useNavigate, useLocation } from 'react-router-dom';
-// css
+import { useAuth } from '../../context/AuthContext';// css
 import '../../css/profile.css';
 // import '../../css/activity.css';
 // bootstrap
@@ -11,10 +11,12 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 function StudentProfileActivity() {
   const [profile, setProfile] = useState({});
-  const { handleLogout } = useOutletContext();
+  // const { handleLogout } = useOutletContext();
   const [activity, setActivity] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState('activity');
   const [previewImage, setPreviewImage] = useState(null);
+  const {user, handleLogout} = useAuth();
+  const userId = user?.id;
   const navigate = useNavigate();
   const location = useLocation();
 

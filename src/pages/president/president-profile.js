@@ -4,6 +4,7 @@ import '../../css/profile.css';
 import { useOutletContext } from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
 import Swal from "sweetalert2";
+import { useAuth } from '../../context/AuthContext';
 
 function PresidentProfile() {
   const [profile, setProfile] = useState({
@@ -15,6 +16,8 @@ function PresidentProfile() {
   const [loginInfo, setLoginInfo] = useState({ username: '', password: '' });
   const [showPassword, setShowPassword] = useState(false); // สำหรับซ่อน/แสดงรหัสผ่าน
   const [previewImage, setPreviewImage] = useState(null);
+  const {user} = useAuth();
+  const userId = user?.id;
   const navigate = useNavigate();
  //แก้ไขข้อมูลส่วนตัว
  const [editing, setEditing] = useState(false); //สลับโหมดการแก้ไข

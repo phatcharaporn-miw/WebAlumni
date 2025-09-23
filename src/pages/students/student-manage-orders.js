@@ -4,19 +4,21 @@ import { useOutletContext } from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
 import Swal from "sweetalert2";
 import { format } from 'date-fns';
+import { useAuth } from '../../context/AuthContext';
 
 function StudentManageOrders() {
     const [profile, setProfile] = useState({});
-    const { handleLogout } = useOutletContext();
+    // const { handleLogout } = useOutletContext();
     const navigate = useNavigate();
     const [previewImage, setPreviewImage] = useState(null);
     const [loading, setLoading] = useState(true);
-    const userId = localStorage.getItem("userId");
     const [orders, setOrders] = useState([]);
     const [selectedOrderId, setSelectedOrderId] = useState(null);
     const [orderStatus, setOrderStatus] = useState('');
     const [trackingNumber, setTrackingNumber] = useState('');
     const [orderId, setOrderId] = useState('');
+    const {user, handleLogout} = useAuth();
+    const userId = user?.id;
 
     // ดึงข้อมูลโปรไฟล์
     useEffect(() => {

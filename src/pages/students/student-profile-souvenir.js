@@ -5,15 +5,16 @@ import { useNavigate } from 'react-router-dom';
 import { FaFolderOpen, FaCheckCircle, FaImage, FaFilePdf } from "react-icons/fa";
 import { MdClose } from "react-icons/md";
 import Swal from "sweetalert2";
-
+import { useAuth } from '../../context/AuthContext';
 // CSS & Bootstrap
 import '../../css/profile.css';
+import '../../css/reUploadSlip.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 function StudentProfileSouvenir() {
     const [profile, setProfile] = useState({});
-    const { handleLogout } = useOutletContext();
+    // const { handleLogout } = useOutletContext();
     const navigate = useNavigate();
     const [orderHistory, setOrderHistory] = useState([]);
     const [previewImage, setPreviewImage] = useState(null);
@@ -26,7 +27,14 @@ function StudentProfileSouvenir() {
     const [currentOrderId, setCurrentOrderId] = useState(null);
     const [selectedFile, setSelectedFile] = useState(null);
     const [isUploading, setIsUploading] = useState(false);
-    const userId = localStorage.getItem("userId");
+    const [showReportModal, setShowReportModal] = useState(false);
+    const [issueType, setIssueType] = useState("");
+    const [issueDescription, setIssueDescription] = useState("");
+    const [evidenceFile, setEvidenceFile] = useState(null);
+    // const [isReportSubmitting, setIsReportSubmitting] = useState(false);
+    // const userId = sessionStorage.getItem("userId");
+    const { user, handleLogout } = useAuth();
+    const userId = user?.id;
 
     // สำหรับฟังก์ชันอัปโหลดหลักฐานการสั่งซื้อ
     const [showProofModal, setShowProofModal] = useState(false);
@@ -188,10 +196,12 @@ function StudentProfileSouvenir() {
             const formData = new FormData();
             formData.append("paymentSlip", selectedFile);
 
+            console.log("DEBUG currentOrderId:", currentOrderId);
+
             const res = await axios.post(
                 `http://localhost:3001/orders/${currentOrderId}/reupload-slip`,
                 formData,
-                { headers: { "Content-Type": "multipart/form-data" } }
+                { headers: { "Content-Type": "multipart/form-data" }, withCredentials: true }
             );
 
             Swal.fire({
@@ -244,7 +254,7 @@ function StudentProfileSouvenir() {
 
             // ถ้ามีสินค้าที่พร้อมเพิ่ม
             if (data.availableItems && data.availableItems.length > 0) {
-                let cart = JSON.parse(localStorage.getItem("cart")) || [];
+                let cart = JSON.parse(sessionStorage.getItem("cart")) || [];
 
                 data.availableItems.forEach(item => {
                     const existingIndex = cart.findIndex(c => c.product_id === item.product_id);
@@ -260,7 +270,7 @@ function StudentProfileSouvenir() {
                     }
                 });
 
-                localStorage.setItem("cart", JSON.stringify(cart));
+                sessionStorage.setItem("cart", JSON.stringify(cart));
 
                 if (data.unavailableItems && data.unavailableItems.length > 0) {
                     alert(`มีสินค้า ${data.unavailableItems.length} รายการที่สต็อกไม่เพียงพอ`);
@@ -282,6 +292,67 @@ function StudentProfileSouvenir() {
             alert("เกิดข้อผิดพลาดในการโหลดข้อมูล");
         }
     };
+
+    // เปิด modal
+    const handleReportIssue = (orderId) => {
+        setCurrentOrderId(orderId);
+        setShowReportModal(true);
+    };
+
+    // ส่งข้อมูลปัญหาไป backend (session-based)
+    const handleReportSubmit = async (e) => {
+        e.preventDefault();
+        if (!issueType || !issueDescription) {
+            Swal.fire("แจ้งเตือน", "กรุณากรอกข้อมูลให้ครบ", "warning");
+            return;
+        }
+
+        try {
+            const formData = new FormData();
+            formData.append("order_id", currentOrderId);
+            formData.append("issue_type", issueType);
+            formData.append("description", issueDescription);
+            if (evidenceFile) formData.append("evidenceImage", evidenceFile);
+
+            const res = await axios.post(
+                'http://localhost:3001/orders/report-issue',
+                formData,
+                { headers: { "Content-Type": "multipart/form-data" }, withCredentials: true }
+            );
+
+            // แจ้งเตือนผู้ใช้ว่าสำเร็จ
+            Swal.fire({
+                icon: "success",
+                title: "แจ้งปัญหาสำเร็จ",
+                text: `ระบบได้รับปัญหาของคุณแล้ว (Order #${currentOrderId})`,
+                timer: 2500,
+                showConfirmButton: false
+            });
+
+            // อัปเดต order state ทันที
+            setOrders(prevOrders =>
+                prevOrders.map(order =>
+                    order.order_id === currentOrderId
+                        ? { ...order, order_status: "issue_reported" }
+                        : order
+                )
+            );
+
+            // รีเซ็ตฟอร์ม
+            setShowReportModal(false);
+            setIssueType("");
+            setIssueDescription("");
+            setEvidenceFile(null);
+
+        } catch (error) {
+            Swal.fire({
+                icon: "error",
+                title: "เกิดข้อผิดพลาด",
+                text: error.response?.data?.error || error.message,
+            });
+        }
+    };
+
 
     // ฟังก์ชันเปลี่ยนหน้า
     const handleClick = (path) => {
@@ -579,19 +650,130 @@ function StudentProfileSouvenir() {
                                                 {/* Action Button */}
                                                 <div className="text-end">
                                                     {order.order_status === "shipping" && (
-                                                        <button
-                                                            className="btn btn-success btn-sm px-3"
-                                                            onClick={() => handleConfirmReceived(order.order_id)}
-                                                        >
-                                                            ยืนยันได้รับสินค้าแล้ว
-                                                        </button>
+                                                        <>
+                                                            <button
+                                                                className="btn btn-danger btn-sm px-3"
+                                                                onClick={() => handleReportIssue(order.order_id)}
+                                                            >
+                                                                แจ้งปัญหา
+                                                            </button>
+
+                                                            <button
+                                                                className="btn btn-success btn-sm px-3 me-2"
+                                                                onClick={() => handleConfirmReceived(order.order_id)}
+                                                            >
+                                                                ยืนยันได้รับสินค้าแล้ว
+                                                            </button>
+
+                                                        </>
                                                     )}
+
+                                                    {showReportModal && (
+                                                        <div className="modal-backdrop" onClick={handleBackdropClick}>
+                                                            <div className="modal-reupload">
+                                                                {/* Modal Header */}
+                                                                <div className="modal-header">
+                                                                    <h5 className="modal-title">แจ้งปัญหาการสั่งซื้อ</h5>
+                                                                    <button
+                                                                        type="button"
+                                                                        className="close-btn"
+                                                                        onClick={() => setShowReportModal(false)}
+                                                                    >
+                                                                        ✕
+                                                                    </button>
+                                                                </div>
+
+                                                                {/* Modal Body */}
+                                                                <div className="modal-body">
+                                                                    <form onSubmit={handleReportSubmit}>
+                                                                        {/* ประเภทปัญหา */}
+                                                                        <div className="mb-3">
+                                                                            <label className="form-label">ประเภทปัญหา</label>
+                                                                            <select
+                                                                                className="form-select"
+                                                                                value={issueType}
+                                                                                onChange={(e) => setIssueType(e.target.value)}
+                                                                                required
+                                                                            >
+                                                                                <option value="">-- เลือกประเภทปัญหา --</option>
+                                                                                <option value="not_received">ไม่ได้รับสินค้า</option>
+                                                                                <option value="damaged">สินค้าเสียหาย</option>
+                                                                                <option value="wrong_item">ได้รับสินค้าผิด</option>
+                                                                                <option value="other">อื่น ๆ</option>
+                                                                            </select>
+                                                                        </div>
+
+                                                                        {/* รายละเอียด */}
+                                                                        <div className="mb-3">
+                                                                            <label className="form-label">รายละเอียดเพิ่มเติม</label>
+                                                                            <textarea
+                                                                                className="form-control w-100"
+                                                                                rows="3"
+                                                                                value={issueDescription}
+                                                                                onChange={(e) => setIssueDescription(e.target.value)}
+                                                                                placeholder="อธิบายปัญหา..."
+                                                                                required
+                                                                            />
+                                                                        </div>
+
+                                                                        {/* แนบหลักฐาน */}
+                                                                        <div className="mb-3">
+                                                                            <label className="form-label">แนบหลักฐาน (ถ้ามี)</label>
+                                                                            <input
+                                                                                type="file"
+                                                                                className="form-control w-100"
+                                                                                accept="image/*,application/pdf"
+                                                                                onChange={(e) => setEvidenceFile(e.target.files[0])}
+                                                                            />
+                                                                        </div>
+
+                                                                        {/* Preview */}
+                                                                        {evidenceFile && (
+                                                                            <div className="file-preview mt-2 p-2 border rounded">
+                                                                                <div className="d-flex align-items-center gap-2">
+                                                                                    <div className="fw-bold">{evidenceFile.name}</div>
+                                                                                    <button
+                                                                                        type="button"
+                                                                                        className="btn-close"
+                                                                                        onClick={() => setEvidenceFile(null)}
+                                                                                    />
+                                                                                </div>
+                                                                            </div>
+                                                                        )}
+
+                                                                        {/* Modal Footer */}
+                                                                        <div className="modal-footer mt-3">
+                                                                            <button
+                                                                                type="button"
+                                                                                className="btn btn-secondary"
+                                                                                onClick={() => setShowReportModal(false)}
+                                                                                disabled={isUploading}
+                                                                            >
+                                                                                ยกเลิก
+                                                                            </button>
+                                                                            <button
+                                                                                type="submit"
+                                                                                className="btn btn-danger"
+                                                                                disabled={isUploading}
+                                                                            >
+                                                                                {isUploading ? "กำลังส่ง..." : "ส่งปัญหา"}
+                                                                            </button>
+                                                                        </div>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    )}
+
 
                                                     <div>
                                                         {order.order_status === "cancelled" && (
                                                             <button
                                                                 className="btn btn-warning btn-sm px-3"
-                                                                onClick={() => setShowUploadModal(true)}
+                                                                onClick={() => {
+                                                                    setCurrentOrderId(order.order_id);
+                                                                    setShowUploadModal(true);
+                                                                }}
                                                             >
                                                                 อัปโหลดสลิปใหม่
                                                             </button>
@@ -610,7 +792,7 @@ function StudentProfileSouvenir() {
                                                                         <button
                                                                             type="button"
                                                                             className="close-btn"
-                                                                            onClick={() => reuploadSlip(order.order_id)}
+                                                                            onClick={() => setShowUploadModal(false)}
                                                                         >
                                                                             ✕
                                                                         </button>

@@ -8,7 +8,8 @@ import { FaEye } from "react-icons/fa";
 import "../../css/admin-webboard.css";
 import Swal from "sweetalert2";
 import Modal from 'react-modal';
-import moment from "moment";
+// import moment from "moment";
+import { useAuth } from '../../context/AuthContext';
 
 Modal.setAppElement('#root');
 
@@ -16,7 +17,8 @@ function AdminWebboard() {
     const navigate = useNavigate();
     const [webboard, setWebboard] = useState([]);
     const [sortOrder, setSortOrder] = useState("latest");
-    const userRole = localStorage.getItem("role");
+    const { user } = useAuth();
+    const userRole = user?.role; 
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [likedUsers, setLikedUsers] = useState([]);
     const [modalPostTitle, setModalPostTitle] = useState("");

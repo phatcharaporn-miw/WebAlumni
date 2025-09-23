@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useNavigate } from "react-router-dom";
 import { IoIosAdd } from "react-icons/io";
 import Swal from "sweetalert2";
+import { useAuth } from '../context/AuthContext';
 
 function CreatePost() {
     const [title, setTitle] = useState('');
@@ -18,12 +19,13 @@ function CreatePost() {
     const [showNewCategoryInput, setShowNewCategoryInput] = useState(false);
     const [banWords, setBanWords] = useState('');
     const [error, setError] = useState("");
+    const {user} = useAuth();
+    const userId = user?.id;
     const navigate = useNavigate();
 
     // ตรวจสอบว่าผู้ใช้ล็อกอินหรือยัง
     useEffect(() => {
-        const userSession = localStorage.getItem("userId");
-        if (!userSession) {
+        if (!userId) {
             Swal.fire({
                 title: "กรุณาเข้าสู่ระบบ",
                 text: "คุณต้องเข้าสู่ระบบก่อนถึงจะสร้างกระทู้ได้",

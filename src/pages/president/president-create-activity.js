@@ -4,7 +4,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-
+import { useAuth } from '../../context/AuthContext';
 
 function PreCreateActivity() {
   const [formData, setFormData] = useState({
@@ -23,11 +23,12 @@ function PreCreateActivity() {
   });
   const [isLoggedin, setIsLoggedin] = useState(false);
   const [minDate, setMinDate] = useState('');
+  const { user} = useAuth();
+  const userId = user?.id;
   const navigate = useNavigate();
 
   useEffect(() => {
-    const userSession = localStorage.getItem("userId");
-    if (userSession) {
+    if (userId) {
       setIsLoggedin(true);
       console.log("ผู้ใช้ล็อกอินแล้ว");
     } else {
@@ -78,8 +79,7 @@ function PreCreateActivity() {
 
     const formattedTimeRange = formatTimeRange(formData.start_time, formData.end_time);
 
-    const userSession = localStorage.getItem("userId");
-    if (!userSession) {
+    if (!userId) {
       alert("กรุณาล็อกอินเพื่อดำเนินการนี้");
       navigate("/login");
       return;

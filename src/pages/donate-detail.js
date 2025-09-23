@@ -9,6 +9,7 @@ import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { PiCoinsFill } from "react-icons/pi";
 import { FaCheck, FaTimes, FaEye, FaEyeSlash } from "react-icons/fa";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from '../context/AuthContext';
 import axios from "axios";
 import jsQR from "jsqr";
 import Swal from "sweetalert2";
@@ -59,10 +60,12 @@ function DonateDetail() {
     const location = useLocation();
     const navigate = useNavigate();
     const { projectId } = useParams();
-    const userId = localStorage.getItem("userId");
+    // const userId = sessionStorage.getItem("userId");
+    const { user } = useAuth();
+    const userId = user?.id;
     const [taxType, setTaxType] = useState("");
     const [useTax, setUseTax] = useState(false);
-    // สร้าง key สำหรับ localStorage
+    // สร้าง key สำหรับ sessionStorage
     const FORM_DATA_KEY = `donateForm_${projectId}_${userId}`;
     // State management
     const donationData = location.state;
@@ -71,7 +74,7 @@ function DonateDetail() {
     const [userData, setUserData] = useState({});
     const [formData, setFormData] = useState({
         amount: "",
-        user_id: userId || "",
+        user_id: user.id || "",
         project_id: projectId || "",
         file: null,
         name: "",          // ตั้งค่าว่างไว้ก่อน
@@ -170,7 +173,7 @@ function DonateDetail() {
 
     // Clear saved form data function
     const clearSavedFormData = useCallback(() => {
-        localStorage.removeItem(FORM_DATA_KEY);
+        sessionStorage.removeItem(FORM_DATA_KEY);
         setHasSavedData(false);
     }, [FORM_DATA_KEY]);
 
@@ -179,12 +182,12 @@ function DonateDetail() {
         window.scrollTo(0, 0);
     }, []);
 
-    // Load saved form data from localStorage
+    // Load saved form data from sessionStorage
     // ตรงนี้อยากเปลี่ยนให้มัมนข้อมูลยังคงอยู่เมื่อกดย้อนกลับมาจากหน้ายืนยันเท่านั้น หากออกไปแล้วกลับเข้ามาใหม่ ก็ไม่ควรมีข้อมูลเก่า
     useEffect(() => {
         const loadSavedFormData = () => {
             try {
-                const savedData = localStorage.getItem(FORM_DATA_KEY);
+                const savedData = sessionStorage.getItem(FORM_DATA_KEY);
                 if (savedData && location.state?.fromConfirm) {
                     const parsedData = JSON.parse(savedData);
 
@@ -242,7 +245,7 @@ function DonateDetail() {
             if (!userId) return;
             try {
                 const res = await axios.get(`http://localhost:3001/donate/tax_addresses/user/${userId}`);
-                console.log("API Response:", res.data); // ตรวจสอบ data
+                // console.log("API Response:", res.data); // ตรวจสอบ data
                 setCorporateAddresses(res.data || []);
             } catch (err) {
                 console.error("Error fetching addresses:", err);
@@ -275,7 +278,7 @@ function DonateDetail() {
             };
 
             try {
-                localStorage.setItem(FORM_DATA_KEY, JSON.stringify(saveData));
+                sessionStorage.setItem(FORM_DATA_KEY, JSON.stringify(saveData));
             } catch (error) {
                 console.error('Error saving form data:', error);
             }
@@ -605,7 +608,7 @@ function DonateDetail() {
                 selectedTaxId,
                 filePreview,
             };
-            localStorage.setItem(FORM_DATA_KEY, JSON.stringify(dataToSave));
+            sessionStorage.setItem(FORM_DATA_KEY, JSON.stringify(dataToSave));
 
             navigate(`/donate/donatedetail/donateconfirm/${projectId}`, {
                 state: {
@@ -629,7 +632,7 @@ function DonateDetail() {
     };
 
     useEffect(() => {
-        const savedData = localStorage.getItem(FORM_DATA_KEY);
+        const savedData = sessionStorage.getItem(FORM_DATA_KEY);
 
         if (savedData && location.state?.fromConfirm) {
             // ถ้ามาจาก confirm → โหลดข้อมูลกลับมา
@@ -641,7 +644,7 @@ function DonateDetail() {
             setFilePreview(parsedData.filePreview || null);
         } else {
             // ถ้าเข้ามาใหม่ (ไม่ใช่มาจาก confirm) → ล้างข้อมูล
-            localStorage.removeItem(FORM_DATA_KEY);
+            sessionStorage.removeItem(FORM_DATA_KEY);
         }
     }, [location.state]);
 

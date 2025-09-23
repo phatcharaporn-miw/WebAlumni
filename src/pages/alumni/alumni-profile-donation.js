@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useOutletContext, useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import Swal from 'sweetalert2';
 import '../../css/profile.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -17,7 +18,8 @@ function AlumniProfileDonation() {
     const [selectedDonation, setSelectedDonation] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [uploadingSlip, setUploadingSlip] = useState(false);
-    const { handleLogout } = useOutletContext();
+    const { user, handleLogout } = useAuth();
+    const userId = user?.id;
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -691,7 +693,7 @@ function AlumniProfileDonation() {
                 </div>
             )}
 
-            <style jsx>{`
+            <style>{`
                 .sticky-top {
                     z-index: 100;
                 }

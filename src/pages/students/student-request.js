@@ -304,6 +304,7 @@ import { useOutletContext } from "react-router-dom";
 import { useNavigate, useLocation } from 'react-router-dom';
 import Swal from "sweetalert2";
 import { Link } from "react-router-dom";
+import { useAuth } from '../../context/AuthContext';
 // css
 import '../../css/profile.css';
 // bootstrap
@@ -313,12 +314,14 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 function PresidentProfileRequest() {
     const [pendingDonations, setPendingDonations] = useState([]);
     const [profile, setProfile] = useState({});
-    const { handleLogout } = useOutletContext();
+    // const { handleLogout } = useOutletContext();
     // const [activity, setActivity] = useState([]);
     // const [selectedStatus, setSelectedStatus] = useState('activity');
     const [previewImage, setPreviewImage] = useState(null);
     const [pendingRequests, setPendingRequests] = useState([]);
     const [loadingRequests, setLoadingRequests] = useState(true);
+    const {user, handleLogout} = useAuth();
+    const userId = user?.id;
     const navigate = useNavigate();
     const location = useLocation();
 

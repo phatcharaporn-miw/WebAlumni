@@ -3,10 +3,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { IoIosAdd } from "react-icons/io";
 import Swal from "sweetalert2";
+import { useAuth } from '../../context/AuthContext';
 
 function EditWebboard() {
     const { webboardId } = useParams();
-    const userId = localStorage.getItem("userId");  
+    const { user} = useAuth();
+    const userId = user?.id; 
     const navigate = useNavigate();
     const [category, setCategory] = useState([]);
     const [formData, setFormData] = useState({

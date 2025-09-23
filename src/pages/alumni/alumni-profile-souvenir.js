@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
-import { useOutletContext } from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
 import { FaFolderOpen, FaCheckCircle, FaImage, FaFilePdf } from "react-icons/fa";
 import { MdClose } from "react-icons/md";
 import Swal from "sweetalert2";
+import { useAuth } from '../../context/AuthContext';
 
 // CSS & Bootstrap
 import '../../css/profile.css';
@@ -14,7 +14,6 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 function AlumniProfileSouvenir({ order }) {
     const [profile, setProfile] = useState({});
-    const { handleLogout } = useOutletContext();
     const navigate = useNavigate();
     const [orderHistory, setOrderHistory] = useState([]);
     const [previewImage, setPreviewImage] = useState(null);
@@ -33,7 +32,8 @@ function AlumniProfileSouvenir({ order }) {
     const [proofFile, setProofFile] = useState(null);
     const [proofOrderId, setProofOrderId] = useState(null);
     const [isProofUploading, setIsProofUploading] = useState(false);
-    const userId = localStorage.getItem("userId");
+    const { user, handleLogout } = useAuth();
+    const userId = user?.id;
 
     // ดึงข้อมูลโปรไฟล์
     useEffect(() => {

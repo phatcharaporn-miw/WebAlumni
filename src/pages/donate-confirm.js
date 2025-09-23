@@ -6,6 +6,7 @@ import { MdDateRange, MdAttachMoney, MdReceipt } from "react-icons/md";
 import { IoInformationCircleOutline, IoCheckmarkCircleOutline, IoWarningOutline } from "react-icons/io5";
 import { FaUser, FaIdCard, FaPhone, FaEnvelope, FaBuilding, FaFileImage } from "react-icons/fa";
 import Swal from "sweetalert2";
+import { useAuth } from '../context/AuthContext';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:3001";
 
@@ -15,7 +16,9 @@ function DonateConfirm() {
     const [projectData, setProjectData] = useState({});
     const [error, setError] = useState(null);
     const [isDataValid, setIsDataValid] = useState(false);
-    const userId = localStorage.getItem("userId");
+    // const userId = sessionStorage.getItem("userId");
+    const {user} = useAuth();
+    const userId = user?.id;
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -249,7 +252,7 @@ function DonateConfirm() {
                     title: 'บริจาคสำเร็จ',
                     text: 'ขอบคุณสำหรับการบริจาคของคุณ! ระบบได้บันทึกการบริจาคเรียบร้อยแล้ว',
                 });
-                localStorage.removeItem("donationFormData");
+                sessionStorage.removeItem("donationFormData");
                 navigate("/alumni-profile/alumni-profile-donation");
             } else {
                 throw new Error(response.data?.message || "การบริจาคไม่สำเร็จ");

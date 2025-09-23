@@ -4,9 +4,11 @@ import "../css/Donate-request.css";
 import { Link, useNavigate } from "react-router-dom";
 import axios from 'axios';
 import Swal from "sweetalert2";
+import { useAuth } from '../context/AuthContext';
 
 function DonateRequest() {
     const navigate = useNavigate();
+    const {user} = useAuth();
     const [formData, setFormData] = useState({
         projectName: "",
         description: "",
@@ -81,13 +83,13 @@ function DonateRequest() {
         e.preventDefault();
         const data = new FormData();
 
-        const userId = localStorage.getItem('userId');
+        // const userId = sessionStorage.getItem('userId');
 
-        if (!userId) {
+        if (!user || !user.id) {
             alert("กรุณาเข้าสู่ระบบก่อน");
             return;
         }
-        data.append("userId", userId);
+        data.append("userId", user.id);
 
         data.append("projectName", formData.projectName);
         data.append("description", formData.description);
@@ -133,7 +135,7 @@ function DonateRequest() {
                 setErrorMessage("");
                 setIsSubmitting(false);
 
-                const role = localStorage.getItem("userRole");
+                const role = sessionStorage.getItem("userRole");
 
                 if (role === "3") {
                     navigate("/alumni-profile/alumni-request");

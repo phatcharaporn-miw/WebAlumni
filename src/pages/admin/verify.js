@@ -4,6 +4,7 @@ import Swal from "sweetalert2";
 import { FaHeart, FaShoppingCart } from 'react-icons/fa';
 import '../../css/verify.css';
 import { CiSearch } from "react-icons/ci";
+import { useAuth } from '../../context/AuthContext';
 
 function AdminVerifySlip() {
     // การสั่งซื้อ
@@ -20,7 +21,8 @@ function AdminVerifySlip() {
     const [searchQuery, setSearchQuery] = useState("");
     const [filterStatus, setFilterStatus] = useState("all");
     const [sortBy, setSortBy] = useState("date");
-    const userId = localStorage.getItem("userId");
+    const { user} = useAuth();
+    const userId = user?.id;
 
     useEffect(() => {
         fetchOrders();

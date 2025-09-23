@@ -8,11 +8,15 @@ import Swal from "sweetalert2";
 import { MdDateRange, MdEdit, MdDelete } from "react-icons/md";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from '../context/AuthContext';
 
 function News() {
     const [news, setNews] = useState([]);
-    const userRole = localStorage.getItem("userRole");
-    const userId = localStorage.getItem("userId");
+    // const userRole = sessionStorage.getItem("userRole");
+    // const userId = sessionStorage.getItem("userId");
+    const { user } = useAuth();
+    const userRole = user?.role;
+    const userId = user?.id;
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState("");
 

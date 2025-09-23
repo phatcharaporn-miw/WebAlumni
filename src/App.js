@@ -3,11 +3,11 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import React, { Suspense, lazy } from "react";
 import './App.css';
-// import { GoogleOAuthProvider } from '@react-oauth/google';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AppLayout from "./components/AppLayout";
-import { CartProvider } from './context/CartContext'; // ปรับ path ตามโครงสร้างโฟลเดอร์
+import { CartProvider } from './context/CartContext'; 
 import { AuthProvider } from './context/AuthContext';
+import { UserProvider } from "./context/UserContext";
 import About from "./pages/about";
 import News from './pages/news';
 import Activity from './pages/activity';
@@ -36,7 +36,6 @@ import EditWebboard from './pages/alumni/editWebboard';
 import ActivityDetail from "./pages/activityDetail";
 import ForgotPassword from './pages/forgotPassword';
 import SouvenirCheckout from './pages/souvenir_checkout';
-// import SouvenirHistory from '../src/pages/alumni/alumni-profile-souvenir';
 import AlumniProfileSouvenir from './pages/alumni/alumni-profile-souvenir';
 import AlumniProfileActivity from './pages/alumni/alumni-profile-activity';
 import SouvenirBasket from './pages/souvenir_basket';
@@ -45,13 +44,8 @@ import AlumniProfileRequest from './pages/alumni/alumni-request';
 import ChangePassword from './pages/change-password';
 import AlumniProfileDonation from './pages/alumni/alumni-profile-donation';
 import AlumniManageOrders from './pages/alumni/alumni-manage-orders';
-import RegistrationForm from './pages/test-regis';
 import CheckFullName from './pages/check-fullName';
 import DonateConfirm from './pages/donate-confirm';
-
-
-// test import
-import Chat from './components/Chat';
 
 // ส่วนของ การ import component ที่ใช้สำหรับการตรวจสอบสิทธิ์
 import AlumniOnly from './components/AlumniOnly';
@@ -127,6 +121,7 @@ function App() {
 
     // <GoogleOAuthProvider clientId={clientId}>
       <BrowserRouter>
+       {/* <UserProvider>  */}
           <AuthProvider>
             <CartProvider>
               <Routes>
@@ -168,8 +163,6 @@ function App() {
 
                   {/* ลองทำไว้ก่อน */}
                   <Route path="/change-password" element={<ChangePassword />} />
-                  <Route path='/test-regis' element={<RegistrationForm />} />
-                  <Route path="/chat" element={<Chat />} />
 
                   {/* route ของศิษย์เก่า */}
                   <Route path="/alumni-home" element={<AlumniOnly><AlumniHome /></AlumniOnly>} />
@@ -247,6 +240,7 @@ function App() {
               </Routes>
             </CartProvider>
           </AuthProvider>
+        {/* </UserProvider> */}
       </BrowserRouter>
     // </GoogleOAuthProvider>
 

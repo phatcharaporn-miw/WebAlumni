@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { IoIosAdd } from "react-icons/io";
 import Swal from "sweetalert2";
+// import { useAuth } from '../../context/AuthContext';
 
 function AdminEditWebboard() {
     const { webboardId } = useParams();
     const navigate = useNavigate();
+    // const { user} = useAuth();
+    // const userId = user?.id;
     const [category, setCategory] = useState([]);
     const [formData, setFormData] = useState({
         title: '',
@@ -14,19 +16,6 @@ function AdminEditWebboard() {
         image_path: '',
         category_id: ''
     });
-
-    const [isLoggedin, setIsLoggedin] = useState(false); 
-    
-    useEffect(() => {
-          const userSession = localStorage.getItem("userId");  
-          if (userSession) {
-              setIsLoggedin(true);
-              console.log("ผู้ใช้ล็อกอินแล้ว");
-          } else {
-              setIsLoggedin(false);
-              console.log("ผู้ใช้ยังไม่ได้ล็อกอิน"); 
-          }
-    }, []);
 
     // ดึงข้อมูลกระทู้ที่ต้องการแก้ไข
     useEffect(() => {

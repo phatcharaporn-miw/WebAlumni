@@ -8,14 +8,17 @@ import Swal from "sweetalert2";
 import { IoMdClose } from "react-icons/io";
 import { MdEdit, MdDelete } from 'react-icons/md';
 import { Link } from "react-router-dom";
-
+import { useAuth } from '../context/AuthContext';
 
 function Activity() {
     const [activityId, setActivityId] = useState(null);
     const [activity, setActivity] = useState([]);
     const [selectedStatus, setSelectedStatus] = useState('activity');
     const [showForm, setShowForm] = useState(false);
-    const userRole = localStorage.getItem("userRole");
+    // const userRole = sessionStorage.getItem("userRole");
+    const {user} = useAuth();
+    const userRole = user?.role;
+    const userId = user?.id;
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         full_name: "",
@@ -31,7 +34,6 @@ function Activity() {
     const [hasJoined, setHasJoined] = useState(false);
 
     const handleJoinClick = (activityId) => {
-        const userId = localStorage.getItem('userId');
         if (!userId) {
             Swal.fire({
                 title: "กรุณาเข้าสู่ระบบ",

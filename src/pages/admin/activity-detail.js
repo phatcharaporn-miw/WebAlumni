@@ -4,6 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { MdEdit, MdDelete } from "react-icons/md";
 import "../../css/admin-activity.css";
+import { useAuth } from '../../context/AuthContext';
 
 function AdminActivityDetail() {
     const { activityId } = useParams(); // ดึง ID ของกิจกรรมจาก URL

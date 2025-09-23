@@ -7,7 +7,7 @@ import { FaUser, FaBarcode, FaEdit, FaTrash, FaCheckCircle, FaHourglassHalf, FaT
 import { MdDelete } from "react-icons/md";
 import { Modal, Button, Box, Typography } from "@mui/material";
 import Swal from "sweetalert2";
-
+import { useAuth } from '../../context/AuthContext';
 
 // CSS & Bootstrap
 import '../../css/profile.css';
@@ -17,7 +17,8 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 function Approve() {
     const [profile, setProfile] = useState({});
-    const { handleLogout } = useOutletContext();
+    const { user, handleLogout } = useAuth();
+    const user_id = user?.id;
     const navigate = useNavigate();
     const [previewImage, setPreviewImage] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -29,8 +30,6 @@ function Approve() {
         message: "",
         severity: "info",
     });
-
-    const user_id = localStorage.getItem("userId");
 
     // ดึงข้อมูลโปรไฟล์
     useEffect(() => {

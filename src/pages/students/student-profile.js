@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../../css/profile.css';
-import { useOutletContext } from "react-router-dom";
+// import { useOutletContext } from "react-router-dom";
+import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import Swal from "sweetalert2";
 import { IoMdCreate } from "react-icons/io";
@@ -15,11 +16,11 @@ function StudentProfile() {
     educations: [],
   });
   const [major, setMajor] = useState([]);
-  const {handleLogout } = useOutletContext();
+  const { user, handleLogout } = useAuth(); 
+  const userId = user?.id;
   const [loginInfo, setLoginInfo] = useState({ username: '', password: '' });
-  const [showPassword, setShowPassword] = useState(false); // สำหรับซ่อน/แสดงรหัสผ่าน
+  // const [showPassword, setShowPassword] = useState(false); // สำหรับซ่อน/แสดงรหัสผ่าน
   const [previewImage, setPreviewImage] = useState(null);
-  const userId = localStorage.getItem("userId");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
  //แก้ไขข้อมูลส่วนตัว
@@ -33,7 +34,7 @@ function StudentProfile() {
       .then((response) => {
         // console.log('majors:', response.data.major);     
         if (response.data.success) {
-          //  console.log('profile data:', response.data.user);
+          console.log('profile data:', response.data.user);
           setProfile(response.data.user);
         }
       })

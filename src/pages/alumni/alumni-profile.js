@@ -4,8 +4,7 @@ import '../../css/profile.css';
 import { useOutletContext } from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
 import Swal from "sweetalert2";
-import { IoMdCreate } from "react-icons/io";
-import { FaBars, FaTimes } from "react-icons/fa";
+import { useAuth } from '../../context/AuthContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
@@ -15,12 +14,12 @@ function Profile() {
     educations: [],
   });
   const [major, setMajor] = useState([]);
-  const {handleLogout } = useOutletContext();
   const [loginInfo, setLoginInfo] = useState({ username: '', password: '' });
   const [showPassword, setShowPassword] = useState(false); // สำหรับซ่อน/แสดงรหัสผ่าน
-  const userId = localStorage.getItem("userId");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState(null); // สำหรับแสดงรูปภาพก่อนอัปโหลด
+  const { user, handleLogout } = useAuth();
+  const userId = user?.id;
   const navigate = useNavigate();
  const [editing, setEditing] = useState(false); 
  
