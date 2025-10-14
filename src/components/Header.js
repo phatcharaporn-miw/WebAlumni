@@ -13,6 +13,7 @@ import Swal from "sweetalert2";
 import axios from "axios";
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import {HOSTNAME} from '../config.js';
 
 function Header() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -22,28 +23,18 @@ function Header() {
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const { cartCount, getCartCount } = useCart();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  // const userId = sessionStorage.getItem('userId');
-  // const { user, handleLogout } = useAuth();
+  // const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, isLoggedIn, handleLogout } = useAuth();
-  const userId = user?.userId;
+  const userId = user?.user_id;
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
   const { addToCart, clearCart, refreshCartCount } = useCart();
-  // const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  // useEffect(() => {
-  //   const user = sessionStorage.getItem('userId');
-  //   setIsLoggedIn(!!user);
-  // }, []);
-
-  
 
   // ดึงแจ้งเตือนเมื่อผู้ใช้เข้าสู่ระบบ
   useEffect(() => {
-    if (!user?.userId) return;
+    if (!userId) return;
     const fetchNotifications = () => {
-      axios.get(`http://localhost:3001/notice/notification/${user.userId}`)
+      axios.get(HOSTNAME +`/notice/notification/${userId}`)
         .then((response) => {
           if (response.data.success) {
             const data = response.data.data || [];
@@ -58,11 +49,11 @@ function Header() {
     fetchNotifications();
     const interval = setInterval(fetchNotifications, 30000); // รีเฟรชทุก 30 วินาที
     return () => clearInterval(interval);
-  }, [user?.userId]);
+  }, [userId]);
 
 
   const markAsRead = (notificationId) => {
-    axios.put(`http://localhost:3001/notice/read/${notificationId}`)
+    axios.put(HOSTNAME +`/notice/read/${notificationId}`)
       .then(() => {
         setNotifications((prevNotifications) =>
           prevNotifications.map((n) =>
@@ -83,7 +74,7 @@ function Header() {
 
   //ลบแจ้งเตือน
   const deleteNotification = (notificationId) => {
-    axios.delete(`http://localhost:3001/notice/notification/${notificationId}`)
+    axios.delete(HOSTNAME +`/notice/notification/${notificationId}`)
       .then(() => {
         setNotifications(notifications.filter((n) => n.notification_id !== notificationId));
         setUnreadCount((prev) => Math.max(prev - 1, 0)); // ลดตัวนับแจ้งเตือน
@@ -93,7 +84,7 @@ function Header() {
 
   // แจ้งเตือนเมื่อมีการกดใจกระทู้
   const handleLikePost = (postId) => {
-    axios.post(`http://localhost:3001/webboard/${postId}/favorite`, {})
+    axios.post(HOSTNAME +`/webboard/${postId}/favorite`, {})
       .then((response) => {
         console.log("Response from Backend:", response.data);
       })
@@ -104,7 +95,7 @@ function Header() {
 
   // แจ้งเตือนเมื่อมีการแสดงความคิดเห็น
   const handleCommentPost = (postId, comment) => {
-    axios.post(`http://localhost:3001/webboard/${postId}/comment`, {
+    axios.post(HOSTNAME +`/webboard/${postId}/comment`, {
       comment_detail: comment
     })
       .then((response) => {
@@ -140,24 +131,16 @@ function Header() {
     event.stopPropagation();
   };
 
-  // ตรวจสอบและโหลดจำนวนตะกร้าเมื่อ component mount หรือเมื่อ user login
-  // useEffect(() => {
-  //    const userId = sessionStorage.getItem('userId');
-  //   if (userId) {
-  //     getCartCount(userId);
-  //   }
-  // }, []); // เรียกครั้งเดียวเมื่อ component mount
-
   useEffect(() => {
-    if (user?.userId) {
-      getCartCount(user.userId);
+    if (userId) {
+      getCartCount(userId);
     }
-  }, [user?.userId, getCartCount]);
+  }, [userId, getCartCount]);
 
   // ฟังก์ชันเพิ่มสินค้าลงตะกร้าสำหรับใช้ในส่วนอื่นๆ ของ Header (ถ้ามี)
   const handleAddToCartFromHeader = async (productId, quantity, total) => {
     // ตรวจสอบจาก user prop แทน sessionStorage
-    if (!user) {
+    if (!userId) {
       Swal.fire({
         title: "กรุณาเข้าสู่ระบบ",
         text: "คุณต้องเข้าสู่ระบบก่อนเพิ่มสินค้า",
@@ -205,10 +188,10 @@ function Header() {
 
   // Refresh cart count เมื่อ user เปลี่ยน (เผื่อกรณี login ใหม่)
   useEffect(() => {
-    if (user) {
+    if (userId) {
       refreshCartCount();
     }
-  }, [user, refreshCartCount]);
+  }, [userId, refreshCartCount]);
 
   // การค้นหา
   const handleSearchChange = (e) => {
@@ -222,7 +205,7 @@ function Header() {
     }
 
     // เรียก API เพื่อดึงคำแนะนำ
-    axios.get(`http://localhost:3001/search/search-all?search=${value}`)
+    axios.get(HOSTNAME +`/search/search-all?search=${value}`)
       .then((response) => {
         if (response.data.success) {
           setSuggestions(response.data.data);
@@ -258,7 +241,7 @@ function Header() {
     }
 
     // ตรวจสอบว่ามีผลการค้นหาหรือไม่
-    axios.get(`http://localhost:3001/search/search-all?search=${searchTerm}`)
+    axios.get(HOSTNAME +`/search/search-all?search=${searchTerm}`)
       .then((response) => {
         if (response.data.success && response.data.data.length > 0) {
           navigate(`/search?query=${searchTerm}`); // มีผลการค้นหา
@@ -396,7 +379,7 @@ function Header() {
           </div>
 
           {/* ผู้ใช้ - เปลี่ยนจาก user เป็น isLoggedIn && user เพื่อความชัดเจน */}
-          {isLoggedIn && user ? (
+          {isLoggedIn && userId ? (
             <div className="user-profile">
               {/* แจ้งเตือน */}
               <div className="notification-container me-4">

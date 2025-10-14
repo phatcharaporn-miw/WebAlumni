@@ -3,7 +3,10 @@ import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import '../css/SouvenirCheckout.css';
+import { ChevronDown, ChevronUp } from "lucide-react";
+import { IoAdd } from "react-icons/io5";
 import { useAuth } from '../context/AuthContext';
+import {HOSTNAME} from '../config.js';
 import Swal from 'sweetalert2';
 import jsQR from "jsqr";
 
@@ -21,24 +24,75 @@ function SouvenirCheckout() {
     const [qrCode, setQrCode] = useState(null);
 
     // const userId = sessionStorage.getItem("userId");
-    const {user} = useAuth();
+    const { user } = useAuth();
+    const userId = user?.user_id;
     const location = useLocation();
     const navigate = useNavigate();
 
-    // กรอกรหัสไปรษณีย์และที่อยู่
-    const [zipcode, setZipcode] = useState("");
-    const [province, setProvince] = useState("");
-    const [district, setDistrict] = useState("");
-    const [subDistricts, setSubDistricts] = useState([]); // array ของตำบล/แขวง
-    const [selectedSubDistrict, setSelectedSubDistrict] = useState("");
-    const [error, setError] = useState("");
+    // State สำหรับเก็บ user_addresses_id ที่เลือก
+    const [selectedAddressId, setSelectedAddressId] = useState(null);
 
-    // ใช้ selectedItems จาก sessionStorage หรือ state
-    const selectedItems = location.state?.selectedItems || JSON.parse(sessionStorage.getItem('selectedItems')) || [];
+    // ใช้ selectedItems จาก localStorage หรือ state
+    const selectedItems = location.state?.selectedItems || JSON.parse(localStorage.getItem('selectedItems')) || [];
+
+    // ที่อยู่
+    const [provinces, setProvinces] = useState([]);
+    const [districts, setDistricts] = useState([]);
+    const [subDistricts, setSubDistricts] = useState([]);
+
+    const [selectedProvince, setSelectedProvince] = useState("");
+    const [selectedDistrict, setSelectedDistrict] = useState("");
+    const [selectedSubDistrict, setSelectedSubDistrict] = useState("");
+    const [zipCode, setZipCode] = useState("");
+    const [profilePhone, setProfilePhone] = useState("");
+    const [phoneForOrder, setPhoneForOrder] = useState("");
+
+
+    const sortedProvinces = [...provinces].sort((a, b) =>
+        a.name_th.localeCompare(b.name_th, "th")
+    );
+    const sortedDistricts = [...districts].sort((a, b) =>
+        a.name_th.localeCompare(b.name_th, "th")
+    );
+    const sortedSubDistricts = [...subDistricts].sort((a, b) =>
+        a.name_th.localeCompare(b.name_th, "th")
+    );
+
+    // State สำหรับเก็บที่อยู่ของผู้ใช้
+    const [userAddresses, setUserAddresses] = useState([]);
+    const [selectedAddress, setSelectedAddress] = useState("");
+    const [isAddingNewAddress, setIsAddingNewAddress] = useState(false);
+    const [isDefault, setIsDefault] = useState(false);
+    const [showAllAddresses, setShowAllAddresses] = useState(false);
+
+    const defaultAddr = userAddresses.find((addr) => addr.is_default === 1);
+    const otherAddresses = userAddresses.filter((addr) => addr.is_default !== 1);
+
+    const provinceName = provinces.find(p => p.id === Number(selectedProvince))?.name_th || "";
+    const districtName = districts.find(d => d.id === Number(selectedDistrict))?.name_th || "";
+    const subDistrictName = subDistricts.find(s => s.id === Number(selectedSubDistrict))?.name_th || "";
+
+    console.log("Selected Items:", provinceName);
 
     useEffect(() => {
-        if (user && user.id) {
-            axios.get(`http://localhost:3001/souvenir/cart?user_id=${user.id}`, {
+        if (defaultAddr) {
+            setDeliveryAddress(defaultAddr.shippingAddress || "");
+            setSelectedProvince(defaultAddr.province_id || "");
+            setSelectedDistrict(defaultAddr.district_id || "");
+            setSelectedSubDistrict(defaultAddr.sub_district_id || "");
+            setZipCode(defaultAddr.zip_code || "");
+            setPhoneForOrder(defaultAddr.phone || "");
+        }
+    }, [defaultAddr]);
+
+    function formatFullAddress(addr) {
+        if (!addr) return "";
+        return `${addr.shippingAddress || ""} ต.${addr.sub_district_name || ""} อ.${addr.district_name || ""} จ.${addr.province_name || ""} ${addr.zip_code || ""}`;
+    }
+
+    useEffect(() => {
+        if (user && user.user_id) {
+            axios.get(HOSTNAME + `/souvenir/cart?user_id=${user.user_id}`, {
                 withCredentials: true
             })
                 .then(response => {
@@ -49,7 +103,254 @@ function SouvenirCheckout() {
                     setCheckoutCart([]);
                 });
         }
-    }, [user]);
+    }, [userId]);
+
+    useEffect(() => {
+        // โหลดจังหวัด
+        axios.get("https://raw.githubusercontent.com/kongvut/thai-province-data/refs/heads/master/api/latest/province.json")
+            .then(res => setProvinces(res.data))
+            .catch(err => console.error("Error loading provinces:", err));
+    }, []);
+
+    useEffect(() => {
+        if (selectedProvince) {
+            axios.get("https://raw.githubusercontent.com/kongvut/thai-province-data/refs/heads/master/api/latest/district.json")
+                .then(res => {
+                    const filtered = res.data.filter(dist => dist.province_id === Number(selectedProvince));
+                    setDistricts(filtered);
+                })
+                .catch(err => console.error("Error loading districts:", err));
+        }
+    }, [selectedProvince]);
+
+    useEffect(() => {
+        if (selectedDistrict) {
+            axios.get("https://raw.githubusercontent.com/kongvut/thai-province-data/refs/heads/master/api/latest/sub_district.json")
+                .then(res => {
+                    const filtered = res.data.filter(sub => sub.district_id === Number(selectedDistrict));
+                    setSubDistricts(filtered);
+                })
+                .catch(err => console.error("Error loading sub-districts:", err));
+        }
+    }, [selectedDistrict]);
+
+    // เมื่อเลือกตำบลแล้วให้ดึง zip_code ออกมา
+    useEffect(() => {
+        if (selectedSubDistrict) {
+            const sub = subDistricts.find(s => s.id === Number(selectedSubDistrict));
+            if (sub) {
+                setZipCode(sub.zip_code);
+            }
+        }
+    }, [selectedSubDistrict, subDistricts]);
+
+
+    useEffect(() => {
+        if (userId) {
+            fetchAddresses();
+            axios.get(HOSTNAME + `/souvenir/user/shippingAddress?user_id=${userId}`)
+                .then(res => {
+                    setUserAddresses(res.data);
+
+                    const defaultAddr = res.data.find(a => a.is_default === 1);
+                    if (defaultAddr) {
+                        setSelectedAddress(defaultAddr.shippingAddress);
+                        setSelectedAddressId(defaultAddr.user_addresses_id);
+                        setSelectedProvince(defaultAddr.province_id || "");
+                        setSelectedDistrict(defaultAddr.district_id || "");
+                        setSelectedSubDistrict(defaultAddr.sub_district_id || "");
+                        setDeliveryAddress(defaultAddr.shippingAddress);
+                        setZipCode(defaultAddr.zip_code || "");
+                        setPhoneForOrder(defaultAddr.phone || "")
+                        setIsDefault(true);
+                    }
+                    console.log("User addresses:", res.data);
+                })
+                .catch(err => console.error(err));
+        }
+    }, [userId]);
+
+    const fetchAddresses = async () => {
+        try {
+            const res = await axios.get(HOSTNAME + `/souvenir/user/shippingAddress?user_id=${userId}`);
+            setUserAddresses(res.data);
+
+            const defaultAddr = res.data.find(a => a.is_default === 1);
+            if (defaultAddr) {
+                setSelectedAddress(defaultAddr.shippingAddress);
+                setSelectedAddressId(defaultAddr.user_addresses_id);
+                setSelectedProvince(defaultAddr.province_id || "");
+                setSelectedDistrict(defaultAddr.district_id || "");
+                setSelectedSubDistrict(defaultAddr.sub_district_id || "");
+                setDeliveryAddress(defaultAddr.shippingAddress);
+                setZipCode(defaultAddr.zip_code || "");
+                setPhoneForOrder(defaultAddr.phone || "")
+                setIsDefault(true);
+            }
+        } catch (err) {
+            console.error("Error fetching addresses:", err);
+        }
+    };
+
+    // กดปุ่มแก้ไข
+    const handleEditAddress = (addr) => {
+        setIsAddingNewAddress(true);
+        setSelectedAddressId(addr.user_addresses_id);
+        setDeliveryAddress(addr.shippingAddress || "");
+        setSelectedProvince(addr.province_id || "");
+        setSelectedDistrict(addr.district_id || "");
+        setSelectedSubDistrict(addr.sub_district_id || "");
+        setZipCode(addr.zip_code || "");
+        setPhoneForOrder(addr.phone || "");
+        setIsDefault(addr.is_default === 1);
+    };
+
+    // ฟังก์ชันบันทึกที่อยู่หลังแก้ไข
+    const handleSaveAddress = async () => {
+        window.scrollTo(0, 0);
+
+        if (!deliveryAddress || !selectedProvince || !selectedDistrict || !selectedSubDistrict) {
+            Swal.fire({
+                icon: "warning",
+                title: "กรอกข้อมูลไม่ครบ",
+                text: "กรุณากรอกที่อยู่ให้ครบทุกช่อง",
+            });
+            return;
+        }
+
+        try {
+            const payload = {
+                user_id: userId,
+                shippingAddress: deliveryAddress,
+                province_id: selectedProvince,
+                province_name: provinceName,
+                district_id: selectedDistrict,
+                district_name: districtName,
+                sub_district_id: selectedSubDistrict,
+                sub_district_name: subDistrictName,
+                zip_code: zipCode,
+                phone: phoneForOrder,
+                is_default: isDefault ? 1 : 0
+            };
+
+            // ถ้ามี selectedAddressId = แก้ไข, ไม่งั้น = เพิ่มใหม่
+            if (selectedAddressId) {
+                payload.user_addresses_id = selectedAddressId;
+                await axios.put(HOSTNAME + "/souvenir/user/shippingAddress", payload);
+
+                setUserAddresses(prev =>
+                    prev.map(addr =>
+                        addr.user_addresses_id === selectedAddressId
+                            ? { ...addr, ...payload }
+                            : addr
+                    )
+                );
+
+                Swal.fire({
+                    icon: "success",
+                    title: "แก้ไขสำเร็จ",
+                    text: "ที่อยู่ถูกอัปเดตเรียบร้อยแล้ว",
+                });
+            } else {
+                // เพิ่มใหม่
+                const { data } = await axios.post(HOSTNAME + "/souvenir/user/shippingAddress", payload);
+
+                setUserAddresses(prev => [...prev, data]); // เพิ่มที่อยู่ใหม่เข้า state
+
+                Swal.fire({
+                    icon: "success",
+                    title: "เพิ่มที่อยู่สำเร็จ",
+                    text: "ที่อยู่ถูกบันทึกเรียบร้อยแล้ว",
+                });
+            }
+
+            await fetchAddresses();
+            setIsAddingNewAddress(false);
+            setSelectedAddressId(null);
+
+        } catch (err) {
+            console.error("Error saving address:", err);
+            Swal.fire({
+                icon: "error",
+                title: "เกิดข้อผิดพลาด",
+                text: "ไม่สามารถบันทึกที่อยู่ได้ กรุณาลองใหม่",
+            });
+        }
+    };
+
+    function formatFullAddress(addr) {
+        if (!addr) return "";
+        return `${addr.shippingAddress || ""} 
+        ต.${addr.sub_district_name || ""} 
+        อ.${addr.district_name || ""} 
+        จ.${addr.province_name || ""} 
+        ${addr.zip_code || ""}
+        ${addr.phone_number ? 'โทร: ' + addr.phone_number : ''}`.replace(/\s+/g, " ").trim();
+    }
+
+    const handleDeleteAddress = async (addressId) => {
+        const addrBeing = userAddresses.find(a => a.user_addresses_id === addressId);
+        if (addrBeing?.is_default === 1) {
+            Swal.fire({
+                icon: "warning",
+                title: "ไม่สามารถลบได้",
+                text: "ที่อยู่เริ่มต้นไม่สามารถลบได้",
+            });
+            return;
+        }
+
+        const result = await Swal.fire({
+            title: "คุณแน่ใจหรือไม่?",
+            text: "คุณต้องการลบที่อยู่นี้ใช่หรือไม่?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "ใช่, ลบเลย",
+            cancelButtonText: "ยกเลิก",
+        });
+
+        if (!result.isConfirmed) return;
+
+        try {
+            await axios.delete(HOSTNAME + `/souvenir/user/shippingAddress/${addressId}`);
+
+            setUserAddresses(prev => prev.filter(a => a.user_addresses_id !== addressId));
+            // ถ้า address ที่ลบคือที่เลือกอยู่ ให้เคลียร์และปิดฟอร์ม
+            if (selectedAddressId === addressId) {
+                setSelectedAddressId(null);
+                setDeliveryAddress("");
+                setSelectedProvince("");
+                setSelectedDistrict("");
+                setSelectedSubDistrict("");
+                setZipCode("");
+                setPhoneForOrder("");
+                setIsDefault(false);
+                setIsAddingNewAddress(false);
+                // setShowAllAddresses(true);
+            }
+            Swal.fire({
+                icon: "success",
+                title: "ลบสำเร็จ",
+                text: "ที่อยู่ถูกลบเรียบร้อยแล้ว",
+            });
+            window.scrollTo(0, 0);
+        } catch (err) {
+            console.error("Error deleting address:", err);
+
+            if (err.response && err.response.status === 400) {
+                Swal.fire({
+                    icon: "error",
+                    title: "ลบไม่ได้",
+                    text: "ที่อยู่นี้ถูกใช้งานในคำสั่งซื้อแล้ว ไม่สามารถลบได้",
+                });
+            } else {
+                Swal.fire({
+                    icon: "error",
+                    title: "เกิดข้อผิดพลาด",
+                    text: "ไม่สามารถลบที่อยู่ได้ กรุณาลองใหม่",
+                });
+            }
+        }
+    };
 
     // Timer for QR Code expiry
     useEffect(() => {
@@ -133,7 +434,7 @@ function SouvenirCheckout() {
             const totalAmount = getCurrentProductsTotal();
 
             // เรียก backend เพื่อสร้าง QR Code
-            const response = await axios.post('http://localhost:3001/souvenir/generateQR', {
+            const response = await axios.post(HOSTNAME + '/souvenir/generateQR', {
                 amount: totalAmount,
                 numberPromtpay: items[0].promptpay_number
             });
@@ -164,12 +465,11 @@ function SouvenirCheckout() {
         }
     };
 
-
     const handleRegenerateQR = async () => {
         if (orderDetails) {
             setIsGeneratingQR(true);
             try {
-                const response = await axios.post('http://localhost:3001/souvenir/generateQR', {
+                const response = await axios.post(HOSTNAME + '/souvenir/generateQR', {
                     amount: orderDetails.amount,
                     numberPromtpay: orderDetails.promptpayNumber
                 });
@@ -258,23 +558,6 @@ function SouvenirCheckout() {
                         setSlipPreview("");
                         return;
                     }
-
-                    // ตรวจสอบข้อมูลใน QR
-                    // const qrData = code.data;
-                    // if (
-                    //     !qrData.includes(orderDetails.promptpayNumber) ||
-                    //     !qrData.includes(getCurrentProductsTotal().toFixed(2))
-                    // ) {
-                    //     Swal.fire({
-                    //         icon: 'error',
-                    //         title: 'ข้อมูลใน QR Code ไม่ตรง',
-                    //         text: 'กรุณาอัปโหลดสลิปที่ตรงกับรายการชำระเงิน',
-                    //         confirmButtonText: 'ตกลง'
-                    //     });
-                    //     setPaymentSlip(null);
-                    //     setSlipPreview("");
-                    //     return;
-                    // }
                 };
                 img.src = e.target.result;
             };
@@ -314,9 +597,52 @@ function SouvenirCheckout() {
             const items = getCurrentProducts();
             if (!items.length) throw new Error("ไม่พบสินค้าในตะกร้า");
 
+            let addressIdToUse = selectedAddressId;
+
+            console.log("เบอร์:", phoneForOrder, profilePhone);
+            // ถ้าเป็นการเพิ่มที่อยู่ใหม่
+            if (isAddingNewAddress) {
+                const newAddress = {
+                    user_id: userId,
+                    shippingAddress: deliveryAddress,
+                    province_name: provinceName,
+                    district_name: districtName,
+                    sub_district_name: subDistrictName,
+                    province_id: selectedProvince,
+                    district_id: selectedDistrict,
+                    sub_district_id: selectedSubDistrict,
+                    zip_code: zipCode,
+                    phone: phoneForOrder,
+                    is_default: isDefault ? 1 : 0
+                };
+
+                const res = await axios.post(
+                    HOSTNAME + "/souvenir/user/shippingAddress",
+                    newAddress
+                );
+
+                addressIdToUse = res.data.user_addresses_id;
+                setSelectedAddressId(addressIdToUse);
+
+                // ตั้ง default ถ้าเลือก
+                if (isDefault) {
+                    await axios.post(
+                        HOSTNAME + "/souvenir/user/shippingAddress/default",
+                        { user_id: userId, user_addresses_id: addressIdToUse }
+                    );
+                }
+            }
+
+            // ถ้าไม่มี address เลย (ครั้งแรก) ให้อัตโนมัติเป็น default
+            if (!addressIdToUse) {
+                Swal.fire({ icon: 'error', title: 'ที่อยู่ไม่ถูกต้อง', confirmButtonText: 'ตกลง' });
+                setIsProcessing(false);
+                return;
+            }
+
             // Create FormData for file upload
             const formData = new FormData();
-            formData.append('user_id', user.id);
+            formData.append('user_id', userId);
             formData.append('order_id', generateOrderId());
             formData.append('products', JSON.stringify(items.map(item => ({
                 product_id: item.product_id,
@@ -330,120 +656,34 @@ function SouvenirCheckout() {
             formData.append('seller_id', items[0].seller_id || "");
             formData.append('total_amount', getCurrentProductsTotal().toString());
             formData.append('shippingAddress', deliveryAddress);
+            formData.append('user_addresses_id', addressIdToUse);
             formData.append('paymentSlip', paymentSlip);
             formData.append('promptpay_number', items[0].promptpay_number);
+            formData.append('phone', phoneForOrder || profilePhone || "");
 
-            const response = await axios.post("http://localhost:3001/souvenir/checkout", formData, {
+            await axios.post(HOSTNAME + "/souvenir/checkout", formData, {
                 withCredentials: true,
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
-            await Swal.fire({
-                icon: 'success',
-                title: 'สั่งซื้อสินค้าสำเร็จ!',
-                text: 'สั่งซื้อสินค้าสำเร็จ กรุณารอการตรวจสอบสลิปจากแอดมิน!',
-                confirmButtonText: 'ตกลง'
+                headers: { 'Content-Type': 'multipart/form-data' },
             });
 
-            sessionStorage.removeItem('selectedItems');
+            Swal.fire({ icon: 'success', title: 'สั่งซื้อสินค้าสำเร็จ กรุณารอการตรวจสอบการชำระเงิน', confirmButtonText: 'ตกลง' });
+            localStorage.removeItem('selectedItems');
 
-            // ดึงข้อมูลสินค้าใหม่ (optional ถ้าอยู่หน้าเดิม)
-
-            // ไปหน้าประวัติหรือหน้าหลัก
-            const userRole = sessionStorage.getItem("userRole");
-            if (userRole === "3") {
-                navigate("/alumni-profile/alumni-profile-souvenir");
-            } else if (userRole === "4") {
-                navigate("/student-profile/student-profile-souvenir");
-            } else if (userRole === "2") {
-                navigate("/president-profile/president-profile-souvenir");
-            } else {
-                navigate("/"); // กลับหน้าหลักหรือหน้า error
-            }
+            // นำทางไปหน้าประวัติ
+            // const userRole = localStorage.getItem("userRole");
+            const userRole = user?.role;
+            if (userRole === 3) navigate("/alumni-profile/alumni-profile-souvenir");
+            else if (userRole === 4) navigate("/student-profile/student-profile-souvenir");
+            else if (userRole === 2) navigate("/president-profile/president-profile-souvenir");
+            else navigate("/");
 
         } catch (error) {
             console.error("Error during checkout:", error);
-            if (error.response) {
-                alert("เกิดข้อผิดพลาดในการชำระเงิน: " + (error.response.data.error || "ไม่ทราบข้อผิดพลาด"));
-            } else {
-                alert("เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์");
-            }
+            Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาดในการชำระเงิน', text: error.message });
         } finally {
             setIsProcessing(false);
         }
     };
-
-    // ตรวจสอบสลิป
-    // const handleFileChange = async (e) => {
-    //         const file = e.target.files[0];
-    //         if (!file) {
-    //             setFormData(prev => ({ ...prev, file: null, slipText: "" }));
-    //             setFilePreview(null);
-    //             return;
-    //         }
-
-    //         const fileError = validateFile(file);
-    //         if (fileError) {
-    //             setErrors(prev => ({ ...prev, file: fileError }));
-    //             setFilePreview(null);
-    //             return;
-    //         }
-
-    //         setErrors(prev => ({ ...prev, file: "" }));
-    //         setFormData(prev => ({
-    //             ...prev,
-    //             file: file,
-    //             slipText: ""
-    //         }));
-
-    //         // Create file preview
-    //         try {
-    //             const reader = new FileReader();
-    //             reader.onload = (event) => {
-    //                 setFilePreview(event.target.result);
-    //             };
-    //             reader.onerror = () => {
-    //                 setErrors(prev => ({ ...prev, file: "ไม่สามารถอ่านไฟล์ได้" }));
-    //             };
-    //             reader.readAsDataURL(file);
-
-    //             // QR Code detection with better error handling
-    //             const qrReader = new FileReader();
-    //             qrReader.onload = (event) => {
-    //                 try {
-    //                     const img = new Image();
-    //                     img.onload = () => {
-    //                         const canvas = document.getElementById("canvas");
-    //                         if (!canvas) return;
-
-    //                         const ctx = canvas.getContext("2d");
-    //                         canvas.width = img.width;
-    //                         canvas.height = img.height;
-    //                         ctx.drawImage(img, 0, 0);
-
-    //                         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    //                         const code = jsQR(imageData.data, imageData.width, imageData.height);
-
-    //                         if (code) {
-    //                             console.log("QR Code Detected:", code.data);
-    //                             // Could implement QR validation logic here
-    //                         }
-    //                     };
-    //                     img.onerror = () => {
-    //                         console.warn("Could not process image for QR detection");
-    //                     };
-    //                     img.src = event.target.result;
-    //                 } catch (error) {
-    //                     console.warn("QR detection failed:", error);
-    //                 }
-    //             };
-    //             qrReader.readAsDataURL(file);
-    //         } catch (error) {
-    //             console.error("File processing failed:", error);
-    //             setErrors(prev => ({ ...prev, file: "ไม่สามารถประมวลผลไฟล์ได้" }));
-    //         }
-    //     };
 
     // ปรับ UI ให้แสดงสินค้าทั้งกลุ่ม
     const renderOrderInfo = () => {
@@ -468,7 +708,7 @@ function SouvenirCheckout() {
                                                     <div className="col-6 col-sm-4 col-md-3">
                                                         <div className="position-relative">
                                                             <img
-                                                                src={`http://localhost:3001/uploads/${item.image}`}
+                                                                src={HOSTNAME + `/uploads/${item.image}`}
                                                                 alt={item.product_name}
                                                                 className="img-fluid rounded shadow-sm"
                                                                 style={{
@@ -543,62 +783,380 @@ function SouvenirCheckout() {
                                 </h5>
                             </div>
                             <div className="card-body">
-                                <div className="mb-4">
-                                    <label htmlFor="deliveryAddress" className="form-label">
-                                        ที่อยู่จัดส่ง *
-                                    </label>
-                                    <textarea
-                                        id="deliveryAddress"
-                                        className="form-control w-100"
-                                        required
-                                        rows="4"
-                                        placeholder="เช่น: 123 ถนนสุขุมวิท แขวงคลองตัน เขตคลองตัน กรุงเทพฯ 10110"
-                                        value={deliveryAddress}
-                                        onChange={(e) => setDeliveryAddress(e.target.value)}
-                                        style={{ resize: 'none' }}
-                                    />
-                                    <small className="text-muted">กรุณากรอกที่อยู่ให้ครบถ้วนและถูกต้อง</small>
-                                </div>
 
-                                <div className="card bg-light">
-                                    <div className="card-body text-center">
-                                        <h6 className="card-title text-muted mb-2">
-                                            ยอดรวมทั้งหมด
-                                        </h6>
-                                        <h3 className="text-primary mb-2 fw-bold"> ฿{getCurrentProductsTotal().toFixed(2)}</h3>
-                                        <small className="text-muted">
-                                            {items.length} รายการ
-                                        </small>
-                                    </div>
-                                </div>
+                                <small className="text-muted d-block mb-2">ที่อยู่จัดส่ง</small>
 
-                                <div className="d-grid gap-2 mt-3">
-                                    <button className="btn btn-outline-secondary" onClick={handleCancel}>
-                                        ยกเลิก
-                                    </button>
-                                    <button
-                                        className="btn btn-success"
-                                        onClick={handleProceedToPayment}
-                                        disabled={isGeneratingQR || !deliveryAddress.trim()}
+                                {/* ที่อยู่หลัก */}
+                                {defaultAddr ? (
+                                    <div
+                                        className="mb-3 p-3 border rounded bg-white d-flex justify-content-between align-items-center shadow-sm"
+                                        style={{ cursor: "pointer" }}
+                                        onClick={() => setShowAllAddresses(!showAllAddresses)}
                                     >
-                                        {isGeneratingQR ? (
-                                            <>
-                                                <span className="spinner-border spinner-border-sm me-2" role="status"></span>
-                                                กำลังสร้าง QR Code...
-                                            </>
-                                        ) : (
-                                            <>
-                                                <i className="fas fa-credit-card me-2"></i>
-                                                ดำเนินการชำระเงิน
-                                            </>
+                                        {/* ปุ่ม radio */}
+                                        <input
+                                            type="radio"
+                                            name="selectedAddress"
+                                            checked={selectedAddressId === defaultAddr.user_addresses_id}
+                                            onChange={(e) => {
+                                                e.stopPropagation();
+                                                if (selectedAddressId === defaultAddr.user_addresses_id) {
+                                                    setSelectedAddressId(null);
+                                                    setDeliveryAddress("");
+                                                    setSelectedProvince("");
+                                                    setSelectedDistrict("");
+                                                    setSelectedSubDistrict("");
+                                                    setZipCode("");
+                                                    setPhoneForOrder("");
+                                                    setIsDefault(false);
+                                                    setIsAddingNewAddress(false);
+                                                } else {
+                                                    setSelectedAddressId(defaultAddr.user_addresses_id);
+                                                    setDeliveryAddress(defaultAddr.shippingAddress || "");
+                                                    setSelectedProvince(defaultAddr.province_id || "");
+                                                    setSelectedDistrict(defaultAddr.district_id || "");
+                                                    setSelectedSubDistrict(defaultAddr.sub_district_id || "");
+                                                    setZipCode(defaultAddr.zip_code || "");
+                                                    setPhoneForOrder(defaultAddr.phone || "");
+                                                    setIsDefault(true);
+                                                    setIsAddingNewAddress(false);
+                                                }
+                                            }}
+                                            className="form-check-input me-3 mt-2"
+                                            style={{ width: "1.2rem", height: "1.2rem" }}
+                                        />
+
+                                        {/* ข้อมูลที่อยู่ */}
+                                        <div>
+                                            <p className="mb-1 fw-semibold">
+                                                <span className="mb-1 fw-light fs-6 text-secondary">
+                                                    (+66) {defaultAddr.phone || "ไม่ระบุ"}
+                                                </span>
+                                            </p>
+                                            <p className="mb-0">{formatFullAddress(defaultAddr)}</p>
+                                            <span className="badge bg-success mt-1">เริ่มต้น</span>
+                                        </div>
+
+                                        {/* ปุ่มแก้ไข */}
+                                        <div className="d-flex flex-column align-items-end">
+                                            <button
+                                                className="btn btn-sm btn-outline-secondary mb-1"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleEditAddress(defaultAddr);
+                                                    setShowAllAddresses(false);
+                                                }}
+                                            >
+                                                แก้ไข
+                                            </button>
+                                        </div>
+
+                                        <div>
+                                            {showAllAddresses ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                                        </div>
+                                    </div>
+
+                                ) : (
+                                    <p className="text-muted">ยังไม่มีที่อยู่เริ่มต้น</p>
+                                )}
+
+                                {/* ที่อยู่อื่น ๆ */}
+                                {showAllAddresses && (
+                                    <>
+                                        {otherAddresses.map(addr => (
+                                            <div
+                                                key={addr.user_addresses_id}
+                                                className={`mb-3 p-2 border rounded bg-white d-flex justify-content-between align-items-center shadow-sm ${selectedAddressId === addr.user_addresses_id ? "border-primary bg-light" : ""
+                                                    }`}
+                                            >
+                                                <div className="d-flex align-items-start">
+                                                    {/* ปุ่ม radio */}
+                                                    <input
+                                                        type="radio"
+                                                        name="selectedAddress"
+                                                        checked={selectedAddressId === addr.user_addresses_id}
+                                                        onChange={() => {
+                                                            if (selectedAddressId === addr.user_addresses_id) {
+                                                                setSelectedAddressId(null);
+                                                                setDeliveryAddress("");
+                                                                setSelectedProvince("");
+                                                                setSelectedDistrict("");
+                                                                setSelectedSubDistrict("");
+                                                                setZipCode("");
+                                                                setPhoneForOrder("");
+                                                                setIsDefault(false);
+                                                            } else {
+                                                                setSelectedAddressId(addr.user_addresses_id);
+                                                                setDeliveryAddress(addr.shippingAddress || "");
+                                                                setSelectedProvince(addr.province_id || "");
+                                                                setSelectedDistrict(addr.district_id || "");
+                                                                setSelectedSubDistrict(addr.sub_district_id || "");
+                                                                setZipCode(addr.zip_code || "");
+                                                                setPhoneForOrder(addr.phone || "");
+                                                                setIsDefault(false);
+                                                            }
+                                                        }}
+                                                        className="form-check-input me-3 mt-2"
+                                                        style={{ width: "1.2rem", height: "1.2rem" }}
+                                                    />
+
+                                                    {/* ข้อมูลที่อยู่ */}
+                                                    <div>
+                                                        <p className="mb-1 fw-semibold">
+                                                            <span className="mb-1 fw-light fs-6 text-secondary">
+                                                                (+66) {addr.phone || "ไม่ระบุ"}
+                                                            </span>
+                                                        </p>
+                                                        <p className="mb-0">{formatFullAddress(addr)}</p>
+                                                    </div>
+                                                </div>
+
+                                                {/* ปุ่มแก้ไข */}
+                                                <div className="d-flex flex-column align-items-end">
+                                                    <button
+                                                        className="btn btn-sm btn-outline-secondary mb-1"
+                                                        onClick={() => {
+                                                            handleEditAddress(addr);
+                                                            setShowAllAddresses(false);
+                                                        }}
+                                                    >
+                                                        แก้ไข
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))}
+
+                                        {/* ปุ่มเพิ่มที่อยู่ใหม่*/}
+                                        {!isAddingNewAddress && (
+                                            <button
+                                                className="btn btn-sm btn-success w-100 mt-2"
+                                                onClick={() => {
+                                                    setIsAddingNewAddress(true);
+                                                    setShowAllAddresses(false);
+                                                    setSelectedAddressId(null);
+                                                    setIsDefault(userAddresses.length === 0);
+                                                    setDeliveryAddress("");
+                                                    setSelectedProvince("");
+                                                    setSelectedDistrict("");
+                                                    setSelectedSubDistrict("");
+                                                    setZipCode("");
+                                                    setPhoneForOrder("");
+                                                }}
+                                            >
+                                                <IoAdd /> เพิ่มที่อยู่ใหม่
+                                            </button>
                                         )}
+                                    </>
+                                )}
+                                {/* ปุ่มเพิ่มที่อยู่ใหม่*/}
+                                {!isDefault && (
+                                    <button
+                                        className="btn btn-sm btn-success w-100 mt-2"
+                                        onClick={() => {
+                                            setIsAddingNewAddress(true);
+                                            setShowAllAddresses(false);
+                                            setSelectedAddressId(null);
+                                            setIsDefault(userAddresses.length === 0);
+                                            setDeliveryAddress("");
+                                            setSelectedProvince("");
+                                            setSelectedDistrict("");
+                                            setSelectedSubDistrict("");
+                                            setZipCode("");
+                                            setPhoneForOrder("");
+                                        }}
+                                    >
+                                        <IoAdd /> เพิ่มที่อยู่ใหม่
                                     </button>
+                                )}
+
+                                {/* ฟอร์มเพิ่ม/แก้ไขที่อยู่ */}
+                                {isAddingNewAddress && (
+                                    <div className="card mt-3 shadow-sm p-3 position-relative border-primary">
+                                        {/* ปุ่ม Close */}
+                                        <button
+                                            type="button"
+                                            className="btn-close position-absolute top-0 end-0 m-2"
+                                            onClick={() => {
+                                                setIsAddingNewAddress(false);
+                                                setSelectedAddressId(null);
+                                            }}
+                                            aria-label="Close"
+                                        ></button>
+
+                                        {/* หัวเรื่อง */}
+                                        <h6 className="fw-bold mb-3">
+                                            {selectedAddressId ? "แก้ไขที่อยู่" : "เพิ่มที่อยู่ใหม่"}
+                                        </h6>
+
+                                        {/* ฟอร์มที่อยู่ */}
+                                        <div className="mb-2">
+                                            <label className="form-label fw-semibold">รายละเอียดที่อยู่</label>
+                                            <textarea
+                                                className="form-control w-100"
+                                                rows={3}
+                                                placeholder="บ้านเลขที่ หมู่ ถนน ฯลฯ"
+                                                value={deliveryAddress}
+                                                onChange={e => setDeliveryAddress(e.target.value)}
+                                            />
+                                        </div>
+
+                                        <div className="row g-2 mb-2 ">
+                                            <div className="col-md-4">
+                                                <label className="form-label fw-semibold">จังหวัด</label>
+                                                <select
+                                                    className="form-select"
+                                                    value={selectedProvince}
+                                                    onChange={e => setSelectedProvince(e.target.value)}
+                                                >
+                                                    <option value="">-- เลือกจังหวัด --</option>
+                                                    {sortedProvinces.map(p => (
+                                                        <option key={p.id} value={p.id}>{p.name_th}</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                            <div className="col-md-4">
+                                                <label className="form-label fw-semibold">อำเภอ</label>
+                                                <select
+                                                    className="form-select"
+                                                    value={selectedDistrict}
+                                                    onChange={e => setSelectedDistrict(e.target.value)}
+                                                    disabled={!selectedProvince}
+                                                >
+                                                    <option value="">-- เลือกอำเภอ --</option>
+                                                    {sortedDistricts.map(d => (
+                                                        <option key={d.id} value={d.id}>{d.name_th}</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                            <div className="col-md-4">
+                                                <label className="form-label fw-semibold">ตำบล</label>
+                                                <select
+                                                    className="form-select"
+                                                    value={selectedSubDistrict}
+                                                    onChange={e => setSelectedSubDistrict(e.target.value)}
+                                                    disabled={!selectedDistrict}
+                                                >
+                                                    <option value="">-- เลือกตำบล --</option>
+                                                    {sortedSubDistricts.map(s => (
+                                                        <option key={s.id} value={s.id}>{s.name_th}</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div className="mb-2">
+                                            <label className="form-label fw-semibold">รหัสไปรษณีย์</label>
+                                            <input type="text" className="form-control w-100" value={zipCode} readOnly />
+                                        </div>
+
+                                        <div className="mb-2">
+                                            <label className="form-label fw-semibold ">หมายเลขโทรศัพท์</label>
+                                            <input
+                                                type="tel"
+                                                className="form-control w-100"
+                                                value={phoneForOrder}
+                                                placeholder={profilePhone ? `เช่น ${profilePhone}` : "กรอกเบอร์โทร 10 หลัก"}
+                                                onChange={e => setPhoneForOrder(e.target.value)}
+                                            />
+                                            {profilePhone && (
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-sm btn-outline-primary mt-2"
+                                                    onClick={() => setPhoneForOrder(profilePhone)}
+                                                >
+                                                    ใช้เบอร์จากโปรไฟล์
+                                                </button>
+                                            )}
+                                        </div>
+
+                                        <div className="form-check mb-3">
+                                            <input
+                                                className="form-check-input"
+                                                type="checkbox"
+                                                checked={isDefault}
+                                                onChange={e => setIsDefault(e.target.checked)}
+                                                id="defaultAddress"
+                                            />
+                                            <label className="form-check-label" htmlFor="defaultAddress">
+                                                ใช้เป็นที่อยู่เริ่มต้น
+                                            </label>
+                                        </div>
+
+                                        {/* ปุ่มล่าง */}
+                                        <div className="d-flex gap-2">
+                                            {selectedAddressId ? (
+                                                <>
+                                                    <button
+                                                        className="btn btn-danger flex-fill"
+                                                        onClick={() => handleDeleteAddress(selectedAddressId)}
+                                                    >
+                                                        ลบที่อยู่
+                                                    </button>
+                                                    <button className="btn btn-primary flex-fill" onClick={handleSaveAddress}>
+                                                        บันทึกการแก้ไข
+                                                    </button>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <button
+                                                        className="btn btn-secondary flex-fill"
+                                                        onClick={() => {
+                                                            setIsAddingNewAddress(false);
+                                                            setSelectedAddressId(null);
+                                                        }}
+                                                    >
+                                                        ยกเลิก
+                                                    </button>
+                                                    <button className="btn btn-primary flex-fill" onClick={handleSaveAddress}>
+                                                        เพิ่มที่อยู่
+                                                    </button>
+                                                </>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+
+                            </div>
+
+                            <div className="card bg-light">
+                                <div className="card-body text-center">
+                                    <h6 className="card-title text-muted mb-2">
+                                        ยอดรวมทั้งหมด
+                                    </h6>
+                                    <h3 className="text-primary mb-2 fw-bold"> ฿{getCurrentProductsTotal().toFixed(2)}</h3>
+                                    <small className="text-muted">
+                                        {items.length} รายการ
+                                    </small>
                                 </div>
+                            </div>
+
+                            <div className="d-grid gap-2 mt-3">
+                                <button className="btn btn-outline-secondary" onClick={handleCancel}>
+                                    ยกเลิก
+                                </button>
+                                <button
+                                    className="btn btn-success"
+                                    onClick={handleProceedToPayment}
+                                    disabled={isGeneratingQR || !deliveryAddress.trim()}
+                                >
+                                    {isGeneratingQR ? (
+                                        <>
+                                            <span className="spinner-border spinner-border-sm me-2" role="status"></span>
+                                            กำลังสร้าง QR Code...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <i className="fas fa-credit-card me-2"></i>
+                                            ดำเนินการชำระเงิน
+                                        </>
+                                    )}
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+            // </div>
         );
     };
 
@@ -633,6 +1191,15 @@ function SouvenirCheckout() {
                                                 </div>
                                             </div>
                                         ))}
+                                        {/* Shipping Address */}
+                                        {(deliveryAddress || selectedProvince || selectedDistrict || selectedSubDistrict) && (
+                                            <div className="mt-3 pt-3 border-top">
+                                                <h6 className="fw-bold mb-1">ที่อยู่จัดส่ง:</h6>
+                                                <p className="mb-0 text-muted">
+                                                    {`${deliveryAddress} ต.${subDistrictName} อ.${districtName} จ.${provinceName} ${zipCode}`}
+                                                </p>
+                                            </div>
+                                        )}
                                         <div className="mt-3 pt-3 border-top">
                                             <div className="d-flex justify-content-between align-items-center">
                                                 <h5 className="mb-0 fw-bold">ยอดรวมทั้งหมด:</h5>
@@ -835,7 +1402,11 @@ function SouvenirCheckout() {
 
                                             <div className="mb-3">
                                                 <strong>ที่อยู่จัดส่ง:</strong>
-                                                <p className="text-muted small mt-1">{deliveryAddress}</p>
+                                                {(deliveryAddress || selectedProvince || selectedDistrict || selectedSubDistrict) && (
+                                                    <div className="ms-2 mt-1">
+                                                        <p className="mb-0 text-muted">{`${deliveryAddress} ต.${subDistrictName} อ.${districtName} จ.${provinceName} ${zipCode}`}</p>
+                                                    </div>
+                                                )}
                                             </div>
 
                                             <div className="alert alert-warning">
@@ -907,7 +1478,6 @@ function SouvenirCheckout() {
             </div>
         </div>
     );
-
 
     return (
         <div className="container-fluid py-4">

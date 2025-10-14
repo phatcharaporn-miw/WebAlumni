@@ -5,6 +5,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { useParams, useNavigate } from "react-router-dom";
 import { MdDelete } from "react-icons/md";
 import { FaUserCircle } from "react-icons/fa";
+import {HOSTNAME} from '../../config.js';
 
 function WebboardDetail() {
     const { webboardId } = useParams(); // ดึง ID ของกระทู้จาก URL
@@ -15,7 +16,7 @@ function WebboardDetail() {
 
     // ดึงข้อมูลกระทู้และความคิดเห็น
     useEffect(() => {
-        axios.get(`http://localhost:3001/web/webboard/${webboardId}`, {
+        axios.get(HOSTNAME +`/web/webboard/${webboardId}`, {
             withCredentials: true
         })
             .then((response) => {
@@ -36,7 +37,7 @@ function WebboardDetail() {
     // ฟังก์ชันลบความคิดเห็น
     const handleDeleteComment = (commentId) => {
         if (window.confirm("คุณต้องการลบความคิดเห็นนี้หรือไม่?")) {
-            axios.delete(`http://localhost:3001/web/webboard/${post.webboard_id}/comment/${commentId}`, {
+            axios.delete(HOSTNAME +`/web/webboard/${post.webboard_id}/comment/${commentId}`, {
                 withCredentials: true
             })
                 .then((response) => {

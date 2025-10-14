@@ -4,11 +4,11 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { FaSearch, FaRegClock, FaArrowRight, FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import { IoIosAddCircleOutline } from "react-icons/io";
+// import { IoIosAddCircleOutline } from "react-icons/io";
 import { FaPlus } from "react-icons/fa";
 import { AiOutlineClose } from "react-icons/ai";
-import { IoTimeOutline } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
+import {HOSTNAME} from '../config.js';
 
 function Donate() {
     const [projects, setProjects] = useState([]);
@@ -27,7 +27,7 @@ function Donate() {
             try {
                 setLoading(true);
                 setError(null);
-                const response = await axios.get("http://localhost:3001/donate/donate");
+                const response = await axios.get(HOSTNAME + "/donate/donate");
                 setProjects(response.data || []);
             } catch (err) {
                 console.error("เกิดข้อผิดพลาดในการดึงข้อมูล:", err);
@@ -300,7 +300,7 @@ function Donate() {
                                         >
                                             <div className="donate-project-image">
                                                 <img
-                                                    src={`http://localhost:3001/uploads/${project.image_path}`}
+                                                    src={HOSTNAME + `/uploads/${project.image_path}`}
                                                     alt={project.project_name}
                                                     onError={(e) => {
                                                         e.target.src = "./image/default.jpg";
@@ -356,7 +356,7 @@ function Donate() {
                                                             </div>
                                                         </div>
                                                     ) : (
-                                                        <div style={{ height: "52px" }}>{/* div เปล่าเพื่อรักษาความสูง */}</div>
+                                                        <div style={{ height: "52px" }}></div>
                                                     )}
                                                 </div>
 

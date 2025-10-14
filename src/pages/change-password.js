@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { FaLock, FaEye, FaEyeSlash, FaCheckCircle } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
+import {HOSTNAME} from '../config.js';
 
 function ChangePassword() {
     const [newPassword, setNewPassword] = useState('');
@@ -10,9 +11,8 @@ function ChangePassword() {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const navigate = useNavigate();
-    // const userId = sessionStorage.getItem('userId');
     const {user} = useAuth();
-    const userId = user?.id;
+    const userId = user?.user_id;
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -25,7 +25,7 @@ function ChangePassword() {
         }
 
         try {
-            await axios.post('http://localhost:3001/api/change-password', {
+            await axios.post(HOSTNAME + '/api/change-password', {
                 userId,
                 newPassword,
             });

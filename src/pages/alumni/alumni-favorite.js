@@ -8,6 +8,7 @@ import { BiSolidComment } from "react-icons/bi";
 import { IoIosEye } from "react-icons/io";
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
+import {HOSTNAME} from '../../config.js';
 
 function WebboardFavorite() {
     const [likedPosts, setLikedPosts] = useState([]); // กระทู้ที่กด
@@ -17,7 +18,7 @@ function WebboardFavorite() {
 
     // ดึงข้อมูลกระทู้ที่ถูกกดหัวใจ
     useEffect(() => {
-        axios.get('http://localhost:3001/webboard/favorites', { withCredentials: true })
+        axios.get(HOSTNAME +'/webboard/favorites', { withCredentials: true })
             .then((response) => {
                 if (response.data.success) {
                     setFavoritePosts(response.data.posts);
@@ -36,7 +37,7 @@ function WebboardFavorite() {
             return; // ไม่บันทึกสถานะหากไม่ได้เข้าสู่ระบบ
         }
 
-        axios.post(`http://localhost:3001/web/webboard/${postId}/favorite`, {}, {
+        axios.post(HOSTNAME +`/web/webboard/${postId}/favorite`, {}, {
             withCredentials: true,
         })
             .then(() => {
@@ -64,7 +65,7 @@ function WebboardFavorite() {
 
             {/* โปรไฟล์ + ชื่อผู้ใช้ */}
             <div className="d-flex">
-              <img src={post.profile_image ? `http://localhost:3001/${post.profile_image}` : "/default-profile.png"} alt="User" className="rounded-circle me-3" width="50" height="50" onError={(e) => e.target.src = "/default-profile.png"} />
+              <img src={post.profile_image ? HOSTNAME +`/${post.profile_image}` : "/default-profile.png"} alt="User" className="rounded-circle me-3" width="50" height="50" onError={(e) => e.target.src = "/default-profile.png"} />
               <div>
                 <h5 className="fw-bold mb-1">{post.title}</h5>
                 <p className="text-muted mb-1">จากคุณ <span className="text">{post.full_name || "ไม่ระบุชื่อ"}</span></p>
@@ -80,7 +81,7 @@ function WebboardFavorite() {
             
             {/* รูปภาพประกอบ */}
             {post.image_path && (
-              <img src={post.image_path ? `http://localhost:3001/${post.image_path}` : "/default-profile.png"} alt="Post" className="img-fluid rounded-3" />
+              <img src={post.image_path ? HOSTNAME +`/${post.image_path}` : "/default-profile.png"} alt="Post" className="img-fluid rounded-3" />
             )}
 
             {/* จำนวนความคิดเห็น */}

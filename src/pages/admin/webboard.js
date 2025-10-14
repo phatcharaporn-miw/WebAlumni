@@ -10,6 +10,7 @@ import Swal from "sweetalert2";
 import Modal from 'react-modal';
 // import moment from "moment";
 import { useAuth } from '../../context/AuthContext';
+import {HOSTNAME} from '../../config.js';
 
 Modal.setAppElement('#root');
 
@@ -30,7 +31,7 @@ function AdminWebboard() {
 
     // Fetching webboard data
     useEffect(() => {
-        axios.get('http://localhost:3001/web/webboard', {
+        axios.get(HOSTNAME +'/web/webboard', {
             withCredentials: true
         })
             .then((response) => {
@@ -67,7 +68,7 @@ function AdminWebboard() {
         }).then((result) => {
             if (result.isConfirmed) {
                 axios
-                    .delete(`http://localhost:3001/web/webboard/${postId}`, {
+                    .delete(HOSTNAME +`/web/webboard/${postId}`, {
                         withCredentials: true,
                     })
                     .then((response) => {

@@ -6,7 +6,7 @@ import Breadcrumb from './Breadcrumb';
 import { useAuth } from '../context/AuthContext';
 
 function AppLayout() {
-    const { user, setUser, notifications, handleLogin, handleLogout, loading, initializing } = useAuth();
+    const { user, setUser, notifications, handleLogin, handleLogout, isLoading, isLoggingOut } = useAuth();
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -15,13 +15,13 @@ function AppLayout() {
     const shouldHideFooter = hideHeaderPaths.includes(location.pathname);
 
     // เพิ่ม loading state
-    if (loading || initializing) {
-        return (
-            <div className="loading-container">
-                <div className="loading-spinner">กำลังโหลด...</div>
-            </div>
-        );
-    }
+    if (isLoading || isLoggingOut) {
+    return (
+        <div className="loading-container">
+            <div className="loading-spinner">กำลังโหลด...</div>
+        </div>
+    );
+}
 
     // สร้าง logout function ที่มี navigation
     const handleLogoutWithNav = async () => {

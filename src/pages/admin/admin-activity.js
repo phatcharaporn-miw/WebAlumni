@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import {HOSTNAME} from '../../config.js';
 // import 'bootstrap/dist/css/bootstrap.min.css';
 // import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { useNavigate } from "react-router-dom";
@@ -19,7 +20,7 @@ function AdminActivity() {
 
     useEffect(() => {
         if (activeTab === "summary") {
-            axios.get("http://localhost:3001/admin/activity-summary", {
+            axios.get(HOSTNAME +"/admin/activity-summary", {
                 withCredentials: true,
             })
                 .then((response) => {
@@ -33,7 +34,7 @@ function AdminActivity() {
                     setLoading(false);
                 });
         } else if (activeTab === "table") {
-            axios.get("http://localhost:3001/activity/all-activity", {
+            axios.get(HOSTNAME +"/activity/all-activity", {
                 withCredentials: true,
             })
                 .then((res) => {

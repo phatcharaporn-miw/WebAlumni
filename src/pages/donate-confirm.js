@@ -7,8 +7,9 @@ import { IoInformationCircleOutline, IoCheckmarkCircleOutline, IoWarningOutline 
 import { FaUser, FaIdCard, FaPhone, FaEnvelope, FaBuilding, FaFileImage } from "react-icons/fa";
 import Swal from "sweetalert2";
 import { useAuth } from '../context/AuthContext';
+import {HOSTNAME} from '../config.js';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:3001";
+const API_BASE_URL = HOSTNAME;
 
 function DonateConfirm() {
     const [userData, setUserData] = useState({});
@@ -17,8 +18,9 @@ function DonateConfirm() {
     const [error, setError] = useState(null);
     const [isDataValid, setIsDataValid] = useState(false);
     // const userId = sessionStorage.getItem("userId");
-    const {user} = useAuth();
-    const userId = user?.id;
+    const { user } = useAuth();
+    const userId = user?.user_id;
+    const role = user?.role;
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -182,28 +184,28 @@ function DonateConfirm() {
             return;
         }
 
-        
-            const confirmMessage = `คุณต้องการยืนยันการบริจาค จำนวน ${new Intl.NumberFormat('th-TH').format(formData.amount)} บาท ให้โครงการ "${projectData.project_name}" หรือไม่?`;
 
-            const result = await Swal.fire({
-                title: 'ยืนยันการบริจาค',
-                text: confirmMessage,
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'ยืนยัน',
-                cancelButtonText: 'ยกเลิก',
-                reverseButtons: true,
-            });
+        const confirmMessage = `คุณต้องการยืนยันการบริจาค จำนวน ${new Intl.NumberFormat('th-TH').format(formData.amount)} บาท ให้โครงการ "${projectData.project_name}" หรือไม่?`;
 
-            if (!result.isConfirmed) return;
-        
+        const result = await Swal.fire({
+            title: 'ยืนยันการบริจาค',
+            text: confirmMessage,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'ยืนยัน',
+            cancelButtonText: 'ยกเลิก',
+            reverseButtons: true,
+        });
+
+        if (!result.isConfirmed) return;
+
 
         setLoading(true);
 
         try {
             const donationData = new FormData();
             donationData.append("amount", formData.amount);
-            donationData.append("userId", userId); // <-- แก้จาก formData.userId
+            donationData.append("userId", userId); 
             donationData.append("projectId", projectId);
 
             if (file) {
@@ -242,7 +244,7 @@ function DonateConfirm() {
                 donationData.append("taxId", formData.taxId);
             }
 
-            const response = await axios.post(`http://localhost:3001/donate/donation`, donationData, {
+            const response = await axios.post(HOSTNAME + `/donate/donation`, donationData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
 
@@ -253,7 +255,15 @@ function DonateConfirm() {
                     text: 'ขอบคุณสำหรับการบริจาคของคุณ! ระบบได้บันทึกการบริจาคเรียบร้อยแล้ว',
                 });
                 sessionStorage.removeItem("donationFormData");
-                navigate("/alumni-profile/alumni-profile-donation");
+                if (role === 3) {
+                    navigate("/alumni-profile/alumni-profile-donation");
+                } else if (role === 4) {
+                    navigate("/student-profile/student-profile-donation");
+                } else if (role === 2) {
+                    navigate("/president-profile/president-profile-donation");
+                } else {
+                    navigate("/"); // fallback
+                }
             } else {
                 throw new Error(response.data?.message || "การบริจาคไม่สำเร็จ");
             }

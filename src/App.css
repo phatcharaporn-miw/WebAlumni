@@ -7,6 +7,28 @@
   pointer-events: none;
 }
 
+/* .bg-purple {
+  background-color: #6f42c1 !important; 
+}
+.text-purple {
+  color: #6f42c1 !important;
+}
+
+.bg-orange {
+  background-color: #fd7e14 !important; 
+}
+.text-orange {
+  color: #fd7e14 !important;
+}
+
+.bg-brown {
+  background-color: #795548 !important; 
+}
+.text-brown {
+  color: #795548 !important;
+} */
+
+
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
     animation: App-logo-spin infinite 20s linear;
@@ -36,3 +58,4 @@
     transform: rotate(360deg);
   }
 }
+

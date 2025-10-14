@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { IoIosAdd } from "react-icons/io";
 import Swal from "sweetalert2";
 import { useAuth } from '../context/AuthContext';
+import {HOSTNAME} from '../config.js';
 
 function CreatePost() {
     const [title, setTitle] = useState('');
@@ -20,7 +21,7 @@ function CreatePost() {
     const [banWords, setBanWords] = useState('');
     const [error, setError] = useState("");
     const {user} = useAuth();
-    const userId = user?.id;
+    const userId = user?.user_id;
     const navigate = useNavigate();
 
     // ตรวจสอบว่าผู้ใช้ล็อกอินหรือยัง
@@ -41,7 +42,7 @@ function CreatePost() {
 
     // ดึงcategory
     useEffect(() => {
-        axios.get(`http://localhost:3001/category/category-all`)
+        axios.get(HOSTNAME + `/category/category-all`)
             .then(response => {
                 if (response.data.success) {
                     setCategory(response.data.data);
@@ -63,7 +64,7 @@ function CreatePost() {
             return;
         }
 
-        axios.post('http://localhost:3001/category/add-category', { category_name: newCategory }, {
+        axios.post(HOSTNAME + ' /category/add-category', { category_name: newCategory }, {
             withCredentials: true
         })
             .then(response => {
@@ -156,7 +157,7 @@ function CreatePost() {
         formData.append('startDate', startDate);
         formData.append('image', image);
 
-        axios.post('http://localhost:3001/web/create-post', formData, {
+        axios.post(HOSTNAME + '/web/create-post', formData, {
             withCredentials: true,
             headers: { "Content-Type": "multipart/form-data" }
         })

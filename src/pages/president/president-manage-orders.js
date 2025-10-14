@@ -5,15 +5,14 @@ import { useNavigate } from 'react-router-dom';
 import Swal from "sweetalert2";
 import { format } from 'date-fns';
 import { useAuth } from '../../context/AuthContext';
+import {HOSTNAME} from '../../config.js';
 
 function PresidentManageOrders() {
     const [profile, setProfile] = useState({});
     const navigate = useNavigate();
     const [previewImage, setPreviewImage] = useState(null);
-    // const [loading, setLoading] = useState(true);
-    // const userId = sessionStorage.getItem("userId");
     const { user, handleLogout } = useAuth();
-    const userId = user?.id;
+    const userId = user?.user_id;
     const [orders, setOrders] = useState([]);
     const [selectedOrderId, setSelectedOrderId] = useState(null);
     const [orderStatus, setOrderStatus] = useState('');
@@ -21,7 +20,7 @@ function PresidentManageOrders() {
 
     // ดึงข้อมูลโปรไฟล์
     useEffect(() => {
-        axios.get('http://localhost:3001/users/profile', { withCredentials: true })
+        axios.get(HOSTNAME +'/users/profile', { withCredentials: true })
             .then((response) => {
                 if (response.data.success) {
                     // console.log("Profile:", response.data.user);
@@ -36,7 +35,7 @@ function PresidentManageOrders() {
     // ดึงรายการที่ตัวเองเป็นผู้ขาย
     useEffect(() => {
         if (profile && profile.userId) {
-            axios.get(`http://localhost:3001/orders/orders-seller?seller_id=${profile.userId}`)
+            axios.get(HOSTNAME +`/orders/orders-seller?seller_id=${profile.userId}`)
                 .then(res => {
                     if (res.data.success) {
                         setOrders(res.data.data);
@@ -50,7 +49,7 @@ function PresidentManageOrders() {
 
     // อัปเดตสถานะและเลขtracking
     const handleUpdate = () => {
-        axios.post(`http://localhost:3001/orders/orders-status/${selectedOrderId}`, {
+        axios.post(HOSTNAME +`/orders/orders-status/${selectedOrderId}`, {
             order_id: selectedOrderId,
             order_status: orderStatus,
             tracking_number: trackingNumber
@@ -94,7 +93,7 @@ function PresidentManageOrders() {
         formData.append("user_id", profile.userId);
 
         try {
-            const res = await axios.post("http://localhost:3001/users/update-profile-image", formData, {
+            const res = await axios.post(HOSTNAME +"/users/update-profile-image", formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
@@ -203,7 +202,7 @@ function PresidentManageOrders() {
 
                                                         {/* Status */}
                                                         <div className="col-3 col-md-2">
-                                                            <span
+                                                            {/* <span
                                                                 className={`badge rounded-pill px-2 py-1 ${order.order_status === 'delivered'
                                                                     ? "text-success bg-success bg-opacity-10"
                                                                     : order.order_status === "shipping"
@@ -228,7 +227,10 @@ function PresidentManageOrders() {
                                                                                 ? "ยกเลิก"
                                                                                 : order.order_status === "pending_verification"
                                                                                     ? "รอตรวจสอบการชำระเงิน"
-                                                                                    : "รอชำระเงิน"}
+                                                                                    : "การจัดส่งมีปัญหา"}
+                                                            </span> */}
+                                                            <span className={`badge rounded-pill px-2 py-1 ${BADGE_CLASS[order.order_status] || "bg-secondary text-white"}`} style={{ fontSize: "0.9rem" }}>
+                                                                {ORDER_STATUS_LABEL[order.order_status] || "สถานะไม่ระบุ"}
                                                             </span>
                                                         </div>
 
@@ -306,32 +308,8 @@ function PresidentManageOrders() {
                                                             <div className="col-md-6 mb-2">
                                                                 <small className="text-muted d-block">สถานะปัจจุบัน</small>
                                                                 <div className="bg-white p-2 rounded border">
-                                                                    {/* Order Status */}
-                                                                    <span
-                                                                        className={`badge rounded-pill px-2 py-1 ${order.order_status === 'delivered'
-                                                                            ? "text-success bg-success bg-opacity-10"
-                                                                            : order.order_status === "shipping"
-                                                                                ? "text-primary bg-primary bg-opacity-10"
-                                                                                : order.order_status === "processing"
-                                                                                    ? "text-warning bg-warning bg-opacity-10"
-                                                                                    : order.order_status === "cancelled"
-                                                                                        ? "text-danger bg-danger bg-opacity-10"
-                                                                                        : order.order_status === "pending_verification"
-                                                                                            ? "text-dark bg-secondary bg-opacity-10"
-                                                                                            : "bg-secondary text-white"
-                                                                            }`}
-                                                                    >
-                                                                        {order.order_status === "delivered"
-                                                                            ? "จัดส่งสำเร็จ"
-                                                                            : order.order_status === "shipping"
-                                                                                ? "กำลังจัดส่ง"
-                                                                                : order.order_status === "processing"
-                                                                                    ? "กำลังดำเนินการ"
-                                                                                    : order.order_status === "cancelled"
-                                                                                        ? "ยกเลิก"
-                                                                                        : order.order_status === "pending_verification"
-                                                                                            ? "รอตรวจสอบการชำระเงิน"
-                                                                                            : "รอชำระเงิน"}
+                                                                    <span className={`badge rounded-pill px-2 py-1 ${BADGE_CLASS[order.order_status] || "bg-secondary text-white"}`} style={{ fontSize: "0.9rem" }}>
+                                                                        {ORDER_STATUS_LABEL[order.order_status] || "สถานะไม่ระบุ"}
                                                                     </span>
                                                                 </div>
 
@@ -353,25 +331,6 @@ function PresidentManageOrders() {
                                                             </h6>
 
                                                             <div className="row">
-                                                                {/* Order Status Update */}
-                                                                {/* <div className="col-md-4 mb-3">
-                                                                                        <label className="form-label small fw-bold text-muted">สถานะคำสั่งซื้อ</label>
-                                                                                        <select
-                                                                                            value={orderStatus && selectedOrderId === order.order_id ? orderStatus : order.order_status}
-                                                                                            onChange={e => {
-                                                                                                setSelectedOrderId(order.order_id);
-                                                                                                setOrderStatus(e.target.value);
-                                                                                            }}
-                                                                                            className="form-select form-select-sm"
-                                                                                        >
-                                                                                            <option value="awaiting_payment">รอชำระเงิน</option>
-                                                                                            <option value="processing">กำลังดำเนินการ</option>
-                                                                                            <option value="shipping">กำลังจัดส่ง</option>
-                                                                                            <option value="delivered">จัดส่งสำเร็จ</option>
-                                                                                            <option value="cancelled">ยกเลิก</option>
-                                                                                        </select>
-                                                                                    </div> */}
-
                                                                 {/* Tracking Number Update */}
                                                                 <div className="col-md-5 mb-3">
                                                                     <label className="form-label small fw-bold text-muted">หมายเลขพัสดุ</label>
@@ -385,14 +344,14 @@ function PresidentManageOrders() {
                                                                                 setSelectedOrderId(order.order_id);
                                                                                 setTrackingNumber(e.target.value);
                                                                             }}
-                                                                            disabled={order.order_status === "delivered"} // ปิดแก้ไขถ้าส่งสำเร็จ
+                                                                            disabled={order.order_status === "delivered"} 
                                                                         />
                                                                     </div>
                                                                 </div>
 
                                                                 {/* Update Button */}
                                                                 <div className="col-md-3 mb-3 d-flex align-items-end">
-                                                                    {order.order_status !== "delivered" && ( // ซ่อนปุ่มถ้าส่งสำเร็จ
+                                                                    {order.order_status !== "delivered" && ( 
                                                                         <button
                                                                             className="btn btn-primary btn-sm w-100"
                                                                             onClick={() => {
@@ -414,7 +373,7 @@ function PresidentManageOrders() {
                                                                     อัปเดตล่าสุด
                                                                 </small>
                                                                 <small className="text-muted">
-                                                                    { format(new Date(), 'dd/MM/yyyy')}
+                                                                    {format(new Date(), 'dd/MM/yyyy')}
                                                                 </small>
                                                             </div>
                                                         </div>
@@ -439,5 +398,43 @@ function PresidentManageOrders() {
         </section>
     );
 };
+
+// สร้าง mapping ไว้ข้างนอก component
+const ORDER_STATUS_LABEL = {
+    pending_verification: "รอตรวจสอบการชำระเงิน",
+    processing: "กำลังดำเนินการ",
+    shipping: "กำลังจัดส่ง",
+    delivered: "จัดส่งสำเร็จ",
+    issue_reported: "มีปัญหาการจัดส่ง",
+    refund_approved: "คืนเงินสำเร็จ",
+    resend_processing: "ส่งสินค้าใหม่กำลังดำเนินการ",
+    issue_rejected: "ปัญหาไม่ได้รับการแก้ไข",
+    return_pending: "ผู้ใช้ส่งสินค้าคืน",
+    return_approved: "คืนสินค้าสำเร็จ",
+    return_rejected: "การคืนไม่ผ่าน",
+    cancelled: "ยกเลิก",
+    repeal_pending: "ยกเลิกการสั่งซื้อ",
+    repeal_approved: "ยกเลิกการสั่งซื้อสำเร็จ",
+    repeal_rejected: "ปฏิเสธการยกเลิก",
+};
+
+const BADGE_CLASS = {
+    pending_verification: "text-dark bg-secondary bg-opacity-10", // เทาเข้ม
+    processing: "text-warning bg-warning bg-opacity-10",          // เหลือง
+    shipping: "text-primary bg-primary bg-opacity-10",            // น้ำเงิน
+    delivered: "text-success bg-success bg-opacity-10",           // เขียว
+    issue_reported: "text-white bg-danger",                       // แดงสด
+    refund_approved: "text-success bg-success bg-opacity-10",           // ฟ้า
+    resend_processing: "text-primary bg-primary bg-opacity-10",    // ม่วง (custom class)
+    issue_rejected: "text-danger bg-danger bg-opacity-25",        // แดงอ่อน
+    return_pending: "text-warning bg-warning bg-opacity-10",         // ส้ม (custom class)
+    return_approved: "text-success bg-success bg-opacity-10",     // เขียวอ่อน
+    return_rejected: "text-danger bg-danger bg-opacity-25",        
+    cancelled: "text-dark bg-dark bg-opacity-25",
+    repeal_pending: "text-dark bg-dark bg-opacity-25",
+    repeal_approved: "text-success bg-success bg-opacity-10",
+    repeal_rejected: "text-danger bg-danger bg-opacity-25",                 
+};
+
 
 export default PresidentManageOrders;

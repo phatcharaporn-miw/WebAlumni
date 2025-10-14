@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { useAuth } from '../../context/AuthContext';
+import {HOSTNAME} from '../../config.js';
 
 function PreCreateActivity() {
   const [formData, setFormData] = useState({
@@ -24,7 +25,7 @@ function PreCreateActivity() {
   const [isLoggedin, setIsLoggedin] = useState(false);
   const [minDate, setMinDate] = useState('');
   const { user} = useAuth();
-  const userId = user?.id;
+  const userId = user?.user_id;
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -104,7 +105,7 @@ function PreCreateActivity() {
     });
 
     try {
-      const response = await axios.post('http://localhost:3001/activity/post-activity', data, {
+      const response = await axios.post(HOSTNAME +'/activity/post-activity', data, {
         withCredentials: true,
         headers: { "Content-Type": "multipart/form-data" },
       });

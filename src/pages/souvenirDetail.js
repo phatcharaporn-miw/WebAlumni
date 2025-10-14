@@ -4,7 +4,8 @@ import axios from "axios";
 import { useNavigate, Link, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import { useCart } from '../context/CartContext';
-import {useAuth} from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
+import { HOSTNAME } from '../config.js';
 
 function SouvenirDetail() {
     const { productId } = useParams();
@@ -13,15 +14,14 @@ function SouvenirDetail() {
     const [error, setError] = useState(null);
     const [quantity, setQuantity] = useState(1);
     const [otherProducts, setOtherProducts] = useState([]);
-    // const user_id = sessionStorage.getItem('userId');
-    const {user} = useAuth();
+    const { user } = useAuth();
     const [loadingAddToCart, setLoadingAddToCart] = useState(false);
     const navigate = useNavigate();
     const { addToCart } = useCart();
 
     useEffect(() => {
         setLoading(true);
-        axios.get(`http://localhost:3001/souvenir/souvenirDetail/${productId}`, {
+        axios.get(HOSTNAME + `/souvenir/souvenirDetail/${productId}`, {
             withCredentials: true
         })
             .then(response => {
@@ -34,7 +34,7 @@ function SouvenirDetail() {
                 setLoading(false);
             });
 
-        axios.get('http://localhost:3001/souvenir', {
+        axios.get(HOSTNAME + '/souvenir', {
             withCredentials: true
         })
             .then(response => setOtherProducts(response.data))
@@ -72,7 +72,7 @@ function SouvenirDetail() {
     };
 
     const handleBuyNow = () => {
-        if (!user || !user.id) {
+        if (!user || !user.user_id) {
             Swal.fire({
                 title: "กรุณาเข้าสู่ระบบ",
                 text: "คุณต้องเข้าสู่ระบบก่อนสั่งซื้อสินค้า",
@@ -98,7 +98,7 @@ function SouvenirDetail() {
     };
 
     const handleAddToCart = async () => {
-        if (!user || !user.id) {
+        if (!user || !user.user_id) {
             Swal.fire({
                 title: "กรุณาเข้าสู่ระบบ",
                 text: "คุณต้องเข้าสู่ระบบก่อนเพิ่มสินค้า",
@@ -157,13 +157,14 @@ function SouvenirDetail() {
                             <div className="souvenirDetail-item-img-container">
                                 <img
                                     className="souvenirDetail-item-img"
-                                    src={`http://localhost:3001/uploads/${product.image}`}
+                                    src={HOSTNAME + `/uploads/${product.image}`}
                                     alt={product.product_name}
                                 />
                             </div>
                             <div className="souvenirDetail-item-info">
                                 <h3 className="souvenir-item-name">{product.product_name}</h3>
                                 <p className="souvenir-item-price">฿{product.price}</p>
+
                                 {product.slot && (
                                     <div className="mb-2">
                                         <span className="fw-semibold">ประเภท/สล็อต: </span>
@@ -187,28 +188,45 @@ function SouvenirDetail() {
                                         คงเหลือ {available} ชิ้น
                                     </p>
                                 </div>
-                                <div className="souvenir-buy_product_button">
-                                    <button
-                                        className="souvenir-buy_product_basket"
-                                        onClick={handleAddToCart}
-                                        disabled={loadingAddToCart || available === 0}
-                                    >
-                                        {loadingAddToCart ? "กำลังโหลด..." :
-                                            available === 0 ? "สินค้าหมด" : "เพิ่มลงตะกร้า"}
-                                    </button>
-                                    <button
-                                        className="souvenir-buy_product"
-                                        onClick={handleBuyNow}
-                                        disabled={available === 0}
-                                    >
-                                        {available === 0 ? "สินค้าหมด" : "สั่งซื้อสินค้า"}
-                                    </button>
-                                </div>
+
+                                {user?.user_id === product.user_id ? (
+                                    // เจ้าของสินค้า → แสดงช่องทางติดต่อแอดมิน
+                                    <div className="contact-admin my-3">
+                                        <p className="text-warning fw-semibold">
+                                            สำหรับแก้ไข/ลบ/เพิ่มล็อตสินค้า กรุณาติดต่อแอดมิน
+                                        </p>
+                                        <ul className="list-unstyled">
+                                            <li><strong>Email: </strong>admin@example.com</li>
+                                            <li><strong>เบอร์: </strong>081-234-5678</li>
+                                            <li><strong>Facebook: </strong>AlumniCollegeOfComputing</li>
+                                        </ul>
+                                    </div>
+                                ) : (
+                                    // คนทั่วไป 
+                                    <div className="souvenir-buy_product_button">
+                                        <button
+                                            className="souvenir-buy_product_basket"
+                                            onClick={handleAddToCart}
+                                            disabled={loadingAddToCart || available === 0}
+                                        >
+                                            {loadingAddToCart ? "กำลังโหลด..." : available === 0 ? "สินค้าหมด" : "เพิ่มลงตะกร้า"}
+                                        </button>
+                                        <button
+                                            className="souvenir-buy_product"
+                                            onClick={handleBuyNow}
+                                            disabled={available === 0}
+                                        >
+                                            {available === 0 ? "สินค้าหมด" : "สั่งซื้อสินค้า"}
+                                        </button>
+                                    </div>
+                                )}
+
                                 <div className="description-product">
                                     <p className="souvenir-item-title-description">รายละเอียด</p>
                                     <p className="souvenir-item-description">{product.description}</p>
                                 </div>
                             </div>
+
                         </div>
                     )}
                 </div>
@@ -223,7 +241,7 @@ function SouvenirDetail() {
                                         <div className="souvenir-item card h-100 shadow-sm border-0 position-relative">
                                             <img
                                                 className="souvenir-item-img card-img-top"
-                                                src={`http://localhost:3001/uploads/${product.image}`}
+                                                src={HOSTNAME + `/uploads/${product.image}`}
                                                 alt={product.product_name}
                                                 style={{ filter: "grayscale(90%)", opacity: 0.6 }}
                                             />
@@ -231,6 +249,7 @@ function SouvenirDetail() {
                                                 <p className="card-title fw-semibold">{product.product_name}</p>
                                                 <p className="souvenir-item-price text-muted">฿{product.price}</p>
                                                 <span className="badge bg-danger mt-2">สินค้าหมดแล้ว</span>
+                                                <small className="text-muted">รอผู้ดูแลเพิ่มสินค้า</small>
                                             </div>
                                         </div>
                                     </div>
@@ -243,7 +262,7 @@ function SouvenirDetail() {
                                             <div className="souvenir-item card h-100 shadow-sm border-0 position-relative">
                                                 <img
                                                     className="souvenir-item-img card-img-top"
-                                                    src={`http://localhost:3001/uploads/${product.image}`}
+                                                    src={HOSTNAME + `/uploads/${product.image}`}
                                                     alt={product.product_name}
                                                 />
                                                 <div className="card-body text-center">
@@ -258,7 +277,6 @@ function SouvenirDetail() {
                         ) : (
                             <p>ไม่มีสินค้าอื่นๆ</p>
                         )}
-
                     </div>
                 </div>
             </div>

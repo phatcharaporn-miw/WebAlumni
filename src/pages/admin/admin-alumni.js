@@ -4,6 +4,7 @@ import '../../css/alumni.css';
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { BsAwardFill } from "react-icons/bs";
+import {HOSTNAME} from '../../config.js';
 
 function AdminAlumni() {
     const [alumniData, setAlumniData] = useState([]);
@@ -18,7 +19,7 @@ function AdminAlumni() {
     ];
 
     useEffect(() => {
-        axios.get("http://localhost:3001/alumni/outstanding-alumni")
+        axios.get(HOSTNAME +"/alumni/outstanding-alumni")
             .then((res) => setAlumniData(res.data))
             .catch((err) => console.error("ไม่สามารถโหลดศิษย์เก่าดีเด่น:", err));
     }, []);
@@ -103,8 +104,8 @@ function AdminAlumni() {
                                         <div className="d-flex align-items-center">
                                             <img
                                                 src={alumni.image_path 
-                                                    ? `http://localhost:3001/${alumni.image_path}` 
-                                                    : "้http://localhost:3001/uploads/default-profile.png"}
+                                                    ? HOSTNAME +`/${alumni.image_path}` 
+                                                    : HOSTNAME +"้/uploads/default-profile.png"}
                                                 alt={alumni.name}
                                                 className="rounded-circle me-3 border"
                                                 style={{ width: "45px", height: "45px", objectFit: "cover" }}

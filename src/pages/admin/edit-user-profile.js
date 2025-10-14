@@ -2,6 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Swal from 'sweetalert2';
+import {HOSTNAME} from '../../config.js';
 
 function EditUserProfile() {
   const { userId } = useParams();
@@ -17,7 +18,7 @@ function EditUserProfile() {
   });
 
   useEffect(() => {
-    axios.get(`http://localhost:3001/admin/users/${userId}`)
+    axios.get(HOSTNAME +`/admin/users/${userId}`)
       .then(res => {
         // console.log("User data fetched:", res.data);
         if (res.data.success) {
@@ -37,8 +38,8 @@ function EditUserProfile() {
     const fetchDegreesAndMajors = async () => {
       try {
         const [resDeg, resMaj] = await Promise.all([
-          axios.get("http://localhost:3001/admin/degrees"),
-          axios.get("http://localhost:3001/admin/majors"),
+          axios.get(HOSTNAME +"/admin/degrees"),
+          axios.get(HOSTNAME +"/admin/majors"),
         ]);
         setDegrees(resDeg.data);
         setMajors(resMaj.data);
@@ -67,7 +68,7 @@ function EditUserProfile() {
   const handleSubmit = async e => {
     e.preventDefault();
     try {
-      const res = await axios.put(`http://localhost:3001/admin/edit-profile-users/${userId}`, formData);
+      const res = await axios.put(HOSTNAME +`/admin/edit-profile-users/${userId}`, formData);
       if (res.data.success) {
         Swal.fire({
           icon: 'success',

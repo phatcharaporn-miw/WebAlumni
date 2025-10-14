@@ -19,11 +19,15 @@ function Profile() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState(null); // สำหรับแสดงรูปภาพก่อนอัปโหลด
   const { user, handleLogout } = useAuth();
-  const userId = user?.id;
+  const userId = user?.user_id;
   const navigate = useNavigate();
  const [editing, setEditing] = useState(false); 
  
-  
+  // Scroll to top on mount
+    useEffect(() => {
+      window.scrollTo(0, 0);
+    }, []);
+    
   useEffect(() => {
     axios.get('http://localhost:3001/users/profile', {
       withCredentials: true, 

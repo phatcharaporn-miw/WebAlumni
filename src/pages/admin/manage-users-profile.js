@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import {HOSTNAME} from '../../config.js';
 
 function UserProfile() {
   const { userId } = useParams();
@@ -11,7 +12,7 @@ function UserProfile() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await axios.get(`http://localhost:3001/admin/users/${userId}`);
+        const res = await axios.get(HOSTNAME +`/admin/users/${userId}`);
         if (res.data.success) {
           // console.log(res.data.data);
           setUser(res.data.data);
@@ -37,7 +38,7 @@ function UserProfile() {
               <div className="text-center">
                 <div className="position-relative d-inline-block mb-3">
                   <img
-                    src={user.image_path ? `http://localhost:3001/${user.image_path}` : "/default-profile-pic.jpg"}
+                    src={user.image_path ? HOSTNAME +`/${user.image_path}` : "/default-profile-pic.jpg"}
                     alt="Profile"
                     className="rounded-circle shadow-lg border border-4 border-white"
                     style={{
@@ -176,7 +177,7 @@ function UserProfile() {
                             <div className="d-flex align-items-start gap-3">
                               <div className="position-relative flex-shrink-0">
                                 <img
-                                  src={act.image_path ? `http://localhost:3001${act.image_path}` : "/default-activity.jpg"}
+                                  src={act.image_path ? HOSTNAME +`${act.image_path}` : "/default-activity.jpg"}
                                   alt={act.activity_name}
                                   className="rounded-3 shadow-sm"
                                   style={{ width: "80px", height: "80px", objectFit: "cover" }}

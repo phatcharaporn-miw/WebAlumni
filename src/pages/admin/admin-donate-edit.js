@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import {HOSTNAME} from '../../config.js';
 
 function AdminEditProject() {
     const { id } = useParams();
@@ -32,7 +33,7 @@ function AdminEditProject() {
         const fetchProject = async () => {
             try {
                 console.log('Fetching project with ID:', id);
-                const response = await axios.get(`http://localhost:3001/admin/donatedetail/${id}`);
+                const response = await axios.get(HOSTNAME +`/admin/donatedetail/${id}`);
                 const project = response.data;
 
                 setFormData({
@@ -52,7 +53,7 @@ function AdminEditProject() {
 
                 if (project.image_path) {
                     setOriginalImage(project.image_path);
-                    setImagePreview(`http://localhost:3001/uploads/${project.image_path}`);
+                    setImagePreview(HOSTNAME +`/uploads/${project.image_path}`);
                 }
 
                 setLoading(false);
@@ -167,7 +168,7 @@ function AdminEditProject() {
                 submitData.append('image', formData.image);
             }
 
-            const response = await axios.put(`http://localhost:3001/admin/editDonate/${id}`, submitData, {
+            const response = await axios.put(HOSTNAME +`/admin/editDonate/${id}`, submitData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }

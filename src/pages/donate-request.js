@@ -5,10 +5,13 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from 'axios';
 import Swal from "sweetalert2";
 import { useAuth } from '../context/AuthContext';
+import {HOSTNAME} from '../config.js';
 
 function DonateRequest() {
     const navigate = useNavigate();
-    const {user} = useAuth();
+    const { user } = useAuth();
+    const userId = user?.user_id;
+    const role = user?.role;
     const [formData, setFormData] = useState({
         projectName: "",
         description: "",
@@ -83,13 +86,11 @@ function DonateRequest() {
         e.preventDefault();
         const data = new FormData();
 
-        // const userId = sessionStorage.getItem('userId');
-
-        if (!user || !user.id) {
+        if (!userId) {
             alert("กรุณาเข้าสู่ระบบก่อน");
             return;
         }
-        data.append("userId", user.id);
+        data.append("userId", userId);
 
         data.append("projectName", formData.projectName);
         data.append("description", formData.description);
@@ -120,26 +121,64 @@ function DonateRequest() {
         }
 
         try {
-            const response = await axios.post('http://localhost:3001/donate/donateRequest', data, {
-                headers: { 'Content-Type': 'multipart/form-data' },
-            }, {
-                withCredentials: true
+            const formDataToSend = new FormData();
+
+            formDataToSend.append("userId", userId);
+            formDataToSend.append("projectName", formData.projectName);
+            formDataToSend.append("description", formData.description);
+            formDataToSend.append("targetAmount", formData.targetAmount || 0);
+            formDataToSend.append("currentAmount", formData.currentAmount || 0);
+            formDataToSend.append("startDate", formData.startDate);
+            formDataToSend.append("endDate", formData.endDate);
+            formDataToSend.append("donationType", formData.donationType);
+            formDataToSend.append("bankName", formData.bankName);
+            formDataToSend.append("accountName", formData.accountName);
+            formDataToSend.append("accountNumber", formData.accountNumber);
+            formDataToSend.append("numberPromtpay", formData.numberPromtpay);
+            formDataToSend.append("forThings", formData.forThings);
+            formDataToSend.append("typeThings", formData.typeThings);
+            formDataToSend.append("quantityThings", formData.quantityThings);
+
+            if (formData.image) {
+                formDataToSend.append("image", formData.image);
+            }
+
+            const response = await axios.post(HOSTNAME + "/donate/donateRequest", formDataToSend, {
+                headers: { "Content-Type": "multipart/form-data" },
+                withCredentials: true,
             });
+
             Swal.fire({
                 title: "ส่งคำขอโครงการบริจาคสำเร็จ!",
                 text: "โปรดรอการอนุมัติจากผู้ดูแลระบบ",
                 icon: "success",
-                confirmButtonText: "ตกลง"
+                confirmButtonText: "ตกลง",
             }).then(() => {
+                setFormData({
+                    projectName: "",
+                    description: "",
+                    targetAmount: "",
+                    currentAmount: "",
+                    startDate: "",
+                    endDate: "",
+                    donationType: "",
+                    bankName: "",
+                    accountName: "",
+                    accountNumber: "",
+                    numberPromtpay: "",
+                    forThings: "",
+                    typeThings: "",
+                    quantityThings: "",
+                    image: null,
+                });
+                setOpen(false);
                 setSuccessMessage("ส่งคำขอโครงการบริจาคสำเร็จ! โปรดรอการอนุมัติจากผู้ดูแลระบบ");
                 setErrorMessage("");
                 setIsSubmitting(false);
 
-                const role = sessionStorage.getItem("userRole");
-
-                if (role === "3") {
+                if (role === 3) {
                     navigate("/alumni-profile/alumni-request");
-                } else if (role === "4") {
+                } else if (role === 4) {
                     navigate("/student-profile/student-request");
                 } else if (role === "2") {
                     navigate("/president-profile/president-request");
@@ -147,11 +186,11 @@ function DonateRequest() {
                     navigate("/");
                 }
             });
-        }
-        catch (error) {
+        } catch (error) {
             console.error("Error:", error);
             alert(error.response?.data?.error || "เกิดข้อผิดพลาด");
         }
+
     };
 
     const [open, setOpen] = React.useState(false);

@@ -5,6 +5,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from 'axios';
 import Swal from "sweetalert2";
 import { useAuth } from '../../context/AuthContext';
+import {HOSTNAME} from '../../config.js';
 
 function AdminDonateRequest() {
     const navigate = useNavigate();
@@ -147,7 +148,7 @@ function AdminDonateRequest() {
             }
 
             // ส่งข้อมูลไปยัง backend - แก้ไขตรงนี้
-            const response = await axios.post("http://localhost:3001/admin/donateRequest", data, {
+            const response = await axios.post(HOSTNAME +"/admin/donateRequest", data, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },

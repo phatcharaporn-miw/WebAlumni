@@ -5,6 +5,7 @@ import axios from 'axios';
 import '../../css/admin-news.css';
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import {HOSTNAME} from '../../config.js';
 
 function PresidentCreateNews() {
     const [title, setTitle] = useState('');
@@ -36,7 +37,7 @@ function PresidentCreateNews() {
             formDataToSend.append('images', img);
         });
     
-        axios.post('http://localhost:3001/news/create-news', formDataToSend, {
+        axios.post(HOSTNAME +'/news/create-news', formDataToSend, {
             withCredentials: true,
             headers: { "Content-Type": "multipart/form-data" }
         })

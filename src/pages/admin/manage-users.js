@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { CiSearch } from "react-icons/ci";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import {HOSTNAME} from '../../config.js';
 
 function UserManagement() {
   const [users, setUsers] = useState([]);
@@ -17,7 +18,7 @@ function UserManagement() {
 
   const fetchUsers = async () => {
     try {
-      const res = await axios.get("http://localhost:3001/admin/users");
+      const res = await axios.get(HOSTNAME +"/admin/users");
       setUsers(res.data);
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -27,7 +28,7 @@ function UserManagement() {
   // เปลี่ยนบทบาทผู้ใช้
   const handleRoleChange = async (userId, newRole) => {
     try {
-      await axios.put(`http://localhost:3001/admin/${userId}/role`, {
+      await axios.put(HOSTNAME +`/admin/${userId}/role`, {
         role: newRole,
       });
       Swal.fire("สำเร็จ!", "เปลี่ยนบทบาทผู้ใช้เรียบร้อยแล้ว", "success");
@@ -51,7 +52,7 @@ function UserManagement() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axios.delete(`http://localhost:3001/admin/delete-user/${userId}`);
+          await axios.delete(HOSTNAME +`/admin/delete-user/${userId}`);
           Swal.fire("ลบสำเร็จ!", "ผู้ใช้ถูกลบเรียบร้อยแล้ว", "success");
           fetchUsers(); // รีเฟรชข้อมูลผู้ใช้
         } catch (error) {
@@ -65,7 +66,7 @@ function UserManagement() {
   // เปลี่ยนสถานะการใช้งานผู้ใช้
   const handleStatusChange = async (userId, isActive) => {
     try {
-      await axios.put(`http://localhost:3001/admin/${userId}/status`, {
+      await axios.put(HOSTNAME +`/admin/${userId}/status`, {
         is_active: isActive,
       });
       fetchUsers(); // รีเฟรชข้อมูล

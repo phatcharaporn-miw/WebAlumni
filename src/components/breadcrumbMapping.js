@@ -9,6 +9,7 @@ export const breadcrumbMapping = {
     "/activity": "กิจกรรม",
     "/about": "เกี่ยวกับสมาคม",
     "/alumni": "ทำเนียบศิษย์เก่า",
+    "/dashboard-stat": "แดชบอร์ด",
     // "/category/:categoryId": "หมวดหมู่",
     "/souvenir": "ของที่ระลึก",
     "/donate": "บริจาค",
@@ -25,6 +26,7 @@ export const breadcrumbMapping = {
     "/souvenir/checkout" : "ชำระเงิน",
     "/check-fullName": "ตรวจสอบข้อมูล",
     "/search": "ผลการค้นหา",
+    "/donate/donatedetail/donateconfirm": "ยืนยันข้อมูลการบริจาค",
 
     // ส่วนของศิษย์เก่า
     "/alumni-profile": "โปรไฟล์",

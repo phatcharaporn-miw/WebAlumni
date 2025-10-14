@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "../css/forgotPassword.css";
+import {HOSTNAME} from '../config.js';
 
 function ForgotPassword() {
     const [step, setStep] = useState(1);
@@ -21,7 +22,7 @@ function ForgotPassword() {
         setMessage("");
 
         try {
-            const response = await axios.post("http://localhost:3001/api/forgot-password", { email });
+            const response = await axios.post(HOSTNAME + "/api/forgot-password", { email });
             if (response.data.success) {
                 setMessage("OTP ถูกส่งไปยังอีเมลของคุณแล้ว");
                 setStep(2);
@@ -48,7 +49,7 @@ function ForgotPassword() {
         }
 
         try {
-            const response = await axios.post("http://localhost:3001/api/reset-password", {
+            const response = await axios.post(HOSTNAME + "/api/reset-password", {
                 email,
                 otp,
                 newPassword

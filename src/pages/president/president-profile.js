@@ -5,6 +5,7 @@ import { useOutletContext } from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
 import Swal from "sweetalert2";
 import { useAuth } from '../../context/AuthContext';
+import {HOSTNAME} from '../../config.js';
 
 function PresidentProfile() {
   const [profile, setProfile] = useState({
@@ -17,14 +18,18 @@ function PresidentProfile() {
   const [showPassword, setShowPassword] = useState(false); // สำหรับซ่อน/แสดงรหัสผ่าน
   const [previewImage, setPreviewImage] = useState(null);
   const {user} = useAuth();
-  const userId = user?.id;
+  const userId = user?.user_id;
   const navigate = useNavigate();
  //แก้ไขข้อมูลส่วนตัว
  const [editing, setEditing] = useState(false); //สลับโหมดการแก้ไข
  
-  
+  // Scroll to top on mount
+    useEffect(() => {
+      window.scrollTo(0, 0);
+    }, []);
+    
   useEffect(() => {
-    axios.get('http://localhost:3001/users/profile', {
+    axios.get(HOSTNAME +'/users/profile', {
       withCredentials: true, 
     })
       .then((response) => {
@@ -37,7 +42,7 @@ function PresidentProfile() {
       });
 
        // ดึงข้อมูล major ทั้งหมด
-    axios.get('http://localhost:3001/add/major', { 
+    axios.get(HOSTNAME +'/add/major', { 
       withCredentials: true 
     })
     .then((response) => {
@@ -50,7 +55,7 @@ function PresidentProfile() {
     });
 
       // ดึงข้อมูล username และ password
-    axios.get('http://localhost:3001/users/login-info', { 
+    axios.get(HOSTNAME +'/users/login-info', { 
       withCredentials: true 
     })
     .then((response) => {
@@ -134,7 +139,7 @@ const removeEducation = (index) => {
   const handleSave = () => {
     const updatedProfile = { ...profile };
     // console.log('ข้อมูลที่ส่งไป Backend:',  updatedProfile); // ตรวจสอบค่า
-    axios.post('http://localhost:3001/users/edit-profile',  updatedProfile, {
+    axios.post(HOSTNAME +'/users/edit-profile',  updatedProfile, {
       withCredentials: true, 
     })
       .then((response) => {
@@ -165,7 +170,7 @@ const removeEducation = (index) => {
     formData.append("user_id", profile.userId); 
   
     try {
-      const res = await axios.post("http://localhost:3001/users/update-profile-image", formData, {
+      const res = await axios.post(HOSTNAME +"/users/update-profile-image", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

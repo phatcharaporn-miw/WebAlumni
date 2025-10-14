@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useParams } from 'react-router-dom';
+import { HOSTNAME } from "../config.js";
 import Modal from 'react-modal';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
@@ -39,22 +40,20 @@ function Webboard() {
   const [replyText, setReplyText] = useState(''); // เก็บข้อความตอบกลับ
   const [recommendedPosts, setRecommendedPosts] = useState([]); //กระทู้ที่แนะนำ
   const [searchTerm, setSearchTerm] = useState("");
-  const { user, isLoggedIn } = useAuth();
+  const { user} = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (user && user.id) {
+    if (user && user.user_id) {
       setIsLoggedin(true);
-      // console.log("ผู้ใช้ล็อกอินแล้ว");
     } else {
       setIsLoggedin(false);
-      // console.log("ผู้ใช้ยังไม่ได้ล็อกอิน"); 
     }
   }, [user]);
 
   //ดึงข้อมูล webboard
   useEffect(() => {
-    axios.get('http://localhost:3001/web/webboard', {
+    axios.get(HOSTNAME +'/web/webboard', {
       withCredentials: true,
     })
       .then((response) => {
@@ -62,7 +61,7 @@ function Webboard() {
 
           setWebboard(response.data.data);
 
-          // สุ่มเลือกกระทู้แนะนำ (เช่น 3 กระทู้)
+          // สุ่มเลือกกระทู้แนะนำ 3 กระทู้
           const randomPosts = getRandomPosts(response.data.data, 3);
           setRecommendedPosts(randomPosts);
         } else {
@@ -88,11 +87,9 @@ function Webboard() {
 
   // ดึงข้อมูลกดใจกระทู้เมื่อผู้ใช้เข้าสู่ระบบ
   useEffect(() => {
-    // const userId = sessionStorage.getItem('userId');
-
-    if (isLoggedin && user && user.id) {
-      axios.get(`http://localhost:3001/web/favorite`, {
-        params: { userId: user.id },
+    if (isLoggedin && user && user.user_id) {
+      axios.get(HOSTNAME +`/web/favorite`, {
+        params: { userId: user.user_id },
         withCredentials: true,
       })
         .then((response) => {
@@ -126,7 +123,7 @@ function Webboard() {
     }
 
     // ส่งคำขอกดถูกใจหรือยกเลิกถูกใจ
-    axios.post(`http://localhost:3001/web/webboard/${postId}/favorite`, {}, {
+    axios.post(HOSTNAME +`/web/webboard/${postId}/favorite`, {}, {
       withCredentials: true,
     })
       .then((response) => {
@@ -158,7 +155,7 @@ function Webboard() {
     }
 
     try {
-      // อัปเดต UI ทันทีก่อน 
+      // อัปเดต UI ทันที
       setWebboard(prevWebboard =>
         prevWebboard.map(item =>
           item.webboard_id === post.webboard_id
@@ -167,7 +164,7 @@ function Webboard() {
         )
       );
 
-      const response = await axios.get(`http://localhost:3001/web/webboard/${post.webboard_id}`, {
+      const response = await axios.get(HOSTNAME +`/web/webboard/${post.webboard_id}`, {
         withCredentials: true,
       });
 
@@ -218,13 +215,13 @@ function Webboard() {
       return;
     }
 
-    axios.post(`http://localhost:3001/web/webboard/${selectedPost.webboard_id}/comment`, {
+    axios.post(HOSTNAME +`/web/webboard/${selectedPost.webboard_id}/comment`, {
       comment_detail: commentText,
     }, {
       withCredentials: true
     })
       .then((response) => {
-        const newComment = response.data.comment; // ปรับตาม response structure
+        const newComment = response.data.comment; 
 
         const userProfileImage = user.image_path || "/default-profile.png";
         const userId = user.id || null;
@@ -232,8 +229,8 @@ function Webboard() {
         const formattedNewComment = {
           ...newComment,
           profile_image: newComment.profile_image || userProfileImage,
-          full_name: newComment.full_name, // ใช้ full_name จาก backend
-          user_id: newComment.user_id || userId, // ใช้ user_id จาก backend 
+          full_name: newComment.full_name, 
+          user_id: newComment.user_id || userId, 
           created_at: newComment.created_at || new Date().toISOString(),
           comment_detail: newComment.comment_detail || commentText,
           replies: [],
@@ -245,7 +242,6 @@ function Webboard() {
             comments: [...(prev.comments || []), { ...formattedNewComment }],
             comments_count: (prev.comments_count ?? 0) + 1
           };
-          // console.log('Updated comments:', updatedPost.comments);
           return updatedPost;
         });
 
@@ -286,18 +282,16 @@ function Webboard() {
 
     try {
       const response = await axios.post(
-        `http://localhost:3001/web/webboard/${selectedPost.webboard_id}/comment/${commentId}/reply`,
+        HOSTNAME +`/web/webboard/${selectedPost.webboard_id}/comment/${commentId}/reply`,
         {
           comment_id: commentId,
           reply_detail: replyText.trim(),
-          user_id: user.id
+          user_id: user.user_id
         },
         {
           withCredentials: true
         }
       );
-
-      // console.log("Reply response:", response.data);
 
       // ตรวจสอบ response ที่ได้รับ
       if (response.status === 200 || response.status === 201) {
@@ -309,7 +303,7 @@ function Webboard() {
               const newReply = {
                 reply_id: response.data.reply_id || response.data.data?.reply_id || Date.now(),
                 comment_id: commentId,
-                user_id: user.id,
+                user_id: user.user_id,
                 reply_detail: replyText.trim(),
                 created_at: new Date().toISOString(),
                 full_name: user.fullName || "คุณ",
@@ -345,7 +339,6 @@ function Webboard() {
     } catch (error) {
       console.error("เกิดข้อผิดพลาดในการส่งการตอบกลับ:", error);
 
-      // ตรวจสอบรายละเอียดของ error
       if (error.response) {
         console.error("Error response:", error.response.data);
         console.error("Error status:", error.response.status);
@@ -374,7 +367,7 @@ function Webboard() {
     }).then((result) => {
       if (result.isConfirmed) {
         axios
-          .delete(`http://localhost:3001/web/webboard/${selectedPost.webboard_id}/comment/${commentId}`, {
+          .delete(HOSTNAME +`/web/webboard/${selectedPost.webboard_id}/comment/${commentId}`, {
             withCredentials: true,
           })
           .then((response) => {
@@ -405,7 +398,7 @@ function Webboard() {
 
   // ลบการตอบกลับความคิดเห็น
   const handleDeleteReply = (replyId, commentId) => {
-    axios.delete(`http://localhost:3001/web/webboard/${selectedPost.webboard_id}/comment/${commentId}/reply/${replyId}`, {
+    axios.delete(HOSTNAME +`/web/webboard/${selectedPost.webboard_id}/comment/${commentId}/reply/${replyId}`, {
       withCredentials: true
     })
       // Swal.fire({
@@ -443,7 +436,7 @@ function Webboard() {
   // search เปิด modal ถ้ามี id
   useEffect(() => {
     if (id) {
-      axios.get(`http://localhost:3001/web/webboard/${id}`, {
+      axios.get(HOSTNAME +`/web/webboard/${id}`, {
         withCredentials: true
       })
         .then((res) => {
@@ -468,7 +461,7 @@ function Webboard() {
 
   // ดึงcategory
   useEffect(() => {
-    axios.get(`http://localhost:3001/category/category-all`, {
+    axios.get(HOSTNAME +`/category/category-all`, {
       withCredentials: true
     })
       .then(response => {
@@ -593,7 +586,7 @@ function Webboard() {
                 <div onClick={() => handlePostClick(post)} style={{ cursor: "pointer" }}>
                   {/* โปรไฟล์ + ชื่อผู้ใช้ */}
                   <div className="d-flex mt-3">
-                    <img src={post.profile_image ? `http://localhost:3001/${post.profile_image}` : "/default-profile.png"} alt="User" className="rounded-circle me-3" width="50" height="50" onError={(e) => e.target.src = "/default-profile.png"} />
+                    <img src={post.profile_image ? HOSTNAME +`/${post.profile_image}` : "/default-profile.png"} alt="User" className="rounded-circle me-3" width="50" height="50" onError={(e) => e.target.src = "/default-profile.png"} />
                     <div>
                       <h5 className="fw-bold mb-1">{post.title}</h5>
                       <p className="text-muted mb-1 small">จากคุณ <span className="fw-semibold">{post.full_name || "ไม่ระบุชื่อ"}</span></p>
@@ -679,7 +672,7 @@ function Webboard() {
               {/* โปรไฟล์ + ชื่อผู้ใช้ */}
               <div className="d-flex mt-4">
                 <img
-                  src={selectedPost.profile_image ? `http://localhost:3001/${selectedPost.profile_image}` : "/default-profile.png"}
+                  src={selectedPost.profile_image ? HOSTNAME +`/${selectedPost.profile_image}` : "/default-profile.png"}
                   alt="User"
                   className="rounded-circle me-3"
                   width="50"
@@ -700,7 +693,7 @@ function Webboard() {
 
               {/* รูปภาพประกอบ*/}
               {selectedPost.image_path && (
-                <img src={selectedPost.image_path ? `http://localhost:3001/${selectedPost.image_path.replace(/^\/+/, '')}` : "/default-image.png"} alt="Post" className="img-fluid rounded-3" onError={(e) => e.target.style.display = 'none'} />
+                <img src={selectedPost.image_path ? HOSTNAME +`/${selectedPost.image_path.replace(/^\/+/, '')}` : "/default-image.png"} alt="Post" className="img-fluid rounded-3" onError={(e) => e.target.style.display = 'none'} />
               )}
 
               {/* จำนวนผู้เข้าชม */}
@@ -718,7 +711,7 @@ function Webboard() {
                         <img
                           src={comment.profile_image.startsWith('http') || comment.profile_image === '/default-profile.png'
                             ? comment.profile_image
-                            : `http://localhost:3001/${comment.profile_image}`}
+                            : HOSTNAME +`/${comment.profile_image}`}
                           alt="User"
                           className="rounded-circle me-3 border"
                           width="45"
@@ -735,7 +728,7 @@ function Webboard() {
                           </div>
                           <div className="d-flex align-items-center mb-2">
                             <p className="text-muted mb-0 small flex-grow-1">{comment.comment_detail}</p>
-                            {Number(comment.user_id) === Number(user.id) && (
+                            {user && Number(comment.user_id) === Number(user.user_id) && (
                               <button
                                 className="btn btn-sm ms-2"
                                 onClick={() => handleDeleteComment(comment.comment_id)}
@@ -794,7 +787,7 @@ function Webboard() {
                                     <img
                                       src={reply.profile_image?.startsWith('http') || reply.profile_image === '/default-profile.png'
                                         ? reply.profile_image
-                                        : `http://localhost:3001/${reply.profile_image}`}
+                                        : HOSTNAME +`/${reply.profile_image}`}
                                       alt="User"
                                       className="rounded-circle me-3 border"
                                       width="35"
@@ -813,7 +806,7 @@ function Webboard() {
                                               : "ไม่ระบุวันที่"}
                                           </small>
                                           {/* ปุ่มลบ reply - แสดงเฉพาะเจ้าของ */}
-                                          {Number(reply.user_id) === Number(user.id) && (
+                                          {user && Number(reply.user_id) === Number(user.user_id) && (
                                             <button
                                               className="btn btn-sm"
                                               onClick={() => handleDeleteReply(reply.reply_id, comment.comment_id)}

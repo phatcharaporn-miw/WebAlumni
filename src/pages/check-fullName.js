@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { User, Search } from "lucide-react";
-import '../css/CheckStudentId.css'; // ใช้ CSS เดิม แต่เปลี่ยนชื่อไฟล์ได้ถ้าต้องการ
+import '../css/CheckStudentId.css'; 
+import {HOSTNAME} from '../config.js';
 
 function CheckFullName() {
     const [userData, setUserData] = useState({
@@ -39,7 +40,7 @@ function CheckFullName() {
         setResult(null);
 
         try {
-            const res = await axios.post('http://localhost:3001/api/check-fullname', { full_name: fullName });
+            const res = await axios.post(HOSTNAME + '/api/check-fullname', { full_name: fullName });
 
             if (res.data.success) {
                 setResult({

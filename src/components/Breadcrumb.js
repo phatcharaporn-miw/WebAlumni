@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 import axios from "axios";
 import { breadcrumbMapping } from '../components/breadcrumbMapping';
+import {HOSTNAME} from '../config.js';
 // css
 import '../css/breadcrumb.css';
 
@@ -13,7 +14,7 @@ function Breadcrumb() {
   // ดึงข้อมูล breadcrumb หากมี activityId, newsId หรือ categoryId
   useEffect(() => {
     if (activityId) {
-      axios.get(`http://localhost:3001/activity/${activityId}`)
+      axios.get(HOSTNAME +`/activity/${activityId}`)
         .then(response => {
           setBreadcrumb(prev => ({ ...prev, activity: response.data.breadcrumb })); 
         })
@@ -22,7 +23,7 @@ function Breadcrumb() {
         });
     }
     if (newsId) {
-      axios.get(`http://localhost:3001/news/news-id/${newsId}`)
+      axios.get(HOSTNAME +`/news/news-id/${newsId}`)
         .then(response => {
           setBreadcrumb(prev => ({ ...prev, news: response.data.newsTitle })); 
         })
@@ -31,7 +32,7 @@ function Breadcrumb() {
         });
     }
     if (categoryId) {
-      axios.get(`http://localhost:3001/web/webboard/category/${categoryId}`)
+      axios.get(HOSTNAME +`/web/webboard/category/${categoryId}`)
         .then(response => {
           setBreadcrumb(prev => ({ ...prev, category: response.data.categoryName })); 
         })
@@ -40,7 +41,7 @@ function Breadcrumb() {
         });
     }
     if (webboardId) {
-      axios.get(`http://localhost:3001/users/webboard/${webboardId}`)
+      axios.get(HOSTNAME +`/users/webboard/${webboardId}`)
         .then(response => {
           setBreadcrumb(prev => ({ ...prev, webboard: response.data.webboardTitle }));
         })
@@ -49,7 +50,7 @@ function Breadcrumb() {
         });
     }
     if (projectId) {
-      axios.get(`http://localhost:3001/donate/donatedetail/${projectId}`)
+      axios.get(HOSTNAME +`/donate/donatedetail/${projectId}`)
         .then(response => {
           setBreadcrumb(prev => ({ ...prev, DonateDetail: response.data.project_name }));
         })
@@ -58,7 +59,7 @@ function Breadcrumb() {
         });
     }
     if (productId) {
-      axios.get(`http://localhost:3001/souvenir/souvenirDetail/${productId}`)
+      axios.get(HOSTNAME +`/souvenir/souvenirDetail/${productId}`)
         .then(response => {
           setBreadcrumb(prev => ({ ...prev, souvenirDetail: response.data.product_name }));
         })
@@ -67,7 +68,7 @@ function Breadcrumb() {
         });
     }
     if (userId) {
-      axios.get(`http://localhost:3001/alumni/${userId}`)
+      axios.get(HOSTNAME +`/alumni/${userId}`)
         .then(response => {
           setBreadcrumb(prev => ({ ...prev, alumniProfile: response.data.fullName }));
         })

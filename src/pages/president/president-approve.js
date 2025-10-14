@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { useOutletContext } from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
 import axios from "axios";
-import { FaRegEdit } from "react-icons/fa";
 import { FaUser, FaBarcode, FaEdit, FaTrash, FaCheckCircle, FaHourglassHalf, FaTimesCircle } from "react-icons/fa";
-import { MdDelete } from "react-icons/md";
 import { Modal, Button, Box, Typography } from "@mui/material";
 import Swal from "sweetalert2";
 import { useAuth } from '../../context/AuthContext';
+import {HOSTNAME} from '../../config.js';
 
 // CSS & Bootstrap
 import '../../css/profile.css';
@@ -18,7 +16,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 function Approve() {
     const [profile, setProfile] = useState({});
     const { user, handleLogout } = useAuth();
-    const user_id = user?.id;
+    const user_id = user?.user_id;
     const navigate = useNavigate();
     const [previewImage, setPreviewImage] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -33,7 +31,7 @@ function Approve() {
 
     // ดึงข้อมูลโปรไฟล์
     useEffect(() => {
-        axios.get('http://localhost:3001/users/profile', { withCredentials: true })
+        axios.get(HOSTNAME +'/users/profile', { withCredentials: true })
             .then((response) => {
                 if (response.data.success) {
                     setProfile(response.data.user);
@@ -47,7 +45,7 @@ function Approve() {
 
     useEffect(() => {
         window.scrollTo(0, 0);
-        axios.get("http://localhost:3001/admin/souvenir")
+        axios.get(HOSTNAME +"/admin/souvenir")
             .then((response) => {
                 setProducts(response.data);
             })
@@ -90,7 +88,7 @@ function Approve() {
             cancelButtonText: "ยกเลิก"
         }).then((result) => {
             if (result.isConfirmed) {
-                axios.put(`http://localhost:3001/admin/approveSouvenir/${productId}`, {
+                axios.put(HOSTNAME +`/admin/approveSouvenir/${productId}`, {
                     status: "1",
                     approver_id: user_id
                 })
@@ -121,7 +119,7 @@ function Approve() {
             cancelButtonText: "ยกเลิก"
         }).then((result) => {
             if (result.isConfirmed) {
-                axios.put(`http://localhost:3001/admin/approveSouvenir/${productId}`, {
+                axios.put(HOSTNAME +`/admin/approveSouvenir/${productId}`, {
                     approver_id: user_id,
                     action: "rejected"
                 })
@@ -151,7 +149,7 @@ function Approve() {
             cancelButtonText: "ยกเลิก"
         }).then((result) => {
             if (result.isConfirmed) {
-                axios.delete(`http://localhost:3001/admin/deleteSouvenir/${productId}`)
+                axios.delete(HOSTNAME +`/admin/deleteSouvenir/${productId}`)
                     .then(() => {
                         setProducts(products.filter(product => product.product_id !== productId));
                         Swal.fire("ลบเรียบร้อย!", "สินค้าถูกลบออกจากระบบแล้ว", "success");
@@ -193,7 +191,7 @@ function Approve() {
         formData.append("user_id", profile.userId);
 
         try {
-            const res = await axios.post("http://localhost:3001/users/update-profile-image", formData, {
+            const res = await axios.post(HOSTNAME +"/users/update-profile-image", formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
@@ -288,7 +286,7 @@ function Approve() {
                                         {/* Product Image */}
                                         <div className="position-relative">
                                             <img
-                                                src={`http://localhost:3001/uploads/${product.image}`}
+                                                src={HOSTNAME +`/uploads/${product.image}`}
                                                 alt={product.product_name}
                                                 className="card-img-top"
                                                 style={{ height: "180px", objectFit: "cover" }}
@@ -480,7 +478,7 @@ function Approve() {
                         </Button>
                         <Button
                             onClick={() => {
-                                axios.put(`http://localhost:3001/admin/editSouvenir/${selectedProduct.product_id}`, selectedProduct)
+                                axios.put(HOSTNAME +`/admin/editSouvenir/${selectedProduct.product_id}`, selectedProduct)
                                     .then(response => {
                                         console.log("บันทึกข้อมูลสินค้าสำเร็จ:", response.data);
                                         setProducts(prevProducts =>

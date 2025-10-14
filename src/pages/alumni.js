@@ -3,6 +3,7 @@ import '../css/alumni.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from "axios";
+import {HOSTNAME} from '../config.js';
 
 function Alumni() {
     const [alumniData, setAlumniData] = useState([]);
@@ -19,7 +20,7 @@ function Alumni() {
     ];
 
     useEffect(() => {
-        axios.get("http://localhost:3001/alumni/outstanding-alumni")
+        axios.get(HOSTNAME +"/alumni/outstanding-alumni")
             .then((res) => {
                 setAlumniData(res.data);
                 setLoading(false);
@@ -142,7 +143,7 @@ function Alumni() {
                                 >
                                     <div className="d-flex align-items-center" id="alumni-row">
                                         <img
-                                            src={alumni.image_path ? `http://localhost:3001/${alumni.image_path}` : "/default-profile-pic.jpg"}
+                                            src={alumni.image_path ? HOSTNAME +`/${alumni.image_path}` : "/default-profile-pic.jpg"}
                                             alt={alumni.name}
                                             loading="lazy"
                                             onError={(e) => e.target.src = "/default-profile-pic.jpg"}
@@ -198,11 +199,11 @@ function Alumni() {
                                         <div className="position-relative">
                                             <img
                                                 src={alumni.image_path
-                                                ? `http://localhost:3001/${alumni.image_path}` 
-                                                : `http://localhost:3001/uploads/default-profile.png`}
+                                                ? HOSTNAME +`/${alumni.image_path}` 
+                                                : HOSTNAME +`/uploads/default-profile.png`}
                                                 alt={alumni.name}
                                                 loading="lazy"
-                                                onError={(e) => e.target.src = `http://localhost:3001/uploads/default-profile.png`}
+                                                onError={(e) => e.target.src = HOSTNAME +`/uploads/default-profile.png`}
                                                 className="img-fluid rounded-circle me-3"
                                                 style={{
                                                     width: "90px",

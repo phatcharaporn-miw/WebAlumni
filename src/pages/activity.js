@@ -9,6 +9,7 @@ import { IoMdClose } from "react-icons/io";
 import { MdEdit, MdDelete } from 'react-icons/md';
 import { Link } from "react-router-dom";
 import { useAuth } from '../context/AuthContext';
+import {HOSTNAME} from '../config.js';
 
 function Activity() {
     const [activityId, setActivityId] = useState(null);
@@ -18,7 +19,7 @@ function Activity() {
     // const userRole = sessionStorage.getItem("userRole");
     const {user} = useAuth();
     const userRole = user?.role;
-    const userId = user?.id;
+    const userId = user?.user_id;
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         full_name: "",
@@ -52,7 +53,7 @@ function Activity() {
 
     useEffect(() => {
         // ดึงข้อมูลกิจกรรมที่กำลังจะจัดขึ้น
-        axios.get('http://localhost:3001/activity/all-activity')
+        axios.get(HOSTNAME +'/activity/all-activity')
             .then(response => {
                 setActivity(response.data.data);
             })
@@ -114,7 +115,7 @@ function Activity() {
             return;
         }
 
-        axios.post('http://localhost:3001/activity/activity-form', formData, {
+        axios.post(HOSTNAME +'/activity/activity-form', formData, {
             withCredentials: true,
         })
             .then(response => {
@@ -150,7 +151,7 @@ function Activity() {
     useEffect(() => {
         if (activityId) {
             setHasJoined(false);
-            axios.get(`http://localhost:3001/activity/check-join/${activityId}`, {
+            axios.get(HOSTNAME +`/activity/check-join/${activityId}`, {
                 withCredentials: true,
             })
                 .then((res) => {
@@ -177,7 +178,7 @@ function Activity() {
             cancelButtonText: "ยกเลิก",
         }).then((result) => {
             if (result.isConfirmed) {
-                axios.delete(`http://localhost:3001/activity/delete-activity/${activityId}`, {
+                axios.delete(HOSTNAME +`/activity/delete-activity/${activityId}`, {
                     withCredentials: true,
                 })
                     .then(() => {
@@ -323,7 +324,7 @@ function Activity() {
                                     <div className="card activity-card">
                                         <div className="image-container-act">
                                             <img
-                                                src={activity.image_path ? `http://localhost:3001${activity.image_path}` : "/default-image.png"}
+                                                src={activity.image_path ? HOSTNAME +`${activity.image_path}` : "/default-image.png"}
                                                 className="card-img-top"
                                                 alt="กิจกรรม"
                                             />

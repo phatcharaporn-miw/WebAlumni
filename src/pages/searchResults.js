@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, Link } from "react-router-dom";
 import axios from "axios";
+import {HOSTNAME} from '../config.js';
 import { MdDateRange } from "react-icons/md";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../css/search.css';
@@ -16,7 +17,7 @@ function SearchResult() {
     useEffect(() => {
         if (query) {
             axios
-                .get(`http://localhost:3001/search/search-all?search=${query}`)
+                .get(HOSTNAME + `/search/search-all?search=${query}`)
                 .then((res) => {
                     // console.log("Search results:", res.data.data);
                     setResults(res.data.data || []);

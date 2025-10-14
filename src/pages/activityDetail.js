@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { FaCalendarAlt, FaClock, FaCheckCircle, FaSpinner, FaHourglassStart, FaUsers, FaInfoCircle,FaBuilding } from 'react-icons/fa';
+import {HOSTNAME} from '../config.js';
 
 function ActivityDetail() {
     const { activityId } = useParams();
@@ -11,7 +12,7 @@ function ActivityDetail() {
 
     useEffect(() => {
         // ดึงข้อมูลกิจกรรมตาม id
-        axios.get(`http://localhost:3001/activity/${activityId}`)
+        axios.get(HOSTNAME +`/activity/${activityId}`)
             .then(response => {
                 setActivity(response.data.data);
                 setLoading(false);
@@ -112,7 +113,7 @@ const formatDate = (dateStr) => {
                     <div className="position-relative">
                         <div className="hero-image-container" style={{ height: '400px', overflow: 'hidden' }}>
                             <img
-                                src={`http://localhost:3001${activity.image_path}`}
+                                src={HOSTNAME +`${activity.image_path}`}
                                 alt="กิจกรรม"
                                 className={`w-100 h-100 object-fit-cover transition-opacity ${imageLoaded ? 'opacity-100' : 'opacity-50'}`}
                                 onLoad={() => setImageLoaded(true)}

@@ -5,6 +5,7 @@ import "../../css/adminDonate.css";
 import { CiSearch } from "react-icons/ci";
 import axios from "axios";
 import { Link, useLocation } from "react-router-dom";
+import {HOSTNAME} from '../../config.js';
 
 function AdminDonate() {
     const [projects, setProjects] = useState([]);
@@ -19,7 +20,7 @@ function AdminDonate() {
         const fetchProjects = async () => {
             try {
                 setLoading(true);
-                const response = await axios.get("http://localhost:3001/admin/donate");
+                const response = await axios.get(HOSTNAME +"/admin/donate");
                 const updatedProjects = response.data.map((project) => ({
                     ...project,
                     showFullDescription: false,
@@ -54,7 +55,7 @@ function AdminDonate() {
         const confirmDelete = window.confirm("คุณแน่ใจหรือไม่ว่าต้องการลบโครงการนี้?");
         if (confirmDelete) {
             try {
-                await axios.delete(`http://localhost:3001/admin/donate/${projectId}`);
+                await axios.delete(HOSTNAME +`/admin/donate/${projectId}`);
                 setProjects(projects.filter((project) => project.project_id !== projectId));
                 alert("ลบโครงการสำเร็จ");
             } catch (error) {
@@ -66,7 +67,7 @@ function AdminDonate() {
     //ฟังก์ชันสำหรับอนุมัติโครงการ
     const Approve = async (projectId) => {
         try {
-            await axios.put(`http://localhost:3001/admin/approveDonate/${projectId}`);
+            await axios.put(HOSTNAME +`/admin/approveDonate/${projectId}`);
             setProjects(projects.map(project =>
                 project.project_id === projectId
                     ? { ...project, status: "1" }
@@ -273,7 +274,7 @@ function AdminDonate() {
                                                     <div className="col-md-3">
                                                         <div className="donate-admin-item-image-frame">
                                                             <img
-                                                                src={`http://localhost:3001/uploads/${project.image_path}`}
+                                                                src={HOSTNAME +`/uploads/${project.image_path}`}
                                                                 alt={project.project_name}
                                                                 className="img-fluid rounded"
                                                                 onError={(e) => {

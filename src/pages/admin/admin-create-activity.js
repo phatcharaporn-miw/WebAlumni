@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { useAuth } from '../../context/AuthContext';
+import {HOSTNAME} from '../../config.js';
 
 function CreateActivity() {
   const [formData, setFormData] = useState({
@@ -24,7 +25,7 @@ function CreateActivity() {
   const [minDate, setMinDate] = useState(''); 
   const navigate = useNavigate();
   const { user} = useAuth();
-  const userId = user?.id;
+  const userId = user?.user_id;
 
     useEffect(() => {
         // กำหนดวันที่ปัจจุบันในรูปแบบ YYYY-MM-DD
@@ -124,7 +125,7 @@ function CreateActivity() {
     });
 
     try {
-      const response = await axios.post('http://localhost:3001/activity/post-activity', data, {
+      const response = await axios.post(HOSTNAME +'/activity/post-activity', data, {
         withCredentials: true,
         headers: { "Content-Type": "multipart/form-data" },
       });

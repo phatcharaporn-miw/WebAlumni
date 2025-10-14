@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useAuth } from '../../context/AuthContext';
+// import { useAuth } from '../../context/AuthContext';
+import {HOSTNAME} from '../../config.js';
 import Swal from "sweetalert2";
 
 function StudentEditWebboard() {
@@ -18,7 +19,7 @@ function StudentEditWebboard() {
 
     // ดึงข้อมูลกระทู้ที่ต้องการแก้ไข
     useEffect(() => {
-        axios.get(`http://localhost:3001/users/webboard/${webboardId}`)
+        axios.get(HOSTNAME +`/users/webboard/${webboardId}`)
             .then((response) => {
                 if (response.data.success) {
                     setFormData(response.data.data);
@@ -55,7 +56,7 @@ function StudentEditWebboard() {
             formDataToSend.append("image_path", formData.image_path);
         }
 
-        axios.put(`http://localhost:3001/users/edit-webboard/${webboardId}`, formDataToSend, {
+        axios.put(HOSTNAME +`/users/edit-webboard/${webboardId}`, formDataToSend, {
             headers: { "Content-Type": "multipart/form-data" },
         },{
             withCredentials: true
@@ -87,7 +88,7 @@ function StudentEditWebboard() {
 
     // ดึงหมวดหมู่
     useEffect(() => {
-        axios.get(`http://localhost:3001/category/category-all`)
+        axios.get(HOSTNAME +`/category/category-all`)
             .then(response => {
                 if (response.data.success) {
                     setCategory(response.data.data);
@@ -143,7 +144,7 @@ function StudentEditWebboard() {
                                     {formData.image_path && (
                                         <div className="mt-2">
                                             <img
-                                                src={`http://localhost:3001/${formData.image_path.replace(/^\/+/, '')}`}
+                                                src={HOSTNAME +`/${formData.image_path.replace(/^\/+/, '')}`}
                                                 alt="Webboard"
                                                 className="img-fluid rounded"
                                                 width="200"

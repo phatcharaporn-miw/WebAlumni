@@ -9,6 +9,7 @@ import { MdDateRange, MdEdit, MdDelete } from "react-icons/md";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from '../context/AuthContext';
+import {HOSTNAME} from '../config.js';
 
 function News() {
     const [news, setNews] = useState([]);
@@ -16,12 +17,12 @@ function News() {
     // const userId = sessionStorage.getItem("userId");
     const { user } = useAuth();
     const userRole = user?.role;
-    const userId = user?.id;
+    const userId = user?.user_id;
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState("");
 
     useEffect(() => {
-        axios.get('http://localhost:3001/news/news-all')
+        axios.get(HOSTNAME + '/news/news-all')
             .then((response) => {
                 if (response.data.success) {
                     setNews(response.data.data || []);
@@ -45,7 +46,7 @@ function News() {
             cancelButtonText: "ยกเลิก",
         }).then((result) => {
             if (result.isConfirmed) {
-                axios.delete(`http://localhost:3001/news/delete-news/${newsId}`, {
+                axios.delete(HOSTNAME + `/news/delete-news/${newsId}`, {
                     withCredentials: true
                 })
                     .then((response) => {
@@ -171,7 +172,7 @@ function News() {
                                     )}
 
                                     <img
-                                        src={`http://localhost:3001${item.image_path}`}
+                                        src={HOSTNAME + `${item.image_path}`}
                                         alt={item.title}
                                         className="news-image w-100 w-md-auto me-md-3 mb-3 mb-md-0"
                                     // style={{ maxWidth: "250px", height: "auto", objectFit: "cover" }}

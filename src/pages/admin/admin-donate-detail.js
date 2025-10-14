@@ -4,6 +4,7 @@ import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../../css/adminDonate-Detail.css';
 import { HiOutlineClock } from "react-icons/hi";
+import {HOSTNAME} from '../../config.js';
 
 function AdminProjectDetail() {
     const { id } = useParams();
@@ -17,7 +18,7 @@ function AdminProjectDetail() {
         const fetchProject = async () => {
             try {
                 // console.log('Fetching project with ID:', id);
-                const response = await axios.get(`http://localhost:3001/admin/donatedetail/${id}`);
+                const response = await axios.get(HOSTNAME +`/admin/donatedetail/${id}`);
                 setProject(response.data);
                 setLoading(false);
             } catch (error) {
@@ -182,7 +183,7 @@ function AdminProjectDetail() {
                                     {project.image_path ? (
                                         <div className="image-wrapper position-relative">
                                             <img
-                                                src={`http://localhost:3001/uploads/${project.image_path}`}
+                                                src={HOSTNAME +`/uploads/${project.image_path}`}
                                                 alt={project.project_name}
                                                 className="img-fluid shadow-lg project-image mx-auto d-block"
                                                 style={{ maxHeight: '400px', width: '100%', objectFit: 'cover' }}

@@ -3,17 +3,18 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "../css/OrderHistory.css";
 import {useAuth} from '../context/AuthContext';
+import {HOSTNAME} from '../config.js';
 
 function OrderHistory() {
     const [orderHistory, setOrderHistory] = useState([]);
     const [loading, setLoading] = useState(true);
-    // const userId = sessionStorage.getItem("userId");
-    const {userId} = useAuth();
+    const {user} = useAuth();
+    const userId = user?.user_id;
     const navigate = useNavigate();
     
     useEffect(() => {
         if (userId) {
-            axios.get(`http://localhost:3001/souvenir/order_history?user_id=${userId}`,{
+            axios.get(HOSTNAME + `/souvenir/order_history?user_id=${userId}`,{
                 withCredentials: true
             })
                 .then(response => {
@@ -54,7 +55,7 @@ function OrderHistory() {
                             {order.details.map(item => (
                                 <div key={item.product_id} className="order-item">
                                     <img
-                                        src={`http://localhost:3001/uploads/${item.image || "product-default.png"}`}
+                                        src={HOSTNAME + `/uploads/${item.image || "product-default.png"}`}
                                         alt={item.product_name}
                                         className="product-image"
                                     />

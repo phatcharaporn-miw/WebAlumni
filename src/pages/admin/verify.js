@@ -5,6 +5,7 @@ import { FaHeart, FaShoppingCart } from 'react-icons/fa';
 import '../../css/verify.css';
 import { CiSearch } from "react-icons/ci";
 import { useAuth } from '../../context/AuthContext';
+import {HOSTNAME} from '../../config.js';
 
 function AdminVerifySlip() {
     // การสั่งซื้อ
@@ -21,8 +22,9 @@ function AdminVerifySlip() {
     const [searchQuery, setSearchQuery] = useState("");
     const [filterStatus, setFilterStatus] = useState("all");
     const [sortBy, setSortBy] = useState("date");
-    const { user} = useAuth();
-    const userId = user?.id;
+    const {user} = useAuth();
+    const userId = user?.user_id;
+
 
     useEffect(() => {
         fetchOrders();
@@ -31,7 +33,7 @@ function AdminVerifySlip() {
     const fetchOrders = async () => {
         setLoading(true);
         try {
-            const res = await axios.get("http://localhost:3001/orders/pending-payment", {
+            const res = await axios.get(HOSTNAME +"/orders/pending-payment", {
                 withCredentials: true
             });
             setOrders(Array.isArray(res.data) ? res.data : []);
@@ -57,8 +59,8 @@ function AdminVerifySlip() {
 
         try {
             const res = await axios.post(
-                "http://localhost:3001/orders/verify-payment",
-                { order_id: orderId, isApproved: true, admin_id: userId },
+                HOSTNAME +"/orders/verify-payment",
+                { order_id: orderId, isApproved: true},
                 { withCredentials: true }
             );
 
@@ -97,7 +99,7 @@ function AdminVerifySlip() {
 
         try {
             const res = await axios.post(
-                "http://localhost:3001/orders/verify-payment",
+                HOSTNAME +"/orders/verify-payment",
                 {
                     order_id: rejectingOrderId,
                     isApproved: false,
@@ -136,7 +138,7 @@ function AdminVerifySlip() {
         const fetchPayments = async () => {
             try {
                 setLoading(true);
-                const response = await axios.get("http://localhost:3001/admin/check-payment-donate");
+                const response = await axios.get(HOSTNAME +"/admin/check-payment-donate");
                 setPayments(response.data);
             } catch (err) {
                 setError(err.response?.data?.message || "เกิดข้อผิดพลาดในการโหลดข้อมูล");
@@ -165,8 +167,8 @@ function AdminVerifySlip() {
 
         try {
             const res = await axios.put(
-                `http://localhost:3001/admin/check-payment-donate/approve/${donationId}`,
-                { isApproved: true }, // body
+                HOSTNAME +`/admin/check-payment-donate/approve/${donationId}`,
+                { isApproved: true }, 
                 { withCredentials: true }
             );
 
@@ -198,7 +200,7 @@ function AdminVerifySlip() {
         }
         try {
             const res = await axios.put(
-                `http://localhost:3001/admin/check-payment-donate/reject/${donationId}`,
+                HOSTNAME +`/admin/check-payment-donate/reject/${donationId}`,
                 {
                     reject_reason: rejectReason,
                 },
@@ -385,12 +387,12 @@ function AdminVerifySlip() {
                                                                 )}
                                                             </div>
                                                             <div>
-                                                                <div className="fw-bold">#{order.order_id}</div>
+                                                                <div className="fw-bold">รายการที่: {order.order_id}</div>
                                                                 <small
                                                                     className={`${isDonation ? 'text-success' : 'text-primary'
                                                                         } fw-semibold`}
                                                                 >
-                                                                    {isDonation ? 'บริจาค' : 'สั่งซื้อ'}
+                                                                    {isDonation ? 'การบริจาค' : 'การสั่งซื้อ'}
                                                                 </small>
                                                             </div>
                                                         </div>
@@ -398,9 +400,9 @@ function AdminVerifySlip() {
 
                                                     <div className="col-6 col-md-3 d-none d-md-block">
                                                         <div>
-                                                            <div className="fw-semibold text-truncate">
+                                                            {/* <div className="fw-semibold text-truncate">
                                                                 {order.buyer_name}
-                                                            </div>
+                                                            </div> */}
                                                             <small className="text-muted">
                                                                 {formatDate(order.order_date)}
                                                             </small>
@@ -462,7 +464,7 @@ function AdminVerifySlip() {
                                                                     {order.slip_path ? (
                                                                         <>
                                                                             <img
-                                                                                src={`http://localhost:3001/uploads/${order.slip_path}`}
+                                                                                src={HOSTNAME +`/uploads/${order.slip_path}`}
                                                                                 alt="slip"
                                                                                 className="img-fluid rounded-2 shadow-sm border"
                                                                                 style={{
@@ -472,7 +474,7 @@ function AdminVerifySlip() {
                                                                                 }}
                                                                                 onClick={() => {
                                                                                     window.open(
-                                                                                        `http://localhost:3001/uploads/${order.slip_path}`,
+                                                                                        HOSTNAME +`/uploads/${order.slip_path}`,
                                                                                         '_blank'
                                                                                     );
                                                                                 }}
@@ -482,7 +484,7 @@ function AdminVerifySlip() {
                                                                                     className="btn btn-outline-primary btn-sm"
                                                                                     onClick={() => {
                                                                                         window.open(
-                                                                                            `http://localhost:3001/uploads/${order.slip_path}`,
+                                                                                            HOSTNAME +`/uploads/${order.slip_path}`,
                                                                                             '_blank'
                                                                                         );
                                                                                     }}
@@ -526,7 +528,7 @@ function AdminVerifySlip() {
                                                                                             <img
                                                                                                 src={
                                                                                                     prod.image
-                                                                                                        ? `http://localhost:3001/uploads/${prod.image}`
+                                                                                                        ? HOSTNAME +`/uploads/${prod.image}`
                                                                                                         : ''
                                                                                                 }
                                                                                                 alt={prod.product_name}
@@ -727,14 +729,14 @@ function AdminVerifySlip() {
                                                         <FaHeart className="text-success" size={16} />
                                                     </div>
                                                     <div>
-                                                        <div className="fw-bold">#{payment.order_number}</div>
-                                                        <small className="text-success fw-semibold">บริจาค</small>
+                                                        <div className="fw-bold">รายการที่: {payment.order_number}</div>
+                                                        <small className="text-success fw-semibold">การบริจาค</small>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div className="col-6 col-md-3 d-none d-md-block">
                                                 <div>
-                                                    <div className="fw-semibold text-truncate">{payment.project_name}</div>
+                                                    {/* <div className="fw-semibold text-truncate">ชื่อ{payment.project_name}</div> */}
                                                     <small className="text-muted">
                                                         {formatDate(payment.start_date)}
                                                     </small>
@@ -788,16 +790,16 @@ function AdminVerifySlip() {
                                                             {payment.slip ? (
                                                                 <>
                                                                     <img
-                                                                        src={`http://localhost:3001/uploads/${payment.slip}`}
+                                                                        src={HOSTNAME +`/uploads/${payment.slip}`}
                                                                         alt="slip"
                                                                         className="img-fluid rounded-2 shadow-sm border"
                                                                         style={{ maxHeight: 200, objectFit: 'contain', cursor: 'pointer' }}
-                                                                        onClick={() => window.open(`http://localhost:3001/uploads/${payment.slip}`, '_blank')}
+                                                                        onClick={() => window.open(HOSTNAME +`/uploads/${payment.slip}`, '_blank')}
                                                                     />
                                                                     <div className="mt-2">
                                                                         <button
                                                                             className="btn btn-outline-success btn-sm"
-                                                                            onClick={() => window.open(`http://localhost:3001/uploads/${payment.slip}`, '_blank')}
+                                                                            onClick={() => window.open(HOSTNAME +`/uploads/${payment.slip}`, '_blank')}
                                                                         >
                                                                             ดูเต็มจอ
                                                                         </button>

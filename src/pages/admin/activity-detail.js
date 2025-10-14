@@ -4,7 +4,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { MdEdit, MdDelete } from "react-icons/md";
 import "../../css/admin-activity.css";
-import { useAuth } from '../../context/AuthContext';
+import {HOSTNAME} from '../../config.js';
+// import { useAuth } from '../../context/AuthContext';
 
 function AdminActivityDetail() {
     const { activityId } = useParams(); // ดึง ID ของกิจกรรมจาก URL
@@ -14,7 +15,7 @@ function AdminActivityDetail() {
 
     // ดึงข้อมูลกิจกรรม
     useEffect(() => {
-        axios.get(`http://localhost:3001/activity/${activityId}`, {
+        axios.get(HOSTNAME +`/activity/${activityId}`, {
             withCredentials: true
         })
             .then((response) => {
@@ -35,7 +36,7 @@ function AdminActivityDetail() {
     // ฟังก์ชันลบกิจกรรม
     const handleDeleteActivity = () => {
         if (window.confirm("คุณต้องการลบกิจกรรมนี้หรือไม่?")) {
-            axios.delete(`http://localhost:3001/activity/delete-activity/${activityId}`, {
+            axios.delete(HOSTNAME +`/activity/delete-activity/${activityId}`, {
                 withCredentials: true
             })
                 .then((response) => {
@@ -85,7 +86,7 @@ function AdminActivityDetail() {
                     {activity.image_path && (
                         <div className="text-center mb-4">
                             <img
-                                src={`http://localhost:3001${activity.image_path}`}
+                                src={HOSTNAME +`${activity.image_path}`}
                                 alt="กิจกรรม"
                                 className="img-fluid rounded"
                                 style={{ maxHeight: "400px", objectFit: "cover" }}

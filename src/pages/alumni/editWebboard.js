@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { IoIosAdd } from "react-icons/io";
 import Swal from "sweetalert2";
 import { useAuth } from '../../context/AuthContext';
+import {HOSTNAME} from '../../config.js';
 
 function EditWebboard() {
     const { webboardId } = useParams();
     const { user} = useAuth();
-    const userId = user?.id; 
+    const userId = user?.user_id; 
     const navigate = useNavigate();
     const [category, setCategory] = useState([]);
     const [formData, setFormData] = useState({
@@ -20,7 +20,7 @@ function EditWebboard() {
 
     // ดึงข้อมูลกระทู้ที่ต้องการแก้ไข
     useEffect(() => {
-        axios.get(`http://localhost:3001/users/webboard/${webboardId}`)
+        axios.get(HOSTNAME +`/users/webboard/${webboardId}`)
             .then((response) => {
                 if (response.data.success) {
                     setFormData(response.data.data);
@@ -57,7 +57,7 @@ function EditWebboard() {
             formDataToSend.append("image_path", formData.image_path);
         }
 
-        axios.put(`http://localhost:3001/users/edit-webboard/${webboardId}`, formDataToSend, {
+        axios.put(HOSTNAME +`/users/edit-webboard/${webboardId}`, formDataToSend, {
             headers: { "Content-Type": "multipart/form-data" },
         })
             .then((response) => {
@@ -87,7 +87,7 @@ function EditWebboard() {
 
     // ดึงหมวดหมู่
     useEffect(() => {
-        axios.get(`http://localhost:3001/category/category-all`)
+        axios.get(HOSTNAME +`/category/category-all`)
             .then(response => {
                 if (response.data.success) {
                     setCategory(response.data.data);
@@ -143,7 +143,7 @@ function EditWebboard() {
                                     {formData.image_path && (
                                         <div className="mt-2">
                                             <img
-                                                src={`http://localhost:3001/${formData.image_path.replace(/^\/+/, '')}`}
+                                                src={HOSTNAME +`/${formData.image_path.replace(/^\/+/, '')}`}
                                                 alt="Webboard"
                                                 className="img-fluid rounded"
                                                 width="200"

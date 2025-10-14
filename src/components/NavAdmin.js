@@ -7,6 +7,7 @@ import { FaTrash } from 'react-icons/fa';
 import '../css/navAdmin.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useAuth } from '../context/AuthContext';
+import {HOSTNAME} from '../config.js';
 
 function NavAdmin() {
     const navigate = useNavigate();
@@ -16,25 +17,26 @@ function NavAdmin() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const { user, handleLogout, loading , initialized} = useAuth();
     
-    const userId = user?.id;
+    const userId = user?.user_id;
     const role = user?.role;
     const username = user?.username;
     const profilePicture = user?.profilePicture;
 
     // รอ loading เสร็จก่อนตรวจสอบ authentication
     useEffect(() => {
-        if (!initialized) return;
-        // if (loading) return; // รอ loading เสร็จก่อน
-        
-        if (!user || !role) {
-            console.log('No user or role, redirecting to login');
-            navigate('/login');
-            return;
-        }
-        
-        console.log("User data:", user);
-        console.log("Profile picture:", profilePicture);
-    }, [loading, user, role, navigate]); // เพิ่ม loading ใน dependency
+  if (!initialized) return; // รอ AuthProvider initialize
+  if (loading) return; // รอ fetch user profile เสร็จ
+
+  if (!userId || !role) {
+    console.log('No user or role, redirecting to login');
+    navigate('/login');
+    return;
+  }
+
+  console.log("User data:", user);
+  console.log("Profile picture:", profilePicture);
+}, [initialized, loading, user, role, navigate]);
+
 
     const onLogout = async () => {
     const result = await Swal.fire({
@@ -64,11 +66,10 @@ function NavAdmin() {
         // console.log("Profile picture:", profilePicture);
     }, [role, user, navigate]);
 
-    // ส่วนอื่นๆ ของ useEffect ยังเหมือนเดิม...
     useEffect(() => {
         if (!userId) return;
         const fetchNotifications = () => {
-            axios.get(`http://localhost:3001/notice/notification/${userId}`)
+            axios.get(HOSTNAME +`/notice/notification/${userId}`)
                 .then((response) => {
                     if (response.data.success) {
                         const data = response.data.data || [];
@@ -87,7 +88,7 @@ function NavAdmin() {
 
     // ฟังก์ชันอื่นๆ ยังเหมือนเดิม...
     const markAsRead = (notificationId) => {
-        axios.put(`http://localhost:3001/notice/read/${notificationId}`)
+        axios.put(HOSTNAME +`/notice/read/${notificationId}`)
             .then(() => {
                 setNotifications((prevNotifications) =>
                     prevNotifications.map((n) =>
@@ -107,7 +108,7 @@ function NavAdmin() {
     };
 
     const deleteNotification = (notificationId) => {
-        axios.delete(`http://localhost:3001/notice/notification/${notificationId}`)
+        axios.delete(HOSTNAME +`/notice/notification/${notificationId}`)
             .then(() => {
                 setNotifications(notifications.filter((n) => n.notification_id !== notificationId));
                 setUnreadCount((prev) => Math.max(prev - 1, 0));
@@ -178,7 +179,7 @@ function NavAdmin() {
                 className="d-block"
             >
                 {/* Notification Icon */}
-                {user && (
+                {userId && (
                     <div className="notification" style={{ position: "absolute", top: 20, right: 20, zIndex: 10 }}>
                         <div
                             className="notification-icon-admin"
@@ -231,16 +232,16 @@ function NavAdmin() {
                 )}
 
                 {/* Profile - ใช้ข้อมูลจาก user context โดยตรง */}
-                {user && (
+                {userId && (
                     <div className="card-body text-center" style={profileContainer}>
                         <img
-                            src={profilePicture || "http://localhost:3001/uploads/default-profile.png"}
+                            src={profilePicture || HOSTNAME +"/uploads/default-profile.png"}
                             alt="profile"
                             className="rounded-circle img-fluid"
                             style={profilePicStyle}
                             onError={(e) => {
                                 console.error("Failed to load profile picture:", e.target.src);
-                                e.target.src = "http://localhost:3001/uploads/default-profile.png";
+                                e.target.src = HOSTNAME +"/uploads/default-profile.png";
                             }}
                             onLoad={() => {
                                 console.log("Profile picture loaded successfully:", profilePicture);

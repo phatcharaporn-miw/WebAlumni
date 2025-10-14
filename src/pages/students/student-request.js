@@ -24,7 +24,7 @@
 
 //     // ดึงข้อมูลโปรไฟล์
 //     useEffect(() => {
-//         axios.get('http://localhost:3001/users/profile', {
+//         axios.get(HOSTNAME +'/users/profile', {
 //             withCredentials: true
 //         })
 //             .then((response) => {
@@ -39,7 +39,7 @@
 
 //     // ดึงข้อมูลคำร้องที่รออนุมัติ
 //     useEffect(() => {
-//         axios.get("http://localhost:3001/souvenir/pending-requests", { withCredentials: true })
+//         axios.get(HOSTNAME +"/souvenir/pending-requests", { withCredentials: true })
 //             .then(res => {
 //                 setPendingRequests(res.data || []);
 //             })
@@ -62,7 +62,7 @@
 //         formData.append("user_id", profile.userId);
 
 //         try {
-//             const res = await axios.post("http://localhost:3001/users/update-profile-image", formData, {
+//             const res = await axios.post(HOSTNAME +"/users/update-profile-image", formData, {
 //                 headers: {
 //                     "Content-Type": "multipart/form-data",
 //                 },
@@ -197,7 +197,7 @@
 //                                                     <div className="position-relative overflow-hidden">
 //                                                         <img
 //                                                             className="card-img-top hover-zoom"
-//                                                             src={item.image ? `http://localhost:3001/uploads/${item.image}` : "/default-image.png"}
+//                                                             src={item.image ? HOSTNAME +`/uploads/${item.image}` : "/default-image.png"}
 //                                                             alt={item.product_name || item.project_name || "รายการ"}
 //                                                             style={{
 //                                                                 height: '200px',
@@ -305,6 +305,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import Swal from "sweetalert2";
 import { Link } from "react-router-dom";
 import { useAuth } from '../../context/AuthContext';
+import {HOSTNAME} from '../../config.js';
 // css
 import '../../css/profile.css';
 // bootstrap
@@ -314,20 +315,17 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 function PresidentProfileRequest() {
     const [pendingDonations, setPendingDonations] = useState([]);
     const [profile, setProfile] = useState({});
-    // const { handleLogout } = useOutletContext();
-    // const [activity, setActivity] = useState([]);
-    // const [selectedStatus, setSelectedStatus] = useState('activity');
     const [previewImage, setPreviewImage] = useState(null);
     const [pendingRequests, setPendingRequests] = useState([]);
     const [loadingRequests, setLoadingRequests] = useState(true);
     const {user, handleLogout} = useAuth();
-    const userId = user?.id;
+    const userId = user?.user_id;
     const navigate = useNavigate();
     const location = useLocation();
 
     // ดึงข้อมูลโปรไฟล์
     useEffect(() => {
-        axios.get('http://localhost:3001/users/profile', {
+        axios.get(HOSTNAME +'/users/profile', {
             withCredentials: true
         })
             .then((response) => {
@@ -342,7 +340,7 @@ function PresidentProfileRequest() {
 
     // ดึงข้อมูลคำร้องที่รออนุมัติ
     useEffect(() => {
-        axios.get("http://localhost:3001/souvenir/pending-requests", { withCredentials: true })
+        axios.get(HOSTNAME +"/souvenir/pending-requests", { withCredentials: true })
             .then(res => {
                 setPendingRequests(res.data || []);
             })
@@ -353,7 +351,7 @@ function PresidentProfileRequest() {
     }, []);
 
     useEffect(() => {
-        axios.get("http://localhost:3001/donate/donatePending", { withCredentials: true })
+        axios.get(HOSTNAME +"/donate/donatePending", { withCredentials: true })
             .then(res => {
                 // console.log("Donation data:", res.data);
                 setPendingDonations(res.data || []);
@@ -384,9 +382,9 @@ function PresidentProfileRequest() {
             </div>
         `,
             imageUrl: item.image_path
-                ? `http://localhost:3001/uploads/${item.image_path}`
+                ? HOSTNAME +`/uploads/${item.image_path}`
                 : item.image
-                    ? `http://localhost:3001/uploads/${item.image}`
+                    ? HOSTNAME +`/uploads/${item.image}`
                     : '/default-image.png',
             imageWidth: 400,
             imageAlt: 'ภาพประกอบ',
@@ -409,7 +407,7 @@ function PresidentProfileRequest() {
         formData.append("user_id", profile.userId);
 
         try {
-            const res = await axios.post("http://localhost:3001/users/update-profile-image", formData, {
+            const res = await axios.post(HOSTNAME +"/users/update-profile-image", formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
@@ -550,9 +548,9 @@ function PresidentProfileRequest() {
                                                             className="card-img-top hover-zoom"
                                                             src={
                                                                 item.image
-                                                                    ? `http://localhost:3001/uploads/${item.image}`
+                                                                    ? HOSTNAME +`/uploads/${item.image}`
                                                                     : item.image_path
-                                                                        ? `http://localhost:3001/uploads/${item.image_path}`
+                                                                        ? HOSTNAME +`/uploads/${item.image_path}`
                                                                         : "/default-image.png"
                                                             }
                                                             alt={altText}

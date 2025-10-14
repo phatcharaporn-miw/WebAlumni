@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
+import {HOSTNAME} from '../../config.js';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function ParticipantsPage() {
@@ -11,7 +12,7 @@ function ParticipantsPage() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        axios.get(`http://localhost:3001/activity/${activityId}/participants`, {
+        axios.get(HOSTNAME +`/activity/${activityId}/participants`, {
             withCredentials: true,
         })
         .then((res) => {

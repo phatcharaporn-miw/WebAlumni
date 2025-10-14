@@ -7,7 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AppLayout from "./components/AppLayout";
 import { CartProvider } from './context/CartContext'; 
 import { AuthProvider } from './context/AuthContext';
-import { UserProvider } from "./context/UserContext";
+// import { UserProvider } from "./context/UserContext";
 import About from "./pages/about";
 import News from './pages/news';
 import Activity from './pages/activity';
@@ -22,7 +22,6 @@ import Login from './pages/login';
 import Register from './pages/register';
 import Faq from './pages/faq';
 import PresidentHome from './pages/president/president-home';
-import ProtectedRoute from './components/ProtectedRoute';
 import AlumniHome from './pages/alumni/alumni-home';
 import Profile from './pages/alumni/alumni-profile';
 import CreatePost from './pages/createPost';
@@ -46,6 +45,7 @@ import AlumniProfileDonation from './pages/alumni/alumni-profile-donation';
 import AlumniManageOrders from './pages/alumni/alumni-manage-orders';
 import CheckFullName from './pages/check-fullName';
 import DonateConfirm from './pages/donate-confirm';
+import DashboardStatic from './pages/dashboard-stat';
 
 // ส่วนของ การ import component ที่ใช้สำหรับการตรวจสอบสิทธิ์
 import AlumniOnly from './components/AlumniOnly';
@@ -114,12 +114,9 @@ const Home = lazy(() => import("./pages/home"));
 const Alumni = lazy(() => import("./pages/alumni"));
 
 function App() {
-
   const clientId = '766363116725-8u97fa7f736i56p1vgm3l3261f0neud2.apps.googleusercontent.com';
 
   return (
-
-    // <GoogleOAuthProvider clientId={clientId}>
       <BrowserRouter>
        {/* <UserProvider>  */}
           <AuthProvider>
@@ -159,8 +156,9 @@ function App() {
                   <Route path="/createPost" element={<CreatePost />} />
                   <Route path="/check-fullName" element={<CheckFullName />} />
                   <Route path="/donate/donatedetail/donateconfirm/:id" element={<DonateConfirm />} />
-                  
+                  <Route path="/dashboard-stat" element={<DashboardStatic />} />
 
+                  
                   {/* ลองทำไว้ก่อน */}
                   <Route path="/change-password" element={<ChangePassword />} />
 
@@ -235,15 +233,12 @@ function App() {
                   <Route path="/admin/donations/donate-detail/:id" element={<AdminOnly><AdminProjectDetail /></AdminOnly>} />
                   <Route path="/admin/users/add-user" element={<AdminOnly><AddUser /></AdminOnly>} />
                   <Route path="/admin/souvenir/product-slot/:productId" element={<AdminOnly><ProductSlots /></AdminOnly>} />
-
                 </Route>
               </Routes>
             </CartProvider>
           </AuthProvider>
         {/* </UserProvider> */}
       </BrowserRouter>
-    // </GoogleOAuthProvider>
-
   );
 }
 

@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from './AuthContext';
+import {HOSTNAME} from '../config.js';
 
 const CartContext = createContext();
 
@@ -17,6 +18,9 @@ export const CartProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   // เชื่อมต่อกับ AuthContext
   const { user } = useAuth();
+  const userId = user?.user_id;
+
+
 
   // ฟังก์ชันล้างตะกร้า
   const clearCart = () => {
@@ -25,14 +29,14 @@ export const CartProvider = ({ children }) => {
 
   // ฟังก์ชันดึงจำนวนสินค้าในตะกร้า
   const getCartCount = async () => {
-    if (!user && !user.id) {
+    if (!userId) {
       setCartCount(0);
       return;
     }
 
     try {
       // ใช้ API ดึงข้อมูลตะกร้าแล้วนับจำนวน
-      const response = await axios.get(`http://localhost:3001/souvenir/cart?user_id=${user.id}`, {
+      const response = await axios.get(HOSTNAME +`/souvenir/cart?user_id=${userId}`, {
         headers: { "Cache-Control": "no-cache" },
         withCredentials: true
       });
@@ -49,14 +53,14 @@ export const CartProvider = ({ children }) => {
   // ฟังก์ชันเพิ่มสินค้าลงตะกร้า - ใช้ API ใหม่
   const addToCart = async (productId, quantity) => {
     // ตรวจสอบจาก user state แทน sessionStorage
-    if (!user || !user.id) {
+    if (!userId ) {
       throw new Error('กรุณาเข้าสู่ระบบก่อน');
     }
     setIsLoading(true);
     
     try {
-      const response = await axios.post("http://localhost:3001/souvenir/cart/add", {
-        user_id: user.id,
+      const response = await axios.post(HOSTNAME +"/souvenir/cart/add", {
+        user_id: userId,
         product_id: productId,
         quantity: quantity
         // ไม่ต้องส่ง total เพราะ backend คำนวณเอง
@@ -78,13 +82,13 @@ export const CartProvider = ({ children }) => {
 
   // ฟังก์ชันอัปเดตจำนวนสินค้าในตะกร้า 
   const updateCart = async (productId, quantity) => {
-    if (!user || !user.id) {
+    if (!userId) {
       throw new Error('กรุณาเข้าสู่ระบบก่อน');
     }
     setIsLoading(true);
     try {
-      const response = await axios.put("http://localhost:3001/souvenir/cart/update", {
-        user_id: user.id,
+      const response = await axios.put(HOSTNAME +"/souvenir/cart/update", {
+        user_id: userId,
         product_id: productId,
         quantity: quantity
         // ไม่ต้องส่ง total เพราะ backend คำนวณเอง
@@ -106,13 +110,13 @@ export const CartProvider = ({ children }) => {
 
   // ฟังก์ชันลบสินค้าจากตะกร้า 
   const removeFromCart = async (productId) => {
-    if (!user || !user.id) {
+    if (userId) {
       throw new Error('กรุณาเข้าสู่ระบบก่อน');
     }
     setIsLoading(true);
     try {
-      const response = await axios.delete(`http://localhost:3001/souvenir/cart/${productId}`, {
-        data: { userId: user.id }, // ส่ง userId ใน body ตามที่ backend ต้องการ
+      const response = await axios.delete(HOSTNAME +`/souvenir/cart/${productId}`, {
+        data: { userId: userId }, // ส่ง userId ใน body ตามที่ backend ต้องการ
         withCredentials: true
       });
 
@@ -130,10 +134,10 @@ export const CartProvider = ({ children }) => {
 
   // ฟังก์ชันดึงรายการสินค้าในตะกร้า
   const getCartItems = async () => {
-    if (!user || !user.id) return [];
+    if (userId) return [];
 
     try {
-      const response = await axios.get(`http://localhost:3001/souvenir/cart?user_id=${user.id}`, {
+      const response = await axios.get(HOSTNAME +`/souvenir/cart?user_id=${userId}`, {
         headers: { "Cache-Control": "no-cache" },
         withCredentials: true
       });
@@ -147,7 +151,7 @@ export const CartProvider = ({ children }) => {
 
   // ฟังก์ชันสำหรับ refresh cart count
   const refreshCartCount = async () => {
-    if (user && user.id) {
+    if (userId) {
         await getCartCount();
     } else {
       clearCart();
@@ -156,7 +160,7 @@ export const CartProvider = ({ children }) => {
 
   // ฟังก์ชันเพิ่มสินค้าหรืออัปเดต (อัตโนมัติ) 
   const addOrUpdateCart = async (productId, quantity) => {
-    if (!user || !user.id) {
+    if (userId) {
       throw new Error('กรุณาเข้าสู่ระบบก่อน');
     }
     setIsLoading(true);
@@ -174,7 +178,7 @@ export const CartProvider = ({ children }) => {
 
   // ฟังก์ชันเพิ่มสำหรับเช็คสต็อกก่อนเพิ่มลงตะกร้า
   const checkStockAndAddToCart = async (productId, quantity) => {
-    if (!user || !user.id) {
+    if (userId) {
       throw new Error('กรุณาเข้าสู่ระบบก่อน');
     }
     setIsLoading(true);
@@ -202,7 +206,7 @@ export const CartProvider = ({ children }) => {
 
   // ฟังก์ชันล้างตะกร้าทั้งหมด (สำหรับกรณี logout หรือ checkout สำเร็จ)
   const clearAllCart = async () => {
-    if (!user || !user.id) return;
+    if (userId) return;
     setIsLoading(true);
     try {
       const cartItems = await getCartItems(); 
@@ -221,20 +225,20 @@ export const CartProvider = ({ children }) => {
 
   // ตรวจสอบสถานะ user และจัดการตะกร้า
   useEffect(() => {
-    if (user && user.id) {
+    if (userId) {
         // getCartCount(userId);
         getCartCount();
     } else {
       //(logout แล้ว) ให้ล้างตะกร้าทันที
       clearCart();
     }
-  }, [user]); 
+  }, [userId]); 
 
   // เพิ่ม useEffect สำหรับ initial load (เผื่อกรณี refresh หน้า)
   useEffect(() => {
     // รอให้ AuthContext โหลดเสร็จก่อน
     const timer = setTimeout(() => {
-      if (user && user.id) {
+      if (userId) {
         getCartCount();
       }
     }, 100);

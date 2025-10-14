@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useOutletContext } from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
 import { FaFolderOpen, FaCheckCircle, FaImage, FaFilePdf } from "react-icons/fa";
 import { MdClose } from "react-icons/md";
 import Swal from "sweetalert2";
 import { useAuth } from '../../context/AuthContext';
+import {HOSTNAME} from '../../config.js';
 
 // CSS & Bootstrap
 import '../../css/profile.css';
@@ -26,8 +26,7 @@ function PresidentProfileSouvenir() {
     const [selectedFile, setSelectedFile] = useState(null);
     const [isUploading, setIsUploading] = useState(false);
     const { user, handleLogout } = useAuth();
-    const userId = user?.id;
-    // const userId = sessionStorage.getItem("userId");
+    const userId = user?.user_id;
 
     // สำหรับฟังก์ชันอัปโหลดหลักฐานการสั่งซื้อ
     const [showProofModal, setShowProofModal] = useState(false);
@@ -37,7 +36,7 @@ function PresidentProfileSouvenir() {
 
     // ดึงข้อมูลโปรไฟล์
     useEffect(() => {
-        axios.get('http://localhost:3001/users/profile', { withCredentials: true })
+        axios.get(HOSTNAME +'/users/profile', { withCredentials: true })
             .then((response) => {
                 if (response.data.success) {
                     setProfile(response.data.user);
@@ -51,7 +50,7 @@ function PresidentProfileSouvenir() {
     // ดึงประวัติการสั่งซื้อ
     useEffect(() => {
         if (userId) {
-            axios.get(`http://localhost:3001/orders/orders-user/${userId}`)
+            axios.get(HOSTNAME +`/orders/orders-user/${userId}`)
                 .then(response => {
                     setOrderHistory(response.data);
                 })
@@ -117,7 +116,7 @@ function PresidentProfileSouvenir() {
                 formData.append("proofImage", proofFile);
     
                 const res = await axios.post(
-                    `http://localhost:3001/orders/${proofOrderId}/upload-proof`,
+                    HOSTNAME +`/orders/${proofOrderId}/upload-proof`,
                     formData,
                     { headers: { "Content-Type": "multipart/form-data" } }
                 );
@@ -177,7 +176,7 @@ function PresidentProfileSouvenir() {
             formData.append("paymentSlip", selectedFile);
 
             const res = await axios.post(
-                `http://localhost:3001/orders/${currentOrderId}/reupload-slip`,
+                HOSTNAME +`/orders/${currentOrderId}/reupload-slip`,
                 formData,
                 { headers: { "Content-Type": "multipart/form-data" } }
             );
@@ -228,7 +227,7 @@ function PresidentProfileSouvenir() {
 
     const buyAgain = async (orderId) => {
         try {
-            const res = await fetch(`http://localhost:3001/orders/order-buyAgain/${orderId}`);
+            const res = await fetch(HOSTNAME +`/orders/order-buyAgain/${orderId}`);
             const data = await res.json();
 
             // ถ้ามีสินค้าที่พร้อมเพิ่ม
@@ -290,7 +289,7 @@ function PresidentProfileSouvenir() {
         formData.append("user_id", profile.userId);
 
         try {
-            const res = await axios.post("http://localhost:3001/users/update-profile-image", formData, {
+            const res = await axios.post(HOSTNAME +"/users/update-profile-image", formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
@@ -429,7 +428,7 @@ function PresidentProfileSouvenir() {
                                                 </small>
                                             </div>
                                             <div className="d-flex flex-column flex-md-row align-items-md-center gap-2">
-                                                <span
+                                                {/* <span
                                                     className={`badge rounded-pill fs-6 px-3 py-2 text-capitalize ${order.order_status === "delivered"
                                                         ? "text-success bg-success bg-opacity-10"
                                                         : order.order_status === "shipping"
@@ -453,7 +452,10 @@ function PresidentProfileSouvenir() {
                                                                     ? "ยกเลิก"
                                                                     : order.order_status === "pending_verification"
                                                                         ? "รอตรวจสอบการชำระเงิน"
-                                                                        : "รอชำระเงิน"}
+                                                                        : "การจัดส่งมีปัญหา"}
+                                                </span> */}
+                                                <span className={`badge rounded-pill px-2 py-1 ${BADGE_CLASS[order.order_status] || "bg-secondary text-white"}`} style={{ fontSize: "0.9rem" }}>
+                                                            {ORDER_STATUS_LABEL[order.order_status] || "สถานะไม่ระบุ"}
                                                 </span>
                                                 <button
                                                     className="btn btn-outline-secondary btn-sm"
@@ -482,7 +484,7 @@ function PresidentProfileSouvenir() {
                                                     </div>
                                                     <div className="col-md-6 mb-2">
                                                         <small className="text-muted d-block">สถานะ</small>
-                                                        <span className="fw-semibold">
+                                                        {/* <span className="fw-semibold">
                                                             {order.order_status === "delivered"
                                                                 ? "จัดส่งสำเร็จ"
                                                                 : order.order_status === "shipping"
@@ -491,7 +493,10 @@ function PresidentProfileSouvenir() {
                                                                         ? "กำลังดำเนินการ"
                                                                         : order.order_status === "cancelled"
                                                                             ? "ยกเลิก"
-                                                                            : "รอชำระเงิน"}
+                                                                            : "การจัดส่งมีปัญหา"}
+                                                        </span> */}
+                                                        <span className={`badge rounded-pill px-2 py-1 ${BADGE_CLASS[order.order_status] || "bg-secondary text-white"}`} style={{ fontSize: "0.9rem" }}>
+                                                            {ORDER_STATUS_LABEL[order.order_status] || "สถานะไม่ระบุ"}
                                                         </span>
                                                     </div>
                                                 </div>
@@ -519,7 +524,7 @@ function PresidentProfileSouvenir() {
                                                                 <div className="card border-0 bg-white shadow-sm h-100 rounded-2">
                                                                     <div className="position-relative">
                                                                         <img
-                                                                            src={prod.image ? `http://localhost:3001/uploads/${prod.image}` : "http://localhost:3001/uploads/default-product.png"}
+                                                                            src={prod.image ? HOSTNAME +`/uploads/${prod.image}` : HOSTNAME +"/uploads/default-product.png"}
                                                                             alt={prod.product_name}
                                                                             className="card-img-top rounded-top-2"
                                                                             style={{ height: "80px", objectFit: "cover" }}
@@ -749,6 +754,44 @@ function PresidentProfileSouvenir() {
         </section>
     );
 }
+
+// สร้าง mapping ไว้ข้างนอก component
+const ORDER_STATUS_LABEL = {
+    pending_verification: "รอตรวจสอบการชำระเงิน",
+    processing: "กำลังดำเนินการ",
+    shipping: "กำลังจัดส่ง",
+    delivered: "จัดส่งสำเร็จ",
+    issue_reported: "มีปัญหาการจัดส่ง",
+    refund_approved: "คืนเงินสำเร็จ",
+    resend_processing: "ส่งสินค้าใหม่กำลังดำเนินการ",
+    issue_rejected: "ปัญหาไม่ได้รับการแก้ไข",
+    return_pending: "ผู้ใช้ส่งสินค้าคืน",
+    return_approved: "คืนสินค้าสำเร็จ",
+    return_rejected: "การคืนไม่ผ่าน",
+    cancelled: "ยกเลิก",
+    repeal_pending: "ยกเลิกการสั่งซื้อ",
+    repeal_approved: "ยกเลิกการสั่งซื้อสำเร็จ",
+    repeal_rejected: "ปฏิเสธการยกเลิก",
+};
+
+const BADGE_CLASS = {
+    pending_verification: "text-dark bg-secondary bg-opacity-10", // เทาเข้ม
+    processing: "text-warning bg-warning bg-opacity-10",          // เหลือง
+    shipping: "text-primary bg-primary bg-opacity-10",            // น้ำเงิน
+    delivered: "text-success bg-success bg-opacity-10",           // เขียว
+    issue_reported: "text-white bg-danger",                       // แดงสด
+    refund_approved: "text-success bg-success bg-opacity-10",           // ฟ้า
+    resend_processing: "text-primary bg-primary bg-opacity-10",    // ม่วง (custom class)
+    issue_rejected: "text-danger bg-danger bg-opacity-25",        // แดงอ่อน
+    return_pending: "text-warning bg-warning bg-opacity-10",         // ส้ม (custom class)
+    return_approved: "text-success bg-success bg-opacity-10",     // เขียวอ่อน
+    return_rejected: "text-danger bg-danger bg-opacity-25",        
+    cancelled: "text-dark bg-dark bg-opacity-25",
+    repeal_pending: "text-dark bg-dark bg-opacity-25",
+    repeal_approved: "text-success bg-success bg-opacity-10",
+    repeal_rejected: "text-danger bg-danger bg-opacity-25",                 
+};
+
 
 export default PresidentProfileSouvenir;
 

@@ -4,6 +4,7 @@ import axios from "axios";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { useAuth } from '../context/AuthContext';
+import {HOSTNAME} from '../config.js';
 
 function HomeAlumniProfile() {
   const { userId } = useParams();
@@ -12,7 +13,7 @@ function HomeAlumniProfile() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await axios.get(`http://localhost:3001/alumni/${userId}`, {
+        const res = await axios.get(HOSTNAME +`/alumni/${userId}`, {
           withCredentials: true
         });
         if (res.data.success) {
@@ -48,7 +49,7 @@ function HomeAlumniProfile() {
             <div className="text-center">
               <div className="position-relative d-inline-block mb-3">
                 <img
-                  src={alumni.image_path ? `http://localhost:3001/${alumni.image_path}` : "/default-profile-pic.jpg"}
+                  src={alumni.image_path ? HOSTNAME +`/${alumni.image_path}` : "/default-profile-pic.jpg"}
                   alt="Profile"
                   className="rounded-circle shadow-lg border border-4 border-white"
                   style={{ 
@@ -181,7 +182,7 @@ function HomeAlumniProfile() {
                           <div className="d-flex align-items-start gap-3">
                             <div className="position-relative flex-shrink-0">
                               <img
-                                src={act.image_path ? `http://localhost:3001${act.image_path}` : "/default-activity.jpg"}
+                                src={act.image_path ? HOSTNAME +`${act.image_path}` : "/default-activity.jpg"}
                                 alt={act.activity_name}
                                 className="rounded-3 shadow-sm"
                                 style={{ width: "80px", height: "80px", objectFit: "cover" }}

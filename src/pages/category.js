@@ -13,6 +13,7 @@ import { th } from 'date-fns/locale';
 import Swal from "sweetalert2";
 import { MdDelete } from "react-icons/md";
 import { useAuth } from '../context/AuthContext';
+import {HOSTNAME} from '../config.js';
 // css
 import '../css/webboard.css';
 // bootstrap
@@ -37,7 +38,7 @@ function Category() {
   const [replyText, setReplyText] = useState(''); // เก็บข้อความตอบกลับ
   const [showReplyForm, setShowReplyForm] = useState(null);
   const {user} = useAuth();
-  const userId = user?.id;
+  const userId = user?.user_id;
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -52,7 +53,7 @@ function Category() {
 
   useEffect(() => {
     // ดึงข้อมูลกระทู้ที่มีหมวดหมู่ตรงกับ categoryId
-    axios.get(`http://localhost:3001/web/webboard/category/${categoryId}`)
+    axios.get(HOSTNAME + `/web/webboard/category/${categoryId}`)
       .then(response => {
 
         // console.log('categoryId:', categoryId);             
@@ -77,7 +78,7 @@ function Category() {
 
   // ดึงข้อมูลกระทู้ที่ถูกกดหัวใจ
   useEffect(() => {
-    axios.get('http://localhost:3001/webboard/favorite', {
+    axios.get(HOSTNAME + '/webboard/favorite', {
       withCredentials: true
     })
       .then((response) => {
@@ -97,7 +98,7 @@ function Category() {
       return; // ไม่บันทึกสถานะหากไม่ได้เข้าสู่ระบบ
     }
 
-    axios.post(`http://localhost:3001/web/webboard/${postId}/favorite`, {}, {
+    axios.post(HOSTNAME + `/web/webboard/${postId}/favorite`, {}, {
       withCredentials: true,
     })
       .then((response) => {
@@ -125,7 +126,7 @@ function Category() {
       setModalIsOpen(true);
       return;
     }
-    axios.get(`http://localhost:3001/web/webboard/${post.webboard_id}`, {
+    axios.get(HOSTNAME + `/web/webboard/${post.webboard_id}`, {
       withCredentials: true,
     })
       .then((response) => {
@@ -173,7 +174,7 @@ function Category() {
         return;
       }
   
-      axios.post(`http://localhost:3001/web/webboard/${selectedPost.webboard_id}/comment`, {
+      axios.post(HOSTNAME + `/web/webboard/${selectedPost.webboard_id}/comment`, {
         comment_detail: commentText,
       }, {
         withCredentials: true
@@ -230,7 +231,7 @@ function Category() {
 
     try {
       const response = await axios.post(
-        `http://localhost:3001/web/webboard/${selectedPost.webboard_id}/comment/${commentId}/reply`,
+        HOSTNAME + `/web/webboard/${selectedPost.webboard_id}/comment/${commentId}/reply`,
         {
           comment_id: commentId,
           reply_detail: replyText.trim(),
@@ -318,7 +319,7 @@ function Category() {
     }).then((result) => {
       if (result.isConfirmed) {
         axios
-          .delete(`http://localhost:3001/web/webboard/${selectedPost.webboard_id}/comment/${commentId}`, {
+          .delete(HOSTNAME + `/web/webboard/${selectedPost.webboard_id}/comment/${commentId}`, {
             withCredentials: true,
           })
           .then((response) => {
@@ -349,7 +350,7 @@ function Category() {
 
   // ลบการตอบกลับความคิดเห็น
   const handleDeleteReply = (replyId, commentId) => {
-    axios.delete(`http://localhost:3001/web/webboard/${selectedPost.webboard_id}/comment/${commentId}/reply/${replyId}`, {
+    axios.delete(HOSTNAME + `/web/webboard/${selectedPost.webboard_id}/comment/${commentId}/reply/${replyId}`, {
       withCredentials: true
     })
       // Swal.fire({
@@ -446,7 +447,7 @@ function Category() {
                     <div onClick={() => handlePostClick(post)} style={{ cursor: "pointer" }}>
                       {/* โปรไฟล์ + ชื่อผู้ใช้ */}
                       <div className="d-flex mt-3">
-                        <img src={post.profile_image ? `http://localhost:3001/${post.profile_image}` : "/default-profile.png"} alt="User" className="rounded-circle me-3" width="50" height="50" onError={(e) => e.target.src = "/default-profile.png"} />
+                        <img src={post.profile_image ? HOSTNAME + `/${post.profile_image}` : "/default-profile.png"} alt="User" className="rounded-circle me-3" width="50" height="50" onError={(e) => e.target.src = "/default-profile.png"} />
                         <div>
                           <h5 className="fw-bold mb-1">{post.title}</h5>
                           <p className="text-muted mb-1">จากคุณ <span className="text">{post.full_name || "ไม่ระบุชื่อ"}</span></p>
@@ -454,7 +455,7 @@ function Category() {
                         </div>
                       </div>
 
-                      {/* <img src={post.image_path ? `http://localhost:3001/${post.image_path.replace(/^\/+/, '')}` : "/default-image.png"}   alt="Post" className="img-fluid rounded-3" /> */}
+                      {/* <img src={post.image_path ? HOSTNAME + `/${post.image_path.replace(/^\/+/, '')}` : "/default-image.png"}   alt="Post" className="img-fluid rounded-3" /> */}
 
 
                       <div className="card-body px-0">
@@ -506,7 +507,7 @@ function Category() {
               {/* โปรไฟล์ + ชื่อผู้ใช้ */}
               <div className="d-flex mt-4">
                 <img
-                  src={selectedPost.profile_image ? `http://localhost:3001/${selectedPost.profile_image}` : "/default-profile.png"}
+                  src={selectedPost.profile_image ? HOSTNAME + `/${selectedPost.profile_image}` : "/default-profile.png"}
                   alt="User"
                   className="rounded-circle me-3"
                   width="50"
@@ -527,7 +528,7 @@ function Category() {
 
               {/* รูปภาพประกอบ*/}
               {selectedPost.image_path && (
-                <img src={selectedPost.image_path ? `http://localhost:3001/${selectedPost.image_path.replace(/^\/+/, '')}` : "/default-image.png"} alt="Post" className="img-fluid rounded-3" onError={(e) => e.target.style.display = 'none'} />
+                <img src={selectedPost.image_path ? HOSTNAME +` /${selectedPost.image_path.replace(/^\/+/, '')}` : "/default-image.png"} alt="Post" className="img-fluid rounded-3" onError={(e) => e.target.style.display = 'none'} />
               )}
 
               {/* จำนวนผู้เข้าชม */}
@@ -545,7 +546,7 @@ function Category() {
                         <img
                           src={comment.profile_image.startsWith('http') || comment.profile_image === '/default-profile.png'
                             ? comment.profile_image
-                            : `http://localhost:3001/${comment.profile_image}`}
+                            : HOSTNAME +` /${comment.profile_image}`}
                           alt="User"
                           className="rounded-circle me-3 border"
                           width="45"
@@ -621,7 +622,7 @@ function Category() {
                                     <img
                                       src={reply.profile_image?.startsWith('http') || reply.profile_image === '/default-profile.png'
                                         ? reply.profile_image
-                                        : `http://localhost:3001/${reply.profile_image}`}
+                                        : HOSTNAME +` /${reply.profile_image}`}
                                       alt="User"
                                       className="rounded-circle me-3 border"
                                       width="35"

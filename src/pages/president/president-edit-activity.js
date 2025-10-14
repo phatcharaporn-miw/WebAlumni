@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import {HOSTNAME} from '../../config.js';
 
 function PresidentEditActivity() {
     const { activityId } = useParams(); // ดึง ID ของกิจกรรมจาก URL
@@ -21,7 +22,7 @@ function PresidentEditActivity() {
 
     // ดึงข้อมูลกิจกรรม
     useEffect(() => {
-        axios.get(`http://localhost:3001/activity/${activityId}`, { withCredentials: true })
+        axios.get(HOSTNAME +`/activity/${activityId}`, { withCredentials: true })
             .then((response) => {
                 if (response.data.success) {
                     setActivity(response.data.data);
@@ -74,7 +75,7 @@ function PresidentEditActivity() {
         }
 
         axios
-            .put(`http://localhost:3001/activity/edit-activity/${activityId}`, data, {
+            .put(HOSTNAME +`/activity/edit-activity/${activityId}`, data, {
                 withCredentials: true,
                 headers: { "Content-Type": "multipart/form-data" },
             })

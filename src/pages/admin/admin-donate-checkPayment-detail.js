@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
+import {HOSTNAME} from '../../config.js';
 
 function AdminCheckPaymentDonateDetail() {
     const { id } = useParams();
@@ -13,7 +14,7 @@ function AdminCheckPaymentDonateDetail() {
     useEffect(() => {
         const fetchPayment = async () => {
             try {
-                const res = await axios.get(`http://localhost:3001/admin/check-payment-donate/${id}`);
+                const res = await axios.get(HOSTNAME +`/admin/check-payment-donate/${id}`);
                 setPayment(res.data);
             } catch (err) {
                 setError("ไม่พบข้อมูลหรือมีข้อผิดพลาด");
@@ -28,7 +29,7 @@ function AdminCheckPaymentDonateDetail() {
     const approvePayment = async () => {
         if (!window.confirm("ยืนยันการอนุมัติ?")) return;
         try {
-            await axios.put(`http://localhost:3001/admin/check-payment-donate/approve/${id}`);
+            await axios.put(HOSTNAME +`/admin/check-payment-donate/approve/${id}`);
             alert("อนุมัติเรียบร้อยแล้ว");
             navigate("/admin/donations/check-payment-donate");
         } catch {
@@ -39,7 +40,7 @@ function AdminCheckPaymentDonateDetail() {
     const rejectPayment = async () => {
         if (!window.confirm("ยืนยันการปฏิเสธ?")) return;
         try {
-            await axios.put(`http://localhost:3001/admin/check-payment-donate/reject/${id}`);
+            await axios.put(HOSTNAME +`/admin/check-payment-donate/reject/${id}`);
             alert("ปฏิเสธเรียบร้อยแล้ว");
             navigate("/admin/donations/check-payment-donate");
         } catch {
@@ -94,7 +95,7 @@ function AdminCheckPaymentDonateDetail() {
                         <td>
                             {payment.proof_image ? (
                                 <img
-                                    src={`http://localhost:3001/uploads/${payment.proof_image}`}
+                                    src={HOSTNAME +`/uploads/${payment.proof_image}`}
                                     alt="หลักฐาน"
                                     style={{ maxWidth: "300px", height: "auto" }}
                                 />

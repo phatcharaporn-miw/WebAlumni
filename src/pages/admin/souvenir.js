@@ -6,28 +6,24 @@ import { FaRegEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import { CiSearch } from "react-icons/ci";
 import { BsCheck2Square } from "react-icons/bs";
-// import {
-//     TextField, FormControl, InputLabel, Select, MenuItem,
-//     Button, Typography, Box, Modal, InputAdornment
-// } from "@mui/material";
 import "../../css/admin.css";
 import Swal from "sweetalert2";
 import { useAuth } from '../../context/AuthContext';
+import { HOSTNAME } from '../../config.js';
 
 function Souvenir() {
     const [products, setProducts] = useState([]);
     const [open, setOpen] = useState(false);
-    const [detailOpen, setDetailOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
-    const [detailProduct, setDetailProduct] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
-    const { user} = useAuth();
-    const user_id = user?.id;
+    const { user } = useAuth();
+    const user_id = user?.user_id;
 
     useEffect(() => {
         window.scrollTo(0, 0);
-        axios.get("http://localhost:3001/admin/souvenir")
+        axios.get(HOSTNAME + "/admin/souvenir")
             .then((response) => {
+                // console.log(response.data.data);
                 const sortedProducts = response.data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
                 setProducts(sortedProducts);
             })
@@ -60,18 +56,26 @@ function Souvenir() {
 
     const handleDelete = (productId) => {
         // เมื่อผู้ใช้ยืนยันการลบ
-        const confirmDelete = window.confirm("คุณต้องการลบสินค้านี้จริงหรือ?");
-
-        if (confirmDelete) {
-            axios.delete(`http://localhost:3001/admin/deleteSouvenir/${productId}`)
-                .then(() => {
-                    setProducts(products.filter(product => product.product_id !== productId));
-                })
-                .catch(error => {
-                    console.error("เกิดข้อผิดพลาดในการลบ:", error);
-
-                });
-        }
+        Swal.fire({
+            title: "ลบสินค้า?",
+            text: "คุณต้องการลบสินค้านี้ใช่หรือไม่?",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "ใช่, ลบ",
+            cancelButtonText: "ยกเลิก"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axios.delete(HOSTNAME + `/admin/deleteSouvenir/${productId}`)
+                    .then(() => {
+                        setProducts(products.filter(product => product.product_id !== productId));
+                    })
+                    .catch(error => {
+                        console.error("เกิดข้อผิดพลาดในการลบ:", error);
+                    });
+            }
+        });
     };
 
     const handleApprove = (productId) => {
@@ -82,11 +86,11 @@ function Souvenir() {
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
-            confirmButtonText: "ใช่, อนุมัติเลย",
+            confirmButtonText: "ใช่, อนุมัติ",
             cancelButtonText: "ยกเลิก"
         }).then((result) => {
             if (result.isConfirmed) {
-                axios.put(`http://localhost:3001/admin/approveSouvenir/${productId}`, {
+                axios.put(HOSTNAME + `/admin/approveSouvenir/${productId}`, {
                     approver_id: user_id,
                     action: "approved"
                 })
@@ -113,11 +117,11 @@ function Souvenir() {
             showCancelButton: true,
             confirmButtonColor: "#d33",
             cancelButtonColor: "#3085d6",
-            confirmButtonText: "ใช่, ปฏิเสธเลย",
+            confirmButtonText: "ใช่, ปฏิเสธ",
             cancelButtonText: "ยกเลิก"
         }).then((result) => {
             if (result.isConfirmed) {
-                axios.put(`http://localhost:3001/admin/approveSouvenir/${productId}`, {
+                axios.put(HOSTNAME + `/admin/approveSouvenir/${productId}`, {
                     approver_id: user_id,
                     action: "rejected"
                 })
@@ -199,250 +203,222 @@ function Souvenir() {
                         </button>
                     </Link>
                 </div>
-
             </div>
 
-            {/* Table Section
-            <div className="card shadow-sm">
-                <div className="card-body p-0">
-                    <div className="table-responsive">
-                        <table className="table table-hover mb-0">
-                            <thead className="table-primary">
-                                <tr>
-                                    <th scope="col" className="text-center">รหัสสินค้า</th>
-                                    <th scope="col" className="text-center">รูปภาพ</th>
-                                    <th scope="col">ชื่อสินค้า</th>
-                                    <th scope="col" className="text-center">ราคา</th>
-                                    <th scope="col" className="text-center">จำนวน</th>
-                                    <th scope="col" className="text-center">ผู้ดูแล</th>
-                                    <th scope="col" className="text-center">สถานะ</th>
-                                    <th scope="col" className="text-center">วันที่เพิ่ม</th>
-                                    <th scope="col" className="text-center">จัดการ</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {filteredProducts.length === 0 ? (
-                                    <tr>
-                                        <td colSpan={9} className="text-center py-4 text-muted">
-                                            <div className="d-flex flex-column align-items-center">
-                                                ไม่พบสินค้าที่ค้นหา
-                                            </div>
-                                        </td>
+            <div className="row g-4 ">
+                {/* สินค้าของสมาคม */}
+                {filteredProducts.filter(p => p.is_official === 1).length > 0 && (
+                    <>
+                        <h4 className="fw-bold">สินค้าของสมาคม</h4>
+                        {filteredProducts
+                            .filter(p => p.is_official === 1)
+                            .map((product) => (
+                                <div
+                                    key={product.product_id}
+                                    className="col-12 col-sm-6 col-md-4 col-lg-3"
+                                    onClick={() => handleDetail(product)}
+                                    style={{ cursor: "pointer" }}
+                                >
+                                    <div className="card h-100 shadow-sm position-relative">
+                                        {/* รูปสินค้า */}
+                                        <div className="position-relative">
+                                            <img
+                                                src={HOSTNAME + `/uploads/${product.image}`}
+                                                alt={product.image}
+                                                onError={(e) => (e.target.src = "/image/default.jpg")}
+                                                className="card-img-top"
+                                                style={{ height: "180px", objectFit: "cover" }}
+                                            />
 
-                                    </tr>
-                                ) : (
-                                    filteredProducts.map((product) => (
-                                        <tr
-                                            key={product.product_id}
-                                            onClick={() => handleDetail(product)}
-                                            className="cursor-pointer"
-                                            style={{ cursor: "pointer" }}
-                                        >
-                                            <td className="text-center align-middle fw-semibold">
-                                                {product.product_id}
-                                            </td>
-                                            <td className="text-center align-middle">
-                                                <div className="d-flex justify-content-center">
-                                                    <img
-                                                        src={`http://localhost:3001/uploads/${product.image}`}
-                                                        alt={product.image}
-                                                        onError={(e) => e.target.src = "/image/default.jpg"}
-                                                        className="rounded shadow-sm"
-                                                        style={{
-                                                            width: "70px",
-                                                            height: "70px",
-                                                            objectFit: "cover"
-                                                        }}
-                                                    />
-                                                </div>
-                                            </td>
-                                            <td className="align-middle">
-                                                <span className="fw-semibold">{product.product_name}</span>
-                                            </td>
-                                            <td className="text-center align-middle">
-                                                <span className="text-success fs-6 fw-bold">
-                                                    ฿{product.price}
-                                                </span>
-                                            </td>
-                                            <td className="text-center align-middle">
-                                                <span className="fs-6">
-                                                    {product.stock_remain} ชิ้น
-                                                </span>
-                                                <div className="small text-muted">
+                                            {/* สถานะสินค้า */}
+                                            <span
+                                                className={`badge position-absolute top-0 end-0 m-2 px-2 py-1 
+                                            ${product.stock_remain === "0"
+                                                        ? "bg-danger"
+                                                        : product.status === "1"
+                                                            ? "bg-success"
+                                                            : "bg-warning"
+                                                    }`}
+                                                style={{ fontSize: "0.9rem" }}
+                                            >
+                                                {product.stock_remain === "0"
+                                                    ? "สินค้าหมด"
+                                                    : product.status === "1"
+                                                        ? "กำลังจำหน่าย"
+                                                        : "ยังไม่จำหน่าย"}
+                                            </span>
+                                        </div>
+
+                                        {/* เนื้อหา card */}
+                                        <div className="card-body d-flex flex-column">
+                                            <h5 className="card-title">{product.product_name}</h5>
+                                            <p className="card-text mb-1">
+                                                <span className="fw-bold text-success">฿{product.price}</span>
+                                            </p>
+                                            <p className="mb-1">
+                                                เหลือ {product.stock_remain} ชิ้น
+                                                <br />
+                                                <small className="text-muted">
                                                     (ทั้งหมด {product.total_quantity}, ขายแล้ว {product.total_sold}, จอง {product.total_reserved})
-                                                </div>
-                                            </td>
+                                                </small>
+                                            </p>
+                                            <p className="small text-muted mb-2">
+                                                ผู้ดูแล: {roleNames[product.role_id]}
+                                                <br />
+                                                เพิ่มเมื่อ {new Date(product.created_at).toLocaleDateString("th-TH")}
+                                            </p>
 
-                                            <td className="text-center align-middle">
-                                                {roleNames[product.role_id]}
-                                            </td>
-                                            <td className="text-center align-middle">
-                                                <span
-                                                    className={`badge fs-7 
-                                                        ${product.stock_remain === 0
-                                                            ? "bg-danger bg-opacity-10 text-danger"
-                                                            : product.status === "1"
-                                                                ? "bg-success bg-opacity-10 text-success"
-                                                                : "bg-warning bg-opacity-10 text-warning"
-                                                        }`}
+                                            {/* ปุ่มจัดการ */}
+                                            <div
+                                                className="mt-auto btn-group-vertical btn-group-sm gap-1"
+                                                onClick={(e) => e.stopPropagation()}
+                                            >
+                                                {product.status === "0" && (
+                                                    <button
+                                                        className="btn btn-outline-success btn-sm"
+                                                        onClick={() => handleApprove(product.product_id)}
+                                                    >
+                                                        <BsCheck2Square className="me-1" /> อนุมัติ
+                                                    </button>
+                                                )}
+                                                <button
+                                                    className="btn btn-outline-primary btn-sm"
+                                                    onClick={() => handleOpen(product)}
                                                 >
-                                                    {product.stock_remain === 0
-                                                        ? "สินค้าหมด"
-                                                        : statusLabel(product.status)}
-                                                </span>
-                                            </td>
+                                                    <FaRegEdit className="me-1" /> แก้ไข
+                                                </button>
+                                                <button
+                                                    className="btn btn-outline-danger btn-sm"
+                                                    onClick={() => handleDelete(product.product_id)}
+                                                >
+                                                    <MdDelete className="me-1" /> ลบ
+                                                </button>
+                                                <Link
+                                                    to={`/admin/souvenir/product-slot/${product.product_id}`}
+                                                    className="btn btn-outline-warning btn-sm"
+                                                    onClick={(e) => e.stopPropagation()}
+                                                >
+                                                    <IoIosAddCircleOutline className="me-1" /> เพิ่มสล็อตสินค้า
+                                                </Link>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))
+                        }
+                    </>
+                )}
 
-                                            <td className="text-center align-middle">
-                                                {new Date(product.created_at).toLocaleDateString("th-TH")}
-                                            </td>
-                                            <td className="text-center align-middle" onClick={(e) => e.stopPropagation()}>
-                                                <div className="btn-group-vertical btn-group-sm gap-1">
-                                                    {product.status === "0" && (
-                                                        <button
-                                                            className="btn btn-outline-success btn-sm"
-                                                            onClick={() => handleApprove(product.product_id)}
-                                                            title="อนุมัติสินค้า"
-                                                        >
-                                                            <BsCheck2Square className="me-1" />
-                                                            อนุมัติ
-                                                        </button>
-                                                    )}
-                                                    <button
-                                                        className="btn btn-outline-primary btn-sm"
-                                                        onClick={() => handleOpen(product)}
-                                                        title="แก้ไขสินค้า"
-                                                    >
-                                                        <FaRegEdit className="me-1" />
-                                                        แก้ไข
-                                                    </button>
-                                                    <button
-                                                        className="btn btn-outline-danger btn-sm"
-                                                        onClick={() => handleDelete(product.product_id)}
-                                                        title="ลบสินค้า"
-                                                    >
-                                                        <MdDelete className="me-1" />
-                                                        ลบ
-                                                    </button>
-                                                    <Link
-                                                        to={`/admin/souvenir/product-slot/${product.product_id}`}
-                                                        className="btn btn-outline-warning btn-sm"
-                                                        title="เพิ่มสล็อตสินค้า"
-                                                        onClick={e => e.stopPropagation()}
-                                                    >
-                                                        <IoIosAddCircleOutline className="me-1" />
-                                                        เพิ่มสล็อตสินค้า
-                                                    </Link>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div> */}
+                {/* สินค้าของสมาชิกทั่วไป */}
+                {filteredProducts.filter(p => p.is_official === 0).length > 0 && (
+                    <>
+                        <h4 className="fw-bold">สินค้าของสมาชิกทั่วไป</h4>
+                        {filteredProducts
+                            .filter(p => p.is_official === 0)
+                            .map((product) => (
+                                <div
+                                    key={product.product_id}
+                                    className="col-12 col-sm-6 col-md-4 col-lg-3"
+                                    onClick={() => handleDetail(product)}
+                                    style={{ cursor: "pointer" }}
+                                >
+                                    <div className="card h-100 shadow-sm position-relative">
+                                        {/* รูปสินค้า */}
+                                        <div className="position-relative">
+                                            <img
+                                                src={HOSTNAME + `/uploads/${product.image}`}
+                                                alt={product.image}
+                                                onError={(e) => (e.target.src = "/image/default.jpg")}
+                                                className="card-img-top"
+                                                style={{ height: "180px", objectFit: "cover" }}
+                                            />
 
-            <div className="row g-4">
-                {filteredProducts.length === 0 ? (
+                                            {/* สถานะสินค้า */}
+                                            <span
+                                                className={`badge position-absolute top-0 end-0 m-2 px-2 py-1 
+                                            ${product.stock_remain === "0"
+                                                        ? "bg-danger"
+                                                        : product.status === "1"
+                                                            ? "bg-success"
+                                                            : "bg-warning"
+                                                    }`}
+                                                style={{ fontSize: "0.9rem" }}
+                                            >
+                                                {product.stock_remain === "0"
+                                                    ? "สินค้าหมด"
+                                                    : product.status === "1"
+                                                        ? "กำลังจำหน่าย"
+                                                        : "ยังไม่จำหน่าย"}
+                                            </span>
+                                        </div>
+
+                                        {/* เนื้อหา card */}
+                                        <div className="card-body d-flex flex-column">
+                                            <h5 className="card-title">{product.product_name}</h5>
+                                            <p className="card-text mb-1">
+                                                <span className="fw-bold text-success">฿{product.price}</span>
+                                            </p>
+                                            <p className="mb-1">
+                                                เหลือ {product.stock_remain} ชิ้น
+                                                <br />
+                                                <small className="text-muted">
+                                                    (ทั้งหมด {product.total_quantity}, ขายแล้ว {product.total_sold}, จอง {product.total_reserved})
+                                                </small>
+                                            </p>
+                                            <p className="small text-muted mb-2">
+                                                ผู้ดูแล: {roleNames[product.role_id]}
+                                                <br />
+                                                เพิ่มเมื่อ {new Date(product.created_at).toLocaleDateString("th-TH")}
+                                            </p>
+
+                                            {/* ปุ่มจัดการ */}
+                                            <div
+                                                className="mt-auto btn-group-vertical btn-group-sm gap-1"
+                                                onClick={(e) => e.stopPropagation()}
+                                            >
+                                                {product.status === "0" && (
+                                                    <button
+                                                        className="btn btn-outline-success btn-sm"
+                                                        onClick={() => handleApprove(product.product_id)}
+                                                    >
+                                                        <BsCheck2Square className="me-1" /> อนุมัติ
+                                                    </button>
+                                                )}
+                                                <button
+                                                    className="btn btn-outline-primary btn-sm"
+                                                    onClick={() => handleOpen(product)}
+                                                >
+                                                    <FaRegEdit className="me-1" /> แก้ไข
+                                                </button>
+                                                <button
+                                                    className="btn btn-outline-danger btn-sm"
+                                                    onClick={() => handleDelete(product.product_id)}
+                                                >
+                                                    <MdDelete className="me-1" /> ลบ
+                                                </button>
+                                                <Link
+                                                    to={`/admin/souvenir/product-slot/${product.product_id}`}
+                                                    className="btn btn-outline-warning btn-sm"
+                                                    onClick={(e) => e.stopPropagation()}
+                                                >
+                                                    <IoIosAddCircleOutline className="me-1" /> เพิ่มสล็อตสินค้า
+                                                </Link>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))
+                        }
+                    </>
+                )}
+
+                {/* ไม่พบสินค้า */}
+                {filteredProducts.length === 0 && (
                     <div className="col-12 text-center text-muted py-4">
                         ไม่พบสินค้าที่ค้นหา
                     </div>
-                ) : (
-                    filteredProducts.map((product) => (
-                        <div
-                            key={product.product_id}
-                            className="col-12 col-sm-6 col-md-4 col-lg-3"
-                            onClick={() => handleDetail(product)}
-                            style={{ cursor: "pointer" }}
-                        >
-                            <div className="card h-100 shadow-sm position-relative">
-                                {/* รูปสินค้า */}
-                                <div className="position-relative">
-                                    <img
-                                        src={`http://localhost:3001/uploads/${product.image}`}
-                                        alt={product.image}
-                                        onError={(e) => (e.target.src = "/image/default.jpg")}
-                                        className="card-img-top"
-                                        style={{ height: "180px", objectFit: "cover" }}
-                                    />
-
-                                    {/* สถานะสินค้า */}
-                                    <span
-                                        className={`badge position-absolute top-0 end-0 m-2 px-2 py-1 
-                                            ${product.stock_remain === 0
-                                                ? "bg-danger"
-                                                : product.status === "1"
-                                                    ? "bg-success "
-                                                    : "bg-warning "
-                                            }`}
-                                        style={{ fontSize: "0.9rem" }}
-                                    >
-                                        {product.stock_remain === 0
-                                            ? "สินค้าหมด"
-                                            : statusLabel(product.status)}
-                                    </span>
-                                </div>
-
-                                {/* เนื้อหา card */}
-                                <div className="card-body d-flex flex-column">
-                                    <h5 className="card-title">{product.product_name}</h5>
-                                    <p className="card-text mb-1">
-                                        <span className="fw-bold text-success">฿{product.price}</span>
-                                    </p>
-                                    <p className="mb-1">
-                                        เหลือ {product.stock_remain} ชิ้น
-                                        <br />
-                                        <small className="text-muted">
-                                            (ทั้งหมด {product.total_quantity}, ขายแล้ว {product.total_sold}, จอง {product.total_reserved})
-                                        </small>
-                                    </p>
-                                    <p className="small text-muted mb-2">
-                                        ผู้ดูแล: {roleNames[product.role_id]}
-                                        <br />
-                                        เพิ่มเมื่อ {new Date(product.created_at).toLocaleDateString("th-TH")}
-                                    </p>
-
-                                    {/* ปุ่มจัดการ */}
-                                    <div
-                                        className="mt-auto btn-group-vertical btn-group-sm gap-1"
-                                        onClick={(e) => e.stopPropagation()}
-                                    >
-                                        {product.status === "0" && (
-                                            <button
-                                                className="btn btn-outline-success btn-sm"
-                                                onClick={() => handleApprove(product.product_id)}
-                                            >
-                                                <BsCheck2Square className="me-1" /> อนุมัติ
-                                            </button>
-                                        )}
-                                        <button
-                                            className="btn btn-outline-primary btn-sm"
-                                            onClick={() => handleOpen(product)}
-                                        >
-                                            <FaRegEdit className="me-1" /> แก้ไข
-                                        </button>
-                                        <button
-                                            className="btn btn-outline-danger btn-sm"
-                                            onClick={() => handleDelete(product.product_id)}
-                                        >
-                                            <MdDelete className="me-1" /> ลบ
-                                        </button>
-                                        <Link
-                                            to={`/admin/souvenir/product-slot/${product.product_id}`}
-                                            className="btn btn-outline-warning btn-sm"
-                                            onClick={(e) => e.stopPropagation()}
-                                        >
-                                            <IoIosAddCircleOutline className="me-1" /> เพิ่มสล็อตสินค้า
-                                        </Link>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    ))
                 )}
             </div>
-
 
 
             {/* Modal */}
@@ -477,7 +453,7 @@ function Souvenir() {
                                                 style={{ width: "250px", height: "200px" }}
                                             >
                                                 <img
-                                                    src={`http://localhost:3001/uploads/${selectedProduct.image}`}
+                                                    src={HOSTNAME + `/uploads/${selectedProduct.image}`}
                                                     alt={selectedProduct.image}
                                                     onError={(e) => (e.target.src = "/image/default.jpg")}
                                                     className="w-100 h-100 rounded"
@@ -559,7 +535,7 @@ function Souvenir() {
                                 type="submit"
                                 className="btn btn-primary px-4 rounded-3 shadow-sm"
                                 onClick={() => {
-                                    axios.put(`http://localhost:3001/admin/editSouvenir/${selectedProduct.product_id}`, selectedProduct)
+                                    axios.put(HOSTNAME + `/admin/editSouvenir/${selectedProduct.product_id}`, selectedProduct)
                                         .then(response => {
                                             console.log("บันทึกข้อมูลสินค้าสำเร็จ:", response.data);
                                             setProducts(prevProducts =>
@@ -582,7 +558,6 @@ function Souvenir() {
                     </div>
                 </div>
             </div>
-
             {/* Modal Backdrop */}
             {open && <div className="modal-backdrop fade show" onClick={handleClose}></div>}
         </div>

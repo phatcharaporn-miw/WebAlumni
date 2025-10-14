@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import {HOSTNAME} from '../../config.js';
 import axios from "axios";
 import { MdVolunteerActivism, MdEvent, MdPeople, MdTrendingUp } from "react-icons/md";
 import { Bar, Pie } from 'react-chartjs-2';
@@ -45,32 +46,12 @@ function AdminHome() {
 
   useEffect(() => {
     // Dashboard Stats
-    axios.get("http://localhost:3001/admin/dashboard-stats")
+    axios.get(HOSTNAME +"/admin/dashboard-stats")
       .then((res) => setStats(res.data))
       .catch((err) => console.error("Error fetching dashboard stats:", err));
 
-    // // Activity per year graph
-    // axios.get("http://localhost:3001/admin/activity-per-year")
-    //   .then(res => {
-    //     if (Array.isArray(res.data)) {
-    //       const labels = res.data.map(item => `ปี ${item.year + 543}`);
-    //       const data = res.data.map(item => item.total_activities);
-    //       setBarData({
-    //         labels,
-    //         datasets: [{
-    //           label: 'จำนวนกิจกรรม',
-    //           data,
-    //           backgroundColor: 'rgba(13, 110, 253, 0.8)',
-    //           borderColor: 'rgba(13, 110, 253, 1)',
-    //           borderWidth: 2,
-    //           borderRadius: 6,
-    //           borderSkipped: false,
-    //         }],
-    //       });
-    //     }
-    //   });
     // Activity per month graph
-axios.get("http://localhost:3001/admin/activity-per-month")
+axios.get(HOSTNAME +"/admin/activity-per-month")
   .then(res => {
     if (Array.isArray(res.data)) {
       // สร้าง labels เป็น "เดือน ปี" (ภาษาไทย)
@@ -100,7 +81,7 @@ axios.get("http://localhost:3001/admin/activity-per-month")
 
 
     // สถิติการบริจาค
-    axios.get("http://localhost:3001/admin/donation-stats")
+    axios.get(HOSTNAME +"/admin/donation-stats")
       .then((res) => {
         const labels = res.data.map(item => item.donation_type);
         const data = res.data.map(item => item.total);
@@ -117,7 +98,7 @@ axios.get("http://localhost:3001/admin/activity-per-month")
 
 
     // Total alumni count
-    axios.get("http://localhost:3001/admin/total-alumni")
+    axios.get(HOSTNAME +"/admin/total-alumni")
       .then(res => setAlumniCount(res.data.totalAlumni));
   }, []);
 
@@ -279,7 +260,7 @@ axios.get("http://localhost:3001/admin/activity-per-month")
 
             // format number ให้มี , คั่นหลักพัน
             const formattedValue = value.toLocaleString();
-            return `${tooltipItem.label}: ฿${formattedValue} (${percent}%)`; //คืนค่า string ที่จะแสดงใน tooltip
+            return `${tooltipItem.label}: ฿${formattedValue} (${percent}%)`; 
           },
         },
       },
@@ -368,7 +349,6 @@ axios.get("http://localhost:3001/admin/activity-per-month")
 
       
     </div>
-    // </div>
   );
 }
 

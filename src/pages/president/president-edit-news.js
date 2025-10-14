@@ -4,6 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { useParams, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import {HOSTNAME} from '../../config.js';
 import '../../css/admin-news.css';
 
 function PresidentEditNews() {
@@ -18,7 +19,7 @@ function PresidentEditNews() {
     });
 
     useEffect(() => {
-        axios.get(`http://localhost:3001/news/news-id/${newsId}`, { 
+        axios.get(HOSTNAME +`/news/news-id/${newsId}`, { 
             withCredentials: true,
             headers: { "Content-Type": "multipart/form-data" }
         })
@@ -64,7 +65,7 @@ function PresidentEditNews() {
         }
         
 
-        axios.put(`http://localhost:3001/news/edit-news/${newsId}`, updatedFormData, {
+        axios.put(HOSTNAME +`/news/edit-news/${newsId}`, updatedFormData, {
             withCredentials: true,
             headers: { "Content-Type": "multipart/form-data" }
         })

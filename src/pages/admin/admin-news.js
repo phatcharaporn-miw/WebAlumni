@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import '../../css/admin-news.css';
 import { MdDateRange, MdEdit, MdDelete } from "react-icons/md";
 import Swal from "sweetalert2";
+import {HOSTNAME} from '../../config.js';
 
 function AdminNews() {
     const navigate = useNavigate();
@@ -13,7 +14,7 @@ function AdminNews() {
 
     // ดึงข้อมูลข่าวประชาสัมพันธ์
     useEffect(() => {
-        axios.get('http://localhost:3001/news/news-all')
+        axios.get(HOSTNAME +'/news/news-all')
             .then((response) => {
                 if (response.data.success) {
                     setNews(response.data.data || []);
@@ -37,7 +38,7 @@ function AdminNews() {
             cancelButtonText: "ยกเลิก",
         }).then((result) => {
             if (result.isConfirmed) {
-                axios.delete(`http://localhost:3001/news/delete-news/${newsId}`, {
+                axios.delete(HOSTNAME +`/news/delete-news/${newsId}`, {
                     withCredentials: true
                 })
                     .then((response) => {
@@ -96,7 +97,7 @@ function AdminNews() {
                         <div key={item.news_id} className="col-md-4 col-sm-12 mb-4">
                             <div className="card shadow-sm border-15 h-100">
                                 <img
-                                    src={`http://localhost:3001${item.image_path}`}
+                                    src={HOSTNAME +`${item.image_path}`}
                                     alt={item.title}
                                     className="card-img-top"
                                     onError={(e) => e.target.src = '/default-image.png'}

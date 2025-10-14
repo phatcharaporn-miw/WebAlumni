@@ -7,6 +7,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { useNavigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import Swal from "sweetalert2";
+import {HOSTNAME} from '../config.js';
 
 function Register() {
     const [error, setError] = useState("");
@@ -89,7 +90,7 @@ function Register() {
         }
 
         try {
-            const response = await axios.post("http://localhost:3001/add/register", data, { withCredentials: true });
+            const response = await axios.post(HOSTNAME + "/add/register", data, { withCredentials: true });
             Swal.fire({
                 icon: "success",
                 title: "ลงทะเบียนสำเร็จ!",
@@ -109,7 +110,7 @@ function Register() {
     useEffect(() => {
         const fetchMajors = async () => {
             try {
-                const response = await axios.get('http://localhost:3001/add/major', {
+                const response = await axios.get(HOSTNAME + '/add/major', {
                     withCredentials: true
                 });
                 setMajor(response.data.major);
@@ -182,7 +183,7 @@ function Register() {
                             <h2>ลงทะเบียน</h2>
                             <div className="upImage">
                                 <div className="image-profile">
-                                    <img className="profile" src={selectedFile ? URL.createObjectURL(selectedFile) : "http://localhost:3001/uploads/default-profile.png"} alt="Profile" />
+                                    <img className="profile" src={selectedFile ? URL.createObjectURL(selectedFile) : HOSTNAME + "/uploads/default-profile.png"} alt="Profile" />
                                     <br />
                                     <label htmlFor="file-upload" className="upFile">อัพโหลดรูปภาพ</label>
                                     <input type="file" id="file-upload" className="upFile-input" name="file-upload" onChange={(e) => {

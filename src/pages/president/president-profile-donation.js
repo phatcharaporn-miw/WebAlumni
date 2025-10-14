@@ -6,6 +6,7 @@ import '../../css/profile.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { useAuth } from '../../context/AuthContext';
+import {HOSTNAME} from '../../config.js';
 
 function PresidentProfileDonation() {
     const [profile, setProfile] = useState({});
@@ -19,12 +20,12 @@ function PresidentProfileDonation() {
     const [showModal, setShowModal] = useState(false);
     const [uploadingSlip, setUploadingSlip] = useState(false);
     const { user, handleLogout } = useAuth();
-    const userId = user?.id;
+    const userId = user?.user_id;
     const navigate = useNavigate();
     const location = useLocation();
 
     useEffect(() => {
-        axios.get('http://localhost:3001/users/profile', { withCredentials: true })
+        axios.get(HOSTNAME +'/users/profile', { withCredentials: true })
             .then((res) => {
                 if (res.data.success) {
                     setProfile(res.data.user);
@@ -39,7 +40,7 @@ function PresidentProfileDonation() {
 
     const fetchDonations = () => {
         setLoading(true);
-        axios.get('http://localhost:3001/donate/donatePaid', { withCredentials: true })
+        axios.get(HOSTNAME +'/donate/donatePaid', { withCredentials: true })
             .then((res) => {
                 setDonations(res.data);
                 setLoading(false);
@@ -69,7 +70,7 @@ function PresidentProfileDonation() {
         formData.append('user_id', profile.userId);
 
         try {
-            const res = await axios.post('http://localhost:3001/users/update-profile-image', formData, {
+            const res = await axios.post(HOSTNAME +'/users/update-profile-image', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
 
@@ -142,7 +143,7 @@ function PresidentProfileDonation() {
             formData.append('donation_id', selectedDonation.donation_id);
 
             try {
-                const res = await axios.post('http://localhost:3001/donate/upload-slip', formData, {
+                const res = await axios.post(HOSTNAME +'/donate/upload-slip', formData, {
                     headers: { 'Content-Type': 'multipart/form-data' },
                     withCredentials: true
                 });
@@ -548,14 +549,14 @@ function PresidentProfileDonation() {
                                             {selectedDonation.slip ? (
                                                 <div className='text-center'>
                                                     <img
-                                                        src={`http://localhost:3001/uploads/${selectedDonation.slip}`}
+                                                        src={HOSTNAME +`/uploads/${selectedDonation.slip}`}
                                                         alt='สลิปการชำระเงิน'
                                                         className='img-fluid rounded-3 mb-3'
                                                         style={{ maxHeight: '300px', objectFit: 'contain' }}
                                                     />
                                                     <div className='d-grid gap-2'>
                                                         {/* <a 
-                                                            href={`http://localhost:3001/uploads/${selectedDonation.slip}`} 
+                                                            href={HOSTNAME +`/uploads/${selectedDonation.slip}`} 
                                                             target='_blank' 
                                                             rel='noopener noreferrer'
                                                             className='btn btn-outline-primary btn-sm'

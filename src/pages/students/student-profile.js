@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../../css/profile.css';
-// import { useOutletContext } from "react-router-dom";
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import {HOSTNAME} from '../../config.js';
 import Swal from "sweetalert2";
-import { IoMdCreate } from "react-icons/io";
-import { FaBars, FaTimes } from "react-icons/fa";
+// import { IoMdCreate } from "react-icons/io";
+// import { FaBars, FaTimes } from "react-icons/fa";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
@@ -17,7 +17,7 @@ function StudentProfile() {
   });
   const [major, setMajor] = useState([]);
   const { user, handleLogout } = useAuth(); 
-  const userId = user?.id;
+  const userId = user?.user_id;
   const [loginInfo, setLoginInfo] = useState({ username: '', password: '' });
   // const [showPassword, setShowPassword] = useState(false); // สำหรับซ่อน/แสดงรหัสผ่าน
   const [previewImage, setPreviewImage] = useState(null);
@@ -26,15 +26,19 @@ function StudentProfile() {
  //แก้ไขข้อมูลส่วนตัว
  const [editing, setEditing] = useState(false); //สลับโหมดการแก้ไข
  
+ // Scroll to top on mount
+   useEffect(() => {
+     window.scrollTo(0, 0);
+   }, []);
   
   useEffect(() => {
-    axios.get('http://localhost:3001/users/profile', {
+    axios.get(HOSTNAME +'/users/profile', {
       withCredentials: true, 
     })
       .then((response) => {
         // console.log('majors:', response.data.major);     
         if (response.data.success) {
-          console.log('profile data:', response.data.user);
+          // console.log('profile data:', response.data.user);
           setProfile(response.data.user);
         }
       })
@@ -43,7 +47,7 @@ function StudentProfile() {
       });
 
        // ดึงข้อมูล major ทั้งหมด
-    axios.get('http://localhost:3001/add/major', { 
+    axios.get(HOSTNAME +'/add/major', { 
       withCredentials: true 
     })
     .then((response) => {
@@ -56,7 +60,7 @@ function StudentProfile() {
     });
 
       // ดึงข้อมูล username และ password
-    axios.get('http://localhost:3001/users/login-info', { 
+    axios.get(HOSTNAME +'/users/login-info', { 
       withCredentials: true 
     })
     .then((response) => {
@@ -139,7 +143,7 @@ const removeEducation = (index) => {
 
   const handleSave = () => {
     // console.log("ก่อนส่งข้อมูล educations:", JSON.stringify(profile.educations, null, 2));
-    axios.post('http://localhost:3001/users/edit-profile',  profile, {
+    axios.post(HOSTNAME +'/users/edit-profile',  profile, {
       withCredentials: true, 
     })
       .then((response) => {
@@ -170,7 +174,7 @@ const handleImageChange = async (e) => {
   formData.append("user_id", profile.userId); 
 
   try {
-    const res = await axios.post("http://localhost:3001/users/update-profile-image", formData, {
+    const res = await axios.post(HOSTNAME +"/users/update-profile-image", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },

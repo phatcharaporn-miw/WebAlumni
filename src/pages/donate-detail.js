@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
+import {HOSTNAME} from '../config.js';
 import "../css/Donate-detail.css";
 import { MdDateRange, MdOutlinePayment } from "react-icons/md";
 import { ImUser } from "react-icons/im";
@@ -14,7 +15,7 @@ import axios from "axios";
 import jsQR from "jsqr";
 import Swal from "sweetalert2";
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:3001";
+const API_BASE_URL = HOSTNAME;
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ALLOWED_FILE_TYPES = ["image/jpeg", "image/png", "image/jpg", "image/jfif"];
 const MAX_AMOUNT = 1000000;
@@ -62,7 +63,7 @@ function DonateDetail() {
     const { projectId } = useParams();
     // const userId = sessionStorage.getItem("userId");
     const { user } = useAuth();
-    const userId = user?.id;
+    const userId = user?.user_id;
     const [taxType, setTaxType] = useState("");
     const [useTax, setUseTax] = useState(false);
     // สร้าง key สำหรับ sessionStorage
@@ -74,7 +75,7 @@ function DonateDetail() {
     const [userData, setUserData] = useState({});
     const [formData, setFormData] = useState({
         amount: "",
-        user_id: user.id || "",
+        user_id: userId || "",
         project_id: projectId || "",
         file: null,
         name: "",          // ตั้งค่าว่างไว้ก่อน
@@ -224,7 +225,7 @@ function DonateDetail() {
 
 
     useEffect(() => {
-        axios.get("http://localhost:3001/users/profile", { withCredentials: true })
+        axios.get(HOSTNAME + "/users/profile", { withCredentials: true })
             .then(response => {
                 if (response.data.success) {
                     setUserData(response.data.user);
@@ -244,7 +245,7 @@ function DonateDetail() {
         const fetchAddresses = async () => {
             if (!userId) return;
             try {
-                const res = await axios.get(`http://localhost:3001/donate/tax_addresses/user/${userId}`);
+                const res = await axios.get(HOSTNAME + `/donate/tax_addresses/user/${userId}`);
                 // console.log("API Response:", res.data); // ตรวจสอบ data
                 setCorporateAddresses(res.data || []);
             } catch (err) {
@@ -582,7 +583,7 @@ function DonateDetail() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!userId) {
-            alert("กรุณาเข้าสู่ระบบก่อนทำการบริจาค");
+            Swal.fire("แจ้งเตือน", "กรุณาเข้าสู่ระบบก่อนทำการบริจาค", "warning");
             navigate("/login");
             return;
         }
@@ -789,7 +790,7 @@ function DonateDetail() {
                         </div>
 
                         {userId && (
-                            <div className="option-card">
+                            <div className="option-card"> 
                                 <h7>ประวัติการบริจาคของฉัน</h7>
                                 <p>ตรวจสอบประวัติการบริจาคทั้งหมดของคุณ</p>
                                 <button
@@ -807,7 +808,8 @@ function DonateDetail() {
                             <button
                                 className="option-button secondary"
                                 onClick={() => {
-                                    alert('ฟีเจอร์นี้จะเปิดใช้งานเร็วๆ นี้');
+                                    // alert('ฟีเจอร์นี้จะเปิดใช้งานเร็วๆ นี้');
+                                    Swal.fire("แจ้งเตือน", "ฟีเจอร์นี้จะเปิดใช้งานเร็วๆ นี้", "question");
                                 }}
                             >
                                 ติดตามผล

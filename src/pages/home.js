@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from '../context/AuthContext';
+import { HOSTNAME } from "../config.js";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import "../css/home.css";
@@ -60,44 +61,34 @@ function Home() {
   const [filter, setFilter] = useState("all");
   const [error] = useState(null);
   const [filterStatus, setFilterStatus] = useState("all");
-
-
-  // useEffect(() => {
-  //   const userSession = sessionStorage.getItem("userId");
-  //   if (userSession) {
-  //     setIsLoggedin(true);
-  //     console.log("ผู้ใช้ล็อกอินแล้ว");
-  //   } else {
-  //     setIsLoggedin(false);
-  //     console.log("ผู้ใช้ยังไม่ได้ล็อกอิน");
-  //   }
-  // }, []);
+  const { user } = useAuth();
+  // const userId = user?.id;
 
   useEffect(() => {
-  const checkUser = async () => {
-    try {
-      const res = await axios.get("http://localhost:3001/users/profile", { withCredentials: true });
-      if (res.data.success) {
-        setIsLoggedin(true);
-        console.log("ผู้ใช้ล็อกอินแล้ว");
-      } else {
+    const checkUser = async () => {
+      try {
+        const res = await axios.get( HOSTNAME + "/users/profile", { withCredentials: true });
+        if (res.data.success) {
+          setIsLoggedin(true);
+          console.log("ผู้ใช้ล็อกอินแล้ว");
+        } else {
+          setIsLoggedin(false);
+          console.log("ผู้ใช้ยังไม่ได้ล็อกอิน");
+        }
+      } catch (err) {
         setIsLoggedin(false);
         console.log("ผู้ใช้ยังไม่ได้ล็อกอิน");
       }
-    } catch (err) {
-      setIsLoggedin(false);
-      console.log("ผู้ใช้ยังไม่ได้ล็อกอิน");
-    }
-  };
+    };
 
-  checkUser();
-}, []);
+    checkUser();
+  }, []);
 
 
   // ข่าวประชาสัมพันธ์
   useEffect(() => {
     // ดึงข้อมูลข่าวประชาสัมพันธ์
-    axios.get('http://localhost:3001/news/news-all')
+    axios.get(HOSTNAME + '/news/news-all')
       .then((response) => {
         // console.log("API Response:", response.data); 
         if (response.data.success) {
@@ -110,7 +101,7 @@ function Home() {
 
 
     // ดึงข้อมูลกิจกรรมที่กำลังจะจัดขึ้น
-    axios.get('http://localhost:3001/activity/all-activity')
+    axios.get(HOSTNAME + '/activity/all-activity')
       .then(response => {
         // กรองเฉพาะกิจกรรมที่กำลังจะจัดขึ้นหรือกำลังดำเนินการ
         const now = new Date();
@@ -162,32 +153,12 @@ function Home() {
 
   useEffect(() => {
     // Dashboard Stats
-    axios.get("http://localhost:3001/admin/dashboard-stats")
+    axios.get(HOSTNAME + "/admin/dashboard-stats")
       .then((res) => setStats(res.data))
       .catch((err) => console.error("Error fetching dashboard stats:", err));
 
-    // // Activity per year graph
-    // axios.get("http://localhost:3001/admin/activity-per-year")
-    //   .then(res => {
-    //     if (Array.isArray(res.data)) {
-    //       const labels = res.data.map(item => `ปี ${item.year + 543}`);
-    //       const data = res.data.map(item => item.total_activities);
-    //       setBarData({
-    //         labels,
-    //         datasets: [{
-    //           label: 'จำนวนกิจกรรม',
-    //           data,
-    //           backgroundColor: 'rgba(13, 110, 253, 0.8)',
-    //           borderColor: 'rgba(13, 110, 253, 1)',
-    //           borderWidth: 2,
-    //           borderRadius: 6,
-    //           borderSkipped: false,
-    //         }],
-    //       });
-    //     }
-    //   });
     // Activity per month graph
-    axios.get("http://localhost:3001/admin/activity-per-month")
+    axios.get(HOSTNAME + "/admin/activity-per-month")
       .then(res => {
         if (Array.isArray(res.data)) {
           // สร้าง labels เป็น "เดือน ปี" (ภาษาไทย)
@@ -217,7 +188,7 @@ function Home() {
 
 
     // สถิติการบริจาค
-    axios.get("http://localhost:3001/admin/donation-stats")
+    axios.get(HOSTNAME + "/admin/donation-stats")
       .then((res) => {
         const labels = res.data.map(item => item.donation_type);
         const data = res.data.map(item => item.total);
@@ -231,7 +202,7 @@ function Home() {
       });
 
     // Total alumni count
-    axios.get("http://localhost:3001/admin/total-alumni")
+    axios.get(HOSTNAME + "/admin/total-alumni")
       .then(res => setAlumniCount(res.data.totalAlumni));
   }, []);
 
@@ -402,7 +373,7 @@ function Home() {
 
   //ดึงข้อมูล webboard
   useEffect(() => {
-    axios.get('http://localhost:3001/web/webboard')
+    axios.get(HOSTNAME + '/web/webboard')
       .then((response) => {
         if (response.data.success) {
 
@@ -416,7 +387,7 @@ function Home() {
       });
 
     axios
-      .get("http://localhost:3001/donate/donate", {
+      .get(HOSTNAME + "/donate/donate", {
         withCredentials: true
       })
       .then((response) => {
@@ -448,7 +419,7 @@ function Home() {
       return; // ไม่บันทึกสถานะหากไม่ได้เข้าสู่ระบบ
     }
 
-    axios.post(`http://localhost:3001/web/webboard/${postId}/favorite`, {}, {
+    axios.post( HOSTNAME + `/web/webboard/${postId}/favorite`, {}, {
       withCredentials: true,
     })
       .then((response) => {
@@ -488,7 +459,7 @@ function Home() {
         )
       );
 
-      const response = await axios.get(`http://localhost:3001/web/webboard/${post.webboard_id}`, {
+      const response = await axios.get(HOSTNAME + `/web/webboard/${post.webboard_id}`, {
         withCredentials: true,
       });
 
@@ -539,7 +510,7 @@ function Home() {
       return;
     }
 
-    axios.post(`http://localhost:3001/web/webboard/${selectedPost.webboard_id}/comment`, {
+    axios.post(HOSTNAME + `/web/webboard/${selectedPost.webboard_id}/comment`, {
       comment_detail: commentText,
     }, {
       withCredentials: true
@@ -547,14 +518,14 @@ function Home() {
       .then((response) => {
         const newComment = response.data.comment; // ปรับตาม response structure
 
-        const userProfileImage = sessionStorage.getItem("image_path") || "/default-profile.png";
-        const userId = sessionStorage.getItem("userId");
+        const userProfileImage = user.image_path || "/default-profile.png";
+        const userId = user.user_id || null;
 
         const formattedNewComment = {
           ...newComment,
           profile_image: newComment.profile_image || userProfileImage,
-          full_name: newComment.full_name, // ใช้ full_name จาก backend
-          user_id: newComment.user_id || userId, // ใช้ user_id จาก backend หรือ sessionStorage
+          full_name: newComment.full_name, 
+          user_id: newComment.user_id || userId, 
           created_at: newComment.created_at || new Date().toISOString(),
           comment_detail: newComment.comment_detail || commentText,
           replies: [],
@@ -610,10 +581,10 @@ function Home() {
     }
 
     try {
-      const response = await axios.post(`http://localhost:3001/api/replies`, {
+      const response = await axios.post(HOSTNAME + `/api/replies`, {
         comment_id: commentId,
         reply_detail: replyText.trim(),
-        user_id: sessionStorage.getItem("userId")
+        user_id: user.user_id
       }, {
         withCredentials: true
       });
@@ -625,13 +596,13 @@ function Home() {
             if (comment.comment_id === commentId) {
               // สร้าง reply object ใหม่
               const newReply = {
-                reply_id: response.data.reply_id || Date.now(), // ใช้ ID จาก response หรือ timestamp
+                reply_id: response.data.reply_id || Date.now(), 
                 comment_id: commentId,
-                user_id: sessionStorage.getItem("userId"),
+                user_id: user.user_id,
                 reply_detail: replyText.trim(),
                 created_at: new Date().toISOString(),
-                full_name: sessionStorage.getItem("fullName") || "คุณ", // ดึงชื่อจาก sessionStorage
-                profile_image: sessionStorage.getItem("profileImage") || "/default-profile.png"
+                full_name: user.full_name || "คุณ", 
+                profile_image: user.image_path || "/default-profile.png"
               };
 
               return {
@@ -651,9 +622,6 @@ function Home() {
         // รีเซ็ตฟอร์ม
         setReplyText("");
         setShowReplyForm(null);
-
-        // แสดงข้อความสำเร็จ (optional)
-        // toast.success("ตอบกลับเรียบร้อยแล้ว!");
 
       } else {
         console.error("ไม่สามารถส่งการตอบกลับได้");
@@ -679,7 +647,7 @@ function Home() {
     }).then((result) => {
       if (result.isConfirmed) {
         axios
-          .delete(`http://localhost:3001/web/webboard/${selectedPost.webboard_id}/comment/${commentId}`, {
+          .delete(HOSTNAME + `/web/webboard/${selectedPost.webboard_id}/comment/${commentId}`, {
             withCredentials: true,
           })
           .then((response) => {
@@ -710,7 +678,7 @@ function Home() {
 
   // ลบการตอบกลับความคิดเห็น
   const handleDeleteReply = (replyId, commentId) => {
-    axios.delete(`http://localhost:3001/web/webboard/${selectedPost.webboard_id}/comment/${commentId}/reply/${replyId}`, {
+    axios.delete(HOSTNAME +`/web/webboard/${selectedPost.webboard_id}/comment/${commentId}/reply/${replyId}`, {
       withCredentials: true
     })
       .then(response => {
@@ -742,7 +710,7 @@ function Home() {
 
   // ดึงcategory
   useEffect(() => {
-    axios.get(`http://localhost:3001/category/category-all`)
+    axios.get(HOSTNAME +`/category/category-all`)
       .then(response => {
         if (response.data.success) {
           setCategory(response.data.data);
@@ -757,7 +725,7 @@ function Home() {
   }, []);
 
   const handleCategoryClick = (categoryId) => {
-    navigate(`/webboard/category/${categoryId}`)
+    navigate(HOSTNAME +`/webboard/category/${categoryId}`)
   };
 
   // กำหนดสีหมวดหมู่
@@ -768,7 +736,7 @@ function Home() {
   };
 
   const handleReadMore = (newsId) => {
-    navigate(`/news/${newsId}`);
+    navigate(HOSTNAME +`/news/${newsId}`);
   };
 
   const calculateDaysRemaining = (endDate) => {
@@ -944,7 +912,7 @@ function Home() {
                     >
                       <div className="image-container position-relative">
                         <img
-                          src={`http://localhost:3001${item.image_path}`}
+                          src={HOSTNAME + `${item.image_path}`}
                           alt={item.title}
                           className="news-image-home"
                           onError={(e) => e.target.src = '/default-image.png'}
@@ -1219,10 +1187,13 @@ function Home() {
               </div>
             </div>
           </div>
-          <div className="pt-3 border-top">
+          <div className="p-3 border-top">
             <div className="row align-items-center">
-              <div className="col-md-4 text-md-end mt-2 mt-md-0">
-                <a href="/dashboard-static" className="btn btn-outline-primary btn-sm">
+              <div className="col-12 d-flex justify-content-end mt-2">
+                <a 
+                  href="/dashboard-stat" 
+                  className="btn btn-outline-primary btn-sm"
+                >
                   ดูข้อมูลเพิ่มเติม
                 </a>
               </div>
@@ -1275,7 +1246,7 @@ function Home() {
                             {/* โปรไฟล์ + ชื่อผู้ใช้ */}
                             <div className="d-flex mb-3">
                               <img
-                                src={post.profile_image ? `http://localhost:3001/${post.profile_image}` : "/default-profile.png"}
+                                src={post.profile_image ? HOSTNAME +`/${post.profile_image}` : "/default-profile.png"}
                                 alt="User"
                                 className="rounded-circle me-3"
                                 width="50"
@@ -1374,7 +1345,7 @@ function Home() {
                   {/* โปรไฟล์ + ชื่อผู้ใช้ */}
                   <div className="d-flex mt-4">
                     <img
-                      src={selectedPost.profile_image ? `http://localhost:3001/${selectedPost.profile_image}` : "/default-profile.png"}
+                      src={selectedPost.profile_image ? HOSTNAME + `/${selectedPost.profile_image}` : "/default-profile.png"}
                       alt="User"
                       className="rounded-circle me-3"
                       width="50"
@@ -1382,8 +1353,8 @@ function Home() {
                     />
                     <div>
                       <h5 className="fw-bold mb-1">{selectedPost.title}</h5>
-                      <p className="text-muted mb-1">จากคุณ <span className="text">{selectedPost.full_name || "ไม่ระบุชื่อ"}</span></p>
-                      <p className="text-muted small">{new Date(selectedPost.created_at).toLocaleDateString()}</p>
+                      <p className="text-muted mb-1 small">จากคุณ <span className="fw-semibold">{selectedPost.full_name || "ไม่ระบุชื่อ"}</span></p>
+                      <p className="text-muted small mb-0">{new Date(selectedPost.created_at).toLocaleDateString('th-TH')}</p>
                     </div>
                   </div>
 
@@ -1395,7 +1366,7 @@ function Home() {
 
                   {/* รูปภาพประกอบ*/}
                   {selectedPost.image_path && (
-                    <img src={selectedPost.image_path ? `http://localhost:3001/${selectedPost.image_path.replace(/^\/+/, '')}` : "/default-image.png"} alt="Post" className="img-fluid rounded-3" onError={(e) => e.target.style.display = 'none'} />
+                    <img src={selectedPost.image_path ? HOSTNAME + `/${selectedPost.image_path.replace(/^\/+/, '')}` : "/default-image.png"} alt="Post" className="img-fluid rounded-3" onError={(e) => e.target.style.display = 'none'} />
                   )}
 
                   {/* จำนวนผู้เข้าชม */}
@@ -1413,7 +1384,7 @@ function Home() {
                             <img
                               src={comment.profile_image.startsWith('http') || comment.profile_image === '/default-profile.png'
                                 ? comment.profile_image
-                                : `http://localhost:3001/${comment.profile_image}`}
+                                : HOSTNAME + `/${comment.profile_image}`}
                               alt="User"
                               className="rounded-circle me-3 border"
                               width="45"
@@ -1430,7 +1401,7 @@ function Home() {
                               </div>
                               <div className="d-flex align-items-center mb-2">
                                 <p className="text-muted mb-0 small flex-grow-1">{comment.comment_detail}</p>
-                                {Number(comment.user_id) === Number(sessionStorage.getItem("userId")) && (
+                                {user && Number(comment.user_id) === Number(user.user_id) && (
                                   <button
                                     className="btn btn-sm ms-2"
                                     onClick={() => handleDeleteComment(comment.comment_id)}
@@ -1440,6 +1411,7 @@ function Home() {
                                   </button>
                                 )}
                               </div>
+
                               {/* Reply button */}
                               {isLoggedin && (
                                 <button
@@ -1479,7 +1451,7 @@ function Home() {
                                 </div>
                               )}
 
-                              {/* แสดง Replies */}
+                              {/* แสดง Replies - ส่วนที่แก้ไขแล้ว */}
                               {comment.replies && comment.replies.length > 0 && (
                                 <div className="replies-section mt-3 ms-3">
                                   {comment.replies.map((reply) => (
@@ -1488,7 +1460,7 @@ function Home() {
                                         <img
                                           src={reply.profile_image?.startsWith('http') || reply.profile_image === '/default-profile.png'
                                             ? reply.profile_image
-                                            : `http://localhost:3001/${reply.profile_image}`}
+                                            : HOSTNAME + `/${reply.profile_image}`}
                                           alt="User"
                                           className="rounded-circle me-3 border"
                                           width="35"
@@ -1500,11 +1472,24 @@ function Home() {
                                             <strong className="text-dark" style={{ fontSize: '0.9rem' }}>
                                               {reply.full_name || "ไม่ระบุชื่อ"}
                                             </strong>
-                                            <small className="text-muted" style={{ fontSize: '0.8rem' }}>
-                                              {reply.created_at && !isNaN(new Date(reply.created_at).getTime())
-                                                ? format(new Date(reply.created_at), 'dd/MM/yyyy HH:mm', { locale: th })
-                                                : "ไม่ระบุวันที่"}
-                                            </small>
+                                            <div className="d-flex align-items-center gap-2">
+                                              <small className="text-muted" style={{ fontSize: '0.8rem' }}>
+                                                {reply.created_at && !isNaN(new Date(reply.created_at).getTime())
+                                                  ? format(new Date(reply.created_at), 'dd/MM/yyyy HH:mm', { locale: th })
+                                                  : "ไม่ระบุวันที่"}
+                                              </small>
+                                              {/* ปุ่มลบ reply - แสดงเฉพาะเจ้าของ */}
+                                              {user && Number(reply.user_id) === Number(user.user_id) && (
+                                                <button
+                                                  className="btn btn-sm"
+                                                  onClick={() => handleDeleteReply(reply.reply_id, comment.comment_id)}
+                                                  style={{ border: "none", background: "none", padding: "0" }}
+                                                  title="ลบการตอบกลับ"
+                                                >
+                                                  <MdDelete size={16} color="red" />
+                                                </button>
+                                              )}
+                                            </div>
                                           </div>
                                           <p className="text-dark mb-0" style={{ fontSize: '0.85rem', lineHeight: '1.4' }}>
                                             {reply.reply_detail}
@@ -1548,6 +1533,7 @@ function Home() {
                 </div>
               )}
             </Modal>
+
           </div>
         </div >
 
@@ -1585,7 +1571,7 @@ function Home() {
                       >
                         <div className="donate-project-image">
                           <img
-                            src={`http://localhost:3001/uploads/${project.image_path}`}
+                            src={HOSTNAME + `/uploads/${project.image_path}`}
                             alt={project.project_name}
                             onError={(e) => {
                               e.target.src = "./image/default.jpg";

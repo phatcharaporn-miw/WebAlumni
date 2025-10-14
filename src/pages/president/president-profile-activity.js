@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useOutletContext } from "react-router-dom";
 import { useNavigate, useLocation } from 'react-router-dom';
 // import Swal from "sweetalert2";
 import { useAuth } from '../../context/AuthContext';
+import {HOSTNAME} from '../../config.js';
 
 // css
 import '../../css/profile.css';
@@ -18,13 +18,13 @@ function PresidentProfileActivity() {
   const [selectedStatus, setSelectedStatus] = useState('activity');
   const [previewImage, setPreviewImage] = useState(null);
   const { user, handleLogout } = useAuth();
-  const userId = user?.id;
+  const userId = user?.user_id;
   const navigate = useNavigate();
   const location = useLocation();
 
   // ดึงข้อมูลโปรไฟล์
   useEffect(() => {
-    axios.get('http://localhost:3001/users/profile', {
+    axios.get(HOSTNAME +'/users/profile', {
       withCredentials: true
     })
       .then((response) => {
@@ -39,8 +39,8 @@ function PresidentProfileActivity() {
 
   // ดึงประวัติการเข้าร่วมกิจกรรม
   useEffect(() => {
-    if (profile && profile.userId) {
-      axios.get(`http://localhost:3001/activity/activity-history/${profile.userId}`, {
+    if (userId) {
+      axios.get(HOSTNAME +`/activity/activity-history/${profile.userId}`, {
         withCredentials: true,
       })
         .then((response) => {
@@ -53,9 +53,9 @@ function PresidentProfileActivity() {
           console.error('เกิดข้อผิดพลาดในการดึงข้อมูลกิจกรรม:', error.response ? error.response.data.message : error.message);
         });
     }
-  }, [profile]);
+  }, [userId]);
 
-  if (!profile) {
+  if (!userId) {
     return <div>ไม่พบข้อมมูลผู้ใช้</div>;
   }
 
@@ -117,7 +117,7 @@ const formatDate = (dateStr) => {
     formData.append("user_id", profile.userId);
 
     try {
-      const res = await axios.post("http://localhost:3001/users/update-profile-image", formData, {
+      const res = await axios.post(HOSTNAME +"/users/update-profile-image", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -217,7 +217,7 @@ const formatDate = (dateStr) => {
                       {/* Image Container with Overlay */}
                       <div className="image-container position-relative overflow-hidden">
                         <img
-                          src={activity.image_path ? `http://localhost:3001${activity.image_path}` : "/default-image.png"}
+                          src={activity.image_path ? HOSTNAME +`${activity.image_path}` : "/default-image.png"}
                           className="card-img-top activity-image"
                           alt="กิจกรรม"
                           style={{ height: 200, objectFit: 'cover', transition: 'transform 0.3s ease' }}

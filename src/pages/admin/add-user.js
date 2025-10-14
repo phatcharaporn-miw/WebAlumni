@@ -3,6 +3,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import "../../css/add-user.css";
+import {HOSTNAME} from '../../config.js';
 
 function AddUser() {
     const navigate = useNavigate();
@@ -30,8 +31,8 @@ function AddUser() {
     const [majors, setMajors] = useState([]);
 
     useEffect(() => {
-        axios.get("http://localhost:3001/admin/degrees").then((res) => setDegrees(res.data));
-        axios.get("http://localhost:3001/admin/majors").then((res) => setMajors(res.data));
+        axios.get(HOSTNAME +"/admin/degrees").then((res) => setDegrees(res.data));
+        axios.get(HOSTNAME +"/admin/majors").then((res) => setMajors(res.data));
     }, []);
 
 
@@ -87,7 +88,7 @@ function AddUser() {
         }
 
         try {
-            await axios.post("http://localhost:3001/admin/add-user", sendData, {
+            await axios.post(HOSTNAME +"/admin/add-user", sendData, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
             Swal.fire("สำเร็จ!", "เพิ่มผู้ใช้เรียบร้อยแล้ว", "success");

@@ -4,6 +4,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import '../../css/major-detail.css';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import {HOSTNAME} from '../../config.js';
 
 function AdminAlumniView() {
     const { major } = useParams();
@@ -25,7 +26,7 @@ function AdminAlumniView() {
     const displayMajor = majors.find((m) => m.slug === major)?.title || major;
 
     useEffect(() => {
-        axios.get(`http://localhost:3001/alumni/major/${major}`)
+        axios.get(HOSTNAME +`/alumni/major/${major}`)
             .then(res => {
                 // แปลง degree_id เป็นข้อความ
                 const updatedData = res.data.map(student => ({
@@ -103,7 +104,7 @@ function AdminAlumniView() {
     };
 
     // useEffect(() => {
-    //     axios.get("http://localhost:3001/alumni/outstanding-alumni")
+    //     axios.get(HOSTNAME +"/alumni/outstanding-alumni")
     //         .then((res) => setAlumniData(res.data))
     //         .catch((err) => console.error("โหลดศิษย์เก่าดีเด่นล้มเหลว:", err));
     // }, []);
@@ -210,7 +211,7 @@ function AdminAlumniView() {
                         >
                             <div className="d-flex align-items-center shadow p-3 rounded-3 bg-light">
                                 <img
-                                    src={alumni.image_path ? `http://localhost:3001/${alumni.image_path}` : "/default-profile-pic.jpg"}
+                                    src={alumni.image_path ? HOSTNAME +`/${alumni.image_path}` : "/default-profile-pic.jpg"}
                                     alt={alumni.name}
                                     className="rounded-circle me-3"
                                     style={{ width: "70px", height: "70px", objectFit: "cover", border: "2px solid #0F75BC" }}

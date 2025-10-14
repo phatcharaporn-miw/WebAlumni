@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useOutletContext } from "react-router-dom";
 import { useNavigate, useLocation } from 'react-router-dom';
-import { SlHeart } from "react-icons/sl";
 import { MdDelete } from "react-icons/md";
-import { BiSolidComment } from "react-icons/bi";
-import { FaEye } from "react-icons/fa";
 import { IoMdCreate } from "react-icons/io";
 import Swal from "sweetalert2";
 import { useAuth } from '../../context/AuthContext';
+import {HOSTNAME} from '../../config.js';
 // css
 import '../../css/profile.css';
 // bootstrap
@@ -19,7 +16,7 @@ function PresidentProfileWebboard() {
     const [webboard, setWebboard] = useState([]);
     const [profile, setProfile] = useState({});
     const { user, handleLogout } = useAuth();
-    const userId = user?.id;
+    const userId = user?.user_id;
     const [sortOrder, setSortOrder] = useState("latest");
     const [previewImage, setPreviewImage] = useState(null);
     const navigate = useNavigate();
@@ -27,7 +24,7 @@ function PresidentProfileWebboard() {
 
     // ดึงข้อมูลโปรไฟล์
     useEffect(() => {
-        axios.get('http://localhost:3001/users/profile', { withCredentials: true })
+        axios.get(HOSTNAME +'/users/profile', { withCredentials: true })
             .then((response) => {
                 if (response.data.success) {
                     setProfile(response.data.user);
@@ -40,8 +37,8 @@ function PresidentProfileWebboard() {
 
     // ดึงกระทู้ที่ผู้ใช้เคยสร้าง
     useEffect(() => {
-        if (profile && profile.userId) {
-            axios.get(`http://localhost:3001/users/webboard-user/${profile.userId}`, {
+        if (userId) {
+            axios.get(HOSTNAME +`/users/webboard-user/${profile.userId}`, {
                 withCredentials: true
             })
                 .then((response) => {
@@ -53,7 +50,7 @@ function PresidentProfileWebboard() {
                     console.error('เกิดข้อผิดพลาดในการดึงกระทู้ที่สร้าง:', error.response ? error.response.data.message : error.message);
                 });
         }
-    }, [profile]);
+    }, [userId]);
 
     // เรียงลำดับโพสต์ตามวันที่
     const sortedPosts = [...webboard].sort((a, b) => {
@@ -79,7 +76,7 @@ function PresidentProfileWebboard() {
         }).then((result) => {
             if (result.isConfirmed) {
                 axios
-                    .delete(`http://localhost:3001/users/delete-webboard/${webboardId}`, {
+                    .delete(HOSTNAME +`/users/delete-webboard/${webboardId}`, {
                         withCredentials: true,
                     })
                     .then((response) => {
@@ -118,7 +115,7 @@ function PresidentProfileWebboard() {
         formData.append("user_id", profile.userId);
 
         try {
-            const res = await axios.post("http://localhost:3001/users/update-profile-image", formData, {
+            const res = await axios.post(HOSTNAME +"/users/update-profile-image", formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },

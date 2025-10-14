@@ -4,6 +4,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import '../css/major-detail.css';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
+import {HOSTNAME} from '../config.js';
 
 function MajorDetail() {
     const { major } = useParams(); 
@@ -22,7 +23,7 @@ function MajorDetail() {
     const displayMajor = majors.find((m) => m.slug === major)?.title || major;
 
     useEffect(() => {
-        axios.get(`http://localhost:3001/alumni/major/${major}`)
+        axios.get(HOSTNAME + `/alumni/major/${major}`)
             .then(res => {
                 // แปลง degree_id เป็นข้อความ
                 const updatedData = res.data.map(student => ({

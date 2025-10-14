@@ -4,6 +4,7 @@ import axios from 'axios';
 import { MdDateRange } from 'react-icons/md';
 import '../css/news-detail.css';
 import Modal from 'react-modal';
+import {HOSTNAME} from '../config.js';
 
 Modal.setAppElement('#root');
 
@@ -14,14 +15,14 @@ function NewsDetail() {
     const [selectedImage, setSelectedImage] = useState(null);
 
     useEffect(() => {
-        axios.get(`http://localhost:3001/news/news-id/${newsId}`)
+        axios.get(HOSTNAME + `/news/news-id/${newsId}`)
             .then((res) => {
                 if (res.data.success) setNews(res.data.data);
                 else setNews(null);
             })
             .catch((err) => console.error("Error loading news:", err));
 
-        axios.get(`http://localhost:3001/news/related-news/${newsId}`)
+        axios.get(HOSTNAME + `/news/related-news/${newsId}`)
             .then((res) => {
                 if (res.data.success) setRelatedNews(res.data.data);
             })
@@ -41,14 +42,14 @@ function NewsDetail() {
                 {Array.isArray(news.images) && news.images.length > 0 ? (
                     <div className="main-image mb-4">
                         <img
-                            src={`http://localhost:3001${selectedImage || news.images[0]}`}
+                            src={HOSTNAME + `${selectedImage || news.images[0]}`}
                             alt="main"
                             style={{ width: "100%", height: "450px", borderRadius: 10, objectFit: "cover", transition: "0.2s" }}
                         />
                     </div>
                 ) : (
                     <img
-                        src={`http://localhost:3001${news.image_path}`}
+                        src={HOSTNAME + `${news.image_path}`}
                         alt={news.title}
                         className="newsd-image mb-4"
                     />
@@ -62,7 +63,7 @@ function NewsDetail() {
                             {news.images.map((img, idx) => (
                                 <img
                                     key={idx}
-                                    src={`http://localhost:3001${img}`}
+                                    src={HOSTNAME + `${img}`}
                                     alt={`album-${idx}`}
                                     style={{
                                         width: 120,
@@ -103,7 +104,7 @@ function NewsDetail() {
                             }}
                         >
                             <img
-                                src={`http://localhost:3001${selectedImage}`}
+                                src={HOSTNAME + `${selectedImage}`}
                                 alt="large"
                                 style={{
                                     maxWidth: "90vw",
@@ -135,7 +136,7 @@ function NewsDetail() {
                         <div className="col-md-4 col-sm-6 mb-4" key={index}>
                             <div className="newsd-card shadow-sm h-100 rounded">
                                 <img
-                                    src={`http://localhost:3001${related.image_path}`}
+                                    src={HOSTNAME + `${related.image_path}`}
                                     alt={related.title}
                                     className="newsd-card-img"
                                 />

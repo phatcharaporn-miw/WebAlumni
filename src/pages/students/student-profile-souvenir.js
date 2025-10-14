@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
-import { useOutletContext } from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
 import { FaFolderOpen, FaCheckCircle, FaImage, FaFilePdf } from "react-icons/fa";
 import { MdClose } from "react-icons/md";
 import Swal from "sweetalert2";
 import { useAuth } from '../../context/AuthContext';
+import { HOSTNAME } from '../../config.js';
+import { GoArrowUpRight } from "react-icons/go";
+
 // CSS & Bootstrap
 import '../../css/profile.css';
 import '../../css/reUploadSlip.css';
@@ -14,7 +16,6 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 function StudentProfileSouvenir() {
     const [profile, setProfile] = useState({});
-    // const { handleLogout } = useOutletContext();
     const navigate = useNavigate();
     const [orderHistory, setOrderHistory] = useState([]);
     const [previewImage, setPreviewImage] = useState(null);
@@ -27,24 +28,38 @@ function StudentProfileSouvenir() {
     const [currentOrderId, setCurrentOrderId] = useState(null);
     const [selectedFile, setSelectedFile] = useState(null);
     const [isUploading, setIsUploading] = useState(false);
+    // การสั่งซื้อมีปัญหา
+    const [selectedOrder, setSelectedOrder] = useState(null);
     const [showReportModal, setShowReportModal] = useState(false);
+    const [showReturnModal, setShowReturnModal] = useState(false);
+    const [showCancelModal, setShowCancelModal] = useState(false);
     const [issueType, setIssueType] = useState("");
     const [issueDescription, setIssueDescription] = useState("");
+    const [contacted, setContacted] = useState("");
     const [evidenceFile, setEvidenceFile] = useState(null);
-    // const [isReportSubmitting, setIsReportSubmitting] = useState(false);
-    // const userId = sessionStorage.getItem("userId");
     const { user, handleLogout } = useAuth();
-    const userId = user?.id;
+    const userId = user?.user_id;
 
     // สำหรับฟังก์ชันอัปโหลดหลักฐานการสั่งซื้อ
     const [showProofModal, setShowProofModal] = useState(false);
+    const [selectedOrderForConfirm, setSelectedOrderForConfirm] = useState(null);
     const [proofFile, setProofFile] = useState(null);
-    const [proofOrderId, setProofOrderId] = useState(null);
     const [isProofUploading, setIsProofUploading] = useState(false);
+
+    const [companies, setCompanies] = useState([]);
+
+    function formatFullAddress(addr) {
+        if (!addr) return "";
+        return `${addr.shippingAddress || ""} 
+        ต.${addr.sub_district_name || ""} 
+        อ.${addr.district_name || ""} 
+        จ.${addr.province_name || ""} 
+        ${addr.zip_code || ""}`;
+    }
 
     // ดึงข้อมูลโปรไฟล์
     useEffect(() => {
-        axios.get('http://localhost:3001/users/profile', { withCredentials: true })
+        axios.get(HOSTNAME + '/users/profile', { withCredentials: true })
             .then((response) => {
                 if (response.data.success) {
                     setProfile(response.data.user);
@@ -57,21 +72,22 @@ function StudentProfileSouvenir() {
 
     // การค้นหาประวัติการสั่งซื้อ
     const filteredOrders = useMemo(() => {
-        return orderHistory.filter(order => {
+        return (orderHistory || []).filter(order => {
             const keyword = searchTerm.toLowerCase();
             return (
                 order.order_id.toString().includes(keyword) ||
                 order.order_status.toLowerCase().includes(keyword) ||
-                order.products.some(prod =>
+                order.products?.some(prod =>
                     prod.product_name.toLowerCase().includes(keyword))
             );
         });
     }, [orderHistory, searchTerm]);
 
+
     // ดึงประวัติการสั่งซื้อ
     useEffect(() => {
         if (userId) {
-            axios.get(`http://localhost:3001/orders/orders-user/${userId}`)
+            axios.get(HOSTNAME + `/orders/orders-user/${userId}`)
                 .then(response => {
                     setOrderHistory(response.data);
                 })
@@ -84,100 +100,86 @@ function StudentProfileSouvenir() {
         }
     }, [userId]);
 
-    // const confirmReceived = async (orderId) => {
-    //     try {
-    //         const res = await axios.put(`http://localhost:3001/orders/orders-confirm/${orderId}`);
-    //         if (res.data && res.data.success) {
-    //             await Swal.fire({
-    //                 icon: 'success',
-    //                 title: 'ยืนยันสำเร็จ',
-    //                 text: 'คำสั่งซื้อของคุณ "จัดส่งสำเร็จ" แล้ว',
-    //                 confirmButtonText: 'ตกลง'
-    //             });
-    //             // อัปเดตสถานะในหน้าเว็บ (refresh order history)
-    //             setOrderHistory(prev =>
-    //                 prev.map(order =>
-    //                     order.order_id === orderId
-    //                         ? { ...order, order_status: "delivered" }
-    //                         : order
-    //                 )
-    //             );
-    //         } else {
-    //             Swal.fire({
-    //                 icon: 'error',
-    //                 title: 'เกิดข้อผิดพลาด',
-    //                 text: res.data?.message || 'ไม่สามารถยืนยันได้',
-    //             });
-    //         }
-    //     } catch (err) {
-    //         Swal.fire({
-    //             icon: 'error',
-    //             title: 'เกิดข้อผิดพลาด',
-    //             text: 'ไม่สามารถยืนยันได้',
-    //         });
-    //     }
-    // };
+    // กำหนด mapping ของบริษัทกับ URL
+    const courierTrackingLinks = {
+        thailand_post: (trackingNumber) => `https://track.thailandpost.co.th/?trackNumber=${trackingNumber}`,
+        kerry: (trackingNumber) => `https://th.kerryexpress.com/th/track/?track=${trackingNumber}`,
+        dhl: (trackingNumber) => `https://www.dhl.com/th-th/home/tracking/tracking-express.html?tracking-id=${trackingNumber}`,
+        flash: (trackingNumber) => `https://www.flashexpress.co.th/tracking/?se=${trackingNumber}`,
+        'j&t': (trackingNumber) => `https://www.jtexpress.co.th/index/query/gztracking.html?billcode=${trackingNumber}`
+    };
 
-    const handleConfirmReceived = (orderId) => {
-        setProofOrderId(orderId);
+    // ดึงข้อมูลบริษัทขนส่ง
+    useEffect(() => {
+        axios.get(HOSTNAME + "/orders/shipping-companies")
+            .then(res => setCompanies(res.data.companies))
+            .catch(err => console.error(err));
+    }, []);
+
+
+    // เปิด Modal สำหรับยืนยันรับสินค้า
+    const openConfirmModal = (order) => {
+        setSelectedOrderForConfirm(order);
+        setProofFile(null);
         setShowProofModal(true);
     };
 
-    // อัปโหลดหลักฐาน
+    // เมื่อเลือกไฟล์หลักฐาน
     const handleProofFileChange = (e) => {
-        setProofFile(e.target.files[0]);
+        const file = e.target.files[0];
+        if (file) {
+            // ตรวจสอบขนาดไฟล์ (ไม่เกิน 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                alert("ไฟล์มีขนาดใหญ่เกิน 5MB");
+                return;
+            }
+            setProofFile(file);
+        }
     };
 
-    const handleProofSubmit = async (e) => {
-        if (!proofFile) return;
+    // Submit การยืนยันรับสินค้า
+    const handleProofSubmit = async () => {
+        console.log("selectedOrderForConfirm:", selectedOrderForConfirm);
+
+        if (!proofFile) {
+            alert("กรุณาเลือกรูปภาพหลักฐาน");
+            return;
+        }
+
         setIsProofUploading(true);
 
-        try {
-            const formData = new FormData();
-            formData.append("proofImage", proofFile);
+        const formData = new FormData();
+        formData.append('proofImage', proofFile);
 
-            const res = await axios.post(
-                `http://localhost:3001/orders/${proofOrderId}/upload-proof`,
-                formData,
-                { headers: { "Content-Type": "multipart/form-data" } }
+        try {
+            const response = await fetch(
+                `${HOSTNAME}/orders/${selectedOrderForConfirm}/upload-proof`,
+                {
+                    method: 'POST',
+                    body: formData
+                }
             );
 
-            if (res.data && res.data.success) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'อัปโหลดหลักฐานสำเร็จ',
-                    text: 'สินค้าของคุณจัดส่งสำเร็จแล้ว',
-                    confirmButtonText: 'ตกลง'
-                });
-                setOrderHistory(prev =>
-                    prev.map(order =>
-                        order.order_id === proofOrderId
-                            ? { ...order, order_status: "delivered" }
-                            : order
-                    )
-                );
+            const result = await response.json();
+
+            if (result.success) {
+                Swal.fire('สำเร็จ', 'ยืนยันการได้รับสินค้าแล้ว', 'success');
                 setShowProofModal(false);
                 setProofFile(null);
+                // โหลดข้อมูลใหม่
+                setOrderHistory();
             } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'เกิดข้อผิดพลาด',
-                    text: res.data?.message || 'ไม่สามารถอัปโหลดหลักฐานได้',
-                });
+                alert(result.message || "เกิดข้อผิดพลาด");
             }
-        } catch (err) {
-            Swal.fire({
-                icon: 'error',
-                title: 'เกิดข้อผิดพลาด',
-                text: 'ไม่สามารถอัปโหลดหลักฐานได้',
-            });
+        } catch (error) {
+            console.error("Error:", error);
+            alert("เกิดข้อผิดพลาดในการยืนยันการรับสินค้า");
         } finally {
             setIsProofUploading(false);
         }
     };
 
     const reuploadSlip = (orderId) => {
-        // เปิด modal
         setShowUploadModal(true);
     };
 
@@ -189,7 +191,6 @@ function StudentProfileSouvenir() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!selectedFile) return;
-
         setIsUploading(true);
 
         try {
@@ -199,7 +200,7 @@ function StudentProfileSouvenir() {
             console.log("DEBUG currentOrderId:", currentOrderId);
 
             const res = await axios.post(
-                `http://localhost:3001/orders/${currentOrderId}/reupload-slip`,
+                HOSTNAME + `/orders/${currentOrderId}/reupload-slip`,
                 formData,
                 { headers: { "Content-Type": "multipart/form-data" }, withCredentials: true }
             );
@@ -247,9 +248,10 @@ function StudentProfileSouvenir() {
         }
     };
 
+    // ซื้ออีกครั้ง
     const buyAgain = async (orderId) => {
         try {
-            const res = await fetch(`http://localhost:3001/orders/order-buyAgain/${orderId}`);
+            const res = await fetch(HOSTNAME + `/orders/order-buyAgain/${orderId}`);
             const data = await res.json();
 
             // ถ้ามีสินค้าที่พร้อมเพิ่ม
@@ -294,54 +296,81 @@ function StudentProfileSouvenir() {
     };
 
     // เปิด modal
-    const handleReportIssue = (orderId) => {
-        setCurrentOrderId(orderId);
-        setShowReportModal(true);
-    };
-
-    // ส่งข้อมูลปัญหาไป backend (session-based)
-    const handleReportSubmit = async (e) => {
-        e.preventDefault();
-        if (!issueType || !issueDescription) {
-            Swal.fire("แจ้งเตือน", "กรุณากรอกข้อมูลให้ครบ", "warning");
+    const handleReportIssue = (order) => {
+        if (!order?.order_id) {
+            console.error("Order ไม่ถูกต้อง:", order);
+            Swal.fire("แจ้งเตือน", "ไม่พบคำสั่งซื้อที่เลือก", "warning");
             return;
         }
 
+        setSelectedOrder(order);
+        setShowReportModal(true);
+    };
+
+    const [resolutionOptions, setResolutionOptions] = useState([]);
+
+    const toggleResolutionOption = (option) => {
+        setResolutionOptions((prev) => {
+            if (prev.includes(option)) {
+                return prev.filter((item) => item !== option); // เอาออก
+            } else {
+                return [...prev, option]; // เพิ่มเข้า
+            }
+        });
+    };
+
+    // แจ้งปัญหา
+    const handleReportSubmit = async (e) => {
+        e.preventDefault();
+        if (!selectedOrder?.order_id || !issueType || !issueDescription || !contacted) return;
+
         try {
             const formData = new FormData();
-            formData.append("order_id", currentOrderId);
+            formData.append("order_id", selectedOrder.order_id);
             formData.append("issue_type", issueType);
             formData.append("description", issueDescription);
-            if (evidenceFile) formData.append("evidenceImage", evidenceFile);
+            formData.append("contact", contacted);
+            // แปลง Array เป็น JSON string
+            formData.append("resolution_options", JSON.stringify(resolutionOptions)); if (evidenceFile) formData.append("evidenceImage", evidenceFile);
 
             const res = await axios.post(
-                'http://localhost:3001/orders/report-issue',
+                HOSTNAME + '/orders/report-issue',
                 formData,
                 { headers: { "Content-Type": "multipart/form-data" }, withCredentials: true }
             );
 
-            // แจ้งเตือนผู้ใช้ว่าสำเร็จ
             Swal.fire({
                 icon: "success",
                 title: "แจ้งปัญหาสำเร็จ",
-                text: `ระบบได้รับปัญหาของคุณแล้ว (Order #${currentOrderId})`,
+                text: `ระบบได้รับปัญหาของคุณแล้ว (Order #${selectedOrder.order_id})`,
                 timer: 2500,
                 showConfirmButton: false
             });
 
-            // อัปเดต order state ทันที
-            setOrders(prevOrders =>
-                prevOrders.map(order =>
-                    order.order_id === currentOrderId
-                        ? { ...order, order_status: "issue_reported" }
+            // สมมติ backend ส่งกลับ issue_id ของ order ที่สร้างใหม่
+            const issueId = res.data.issue_id;
+
+            setOrders(prev =>
+                prev.map(order =>
+                    order.order_id === selectedOrder.order_id
+                        ? { ...order, order_status: "issue_reported", issue_id: issueId }
                         : order
                 )
             );
 
-            // รีเซ็ตฟอร์ม
+            setOrderHistory(prev =>
+                prev.map(order =>
+                    order.order_id === selectedOrder.order_id
+                        ? { ...order, order_status: "issue_reported", issue_id: issueId }
+                        : order
+                )
+            );
+
             setShowReportModal(false);
+            setSelectedOrder(null);
             setIssueType("");
             setIssueDescription("");
+            setContacted("");
             setEvidenceFile(null);
 
         } catch (error) {
@@ -353,15 +382,113 @@ function StudentProfileSouvenir() {
         }
     };
 
+    // ยืนยันแก้ปัญหาแล้ว
+    const handleResolveIssue = async (orderId) => {
+        try {
+            const result = await Swal.fire({
+                title: "ยืนยันการแก้ไขปัญหา?",
+                text: "เมื่อยืนยันแล้ว รายการนี้จะถูกปิดปัญหาและสถานะจะกลับเป็นปกติ",
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonText: "ยืนยัน",
+                cancelButtonText: "ยกเลิก",
+            });
+
+            if (!result.isConfirmed) return;
+
+            const res = await axios.post(`http://localhost:3001/orders/resolve-issue/${orderId}`);
+
+            if (res.data.success) {
+                Swal.fire("สำเร็จ", "ปัญหานี้แก้ไขเรียบร้อยแล้ว", "success");
+                // รีเฟรชข้อมูล order หรือรีโหลดหน้า
+                setOrderHistory();
+            } else {
+                Swal.fire("เกิดข้อผิดพลาด", res.data.error || "ไม่สามารถอัปเดตสถานะได้", "error");
+            }
+        } catch (err) {
+            console.error(err);
+            Swal.fire("ผิดพลาด", "เกิดข้อผิดพลาดในการอัปเดตสถานะ", "error");
+        }
+    };
+
+
+    // กดยืนยันคืนสินค้า
+    const handleReturn = async (orderId) => {
+        try {
+            setIsUploading(true);
+
+            // ดึง issue_id ล่าสุดของ order
+            const resIssue = await axios.get(HOSTNAME + `/orders/issues/${orderId}`);
+            const issueId = resIssue.data.issue_id;
+            if (!issueId) throw new Error("ไม่พบปัญหาสำหรับคำสั่งซื้อนี้");
+
+            const formData = new FormData();
+            formData.append("issue_id", issueId);
+            if (evidenceFile) formData.append("evidenceImage", evidenceFile);
+            formData.append("reason", "ผู้ใช้คืนสินค้า");
+
+            const res = await axios.post(HOSTNAME + "/orders/return", formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+                withCredentials: true
+            });
+
+            Swal.fire({
+                icon: "success",
+                title: "คืนสินค้าแล้ว",
+                text: "ระบบได้ส่งแจ้งเตือนไปยังแอดมินเรียบร้อยแล้ว กรุณารอการติดต่อจากแอดมิน",
+            });
+
+            // อัปเดต order ใน state ให้ซ่อนปุ่ม และเปลี่ยนสถานะ
+            setOrders(prev =>
+                prev.map(o =>
+                    o.order_id === orderId
+                        ? { ...o, order_status: res.data.newStatus, returned: true }
+                        : o
+                )
+            )
+
+            setShowReturnModal(false);
+            setSelectedOrder(null);
+            setEvidenceFile(null);
+
+        } catch (error) {
+            console.error("Error returning product:", error);
+            Swal.fire({
+                icon: "error",
+                title: "เกิดข้อผิดพลาด",
+                text: error.response?.data?.error || error.message,
+            });
+        } finally {
+            setIsUploading(false);
+        }
+    };
+
+    // ยกเลิกการสั่งซื้อ
+    const [cancelReason, setCancelReason] = useState("");
+    const handleCancel = async (orderId) => {
+        try {
+            const res = await axios.put(
+                HOSTNAME + `/orders/cancel/${orderId}`,
+                { reason: cancelReason, userId: userId }
+            );
+
+            Swal.fire("สำเร็จ", res.data.message, "success");
+            setOrders(prev =>
+                prev.map(o =>
+                    o.order_id === orderId ? { ...o, order_status: "repeal" } : o
+                )
+            );
+
+            setCancelReason("");
+            setShowCancelModal(false);
+        } catch (err) {
+            Swal.fire("ผิดพลาด", err.response?.data?.message || "ไม่สามารถยกเลิกได้", "error");
+        }
+    };
 
     // ฟังก์ชันเปลี่ยนหน้า
     const handleClick = (path) => {
         navigate(path);
-    };
-
-    // ฟังก์ชันไปหน้ารายละเอียดประวัติการสั่งซื้อ
-    const goToManageOrder = () => {
-        navigate("/student-profile/student-profile-souvenir/student-manage-orders");
     };
 
     // อัปโหลดรูปภาพ
@@ -377,7 +504,7 @@ function StudentProfileSouvenir() {
         formData.append("user_id", profile.userId);
 
         try {
-            const res = await axios.post("http://localhost:3001/users/update-profile-image", formData, {
+            const res = await axios.post(HOSTNAME + "/users/update-profile-image", formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
@@ -464,9 +591,6 @@ function StudentProfileSouvenir() {
                         <div className="bg-white rounded-4 shadow-sm p-4 mb-4">
                             <div className="d-flex justify-content-between align-items-center">
                                 <div className="d-flex align-items-center">
-                                    <div className="bg-success bg-opacity-10 rounded-circle p-2 me-3">
-                                        <i className="fas fa-calendar-check text-success fs-5"></i>
-                                    </div>
                                     <div>
                                         <h4 className="fw-bold mb-1">ประวัติการสั่งซื้อของที่ระลึก</h4>
                                         <p className="text-muted mb-0 small">รวบรวมการสั่งซื้อสินค้าทั้งหมด</p>
@@ -489,7 +613,6 @@ function StudentProfileSouvenir() {
                         </div>
 
                         <div className="order-history-list">
-
                             {orderHistory.length === 0 ? (
                                 <div className="text-center py-5">
                                     <div className="empty-state">
@@ -499,7 +622,6 @@ function StudentProfileSouvenir() {
                                             </div>
                                             <h5 className="text-muted">ยังไม่มีประวัติการสั่งซื้อ</h5>
                                             <p className="text-muted mb-4">เมื่อคุณทำการสั่งซื้อสินค้า ประวัติจะแสดงที่นี่</p>
-
                                         </div>
                                     </div>
                                 </div>
@@ -517,31 +639,8 @@ function StudentProfileSouvenir() {
                                                 </small>
                                             </div>
                                             <div className="d-flex flex-column flex-md-row align-items-md-center gap-2">
-                                                <span
-                                                    className={`badge rounded-pill fs-6 px-3 py-2 text-capitalize ${order.order_status === "delivered"
-                                                        ? "text-success bg-success bg-opacity-10"
-                                                        : order.order_status === "shipping"
-                                                            ? "text-primary bg-primary bg-opacity-10"
-                                                            : order.order_status === "processing"
-                                                                ? "text-warning bg-warning bg-opacity-10"
-                                                                : order.order_status === "cancelled"
-                                                                    ? "text-danger bg-danger bg-opacity-10"
-                                                                    : order.order_status === "pending_verification"
-                                                                        ? "text-dark bg-secondary bg-opacity-10"
-                                                                        : "bg-secondary text-white"
-                                                        }`}
-                                                >
-                                                    {order.order_status === "delivered"
-                                                        ? "จัดส่งสำเร็จ"
-                                                        : order.order_status === "shipping"
-                                                            ? "กำลังจัดส่ง"
-                                                            : order.order_status === "processing"
-                                                                ? "กำลังดำเนินการ"
-                                                                : order.order_status === "cancelled"
-                                                                    ? "ยกเลิก"
-                                                                    : order.order_status === "pending_verification"
-                                                                        ? "รอตรวจสอบการชำระเงิน"
-                                                                        : "รอชำระเงิน"}
+                                                <span className={`badge rounded-pill px-2 py-1 ${BADGE_CLASS[order.order_status] || "bg-secondary text-white"}`} style={{ fontSize: "0.9rem" }}>
+                                                    {ORDER_STATUS_LABEL[order.order_status] || "สถานะไม่ระบุ"}
                                                 </span>
                                                 <button
                                                     className="btn btn-outline-secondary btn-sm"
@@ -570,33 +669,72 @@ function StudentProfileSouvenir() {
                                                     </div>
                                                     <div className="col-md-6 mb-2">
                                                         <small className="text-muted d-block">สถานะ</small>
-                                                        <span className="fw-semibold">
-                                                            {order.order_status === "delivered"
-                                                                ? "จัดส่งสำเร็จ"
-                                                                : order.order_status === "shipping"
-                                                                    ? "กำลังจัดส่ง"
-                                                                    : order.order_status === "processing"
-                                                                        ? "กำลังดำเนินการ"
-                                                                        : order.order_status === "cancelled"
-                                                                            ? "ยกเลิก"
-                                                                            : "รอชำระเงิน"}
+                                                        <span className={`badge rounded-pill px-2 py-1 ${BADGE_CLASS[order.order_status] || "bg-secondary text-white"}`} style={{ fontSize: "0.9rem" }}>
+                                                            {ORDER_STATUS_LABEL[order.order_status] || "สถานะไม่ระบุ"}
                                                         </span>
                                                     </div>
                                                 </div>
 
                                                 {/* Shipping Address */}
-                                                <div className="mb-3">
-                                                    <small className="text-muted d-block">ที่อยู่จัดส่ง</small>
-                                                    <span className="fw-semibold">{order.shippingAddress}</span>
+                                                <small className="text-muted d-block mb-2">ที่อยู่จัดส่ง</small>
+                                                <div className="mb-3 p-2 border rounded bg-white d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <p className="mb-1 fw-semibold">
+                                                            {order.full_name}  <span className="mb-1 fw-light fs-6 text-secondary">
+                                                                (+66) {order.phone || "ไม่ระบุ"}
+                                                            </span>
+                                                        </p>
+
+                                                        <p className="mb-0 fw-semibold ">
+                                                            {formatFullAddress(order)}
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <button
+                                                            className="btn btn-outline-secondary btn-sm"
+                                                            onClick={() => {
+                                                                const textToCopy = `${order.full_name} (+66) ${order.phone || ""}, ${formatFullAddress(order)}`;
+                                                                navigator.clipboard.writeText(textToCopy)
+                                                                    .then(() => alert("คัดลอกที่อยู่เรียบร้อยแล้ว"))
+                                                                    .catch(err => console.error("คัดลอกไม่สำเร็จ:", err));
+                                                            }}
+                                                        >
+                                                            คัดลอก
+                                                        </button>
+                                                    </div>
                                                 </div>
 
-                                                {/* Tracking Number */}
-                                                {order.tracking_number && (
-                                                    <div className="mb-3">
-                                                        <small className="text-muted d-block">เลขพัสดุ</small>
-                                                        <span className="text-primary fw-semibold">{order.tracking_number}</span>
+                                                <div key={order.order_id} className="col-md-6 mb-2">
+                                                    <small className="text-muted d-block">บริษัทขนส่ง</small>
+                                                    {order.transport_company_name && order.transport_company_code && order.tracking_number ? (
+                                                        <a
+                                                            href={courierTrackingLinks[order.transport_company_code]?.(order.tracking_number)}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="text-decoration-none"
+                                                        >
+                                                            <div className="bg-white p-2 rounded border d-flex align-items-center justify-content-between">
+                                                                <span className="text-primary fw-bold">{order.transport_company_name}</span>
+                                                                <GoArrowUpRight />
+                                                            </div>
+                                                        </a>
+                                                    ) : order.transport_company_name ? (
+                                                        <div className="bg-white p-2 rounded border text-primary fw-bold">
+                                                            {order.transport_company_name}
+                                                        </div>
+                                                    ) : (
+                                                        <div className="bg-white p-2 rounded border text-muted">
+                                                            ยังไม่ระบุบริษัทขนส่ง
+                                                        </div>
+                                                    )}
+
+                                                    <small className="text-muted d-block mt-2">เลขพัสดุ</small>
+                                                    <div className="bg-white p-2 rounded border">
+                                                        <span className={order.tracking_number ? 'text-primary fw-bold' : 'text-muted'}>
+                                                            {order.tracking_number || "ยังไม่ระบุเลขพัสดุ"}
+                                                        </span>
                                                     </div>
-                                                )}
+                                                </div>
 
                                                 {/* Products Grid */}
                                                 <div className="mb-3">
@@ -607,7 +745,7 @@ function StudentProfileSouvenir() {
                                                                 <div className="card border-0 bg-white shadow-sm h-100 rounded-2">
                                                                     <div className="position-relative">
                                                                         <img
-                                                                            src={prod.image ? `http://localhost:3001/uploads/${prod.image}` : "http://localhost:3001/uploads/default-product.png"}
+                                                                            src={prod.image ? HOSTNAME + `/uploads/${prod.image}` : HOSTNAME + "/uploads/default-product.png"}
                                                                             alt={prod.product_name}
                                                                             className="card-img-top rounded-top-2"
                                                                             style={{ height: "80px", objectFit: "cover" }}
@@ -647,28 +785,28 @@ function StudentProfileSouvenir() {
                                                     </div>
                                                 </div>
 
-                                                {/* Action Button */}
+                                                {/* สถานะการจัดส่ง */}
                                                 <div className="text-end">
-                                                    {order.order_status === "shipping" && (
+                                                    {/* กำลังจัดส่ง / แจ้งปัญหา */}
+                                                    {(order.order_status === "shipping" || order.order_status === "resend_processing") && (
                                                         <>
                                                             <button
                                                                 className="btn btn-danger btn-sm px-3"
-                                                                onClick={() => handleReportIssue(order.order_id)}
+                                                                onClick={() => handleReportIssue(order)}
                                                             >
                                                                 แจ้งปัญหา
                                                             </button>
 
                                                             <button
                                                                 className="btn btn-success btn-sm px-3 me-2"
-                                                                onClick={() => handleConfirmReceived(order.order_id)}
+                                                                onClick={() => openConfirmModal(order.order_id)}
                                                             >
                                                                 ยืนยันได้รับสินค้าแล้ว
                                                             </button>
-
                                                         </>
                                                     )}
 
-                                                    {showReportModal && (
+                                                    {showReportModal && selectedOrder && (
                                                         <div className="modal-backdrop" onClick={handleBackdropClick}>
                                                             <div className="modal-reupload">
                                                                 {/* Modal Header */}
@@ -684,10 +822,10 @@ function StudentProfileSouvenir() {
                                                                 </div>
 
                                                                 {/* Modal Body */}
-                                                                <div className="modal-body">
+                                                                <div className="modal-body-issue">
                                                                     <form onSubmit={handleReportSubmit}>
                                                                         {/* ประเภทปัญหา */}
-                                                                        <div className="mb-3">
+                                                                        <div className="mb-3 text-start">
                                                                             <label className="form-label">ประเภทปัญหา</label>
                                                                             <select
                                                                                 className="form-select"
@@ -703,8 +841,43 @@ function StudentProfileSouvenir() {
                                                                             </select>
                                                                         </div>
 
-                                                                        {/* รายละเอียด */}
-                                                                        <div className="mb-3">
+                                                                        {/* ตัวเลือกวิธีแก้ไข */}
+                                                                        <div className="mb-3 text-start">
+                                                                            <label className="form-label">ต้องการดำเนินการ</label>
+                                                                            <div className="form-check">
+                                                                                <input
+                                                                                    className="form-check-input"
+                                                                                    type="checkbox"
+                                                                                    id="refund"
+                                                                                    checked={resolutionOptions.includes("refund")}
+                                                                                    onChange={() => toggleResolutionOption("refund")}
+                                                                                />
+                                                                                <label className="form-check-label" htmlFor="refund">
+                                                                                    ขอคืนเงิน
+                                                                                </label>
+                                                                            </div>
+                                                                            <div className="form-check">
+                                                                                <input
+                                                                                    className="form-check-input"
+                                                                                    type="checkbox"
+                                                                                    id="return"
+                                                                                    checked={resolutionOptions.includes("return")}
+                                                                                    onChange={() => toggleResolutionOption("return")}
+                                                                                />
+                                                                                <label className="form-check-label" htmlFor="return">
+                                                                                    ขอคืนสินค้า
+                                                                                </label>
+                                                                            </div>
+                                                                            {/* ข้อความเตือน */}
+                                                                            {(resolutionOptions.includes("refund") || resolutionOptions.includes("return")) && (
+                                                                                <div className="alert alert-warning mt-2 p-2 small">
+                                                                                    ⚠️ กรุณาส่งสินค้าคืนก่อน จากนั้นแอดมินจะตรวจสอบและดำเนินการคืนเงินให้ภายหลัง
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
+
+                                                                        {/* รายละเอียดเพิ่มเติม */}
+                                                                        <div className="mb-3 text-start">
                                                                             <label className="form-label">รายละเอียดเพิ่มเติม</label>
                                                                             <textarea
                                                                                 className="form-control w-100"
@@ -716,8 +889,21 @@ function StudentProfileSouvenir() {
                                                                             />
                                                                         </div>
 
+                                                                        {/* ข้อมูลติดต่อ */}
+                                                                        <div className="mb-3 text-start">
+                                                                            <label className="form-label">ข้อมูลติดต่อ</label>
+                                                                            <input
+                                                                                className="form-control w-100"
+                                                                                rows="3"
+                                                                                value={contacted}
+                                                                                onChange={(e) => setContacted(e.target.value)}
+                                                                                placeholder="เบอร์โทร หรือ อีเมล"
+                                                                                required
+                                                                            />
+                                                                        </div>
+
                                                                         {/* แนบหลักฐาน */}
-                                                                        <div className="mb-3">
+                                                                        <div className="mb-3 text-start">
                                                                             <label className="form-label">แนบหลักฐาน (ถ้ามี)</label>
                                                                             <input
                                                                                 type="file"
@@ -761,11 +947,202 @@ function StudentProfileSouvenir() {
                                                                         </div>
                                                                     </form>
                                                                 </div>
+
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                    {/* คืนสินค้า */}
+                                                    {showReturnModal && selectedOrder && (
+                                                        <div className="modal-backdrop">
+                                                            <div className="modal-reupload">
+                                                                {/* Modal Header */}
+                                                                <div className="modal-header">
+                                                                    <h5 className="modal-title">คืนสินค้า</h5>
+                                                                    <button
+                                                                        type="button"
+                                                                        className="close-btn"
+                                                                        onClick={() => setShowReturnModal(false)}
+                                                                    >
+                                                                        ✕
+                                                                    </button>
+                                                                </div>
+
+                                                                {/* Modal Body */}
+                                                                <div className="modal-body">
+                                                                    <div className="mb-3 text-start">
+                                                                        <label className="form-label fw-bold">ชื่อสินค้า</label>
+                                                                        <p>{selectedOrder.product_name}</p>
+                                                                    </div>
+
+                                                                    <div className="mb-3 text-start">
+                                                                        <label className="form-label fw-bold">ที่อยู่จัดส่ง</label>
+                                                                        <p>{selectedOrder.address}</p>
+                                                                    </div>
+
+                                                                    <div className="mb-3 text-start">
+                                                                        <label className="form-label fw-bold">แนบหลักฐาน (ถ้ามี)</label>
+                                                                        <input
+                                                                            type="file"
+                                                                            className="form-control w-100"
+                                                                            accept="image/*,application/pdf"
+                                                                            onChange={(e) => setEvidenceFile(e.target.files[0])}
+                                                                        />
+                                                                    </div>
+
+                                                                    {evidenceFile && (
+                                                                        <div className="file-preview mt-2 p-2 border rounded">
+                                                                            <div className="d-flex align-items-center gap-2">
+                                                                                <div className="fw-bold">{evidenceFile.name}</div>
+                                                                                <button
+                                                                                    type="button"
+                                                                                    className="btn-close"
+                                                                                    onClick={() => setEvidenceFile(null)}
+                                                                                />
+                                                                            </div>
+                                                                        </div>
+                                                                    )}
+
+                                                                    {/* Modal Footer */}
+                                                                    <div className="modal-footer mt-3">
+                                                                        <button
+                                                                            type="button"
+                                                                            className="btn btn-secondary"
+                                                                            onClick={() => setShowReturnModal(false)}
+                                                                            disabled={isUploading}
+                                                                        >
+                                                                            ยกเลิก
+                                                                        </button>
+                                                                        <button
+                                                                            type="button"
+                                                                            className="btn btn-primary"
+                                                                            onClick={() => handleReturn(selectedOrder.order_id)}
+                                                                            disabled={isUploading}
+                                                                        >
+                                                                            {isUploading ? "กำลังบันทึก..." : "บันทึก"}
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     )}
 
 
+                                                    {selectedOrder && selectedOrder.products && selectedOrder.order_status === "issue_reported" && !selectedOrder.returned && (
+                                                        <div className="mt-3 text-center">
+                                                            {selectedOrder.products.some(product => product.is_official === 0) ? (
+                                                                // เคส: มีสินค้าผู้ขายทั่วไป (is_official = 0)
+                                                                <div className="alert alert-warning text-center py-3 px-3 d-flex flex-column flex-md-row justify-content-center align-items-center rounded-3 shadow-sm">
+                                                                    <div className="me-md-3 mb-2 mb-md-0">
+                                                                        <strong> กรุณาติดต่อผู้ขายโดยตรง</strong>
+                                                                    </div>
+
+                                                                    {/* ปุ่มแก้ไขแล้ว */}
+                                                                    <button
+                                                                        className="btn btn-success btn-sm"
+                                                                        onClick={() => handleResolveIssue(selectedOrder.order_id)}
+                                                                    >
+                                                                        แก้ไขแล้ว
+                                                                    </button>
+                                                                </div>
+                                                            ) : (
+                                                                // เคส: มีแต่สินค้าสมาคม (is_official = 1)
+                                                                <button
+                                                                    className="btn btn-secondary btn-sm px-3"
+                                                                    onClick={() => setShowReturnModal(true)}
+                                                                >
+                                                                    คืนสินค้า
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                    )}
+
+
+
+                                                    {/* ยกเลิกการสั่งซื้อ */}
+                                                    <div>
+                                                        {order.order_status === "processing" && (
+                                                            <button
+                                                                className="btn btn-danger btn-sm px-3"
+                                                                onClick={() => {
+                                                                    setSelectedOrder(order);
+                                                                    setShowCancelModal(true);
+                                                                }}
+                                                            >
+                                                                ยกเลิกการสั่งซื้อ
+                                                            </button>
+                                                        )}
+
+                                                        {showCancelModal && selectedOrder && (
+                                                            <div className="modal-backdrop">
+                                                                <div className="modal-reupload">
+                                                                    <div className="modal-header">
+                                                                        <h5 className="modal-title">ยกเลิกการสั่งซื้อ</h5>
+                                                                        <button
+                                                                            type="button"
+                                                                            className="close-btn"
+                                                                            onClick={() => setShowCancelModal(false)}
+                                                                        >
+                                                                            ✕
+                                                                        </button>
+                                                                    </div>
+
+                                                                    <div className="modal-body">
+                                                                        {/* วันที่สั่งซื้อ */}
+                                                                        <div className="mb-3 text-start">
+                                                                            <label className="form-label fw-bold">วันที่สั่งซื้อ</label>
+                                                                            <p>
+                                                                                {selectedOrder.order_date
+                                                                                    ? `${formatDate(selectedOrder.order_date)}`
+                                                                                    : "ยังไม่ทราบวันที่สั่งซื้อ"}
+                                                                            </p>
+                                                                        </div>
+
+                                                                        {/* สินค้า */}
+                                                                        <div className="mb-3 text-start">
+                                                                            <label className="form-label fw-bold">สินค้า</label>
+                                                                            <p>{selectedOrder.product_name}</p>
+                                                                        </div>
+
+                                                                        {/* ที่อยู่จัดส่ง */}
+                                                                        <div className="mb-3 text-start">
+                                                                            <label className="form-label fw-bold">ที่อยู่จัดส่ง</label>
+                                                                            <p>{selectedOrder.address}</p>
+                                                                        </div>
+
+                                                                        {/* เหตุผล */}
+                                                                        <div className="mb-3 text-start">
+                                                                            <label className="form-label fw-bold">เหตุผล/ปัญหาที่เจอ</label>
+                                                                            <textarea
+                                                                                className="form-control w-100"
+                                                                                value={cancelReason}
+                                                                                onChange={(e) => setCancelReason(e.target.value)}
+                                                                            />
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div className="modal-footer mt-3">
+                                                                        <button
+                                                                            type="button"
+                                                                            className="btn btn-secondary"
+                                                                            onClick={() => setShowCancelModal(false)}
+                                                                        >
+                                                                            ยกเลิก
+                                                                        </button>
+                                                                        <button
+                                                                            type="button"
+                                                                            className="btn btn-primary"
+                                                                            onClick={() => handleCancel(selectedOrder.order_id)}
+                                                                        >
+                                                                            ตกลง
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </div>
+
+                                                    {/* โดนปฏิเสธการชำระเงิน */}
                                                     <div>
                                                         {order.order_status === "cancelled" && (
                                                             <button
@@ -895,6 +1272,7 @@ function StudentProfileSouvenir() {
                                                         )}
                                                     </div>
 
+                                                    {/* จัดส่งสำเร็จ */}
                                                     {order.order_status === "delivered" && (
                                                         <button
                                                             className="btn btn-primary btn-sm px-3"
@@ -904,7 +1282,6 @@ function StudentProfileSouvenir() {
                                                         </button>
                                                     )}
                                                 </div>
-
                                             </div>
                                         </div>
                                     </div>
@@ -914,31 +1291,114 @@ function StudentProfileSouvenir() {
                     </div>
                 </div>
             </div>
-            {/* Modal อัปโหลดหลักฐาน */}
+
+            {/* ยืนยันได้รับสินค้าแล้ว */}
             {showProofModal && (
-                <div className="modal-backdrop" onClick={e => { if (e.target.classList.contains("modal-backdrop")) setShowProofModal(false); }}>
-                    <div className="modal-reupload">
-                        <div className="modal-header">
-                            <h5 className="modal-title">อัปโหลดหลักฐานการได้รับสินค้า</h5>
-                            <button type="button" className="close-btn" onClick={() => setShowProofModal(false)}>✕</button>
+                <div
+                    className="modal-backdrop"
+                    style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%',
+                        backgroundColor: 'rgba(0,0,0,0.5)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 1050
+                    }}
+                    onClick={(e) => {
+                        if (e.target.classList.contains("modal-backdrop")) {
+                            setShowProofModal(false);
+                        }
+                    }}
+                >
+                    <div
+                        className="modal-reupload"
+                        style={{
+                            backgroundColor: 'white',
+                            borderRadius: '8px',
+                            maxWidth: '500px',
+                            width: '90%',
+                            maxHeight: '80vh',
+                            overflow: 'auto'
+                        }}
+                    >
+                        <div className="modal-header" style={{ padding: '1rem', borderBottom: '1px solid #dee2e6' }}>
+                            <h5 className="modal-title">ยืนยันการรับสินค้า</h5>
+                            <button
+                                type="button"
+                                className="close-btn"
+                                onClick={() => setShowProofModal(false)}
+                                style={{
+                                    background: 'none',
+                                    border: 'none',
+                                    fontSize: '1.5rem',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                ✕
+                            </button>
                         </div>
-                        <div className="modal-body">
-                            <input
-                                type="file"
-                                accept="image/*"
-                                onChange={handleProofFileChange}
-                                disabled={isProofUploading}
-                            />
+
+                        <div className="modal-body" style={{ padding: '1rem' }}>
+                            <div className="alert alert-info mb-3">
+                                <small>
+                                    <strong>หมายเหตุ:</strong> กรุณาอัปโหลดรูปภาพหลักฐานการได้รับสินค้า
+                                    (เช่น รูปถ่ายสินค้าที่ได้รับ หรือหลักฐานการเซ็นรับสินค้า)
+                                </small>
+                            </div>
+
+                            <div className="mb-3">
+                                <label className="form-label">
+                                    อัปโหลดรูปภาพหลักฐาน <span className="text-danger">*</span>
+                                </label>
+                                <input
+                                    type="file"
+                                    className="form-control"
+                                    accept="image/*"
+                                    onChange={handleProofFileChange}
+                                    disabled={isProofUploading}
+                                />
+                                <small className="text-muted">รองรับไฟล์: JPG, PNG (ไม่เกิน 5MB)</small>
+                            </div>
+
                             {proofFile && (
                                 <div className="mt-3">
-                                    <img src={URL.createObjectURL(proofFile)} alt="proof" style={{ maxWidth: "100%", maxHeight: "200px" }} />
+                                    <label className="form-label">ตัวอย่างรูปภาพ:</label>
+                                    <div style={{ textAlign: 'center' }}>
+                                        <img
+                                            src={URL.createObjectURL(proofFile)}
+                                            alt="proof preview"
+                                            style={{
+                                                maxWidth: "100%",
+                                                maxHeight: "300px",
+                                                borderRadius: '4px',
+                                                border: '1px solid #dee2e6'
+                                            }}
+                                        />
+                                    </div>
                                 </div>
                             )}
                         </div>
-                        <div className="modal-footer">
-                            <button type="button" className="btn btn-secondary" onClick={() => setShowProofModal(false)} disabled={isProofUploading}>ยกเลิก</button>
-                            <button type="button" className="btn btn-primary" onClick={handleProofSubmit} disabled={!proofFile || isProofUploading}>
-                                {isProofUploading ? "กำลังอัปโหลด..." : "อัปโหลด"}
+
+                        <div className="modal-footer" style={{ padding: '1rem', borderTop: '1px solid #dee2e6' }}>
+                            <button
+                                type="button"
+                                className="btn btn-secondary"
+                                onClick={() => setShowProofModal(false)}
+                                disabled={isProofUploading}
+                            >
+                                ยกเลิก
+                            </button>
+                            <button
+                                type="button"
+                                className="btn btn-success"
+                                onClick={handleProofSubmit}
+                                disabled={!proofFile || isProofUploading}
+                            >
+                                {isProofUploading ? "กำลังอัปโหลด..." : "ยืนยันการรับสินค้า"}
                             </button>
                         </div>
                     </div>
@@ -947,5 +1407,44 @@ function StudentProfileSouvenir() {
         </section>
     );
 }
+
+// สร้าง mapping ไว้ข้างนอก component
+const ORDER_STATUS_LABEL = {
+    pending_verification: "รอตรวจสอบการชำระเงิน",
+    processing: "กำลังดำเนินการ",
+    shipping: "กำลังจัดส่ง",
+    delivered: "จัดส่งสำเร็จ",
+    resolved: "เสร็จสิ้นแล้ว",
+    issue_reported: "มีปัญหาการจัดส่ง",
+    refund_approved: "คืนเงินสำเร็จ",
+    resend_processing: "ส่งสินค้าใหม่กำลังดำเนินการ",
+    issue_rejected: "ปัญหาไม่ได้รับการแก้ไข",
+    return_pending: "ผู้ใช้ส่งสินค้าคืน",
+    return_approved: "คืนสินค้าสำเร็จ",
+    return_rejected: "การคืนไม่ผ่าน",
+    cancelled: "สลิปไม่ถูกต้อง",
+    repeal_pending: "ยกเลิกการสั่งซื้อ",
+    repeal_approved: "ยกเลิกการสั่งซื้อสำเร็จ",
+    repeal_rejected: "ปฏิเสธการยกเลิก",
+};
+
+const BADGE_CLASS = {
+    pending_verification: "text-dark bg-secondary bg-opacity-10", // เทาเข้ม
+    processing: "text-warning bg-warning bg-opacity-10",          // เหลือง
+    shipping: "text-primary bg-primary bg-opacity-10",            // น้ำเงิน
+    delivered: "text-success bg-success bg-opacity-10",
+    resolved: "text-success bg-success bg-opacity-10",        // เขียว
+    issue_reported: "text-white bg-danger",                       // แดงสด
+    refund_approved: "text-success bg-success bg-opacity-10",           // ฟ้า
+    resend_processing: "text-primary bg-primary bg-opacity-10",    // ม่วง (custom class)
+    issue_rejected: "text-danger bg-danger bg-opacity-25",        // แดงอ่อน
+    return_pending: "text-warning bg-warning bg-opacity-10",         // ส้ม (custom class)
+    return_approved: "text-success bg-success bg-opacity-10",     // เขียวอ่อน
+    return_rejected: "text-danger bg-danger bg-opacity-25",
+    cancelled: "text-dark bg-dark bg-opacity-25",
+    repeal_pending: "text-dark bg-dark bg-opacity-25",
+    repeal_approved: "text-success bg-success bg-opacity-10",
+    repeal_rejected: "text-danger bg-danger bg-opacity-25",
+};
 
 export default StudentProfileSouvenir;

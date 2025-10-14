@@ -1,4 +1,4 @@
-import React from "react";
+// import React from "react";
 import "../css/Footer.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { NavLink } from "react-router-dom";
