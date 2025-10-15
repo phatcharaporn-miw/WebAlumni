@@ -40,9 +40,11 @@ export const breadcrumbMapping = {
     "/alumni-profile/alumni-profile-souvenir": "ประวัติการสั่งซื้อของที่ระลึก",
     "/alumni-profile/alumni-profile-donation": "ประวัติการบริจาค",
     "/alumni-profile/alumni-manage-orders": "จัดการคำสั่งซื้อของที่ระลึก",
-    // "/alumni-profile/alumni-profile-souvenir/alumni-orders-history": "ประวัติการสั่งซื้อของที่ระลึก",
-    
-    
+    "/alumni/major-detail/cs" : "สาขาวิทยาการคอมพิวเตอร์",
+    "/alumni/major-detail/it" : "สาขาเทคโนโลยีสารสนเทศ",
+    "/alumni/major-detail/gis" : "สาขาภูมิสารสนเทศศาสตร์",
+    "/alumni/major-detail/cy" : "สาขาความปลอดภัยไซเบอร์",
+    "/alumni/major-detail/ai" : "สาขาปัญญาประดิษฐ์",
     
     // ส่วนศิษย์ปัจุบัน
     "/student-profile": "โปรไฟล์",

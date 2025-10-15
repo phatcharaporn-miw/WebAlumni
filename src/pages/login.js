@@ -38,89 +38,79 @@ function Login() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setErrorMessage('');
+  e.preventDefault();
+  setIsSubmitting(true);
+  setErrorMessage('');
 
-    // ตรวจสอบข้อมูลก่อนส่ง
-    if (!username.trim() || !password.trim()) {
-      setErrorMessage("กรุณากรอกชื่อผู้ใช้งานและรหัสผ่าน");
-      setIsSubmitting(false);
-      return;
-    }
+  if (!username.trim() || !password.trim()) {
+    setErrorMessage("กรุณากรอกชื่อผู้ใช้งานและรหัสผ่าน");
+    setIsSubmitting(false);
+    return;
+  }
 
-    try {
-      
-      // ใช้ handleLogin จาก AuthContext
-      const response = await handleLogin(username.trim(), password.trim());
+  try {
+    const response = await handleLogin(username.trim(), password.trim());
+    console.log('Login response:', response);
 
-      console.log('Login successful:', response);
+    if (response.success) {
+      const { role, firstLogin } = response;
 
-      if (response.success) {
-        const { role, firstLogin } = response;
-
-        // รอให้ state update เสร็จก่อน navigate
-        setTimeout(() => {
-          if (firstLogin) {
-            return navigate('/change-password');
-          }
-
-          // นำทางไปหน้าหลักตาม role
-          switch (Number(role)) {
-            case 1:
-              navigate('/admin-home');
-              break;
-            case 2:
-              navigate('/president-home');
-              break;
-            case 3:
-              navigate('/alumni-home');
-              break;
-            case 4:
-              navigate('/student-home');
-              break;
-            default:
-              setErrorMessage('Unknown role. Please contact support.');
-          }
-        }, 100);
-
-      } else {
-        setErrorMessage(response.message || 'เข้าสู่ระบบไม่สำเร็จ');
+      if (firstLogin) {
+        console.log('First login detected, redirecting to change-password');
+        navigate('/change-password');
+        return;
       }
-    } catch (error) {
-      console.error('Login error:', error);
-      
-      if (error.response) {
-        const status = error.response.status;
-        const message = error.response.data?.message;
-        
-        switch (status) {
-          case 400:
-            setErrorMessage(message || 'ข้อมูลที่ส่งไม่ถูกต้อง กรุณาตรวจสอบชื่อผู้ใช้และรหัสผ่าน');
-            break;
-          case 401:
-            setErrorMessage('ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง');
-            break;
-          case 403:
-            setErrorMessage('บัญชีของคุณถูกระงับ กรุณาติดต่อผู้ดูแลระบบ');
-            break;
-          case 500:
-            setErrorMessage('เกิดข้อผิดพลาดในระบบ กรุณาลองใหม่อีกครั้ง');
-            break;
-          default:
-            setErrorMessage(message || `เกิดข้อผิดพลาด (${status})`);
-        }
-      } else if (error.request) {
-        setErrorMessage('ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้ กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ท');
-      } else if (error.code === 'ECONNABORTED') {
-        setErrorMessage('การเชื่อมต่อหมดเวลา กรุณาลองใหม่อีกครั้ง');
-      } else {
-        setErrorMessage(error.message || 'เกิดข้อผิดพลาดที่ไม่คาดคิด กรุณาลองใหม่อีกครั้ง');
+
+      switch (Number(role)) {
+        case 1:
+          navigate('/admin-home');
+          break;
+        case 2:
+          navigate('/president-home');
+          break;
+        case 3:
+          navigate('/alumni-home');
+          break;
+        case 4:
+          navigate('/student-home');
+          break;
+        default:
+          setErrorMessage('Unknown role. Please contact support.');
       }
-    } finally {
-      setIsSubmitting(false);
+    } else {
+      setErrorMessage(response.message || 'เข้าสู่ระบบไม่สำเร็จ');
     }
-  };
+  } catch (error) {
+    console.error('Login error:', error);
+    if (error.response) {
+      const status = error.response.status;
+      const message = error.response.data?.message;
+      switch (status) {
+        case 400:
+          setErrorMessage(message || 'ข้อมูลที่ส่งไม่ถูกต้อง');
+          break;
+        case 401:
+          setErrorMessage('ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง');
+          break;
+        case 403:
+          setErrorMessage('บัญชีของคุณถูกระงับ');
+          break;
+        case 500:
+          setErrorMessage('เกิดข้อผิดพลาดในระบบ');
+          break;
+        default:
+          setErrorMessage(message || `เกิดข้อผิดพลาด (${status})`);
+      }
+    } else if (error.request) {
+      setErrorMessage('ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้');
+    } else {
+      setErrorMessage(error.message || 'เกิดข้อผิดพลาดที่ไม่คาดคิด');
+    }
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
 
   const logo = <img className="form-login-logo" src="./image/สมาคม-logo.png" alt="Logo" />;
   

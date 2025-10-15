@@ -3,7 +3,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import "../../css/add-user.css";
-import {HOSTNAME} from '../../config.js';
+import { HOSTNAME } from '../../config.js';
 
 function AddUser() {
     const navigate = useNavigate();
@@ -31,9 +31,35 @@ function AddUser() {
     const [majors, setMajors] = useState([]);
 
     useEffect(() => {
-        axios.get(HOSTNAME +"/admin/degrees").then((res) => setDegrees(res.data));
-        axios.get(HOSTNAME +"/admin/majors").then((res) => setMajors(res.data));
+        axios.get(HOSTNAME + "/admin/degrees").then((res) => setDegrees(res.data));
+        axios.get(HOSTNAME + "/admin/majors").then((res) => setMajors(res.data));
     }, []);
+
+    // นำเข้าข้อมูลศิษย์เก่า ไฟล์ excel
+    const handleExcelUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append("excelFile", file);
+
+        try {
+            const res = await axios.post(HOSTNAME + "/alumni/upload-excel", formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+
+            if (res.data.success) {
+                Swal.fire("สำเร็จ", "นำเข้าข้อมูลสำเร็จแล้ว!", "success");
+            } else {
+                Swal.fire("ผิดพลาด", res.data.message || "ไม่สามารถนำเข้าข้อมูลได้", "error");
+            }
+        } catch (error) {
+            console.error(error);
+            Swal.fire("ผิดพลาด", "เกิดข้อผิดพลาดในการอัปโหลดไฟล์", "error");
+        }
+    };
 
 
     const handleChange = (e) => {
@@ -88,7 +114,7 @@ function AddUser() {
         }
 
         try {
-            await axios.post(HOSTNAME +"/admin/add-user", sendData, {
+            await axios.post(HOSTNAME + "/admin/add-user", sendData, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
             Swal.fire("สำเร็จ!", "เพิ่มผู้ใช้เรียบร้อยแล้ว", "success");
@@ -101,7 +127,20 @@ function AddUser() {
 
     return (
         <div className="container p-5">
-            <h3 className="admin-title">เพิ่มผู้ใช้ใหม่</h3>
+             <h3 className="admin-title">เพิ่มผู้ใช้ใหม่</h3>
+
+    <div className="mb-3 d-flex justify-content-end align-items-center">
+        <label htmlFor="excelUpload" className="btn btn-success">
+            นำเข้าข้อมูลจาก Excel
+        </label>
+        <input
+            type="file"
+            id="excelUpload"
+            accept=".xlsx, .xls"
+            onChange={handleExcelUpload}
+            style={{ display: "none" }}
+        />
+    </div>
             <form onSubmit={handleSubmit} className="mt-3">
                 <div className="mb-3">
                     <label className="form-label">ชื่อ-นามสกุล</label>

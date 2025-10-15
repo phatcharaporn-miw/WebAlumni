@@ -231,7 +231,7 @@ function SouvenirDetail() {
                     )}
                 </div>
                 <hr />
-                <div className="souvenirDetail-content-item">
+                {/* <div className="souvenirDetail-content-item">
                     <p className="souvenirDetail-other-products-title">สินค้าอื่นๆ</p>
                     <div className="souvenirDetail-other-products">
                         {randomProducts.length > 0 ? (
@@ -278,6 +278,88 @@ function SouvenirDetail() {
                             <p>ไม่มีสินค้าอื่นๆ</p>
                         )}
                     </div>
+                </div> */}
+                <div className="souvenirDetail-content-item mt-5">
+                    <h5 className="souvenirDetail-other-products-title text-center mb-4 fw-bold">
+                        สินค้าอื่นๆ
+                    </h5>
+
+                    {randomProducts.length > 0 ? (
+                        <div className="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-4">
+                            {randomProducts.map((product) => (
+                                <div className="col" key={product.product_id}>
+                                    {/* ถ้าสินค้าหมด */}
+                                    {product.is_sold_out ? (
+                                        <div
+                                            className="souvenir-item card h-100 border-0 shadow-sm position-relative hover-shadow transition-all sold-out"
+                                            style={{ cursor: "not-allowed" }}
+                                        >
+                                            <div className="position-relative">
+                                                <img
+                                                    className="souvenir-item-img card-img-top rounded-top"
+                                                    src={HOSTNAME + `/uploads/${product.image}`}
+                                                    alt={product.product_name}
+                                                    style={{
+                                                        objectFit: "cover",
+                                                        height: "180px",
+                                                        width: "100%",
+                                                        filter: "grayscale(90%) opacity(0.6)",
+                                                    }}
+                                                />
+                                            </div>
+                                            <div className="card-body text-center">
+                                                <p className="card-title fw-semibold mb-1 text-truncate">
+                                                    {product.product_name}
+                                                </p>
+                                                <p className="souvenir-item-price text-muted mb-1">
+                                                    ฿{product.price}
+                                                </p>
+                                                <span className="badge bg-danger mb-2 px-3 py-1">สินค้าหมดแล้ว</span>
+                                                <small className="text-muted d-block">
+                                                    รอผู้ดูแลเพิ่มสินค้า
+                                                </small>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        // ถ้ายังมีสินค้า กดที่การ์ดได้
+                                        <Link
+                                            to={`/souvenir/souvenirDetail/${product.product_id}`}
+                                            className="text-decoration-none text-dark"
+                                        >
+                                            <div
+                                                className="souvenir-item card h-100 border-0 shadow-sm position-relative hover-shadow transition-all"
+                                                style={{ cursor: "pointer" }}
+                                            >
+                                                <div className="position-relative">
+                                                    <img
+                                                        className="souvenir-item-img card-img-top rounded-top"
+                                                        src={HOSTNAME + `/uploads/${product.image}`}
+                                                        alt={product.product_name}
+                                                        style={{
+                                                            objectFit: "cover",
+                                                            height: "180px",
+                                                            width: "100%",
+                                                            transition: "transform 0.3s ease-in-out",
+                                                        }}
+                                                    />
+                                                </div>
+                                                <div className="card-body text-center">
+                                                    <p className="card-title fw-semibold mb-1 text-truncate">
+                                                        {product.product_name}
+                                                    </p>
+                                                    <p className="souvenir-item-price text-success fw-bold mb-0">
+                                                        ฿{product.price}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </Link>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <p className="text-center text-muted mt-4">ไม่มีสินค้าอื่นๆ ในตอนนี้</p>
+                    )}
                 </div>
             </div>
         </>

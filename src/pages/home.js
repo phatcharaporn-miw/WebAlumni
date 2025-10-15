@@ -736,7 +736,7 @@ function Home() {
   };
 
   const handleReadMore = (newsId) => {
-    navigate(HOSTNAME +`/news/${newsId}`);
+    navigate(`/news/${newsId}`);
   };
 
   const calculateDaysRemaining = (endDate) => {

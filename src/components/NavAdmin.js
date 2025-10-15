@@ -4,10 +4,11 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { FaTrash } from 'react-icons/fa';
+import { FaCamera } from "react-icons/fa";
 import '../css/navAdmin.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useAuth } from '../context/AuthContext';
-import {HOSTNAME} from '../config.js';
+import { HOSTNAME } from '../config.js';
 
 function NavAdmin() {
     const navigate = useNavigate();
@@ -15,8 +16,12 @@ function NavAdmin() {
     const [showNotifications, setShowNotifications] = useState(false);
     const [unreadCount, setUnreadCount] = useState(0);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const { user, handleLogout, loading , initialized} = useAuth();
-    
+    const { user, handleLogout, loading, initialized } = useAuth();
+
+    // จัดการรูปโปรไฟล์
+    const [previewImage, setPreviewImage] = useState(null); // สำหรับแสดงรูปภาพก่อนอัปโหลด
+    const [profile, setProfile] = useState();
+
     const userId = user?.user_id;
     const role = user?.role;
     const username = user?.username;
@@ -24,52 +29,83 @@ function NavAdmin() {
 
     // รอ loading เสร็จก่อนตรวจสอบ authentication
     useEffect(() => {
-  if (!initialized) return; // รอ AuthProvider initialize
-  if (loading) return; // รอ fetch user profile เสร็จ
+        if (!initialized) return; // รอ AuthProvider initialize
+        if (loading) return; // รอ fetch user profile เสร็จ
 
-  if (!userId || !role) {
-    console.log('No user or role, redirecting to login');
-    navigate('/login');
-    return;
-  }
+        if (!userId || !role) {
+            console.log('No user or role, redirecting to login');
+            navigate('/login');
+            return;
+        }
 
-  console.log("User data:", user);
-  console.log("Profile picture:", profilePicture);
-}, [initialized, loading, user, role, navigate]);
+        console.log("User data:", user);
+        console.log("Profile picture:", profilePicture);
+    }, [initialized, loading, user, role, navigate]);
+
+    // เปลี่ยนรูปโปรไฟล์
+    const handleImageChange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        setPreviewImage(URL.createObjectURL(file));
+
+        const formData = new FormData();
+        formData.append("image_path", file);
+        formData.append("user_id", userId);
+
+        try {
+            const res = await axios.post(
+                "http://localhost:3001/users/update-profile-image",
+                formData,
+                { headers: { "Content-Type": "multipart/form-data" } }
+            );
+
+            if (res.status === 200) {
+                Swal.fire("สำเร็จ!", "อัปโหลดรูปโปรไฟล์เรียบร้อยแล้ว", "success");
+
+                // อัปเดตรูปโปรไฟล์ใหม่
+                setPreviewImage(HOSTNAME + "/" + res.data.newImagePath);
+            } else {
+                Swal.fire("ผิดพลาด", res.data.message || "เกิดข้อผิดพลาด", "error");
+            }
+        } catch (err) {
+            console.error(err);
+            Swal.fire("ผิดพลาด", "ไม่สามารถอัปโหลดรูปได้", "error");
+        }
+    };
 
 
     const onLogout = async () => {
-    const result = await Swal.fire({
-        title: 'คุณแน่ใจหรือไม่?',
-        text: 'คุณต้องการออกจากระบบหรือไม่?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'ใช่, ออกจากระบบ!',
-        cancelButtonText: 'ยกเลิก',
-    });
+        const result = await Swal.fire({
+            title: 'คุณแน่ใจหรือไม่?',
+            text: 'คุณต้องการออกจากระบบหรือไม่?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'ใช่, ออกจากระบบ!',
+            cancelButtonText: 'ยกเลิก',
+        });
 
-    if (result.isConfirmed) {
-        // handleLogout จะ redirect เอง ไม่ต้องทำอะไรเพิ่ม
-        handleLogout();
-    }
-};
+        if (result.isConfirmed) {
+            // handleLogout จะ redirect เอง ไม่ต้องทำอะไรเพิ่ม
+            handleLogout();
+        }
+    };
 
     useEffect(() => {
         if (!role) {
             navigate('/login');
             return;
         }
-        
-        // console.log("User data:", user);
-        // console.log("Profile picture:", profilePicture);
+
     }, [role, user, navigate]);
 
+    // แจ้งเตือน
     useEffect(() => {
         if (!userId) return;
         const fetchNotifications = () => {
-            axios.get(HOSTNAME +`/notice/notification/${userId}`)
+            axios.get(HOSTNAME + `/notice/notification/${userId}`)
                 .then((response) => {
                     if (response.data.success) {
                         const data = response.data.data || [];
@@ -88,7 +124,7 @@ function NavAdmin() {
 
     // ฟังก์ชันอื่นๆ ยังเหมือนเดิม...
     const markAsRead = (notificationId) => {
-        axios.put(HOSTNAME +`/notice/read/${notificationId}`)
+        axios.put(HOSTNAME + `/notice/read/${notificationId}`)
             .then(() => {
                 setNotifications((prevNotifications) =>
                     prevNotifications.map((n) =>
@@ -108,7 +144,7 @@ function NavAdmin() {
     };
 
     const deleteNotification = (notificationId) => {
-        axios.delete(HOSTNAME +`/notice/notification/${notificationId}`)
+        axios.delete(HOSTNAME + `/notice/notification/${notificationId}`)
             .then(() => {
                 setNotifications(notifications.filter((n) => n.notification_id !== notificationId));
                 setUnreadCount((prev) => Math.max(prev - 1, 0));
@@ -159,7 +195,6 @@ function NavAdmin() {
             </div>
         );
     }
-
     // ถ้าไม่มี user หลังจาก loading เสร็จแล้ว ก็ไม่แสดงอะไร (จะ redirect ไปแล้ว)
     if (!user) {
         return null;
@@ -233,25 +268,79 @@ function NavAdmin() {
 
                 {/* Profile - ใช้ข้อมูลจาก user context โดยตรง */}
                 {userId && (
-                    <div className="card-body text-center" style={profileContainer}>
-                        <img
-                            src={profilePicture || HOSTNAME +"/uploads/default-profile.png"}
-                            alt="profile"
-                            className="rounded-circle img-fluid"
-                            style={profilePicStyle}
-                            onError={(e) => {
-                                console.error("Failed to load profile picture:", e.target.src);
-                                e.target.src = HOSTNAME +"/uploads/default-profile.png";
+                    <div className="card-body text-center" style={{ padding: "20px"}}>
+                        <div
+                            className="position-relative d-inline-block"
+                            style={{
+                                width: "130px",
+                                height: "130px",
                             }}
-                            onLoad={() => {
-                                console.log("Profile picture loaded successfully:", profilePicture);
-                            }}
-                        />
-                        <h5 className="my-3" style={{ fontSize: '18px', fontWeight: '500' }}>
-                            ยินดีต้อนรับ {username || 'ผู้ดูแลระบบ'}
+                        >
+                            {/* Input file ซ่อน */}
+                            <input
+                                type="file"
+                                accept="image/*"
+                                id="profileUpload"
+                                style={{ display: "none" }}
+                                onChange={handleImageChange}
+                            />
+
+                            {/* รูปโปรไฟล์ */}
+                            <img
+                                src={
+                                    previewImage ||
+                                    profilePicture ||
+                                    `${HOSTNAME}/uploads/default-profile.png`
+                                }
+                                alt="profile"
+                                className="rounded-circle shadow-sm"
+                                style={{
+                                    width: "130px",
+                                    height: "130px",
+                                    objectFit: "cover",
+                                    border: "3px solid #fff",
+                                    cursor: "pointer",
+                                }}
+                                onClick={() => document.getElementById("profileUpload").click()}
+                                onError={(e) => {
+                                    e.target.src = `${HOSTNAME}/uploads/default-profile.png`;
+                                }}
+                            />
+
+                            {/* ไอคอนกล้อง*/}
+                            <div
+                                onClick={() => document.getElementById("profileUpload").click()}
+                                className="position-absolute bg-success text-white rounded-circle d-flex justify-content-center align-items-center shadow"
+                                style={{
+                                    bottom: "5px",
+                                    right: "5px",
+                                    width: "36px",
+                                    height: "36px",
+                                    border: "2px solid white",
+                                    cursor: "pointer",
+                                    transition: "transform 0.2s ease, background-color 0.2s",
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.transform = "scale(1.1)";
+                                    e.currentTarget.style.backgroundColor = "#0F75BC";
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.transform = "scale(1)";
+                                    e.currentTarget.style.backgroundColor = "#0F75BC";
+                                }}
+                            >
+                                <FaCamera size={15} />
+                            </div>
+                        </div>
+
+                        <h5 className="my-3" style={{ fontSize: "18px", fontWeight: "500" }}>
+                            ยินดีต้อนรับ {username || "ผู้ดูแลระบบ"}
                         </h5>
                     </div>
                 )}
+
+
+
 
                 {/* Menu Items */}
                 <div className="nav flex-column nav-pills">
