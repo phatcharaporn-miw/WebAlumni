@@ -67,7 +67,7 @@ function Home() {
   useEffect(() => {
     const checkUser = async () => {
       try {
-        const res = await axios.get( HOSTNAME + "/users/profile", { withCredentials: true });
+        const res = await axios.get(HOSTNAME + "/users/profile", { withCredentials: true });
         if (res.data.success) {
           setIsLoggedin(true);
           console.log("ผู้ใช้ล็อกอินแล้ว");
@@ -419,7 +419,7 @@ function Home() {
       return; // ไม่บันทึกสถานะหากไม่ได้เข้าสู่ระบบ
     }
 
-    axios.post( HOSTNAME + `/web/webboard/${postId}/favorite`, {}, {
+    axios.post(HOSTNAME + `/web/webboard/${postId}/favorite`, {}, {
       withCredentials: true,
     })
       .then((response) => {
@@ -524,8 +524,8 @@ function Home() {
         const formattedNewComment = {
           ...newComment,
           profile_image: newComment.profile_image || userProfileImage,
-          full_name: newComment.full_name, 
-          user_id: newComment.user_id || userId, 
+          full_name: newComment.full_name,
+          user_id: newComment.user_id || userId,
           created_at: newComment.created_at || new Date().toISOString(),
           comment_detail: newComment.comment_detail || commentText,
           replies: [],
@@ -596,12 +596,12 @@ function Home() {
             if (comment.comment_id === commentId) {
               // สร้าง reply object ใหม่
               const newReply = {
-                reply_id: response.data.reply_id || Date.now(), 
+                reply_id: response.data.reply_id || Date.now(),
                 comment_id: commentId,
                 user_id: user.user_id,
                 reply_detail: replyText.trim(),
                 created_at: new Date().toISOString(),
-                full_name: user.full_name || "คุณ", 
+                full_name: user.full_name || "คุณ",
                 profile_image: user.image_path || "/default-profile.png"
               };
 
@@ -678,7 +678,7 @@ function Home() {
 
   // ลบการตอบกลับความคิดเห็น
   const handleDeleteReply = (replyId, commentId) => {
-    axios.delete(HOSTNAME +`/web/webboard/${selectedPost.webboard_id}/comment/${commentId}/reply/${replyId}`, {
+    axios.delete(HOSTNAME + `/web/webboard/${selectedPost.webboard_id}/comment/${commentId}/reply/${replyId}`, {
       withCredentials: true
     })
       .then(response => {
@@ -710,7 +710,7 @@ function Home() {
 
   // ดึงcategory
   useEffect(() => {
-    axios.get(HOSTNAME +`/category/category-all`)
+    axios.get(HOSTNAME + `/category/category-all`)
       .then(response => {
         if (response.data.success) {
           setCategory(response.data.data);
@@ -725,7 +725,7 @@ function Home() {
   }, []);
 
   const handleCategoryClick = (categoryId) => {
-    navigate(HOSTNAME +`/webboard/category/${categoryId}`)
+    navigate(HOSTNAME + `/webboard/category/${categoryId}`)
   };
 
   // กำหนดสีหมวดหมู่
@@ -1187,15 +1187,17 @@ function Home() {
               </div>
             </div>
           </div>
-          <div className="p-3 border-top">
-            <div className="row align-items-center">
-              <div className="col-12 d-flex justify-content-end mt-2">
-                <a 
-                  href="/dashboard-stat" 
-                  className="btn btn-outline-primary btn-sm"
-                >
-                  ดูข้อมูลเพิ่มเติม
-                </a>
+          <div className="border-top">
+            <div className="container">
+              <div className="row">
+                <div className="col-12 text-end">
+                  <a
+                    href="/dashboard-stat"
+                    className="btn btn-outline-primary btn-sm"
+                  >
+                    ดูข้อมูลเพิ่มเติม
+                  </a>
+                </div>
               </div>
             </div>
           </div>
@@ -1246,7 +1248,7 @@ function Home() {
                             {/* โปรไฟล์ + ชื่อผู้ใช้ */}
                             <div className="d-flex mb-3">
                               <img
-                                src={post.profile_image ? HOSTNAME +`/${post.profile_image}` : "/default-profile.png"}
+                                src={post.profile_image ? HOSTNAME + `/${post.profile_image}` : "/default-profile.png"}
                                 alt="User"
                                 className="rounded-circle me-3"
                                 width="50"

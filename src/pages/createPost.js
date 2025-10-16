@@ -18,7 +18,7 @@ function CreatePost() {
     const [newCategory, setNewCategory] = useState('');
     const [isLoggedin, setIsLoggedin] = useState(false);
     const [showNewCategoryInput, setShowNewCategoryInput] = useState(false);
-    const [banWords, setBanWords] = useState('');
+    // const [banWords, setBanWords] = useState('');
     const [error, setError] = useState("");
     const {user} = useAuth();
     const userId = user?.user_id;
@@ -179,6 +179,11 @@ function CreatePost() {
             });
     };
 
+    // ฟังก์ชัน handleCancel สำหรับปุ่มยกเลิก
+    const handleCancel = () => {
+        navigate("/webboard"); 
+    };
+
     return (
         <section className="createPost-page">
             <div className="container">
@@ -269,9 +274,15 @@ function CreatePost() {
                                 </div>
                             )}
 
-
-                            <div className="form-group">
-                                <button type="submit" className="btn btn-primary w-100 mt-3">
+                            <div className="form-group ">
+                                <button
+                                    type="button"
+                                    className="btn btn-secondary w-50 mt-3 g-2 mx-2"
+                                    onClick={handleCancel}
+                                >
+                                    ยกเลิก
+                                </button>
+                                <button type="submit" className="btn btn-primary w-50 mt-3 mx-2">
                                     สร้างกระทู้
                                 </button>
                             </div>

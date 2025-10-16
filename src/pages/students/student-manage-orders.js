@@ -18,22 +18,16 @@ function StudentManageOrders() {
     const [products, setProducts] = useState([]);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [productOrders, setProductOrders] = useState([]);
-    const [trackingNumber, setTrackingNumber] = useState('');
-    const [loading, setLoading] = useState(true);
-    const [orderData, setOrderData] = useState(true);
-
-    // จัดการปัญหา
-    const [allOrders, setAllOrders] = useState([]);
-    const [issueOrders, setIssueOrders] = useState([]); // รายการปัญหา/คืนสินค้า
-    const [currentView, setCurrentView] = useState('orders'); // ใช้ควบคุมการแสดงผล ('orders' หรือ 'issues')
-    const [selectedIssue, setSelectedIssue] = useState(null);
+    const [trackingNumber, setTrackingNumber] = useState({});
+    // const [loading, setLoading] = useState(true);
+    // const [orderData, setOrderData] = useState(true);
 
 
     // สำหรับขนส่ง
-    const [selectedCourier, setSelectedCourier] = useState('');
+    const [selectedCourier, setSelectedCourier] = useState({});
     const [companies, setCompanies] = useState([]);
-    const [orderTracking, setOrderTracking] = useState({});
-    const [trackingErrors, setTrackingErrors] = useState({});
+    // const [orderTracking, setOrderTracking] = useState({});
+    // const [trackingErrors, setTrackingErrors] = useState({});
 
     const courierPatterns = {
         thailand_post: /^[A-Z]{2}\d{9}[A-Z]{2}$/,        // 13 ตัว
@@ -67,7 +61,7 @@ function StudentManageOrders() {
         return courierPatterns[courier].test(number);
     };
 
-    const [trackingError, setTrackingError] = useState("");
+    const [trackingError, setTrackingError] = useState({});
 
     // กำหนด mapping ของบริษัทกับ URL
     const courierTrackingLinks = {
@@ -139,31 +133,6 @@ function StudentManageOrders() {
         setProductOrders([]);
     };
 
-    // แก้ไขปัญหา
-    // const handleResolveIssue = (orderId) => {
-    //     Swal.fire({
-    //         title: "ยืนยันการแก้ไขปัญหา?",
-    //         icon: "warning",
-    //         showCancelButton: true,
-    //         confirmButtonText: "ยืนยัน",
-    //         cancelButtonText: "ยกเลิก",
-    //     }).then((result) => {
-    //         if (result.isConfirmed) {
-    //             axios.put(`http://localhost:3001/seller/resolve-issue/${orderId}`)
-    //                 .then((res) => {
-    //                     if (res.data.success) {
-    //                         Swal.fire("สำเร็จ", "อัปเดตสถานะเรียบร้อยแล้ว", "success");
-    //                         fetchProductOrders(); // โหลดข้อมูลใหม่
-    //                     }
-    //                 })
-    //                 .catch(() => {
-    //                     Swal.fire("ผิดพลาด", "อัปเดตไม่สำเร็จ", "error");
-    //                 });
-    //         }
-    //     });
-    // };
-
-
     // อัปเดตสถานะและเลขtracking
     const handleUpdate = (orderId, status, tracking, courier) => {
         const newStatus = "shipping";
@@ -202,7 +171,7 @@ function StudentManageOrders() {
                 // รีเซ็ต states
                 setTrackingNumber(prev => ({ ...prev, [orderId]: '' }));
                 setSelectedCourier(prev => ({ ...prev, [orderId]: '' }));
-                setTrackingErrors(prev => ({ ...prev, [orderId]: '' }));
+                setTrackingError(prev => ({ ...prev, [orderId]: '' }));
 
             })
             .catch(err => {
@@ -214,9 +183,6 @@ function StudentManageOrders() {
                 });
             });
     };
-
-
-    // if (loading) return <div>กำลังโหลด...</div>;
 
     // ฟังก์ชันเปลี่ยนหน้า
     const handleClick = (path) => {
@@ -289,13 +255,13 @@ function StudentManageOrders() {
                             </div>
                             <hr className="w-100" />
                             <div className="menu d-block mt-3 w-100">
-                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/student-profile")}>โปรไฟล์ของฉัน</div>
-                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/student-profile/student-request")}>คำร้องขอ</div>
-                                <div className="menu-item active py-2 mb-2 rounded" onClick={() => handleClick("/student-profile/student-manage-orders")}>จัดการคำสั่งซื้อของที่ระลึก</div>
-                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/student-profile/student-profile-webboard")}>กระทู้ที่สร้าง</div>
-                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/student-profile/student-profile-donation")}>ประวัติการบริจาค</div>
-                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/student-profile/student-profile-activity")}>ประวัติการเข้าร่วมกิจกรรม</div>
-                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/student-profile/student-profile-souvenir")}>ประวัติการสั่งซื้อของที่ระลึก</div>
+                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile")}>โปรไฟล์ของฉัน</div>
+                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-request")}>คำร้องขอ</div>
+                                <div className="menu-item active py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-manage-orders")}>จัดการคำสั่งซื้อของที่ระลึก</div>
+                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-profile-webboard")}>กระทู้ที่สร้าง</div>
+                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-profile-donation")}>ประวัติการบริจาค</div>
+                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-profile-activity")}>ประวัติการเข้าร่วมกิจกรรม</div>
+                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-profile-souvenir")}>ประวัติการสั่งซื้อของที่ระลึก</div>
                                 <div className="menu-item py-2 rounded" onClick={handleLogout}>ออกจากระบบ</div>
                             </div>
                         </div>
@@ -475,14 +441,14 @@ function StudentManageOrders() {
                                                                         </div>
                                                                     </div>
 
-                                                                    {/* <div className="col-md-6 mb-2">
-                                                                            <small className="text-muted d-block">ติดต่อ</small>
-                                                                            <div className="bg-white p-2 rounded border">
-                                                                                <span className={order.phone ? "text-dark" : "text-muted"}>
-                                                                                    {order.phone || "ยังไม่ระบุ"}
-                                                                                </span>
-                                                                            </div>
-                                                                        </div> */}
+                                                                    <div className="col-md-6 mb-2">
+                                                                        <small className="text-muted d-block">ติดต่อ</small>
+                                                                        <div className="bg-white p-2 rounded border">
+                                                                            <span className={order.phone ? "text-dark" : "text-muted"}>
+                                                                                {order.phone || "ยังไม่ระบุ"}
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
                                                                 </div>
 
                                                                 {/* ซ่อนสลิป ถ้ามีสถานะปัญหา */}
@@ -534,75 +500,75 @@ function StudentManageOrders() {
 
                                                                     {/* ถ้ามีสถานะปัญหา */}
                                                                     {order.order_status === "issue_reported" && order.issue && (
-                                                                    <div className="mt-4 p-4 border border-danger rounded-3 bg-white shadow-sm">
-                                                                        {/* Header */}
-                                                                        <div className="d-flex align-items-center mb-3">
-                                                                        <h5 className="text-danger fw-bold mb-0">รายละเอียดปัญหา</h5>
-                                                                        </div>
+                                                                        <div className="mt-4 p-4 border border-danger rounded-3 bg-white shadow-sm">
+                                                                            {/* Header */}
+                                                                            <div className="d-flex align-items-center mb-3">
+                                                                                <h5 className="text-danger fw-bold mb-0">รายละเอียดปัญหา</h5>
+                                                                            </div>
 
-                                                                        {/* ประเภทปัญหา */}
-                                                                        <div className="mb-2">
-                                                                        <strong className="text-dark">ประเภทปัญหา:</strong>{" "}
-                                                                        <span className="text-secondary">
-                                                                            {ISSUE_TYPE_LABEL[order.issue.issue_type] || "ไม่ระบุ"}
-                                                                        </span>
-                                                                        </div>
-
-                                                                        {/* คำอธิบาย */}
-                                                                        <div className="mb-3">
-                                                                        <strong className="text-dark">คำอธิบาย:</strong>{" "}
-                                                                        <span className="text-secondary">{order.issue.description || "-"}</span>
-                                                                        </div>
-
-                                                                        {/* สิ่งที่ผู้ใช้ต้องการ */}
-                                                                        {order.issue.resolution_options && (
+                                                                            {/* ประเภทปัญหา */}
                                                                             <div className="mb-2">
-                                                                                <strong className="text-dark">สิ่งที่ผู้ใช้ต้องการ:</strong>{" "}
+                                                                                <strong className="text-dark">ประเภทปัญหา:</strong>{" "}
                                                                                 <span className="text-secondary">
-                                                                                {(() => {
-                                                                                    let options = order.issue.resolution_options;
-                                                                                    if (typeof options === "string") {
-                                                                                    try {
-                                                                                        options = JSON.parse(options);
-                                                                                    } catch (e) {
-                                                                                        options = [options];
-                                                                                    }
-                                                                                    }
-                                                                                    if (Array.isArray(options)) {
-                                                                                    return options
-                                                                                        .map(opt => RESOLUTION_LABEL[opt] || opt)
-                                                                                        .join(", ");
-                                                                                    } else {
-                                                                                    return options;
-                                                                                    }
-                                                                                })()}
+                                                                                    {ISSUE_TYPE_LABEL[order.issue.issue_type] || "ไม่ระบุ"}
                                                                                 </span>
                                                                             </div>
-                                                                        )}
 
-                                                                        {/* หลักฐาน */}
-                                                                        {order.issue.evidence_path && (
-                                                                        <div className="mb-3">
-                                                                            <strong className="text-dark d-block mb-1">หลักฐาน:</strong>
-                                                                            <a
-                                                                            href={`${HOSTNAME}/uploads/${order.issue.evidence_path}`}
-                                                                            target="_blank"
-                                                                            rel="noopener noreferrer"
-                                                                            className="btn btn-outline-danger btn-sm"
-                                                                            >
-                                                                            ดูหลักฐาน
-                                                                            </a>
-                                                                        </div>
-                                                                        )}
+                                                                            {/* คำอธิบาย */}
+                                                                            <div className="mb-3">
+                                                                                <strong className="text-dark">คำอธิบาย:</strong>{" "}
+                                                                                <span className="text-secondary">{order.issue.description || "-"}</span>
+                                                                            </div>
 
-                                                                        {/* เบอร์โทร */}
-                                                                        <div className="mb-3">
-                                                                        <strong className="text-dark">ติดต่อผู้ใช้:</strong>{" "}
-                                                                        <span className="text-secondary">{order.phone || "ไม่ระบุ"}</span>
-                                                                        </div>
+                                                                            {/* สิ่งที่ผู้ใช้ต้องการ */}
+                                                                            {order.issue.resolution_options && (
+                                                                                <div className="mb-2">
+                                                                                    <strong className="text-dark">สิ่งที่ผู้ใช้ต้องการ:</strong>{" "}
+                                                                                    <span className="text-secondary">
+                                                                                        {(() => {
+                                                                                            let options = order.issue.resolution_options;
+                                                                                            if (typeof options === "string") {
+                                                                                                try {
+                                                                                                    options = JSON.parse(options);
+                                                                                                } catch (e) {
+                                                                                                    options = [options];
+                                                                                                }
+                                                                                            }
+                                                                                            if (Array.isArray(options)) {
+                                                                                                return options
+                                                                                                    .map(opt => RESOLUTION_LABEL[opt] || opt)
+                                                                                                    .join(", ");
+                                                                                            } else {
+                                                                                                return options;
+                                                                                            }
+                                                                                        })()}
+                                                                                    </span>
+                                                                                </div>
+                                                                            )}
 
-                                                                        {/* ปุ่มแก้ไขแล้ว */}
-                                                                        {/* <div className="text-end">
+                                                                            {/* หลักฐาน */}
+                                                                            {order.issue.evidence_path && (
+                                                                                <div className="mb-3">
+                                                                                    <strong className="text-dark d-block mb-1">หลักฐาน:</strong>
+                                                                                    <a
+                                                                                        href={`${HOSTNAME}/uploads/${order.issue.evidence_path}`}
+                                                                                        target="_blank"
+                                                                                        rel="noopener noreferrer"
+                                                                                        className="btn btn-outline-danger btn-sm"
+                                                                                    >
+                                                                                        ดูหลักฐาน
+                                                                                    </a>
+                                                                                </div>
+                                                                            )}
+
+                                                                            {/* เบอร์โทร */}
+                                                                            <div className="mb-3">
+                                                                                <strong className="text-dark">ติดต่อผู้ใช้:</strong>{" "}
+                                                                                <span className="text-secondary">{order.phone || "ไม่ระบุ"}</span>
+                                                                            </div>
+
+                                                                            {/* ปุ่มแก้ไขแล้ว */}
+                                                                            {/* <div className="text-end">
                                                                         <button
                                                                             className="btn btn-success btn-sm px-4"
                                                                             onClick={() => handleResolveIssue(order.order_id)}
@@ -610,7 +576,7 @@ function StudentManageOrders() {
                                                                             แก้ไขแล้ว
                                                                         </button>
                                                                         </div> */}
-                                                                    </div>
+                                                                        </div>
                                                                     )}
 
 
@@ -648,7 +614,6 @@ function StudentManageOrders() {
                                                                             </div>
                                                                         </div>
                                                                     )}
-
                                                                 </div>
                                                                 {order.order_status !== "issue_reported" && (
                                                                     <div className="border-top pt-3">
@@ -656,18 +621,23 @@ function StudentManageOrders() {
                                                                             อัปเดตข้อมูล
                                                                         </h6>
 
-                                                                        <div className="row">
-                                                                            {/* Tracking Number & Shipping Service */}
+                                                                        <div className="row mt-3">
+                                                                            {/* บริษัทขนส่ง */}
                                                                             <div className="col-md-6 mb-3">
                                                                                 <label className="form-label small fw-bold text-muted">บริษัทขนส่ง</label>
                                                                                 <select
                                                                                     className="form-select"
-                                                                                    value={selectedCourier || ""}
-                                                                                    onChange={e => setSelectedCourier(e.target.value)}
+                                                                                    value={selectedCourier[order.order_id] || ""}
+                                                                                    onChange={e =>
+                                                                                        setSelectedCourier(prev => ({
+                                                                                            ...prev,
+                                                                                            [order.order_id]: e.target.value
+                                                                                        }))
+                                                                                    }
                                                                                     disabled={!!order.tracking_number}
                                                                                 >
                                                                                     <option value="">-- เลือกบริษัทขนส่ง --</option>
-                                                                                    {Array.isArray(companies) && companies.map(c => (
+                                                                                    {companies.map(c => (
                                                                                         <option key={c.transport_company_id} value={c.transport_company_id}>
                                                                                             {c.name}
                                                                                         </option>
@@ -675,63 +645,47 @@ function StudentManageOrders() {
                                                                                 </select>
                                                                             </div>
 
+                                                                            {/* หมายเลขพัสดุ */}
                                                                             <div className="col-md-6 mb-3">
                                                                                 <label className="form-label small fw-bold text-muted">หมายเลขพัสดุ</label>
-                                                                                <div className="input-group input-group-sm">
-                                                                                    <input
-                                                                                        type="text"
-                                                                                        className="form-control"
-                                                                                        placeholder="ใส่เลขพัสดุ..."
-                                                                                        maxLength={patternLengths[selectedCourier] || 14}
-                                                                                        value={trackingNumber}
-                                                                                        onChange={e => {
-                                                                                            let value = e.target.value.toUpperCase();
-                                                                                            setTrackingNumber(value);
-
-                                                                                            if (!selectedCourier) {
-                                                                                                setTrackingError("");
-                                                                                                return;
-                                                                                            }
-
-                                                                                            const firstCharPattern = patternFirstChar[selectedCourier];
-                                                                                            const fullPattern = courierPatterns[selectedCourier];
-                                                                                            const maxLen = patternLengths[selectedCourier] || 14;
-
-                                                                                            if (value.length > 0 && firstCharPattern && !firstCharPattern.test(value[0])) {
-                                                                                                setTrackingError(`เลขพัสดุสำหรับ ${selectedCourier} ต้องเริ่มด้วยตัวอักษร`);
-                                                                                                return;
-                                                                                            }
-
-                                                                                            if (value.length > maxLen) {
-                                                                                                setTrackingError(`เลขพัสดุสำหรับ ${selectedCourier} ต้องไม่เกิน ${maxLen} ตัว`);
-                                                                                                return;
-                                                                                            }
-
-                                                                                            if (value.length === maxLen && fullPattern) {
-                                                                                                const valid = fullPattern.test(value);
-                                                                                                setTrackingError(valid ? "" : `รูปแบบเลขพัสดุไม่ถูกต้องสำหรับ ${selectedCourier}`);
-                                                                                            } else {
-                                                                                                setTrackingError("");
-                                                                                            }
-                                                                                        }}
-                                                                                        disabled={!!order.tracking_number}
-                                                                                    />
-                                                                                </div>
-                                                                                {trackingError && (
-                                                                                    <small className="text-danger mt-1 d-block">{trackingError}</small>
+                                                                                <input
+                                                                                    type="text"
+                                                                                    className="form-control"
+                                                                                    placeholder="ใส่เลขพัสดุ..."
+                                                                                    value={trackingNumber[order.order_id] || ""}
+                                                                                    onChange={e =>
+                                                                                        setTrackingNumber(prev => ({
+                                                                                            ...prev,
+                                                                                            [order.order_id]: e.target.value.toUpperCase()
+                                                                                        }))
+                                                                                    }
+                                                                                    disabled={!!order.tracking_number}
+                                                                                />
+                                                                                {trackingError[order.order_id] && (
+                                                                                    <small className="text-danger mt-1 d-block">
+                                                                                        {trackingError[order.order_id]}
+                                                                                    </small>
                                                                                 )}
                                                                             </div>
 
+                                                                            {/* ปุ่มอัปเดต */}
                                                                             <div className="col-md-3 mb-3 d-flex align-items-end">
                                                                                 {order.order_status !== "delivered" && (
                                                                                     <button
                                                                                         className="btn btn-primary btn-sm w-100"
-                                                                                        onClick={() => handleUpdate(order.order_id, order.order_status, trackingNumber, selectedCourier)}
+                                                                                        onClick={() =>
+                                                                                            handleUpdate(
+                                                                                                order.order_id,
+                                                                                                order.order_status,
+                                                                                                trackingNumber[order.order_id],
+                                                                                                selectedCourier[order.order_id]
+                                                                                            )
+                                                                                        }
                                                                                         disabled={
-                                                                                            !!order.tracking_number ||
-                                                                                            !selectedCourier ||
-                                                                                            !trackingNumber ||
-                                                                                            trackingError !== ""
+                                                                                            order.tracking_number && order.tracking_number.trim() !== "" ||
+                                                                                            !selectedCourier[order.order_id] ||
+                                                                                            !trackingNumber[order.order_id] ||
+                                                                                            (trackingError[order.order_id] && trackingError[order.order_id] !== "")
                                                                                         }
                                                                                     >
                                                                                         อัปเดต
@@ -739,6 +693,7 @@ function StudentManageOrders() {
                                                                                 )}
                                                                             </div>
                                                                         </div>
+
                                                                     </div>
                                                                 )}
 
