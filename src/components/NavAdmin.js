@@ -26,7 +26,6 @@ function NavAdmin() {
     const role = user?.role;
     const username = user?.username;
     const profilePicture = user?.profilePicture;
-
     // รอ loading เสร็จก่อนตรวจสอบ authentication
     useEffect(() => {
         if (!initialized) return; // รอ AuthProvider initialize
@@ -55,7 +54,7 @@ function NavAdmin() {
 
         try {
             const res = await axios.post(
-                "http://localhost:3001/users/update-profile-image",
+                HOSTNAME +"/users/update-profile-image",
                 formData,
                 { headers: { "Content-Type": "multipart/form-data" } }
             );

@@ -7,6 +7,7 @@ import Swal from "sweetalert2";
 import { useAuth } from '../../context/AuthContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import {HOSTNAME} from '../../config.js';
 
 function Profile() {
   const [profile, setProfile] = useState({
@@ -29,7 +30,7 @@ function Profile() {
     }, []);
     
   useEffect(() => {
-    axios.get('http://localhost:3001/users/profile', {
+    axios.get(HOSTNAME +'/users/profile', {
       withCredentials: true, 
     })
       .then((response) => {
@@ -43,7 +44,7 @@ function Profile() {
       });
 
        // ดึงข้อมูล major ทั้งหมด
-    axios.get('http://localhost:3001/add/major', { 
+    axios.get(HOSTNAME +'/add/major', { 
       withCredentials: true 
     })
     .then((response) => {
@@ -56,7 +57,7 @@ function Profile() {
     });
 
       // ดึงข้อมูล username และ password
-    axios.get('http://localhost:3001/users/login-info', { 
+    axios.get(HOSTNAME +'/users/login-info', { 
       withCredentials: true 
     })
     .then((response) => {
@@ -134,7 +135,7 @@ const removeEducation = (index) => {
   const handleSave = () => {
     const updatedProfile = { ...profile };
     // console.log('ข้อมูลที่ส่งไป Backend:',  updatedProfile); // ตรวจสอบค่า
-    axios.post('http://localhost:3001/users/edit-profile',  updatedProfile, {
+    axios.post(HOSTNAME +'/users/edit-profile',  updatedProfile, {
       withCredentials: true, 
     })
       .then((response) => {
@@ -165,7 +166,7 @@ const removeEducation = (index) => {
     formData.append("user_id", profile.userId); 
   
     try {
-      const res = await axios.post("http://localhost:3001/users/update-profile-image", formData, {
+      const res = await axios.post(HOSTNAME +"/users/update-profile-image", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

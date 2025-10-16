@@ -1,1 +1,1 @@
-export const HOSTNAME = 'http://localhost:3001';
+export const HOSTNAME = 'https://collegeofcomputingalumni.com';
