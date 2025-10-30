@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import '../css/news.css';
@@ -9,17 +9,21 @@ import { MdDateRange, MdEdit, MdDelete } from "react-icons/md";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from '../context/AuthContext';
-import {HOSTNAME} from '../config.js';
+import { HOSTNAME } from '../config.js';
+import { FaSearch } from "react-icons/fa";
+import { AiOutlineClose } from "react-icons/ai";
 
 function News() {
     const [news, setNews] = useState([]);
-    // const userRole = sessionStorage.getItem("userRole");
-    // const userId = sessionStorage.getItem("userId");
     const { user } = useAuth();
     const userRole = user?.role;
     const userId = user?.user_id;
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState("");
+    const [filter, setFilter] = useState("all");
+    const [filterStatus, setFilterStatus] = useState("all");
+    const [filterYear, setFilterYear] = useState("all");
+    // const [years, setYears] = useState([]);
 
     useEffect(() => {
         axios.get(HOSTNAME + '/news/news-all')
@@ -65,21 +69,38 @@ function News() {
         });
     };
 
-    // const backgroundVariants = {
-    //     animate: {
-    //       backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
-    //       transition: { duration: 18, repeat: Infinity, ease: "linear" }
-    //     }
-    // };
-
-    const handleSearch = (term) => {
-        setSearchTerm(term);
+    const handleSearchChange = (e) => {
+        setSearchTerm(e.target.value);
     };
 
-    const filteredNews = news.filter((item) =>
-        item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.content.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const handleYearChange = (e) => {
+        setFilterYear(e.target.value);
+    };
+
+    const handleClearFilters = () => {
+        setSearchTerm("");
+        setFilterYear("all");
+    };
+
+    const years = useMemo(() => {
+        const startYear = 2025; // ค.ศ. 2025 = พ.ศ. 2568
+        const currentYear = new Date().getFullYear();
+        const list = [];
+        for (let y = startYear; y <= currentYear; y++) {
+            list.push(y + 543); // แปลงเป็น พ.ศ.
+        }
+        return list.reverse(); // แสดงมากไปน้อย
+    }, []);
+
+    const filteredNews = news
+        .filter(a => {
+            const newYear = new Date(a.created_at).getFullYear() + 543;
+            const matchesYear = filterYear === "all" ? true : newYear.toString() === filterYear;
+            const matchesSearch = a.title.toLowerCase().includes(searchTerm.toLowerCase());
+            return matchesYear && matchesSearch;
+        })
+        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
 
     // Pagination logic
     const [currentPage, setCurrentPage] = useState(1);
@@ -102,8 +123,62 @@ function News() {
             <h3 className="news text-center">ข่าวประชาสัมพันธ์</h3>
 
             <div className="py-3 container">
-                <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-                    {userRole === "2" && (
+               
+
+                {/* Filters */}
+                <div className="donate-filters">
+                    <div className="row g-3">
+                        {/* ค้นหากิจกรรม */}
+                        <div className="col-md-6">
+                            <label htmlFor="search" className="form-label">ค้นหาข่าวประขาสัมพันธ์:</label>
+                            <div className="input-group">
+                                <span className="input-group-text">
+                                    <FaSearch />
+                                </span>
+                                <input
+                                    type="text"
+                                    id="search"
+                                    className="form-control"
+                                    placeholder="ค้นหาข่าวหรือรายละเอียด..."
+                                    value={searchTerm}
+                                    onChange={handleSearchChange}
+                                />
+                            </div>
+                        </div>
+
+                        {/* ปี */}
+                        <div className="col-md-4">
+                            <label htmlFor="year-filter" className="form-label">ปี:</label>
+                            <select
+                                id="year-filter"
+                                className="form-select"
+                                value={filterYear}
+                                onChange={handleYearChange}
+                            >
+                                <option value="all">ทุกปี</option>
+                                {years.map((year) => (
+                                    <option key={year} value={year}>
+                                        {year}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* ปุ่มล้างตัวกรอง */}
+                        <div className="col-md-2 d-flex flex-column">
+                            <label className="form-label invisible">ล้าง</label>
+                            <button
+                                className="btn btn-outline-secondary"
+                                onClick={handleClearFilters}
+                                title="ล้างตัวกรอง"
+                            >
+                                <AiOutlineClose /> ล้าง
+                            </button>
+                        </div>
+                    </div>
+                </div>
+<div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                    {userRole === 2 && (
                         <div className="ms-auto ">
                             <Link to={`/news/president-create-news`} className="text-decoration-none">
                                 <button
@@ -132,7 +207,6 @@ function News() {
                         </div>
                     )}
                 </div>
-
                 <div className="news-list row justify-content-center">
                     {paginatedNews.length === 0 ? (
                         <p className="text-center text-muted">ไม่พบข่าวที่ค้นหา</p>

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../../css/profile.css';
-import { useOutletContext } from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
 import Swal from "sweetalert2";
 import { useAuth } from '../../context/AuthContext';
@@ -16,7 +15,6 @@ function Profile() {
   });
   const [major, setMajor] = useState([]);
   const [loginInfo, setLoginInfo] = useState({ username: '', password: '' });
-  const [showPassword, setShowPassword] = useState(false); // สำหรับซ่อน/แสดงรหัสผ่าน
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState(null); // สำหรับแสดงรูปภาพก่อนอัปโหลด
   const { user, handleLogout } = useAuth();

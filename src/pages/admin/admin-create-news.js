@@ -106,7 +106,10 @@ function CreateNews() {
                                         onChange={handleFileChange}
                                     />
                                 </div>
-                                <div className="d-grid">
+                                <div className="col-12 d-flex justify-content-center mt-3">
+                                    <button type="button" className="btn btn-secondary" onClick={() => navigate('/admin/news')}>
+                                        ยกเลิก
+                                    </button>
                                     <button type="submit" className="btn btn-primary">โพสต์ข่าว</button>
                                 </div>
                             </form>

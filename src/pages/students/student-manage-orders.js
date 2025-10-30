@@ -255,13 +255,13 @@ function StudentManageOrders() {
                             </div>
                             <hr className="w-100" />
                             <div className="menu d-block mt-3 w-100">
-                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile")}>โปรไฟล์ของฉัน</div>
-                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-request")}>คำร้องขอ</div>
-                                <div className="menu-item active py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-manage-orders")}>จัดการคำสั่งซื้อของที่ระลึก</div>
-                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-profile-webboard")}>กระทู้ที่สร้าง</div>
-                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-profile-donation")}>ประวัติการบริจาค</div>
-                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-profile-activity")}>ประวัติการเข้าร่วมกิจกรรม</div>
-                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-profile-souvenir")}>ประวัติการสั่งซื้อของที่ระลึก</div>
+                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/student-profile")}>โปรไฟล์ของฉัน</div>
+                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/student-profile/student-request")}>คำร้องขอ</div>
+                                <div className="menu-item active py-2 mb-2 rounded" onClick={() => handleClick("/student-profile/student-manage-orders")}>จัดการคำสั่งซื้อของที่ระลึก</div>
+                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/student-profile/student-profile-webboard")}>กระทู้ที่สร้าง</div>
+                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/student-profile/student-profile-donation")}>ประวัติการบริจาค</div>
+                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/student-profile/student-profile-activity")}>ประวัติการเข้าร่วมกิจกรรม</div>
+                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/student-profile/student-profile-souvenir")}>ประวัติการสั่งซื้อของที่ระลึก</div>
                                 <div className="menu-item py-2 rounded" onClick={handleLogout}>ออกจากระบบ</div>
                             </div>
                         </div>
@@ -368,8 +368,8 @@ function StudentManageOrders() {
                                                         <div className="card-body py-3">
                                                             <div className="row align-items-center">
                                                                 <div className="col-6 col-md-3">
-                                                                    <div className="fw-bold text-primary mb-1">#{order.order_id}</div>
-                                                                    <small className="text-muted d-none d-md-block">
+                                                                    <div className="text-muted mb-1">วันที่สั่งซื้อ</div>
+                                                                    <small className="fw-bold text-primary d-none d-md-block">
                                                                         {order.order_date ? format(new Date(order.order_date), 'dd/MM/yyyy') : '-'}
                                                                     </small>
                                                                     <small className="text-muted d-md-none">

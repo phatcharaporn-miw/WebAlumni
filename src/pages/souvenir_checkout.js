@@ -6,9 +6,10 @@ import '../css/SouvenirCheckout.css';
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { IoAdd } from "react-icons/io5";
 import { useAuth } from '../context/AuthContext';
-import {HOSTNAME} from '../config.js';
+import { HOSTNAME } from '../config.js';
 import Swal from 'sweetalert2';
 import jsQR from "jsqr";
+import { FiCopy, FiCheck } from 'react-icons/fi';
 
 function SouvenirCheckout() {
     const [deliveryAddress, setDeliveryAddress] = useState("");
@@ -22,6 +23,7 @@ function SouvenirCheckout() {
     const [isGeneratingQR, setIsGeneratingQR] = useState(false);
     const [orderDetails, setOrderDetails] = useState(null);
     const [qrCode, setQrCode] = useState(null);
+    const [copiedField, setCopiedField] = useState(null);
 
     // const userId = sessionStorage.getItem("userId");
     const { user } = useAuth();
@@ -72,7 +74,7 @@ function SouvenirCheckout() {
     const districtName = districts.find(d => d.id === Number(selectedDistrict))?.name_th || "";
     const subDistrictName = subDistricts.find(s => s.id === Number(selectedSubDistrict))?.name_th || "";
 
-    console.log("Selected Items:", provinceName);
+    // console.log("Selected Items:", provinceName);
 
     useEffect(() => {
         if (defaultAddr) {
@@ -164,7 +166,7 @@ function SouvenirCheckout() {
                         setPhoneForOrder(defaultAddr.phone || "")
                         setIsDefault(true);
                     }
-                    console.log("User addresses:", res.data);
+                    // console.log("User addresses:", res.data);
                 })
                 .catch(err => console.error(err));
         }
@@ -390,80 +392,117 @@ function SouvenirCheckout() {
         navigate(-1);
     };
 
-    // ดำเนินการสร้าง QR สำหรับสินค้าทั้งกลุ่ม
-    const handleProceedToPayment = async () => {
-        const items = getCurrentProducts();
-        if (!items.length) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'ไม่มีสินค้าในตะกร้า',
-                text: 'กรุณาเพิ่มสินค้าก่อนดำเนินการชำระเงิน',
-                confirmButtonText: 'ตกลง'
-            });
-            return;
-        }
+const handleProceedToPayment = async () => {
+    const items = getCurrentProducts();
+    if (!items.length) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'ไม่มีสินค้าในตะกร้า',
+            text: 'กรุณาเพิ่มสินค้าก่อนดำเนินการชำระเงิน'
+        });
+        return;
+    }
 
-        if (!deliveryAddress.trim()) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'กรุณากรอกที่อยู่จัดส่ง',
-                text: 'ที่อยู่จัดส่งไม่สามารถว่างเปล่าได้',
-                confirmButtonText: 'ตกลง'
-            });
-            return;
-        }
+    if (!deliveryAddress.trim()) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'กรุณากรอกที่อยู่จัดส่ง',
+            text: 'ที่อยู่จัดส่งไม่สามารถว่างเปล่าได้'
+        });
+        return;
+    }
 
-        if (!items[0].promptpay_number) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'ไม่พบหมายเลข PromptPay',
-                text: 'กรุณาเลือกสินค้าที่มีหมายเลข PromptPay ก่อนดำเนินการชำระเงิน',
-                confirmButtonText: 'ตกลง'
-            });
-            return;
-        }
+    const first = items[0];
+    const totalAmount = getCurrentProductsTotal();
+    const isOfficial = Number(first?.is_official) === 1;
 
-        if (!items[0].promptpay_number) {
-            alert("สินค้านี้ไม่มีเลข PromptPay กรุณาติดต่อผู้ดูแล");
-            return;
-        }
+    // console.log("First item:", first);
+    // console.log("is_official:", first?.is_official, "→ isOfficial:", isOfficial);
 
+    let bankInfo = null;
+
+    try {
+        // เรียก API เดียว โดยส่ง isOfficial ไปเสมอ
+        const response = await axios.get(`${HOSTNAME}/souvenir/bank-info`, {
+            params: { 
+                isOfficial: isOfficial ? "true" : "false"
+            },
+        });
+        
+        // console.log("API Response:", response.data);
+        bankInfo = response.data?.data;
+
+    } catch (err) {
+        console.error("Error fetching bank info:", err);
+        Swal.fire({
+            icon: 'error',
+            title: 'เกิดข้อผิดพลาด',
+            text: 'ไม่สามารถดึงข้อมูลบัญชีธนาคารได้'
+        });
+        return;
+    }
+
+    // ตรวจสอบว่ามีข้อมูลจริง และไม่ใช่ค่า default
+    if (!bankInfo || bankInfo.account_name === '-') {
+        Swal.fire({
+            icon: 'warning',
+            title: 'ไม่พบข้อมูลธนาคาร',
+            text: isOfficial 
+                ? 'ยังไม่ได้ตั้งค่าบัญชีธนาคารของสมาคม กรุณาติดต่อผู้ดูแลระบบ'
+                : 'ผู้ขายยังไม่ได้ตั้งค่าบัญชีธนาคาร กรุณาติดต่อผู้ขาย'
+        });
+        return;
+    }
+
+    // Set orderDetails
+    const newOrderDetails = {
+        bankInfo: {
+            account_name: bankInfo.account_name || '-',
+            bank_name: bankInfo.bank_name || '-',
+            account_number: bankInfo.account_number || '-',
+            promptpay_number: bankInfo.promptpay_number || null,
+        },
+        amount: totalAmount,
+        generatedAt: new Date(),
+    };
+
+    setOrderDetails(newOrderDetails);
+
+    // สร้าง QR Code ถ้ามี promptpay_number
+    if (bankInfo?.promptpay_number) {
         setIsGeneratingQR(true);
-
         try {
-            const totalAmount = getCurrentProductsTotal();
-
-            // เรียก backend เพื่อสร้าง QR Code
-            const response = await axios.post(HOSTNAME + '/souvenir/generateQR', {
+            const qrRes = await axios.post(`${HOSTNAME}/souvenir/generateQR`, {
                 amount: totalAmount,
-                numberPromtpay: items[0].promptpay_number
+                numberPromtpay: bankInfo.promptpay_number,
             });
 
-            const qrImageUrl = response.data?.Result;
-            if (!qrImageUrl) {
-                alert("เกิดข้อผิดพลาด: ไม่สามารถสร้าง QR Code");
-                setIsGeneratingQR(false);
-                return;
+            const qrImageUrl = qrRes.data?.Result;
+            if (qrImageUrl) {
+                setQrCodeImage(qrImageUrl);
+                setQrCodeExpiry(Date.now() + 15 * 60 * 1000);
+            } else {
+                Swal.fire({ icon: 'error', title: 'ไม่สามารถสร้าง QR Code ได้' });
             }
-
-            setQrCodeImage(qrImageUrl);
-            const expiryTime = new Date().getTime() + (15 * 60 * 1000); // 15 นาที
-            setQrCodeExpiry(expiryTime);
-
-            setOrderDetails({
-                promptpayNumber: items[0].promptpay_number,
-                amount: totalAmount,
-                generatedAt: new Date()
+        } catch (err) {
+            console.error("Error generating QR code:", err);
+            Swal.fire({
+                icon: 'error',
+                title: 'เกิดข้อผิดพลาดในการสร้าง QR Code',
+                text: 'กรุณาลองใหม่อีกครั้ง'
             });
-
-            setCurrentStep(2);
-        } catch (error) {
-            console.error("Error generating QR code:", error);
-            alert("เกิดข้อผิดพลาดในการสร้าง QR Code");
         } finally {
             setIsGeneratingQR(false);
         }
-    };
+    } else {
+        // ไม่มี PromptPay
+        setQrCodeImage('');
+        setQrCodeExpiry(null);
+    }
+
+    setCurrentStep(2);
+};
+
 
     const handleRegenerateQR = async () => {
         if (orderDetails) {
@@ -599,7 +638,7 @@ function SouvenirCheckout() {
 
             let addressIdToUse = selectedAddressId;
 
-            console.log("เบอร์:", phoneForOrder, profilePhone);
+            // console.log("เบอร์:", phoneForOrder, profilePhone);
             // ถ้าเป็นการเพิ่มที่อยู่ใหม่
             if (isAddingNewAddress) {
                 const newAddress = {
@@ -778,7 +817,6 @@ function SouvenirCheckout() {
                         <div className="card">
                             <div className="card-header bg-primary text-white">
                                 <h5 className="mb-0 d-flex align-items-center">
-                                    <i className="fas fa-truck me-2"></i>
                                     ข้อมูลการจัดส่ง
                                 </h5>
                             </div>
@@ -1146,7 +1184,6 @@ function SouvenirCheckout() {
                                         </>
                                     ) : (
                                         <>
-                                            <i className="fas fa-credit-card me-2"></i>
                                             ดำเนินการชำระเงิน
                                         </>
                                     )}
@@ -1163,35 +1200,40 @@ function SouvenirCheckout() {
     // ส่วนชำระเงินและแนบสลิปให้ใช้สินค้าทั้งกลุ่ม
     const renderPaymentStep = () => {
         const items = getCurrentProducts();
+        const first = items[0];
+        const isOfficial = Number(first?.is_official) === 1;
+
+        // ตรวจสอบว่ามีข้อมูลบัญชีหรือไม่
+        const hasBankInfo = Boolean(
+            (isOfficial && orderDetails?.bankInfo?.account_number) ||
+            (!isOfficial && (first?.account_number && first?.bank_name))
+        );
+
         return (
             <div className="row justify-content-center">
                 <div className="col-md-10">
                     <div className="card-body">
                         <div className="row">
+                            {/* สรุปคำสั่งซื้อ */}
                             <div className="col-md-6">
                                 <div className="card h-100">
                                     <div className="card-header bg-primary text-white text-center">
-                                        <h5 className="mb-0">
-                                            สรุปคำสั่งซื้อ
-                                        </h5>
+                                        <h5 className="mb-0">สรุปคำสั่งซื้อ</h5>
                                     </div>
                                     <div className="card-body">
-                                        {items.length > 0 && items.map(item => (
+                                        {items.map(item => (
                                             <div key={item.product_id} className="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
                                                 <div>
                                                     <span className="fw-bold fs-5">{item.product_name}</span>
                                                     <br />
-                                                    <span className="text-primary fw-semibold">
-                                                        ฿{item.price.toLocaleString()}
-                                                    </span>
+                                                    <span className="text-primary fw-semibold">฿{item.price.toLocaleString()}</span>
                                                     <br />
-                                                    <span className="text-muted">
-                                                        จำนวน: {item.quantity}
-                                                    </span>
+                                                    <span className="text-muted">จำนวน: {item.quantity}</span>
                                                 </div>
                                             </div>
                                         ))}
-                                        {/* Shipping Address */}
+
+                                        {/* ที่อยู่จัดส่ง */}
                                         {(deliveryAddress || selectedProvince || selectedDistrict || selectedSubDistrict) && (
                                             <div className="mt-3 pt-3 border-top">
                                                 <h6 className="fw-bold mb-1">ที่อยู่จัดส่ง:</h6>
@@ -1200,90 +1242,147 @@ function SouvenirCheckout() {
                                                 </p>
                                             </div>
                                         )}
+
                                         <div className="mt-3 pt-3 border-top">
                                             <div className="d-flex justify-content-between align-items-center">
                                                 <h5 className="mb-0 fw-bold">ยอดรวมทั้งหมด:</h5>
-                                                <h4 className="mb-0 text-primary fw-semibold">
-                                                    ฿{getCurrentProductsTotal().toFixed(2)}
-                                                </h4>
+                                                <h4 className="mb-0 text-primary fw-semibold">฿{getCurrentProductsTotal().toFixed(2)}</h4>
                                             </div>
                                         </div>
 
-                                        {orderDetails && (
-                                            <div className="mt-3 pt-3 border-top">
-                                                <small className="text-muted">
-                                                    PromptPay: {orderDetails.promptpayNumber}
-                                                </small>
-                                            </div>
-                                        )}
                                     </div>
                                 </div>
                             </div>
 
+                            {/* ช่องทางการชำระเงิน */}
                             <div className="col-md-6">
                                 <div className="card h-100">
                                     <div className="card-header bg-primary text-white text-center">
-                                        <h5 className="mb-0">
-                                            สแกน QR Code เพื่อชำระเงิน
-                                        </h5>
+                                        <h5 className="mb-0">ช่องทางการชำระเงิน</h5>
                                     </div>
                                     <div className="card-body text-center">
-                                        {qrCodeImage ? (
-                                            <div>
-                                                <div className="border border-2 rounded p-3 mb-3 bg-white">
-                                                    <img
-                                                        src={qrCodeImage}
-                                                        alt="PromptPay QR Code"
-                                                        className="img-fluid"
-                                                        style={{ maxWidth: '200px' }}
-                                                    />
-                                                </div>
+                                        {/* ถ้าเป็นสินค้าสมาคม ไม่แสดง QR */}
+                                        {(() => {
+    
+                                            if (!orderDetails?.bankInfo) {
+                                                return (
+                                                    <div className="border border-2 border-dashed rounded p-4 mb-3">
+                                                        <h6 className="text-muted">ไม่พบข้อมูลการชำระเงิน</h6>
+                                                        <p className="text-muted mb-0">
+                                                            <small>กรุณาติดต่อผู้ขายหรือผู้ดูแลระบบ</small>
+                                                        </p>
+                                                    </div>
+                                                );
+                                            }
 
-                                                <div className="alert alert-warning">
-                                                    <strong>เหลือเวลา: {formatTime(getTimeLeft())}</strong>
-                                                    <br />
-                                                    <small>QR Code นี้จะหมดอายุใน 15 นาที</small>
-                                                </div>
-
-                                                {getTimeLeft() <= 0 && (
-                                                    <button
-                                                        className="btn btn-outline-primary btn-sm"
-                                                        onClick={handleRegenerateQR}
-                                                        disabled={isGeneratingQR}
-                                                    >
-                                                        {isGeneratingQR ? (
-                                                            <>
-                                                                <span className="spinner-border spinner-border-sm me-2"></span>
-                                                                กำลังสร้างใหม่...
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                สร้าง QR Code ใหม่
-                                                            </>
-                                                        )}
-                                                    </button>
-                                                )}
+                                if (orderDetails.bankInfo.promptpay_number) {
+                                    // แสดง QR Code
+                                    return (
+                                        <div>
+                                            <div className="border border-2 rounded p-3 mb-3 bg-white">
+                                                <img
+                                                    src={qrCodeImage}
+                                                    alt="PromptPay QR Code"
+                                                    className="img-fluid"
+                                                    style={{ maxWidth: '200px' }}
+                                                />
                                             </div>
+                                            <div className="alert alert-warning">
+                                                <strong>เหลือเวลา: {formatTime(getTimeLeft())}</strong>
+                                                <br />
+                                                <small>QR Code นี้จะหมดอายุใน 15 นาที</small>
+                                            </div>
+                                            {getTimeLeft() <= 0 && (
+                                                <button
+                                                    className="btn btn-outline-primary btn-sm"
+                                                    onClick={handleRegenerateQR}
+                                                    disabled={isGeneratingQR}
+                                                >
+                                                    {isGeneratingQR ? (
+                                                        <>
+                                                            <span className="spinner-border spinner-border-sm me-2"></span>
+                                                            กำลังสร้างใหม่...
+                                                        </>
+                                                    ) : (
+                                                        <>สร้าง QR Code ใหม่</>
+                                                    )}
+                                                </button>
+                                            )}
+                                        </div>
+                                    );
+                                } else {
+                                    // แสดงบัญชีธนาคาร
+                                    return (
+                                        <div className="border border-2 rounded p-3 mb-3 bg-white text-start">
+                                            <h6 className="mb-3 text-center">โอนเข้าบัญชีธนาคาร</h6>
+
+                                            <div className="mb-2">
+                                                <small className="text-muted">ชื่อบัญชี</small>
+                                                <div className="fw-semibold">{orderDetails.bankInfo.account_name || '-'}</div>
+                                            </div>
+
+                                            <div className="mb-2">
+                                                <small className="text-muted">ธนาคาร</small>
+                                                <div className="fw-semibold">{orderDetails.bankInfo.bank_name || '-'}</div>
+                                            </div>
+
+                                            <div className="mb-2">
+                                <small className="text-muted">เลขที่บัญชี</small>
+                                <div className="d-flex align-items-center gap-2">
+                                    <div className="fw-semibold flex-grow-1">{orderDetails.bankInfo.account_number || '-'}</div>
+                                    <button
+                                        className="btn btn-sm btn-link text-primary p-0"
+                                        onClick={() => {
+                                            navigator.clipboard.writeText(orderDetails.bankInfo.account_number)
+                                                .then(() => {
+                                                    setCopiedField('account_number');
+                                                    setTimeout(() => setCopiedField(null), 2000);
+                                                })
+                                                .catch(err => console.error('Failed to copy:', err));
+                                        }}
+                                        disabled={!orderDetails.bankInfo.account_number || orderDetails.bankInfo.account_number === '-'}
+                                        title="คัดลอกเลขที่บัญชี"
+                                        style={{ fontSize: '18px' }}
+                                    >
+                                        {copiedField === 'account_number' ? (
+                                            <FiCheck className="text-success" />
                                         ) : (
-                                            <div className="border border-2 border-dashed rounded p-4 mb-3">
-                                                <h6>QR CODE สำหรับชำระเงิน</h6>
-                                                <p className="text-primary fw-bold">
-                                                    จำนวน:  ฿{getCurrentProductsTotal().toFixed(2)}
-                                                </p>
-                                                <div className="bg-light p-4 rounded my-3">
-                                                    <small className="text-muted">กำลังสร้าง QR Code...</small>
-                                                </div>
-                                            </div>
+                                            <FiCopy />
                                         )}
+                                    </button>
+                                </div>
+                            </div>
+
+                                            <div className="mt-3 pt-2 border-top">
+                                                <small className="text-primary">โอนเงินแล้วแนบสลิปในขั้นตอนถัดไป</small>
+                                            </div>
+                                        </div>
+                                    );
+                                }
+                            })()}
+
+
 
                                         <div className="alert alert-info">
                                             <small>
                                                 <strong>คำแนะนำ:</strong><br />
-                                                1. เปิดแอปธนาคารมือถือ<br />
-                                                2. เลือกโอนเงิน สแกน QR<br />
-                                                3. สแกน QR Code ด้านบน<br />
-                                                4. ตรวจสอบจำนวนเงินและโอน<br />
-                                                5. บันทึกสลิปสำหรับขั้นตอนถัดไป
+                                                {!isOfficial && qrCodeImage ? (
+                                                    <>
+                                                        1. เปิดแอปธนาคารมือถือ<br />
+                                                        2. เลือกโอนเงิน สแกน QR<br />
+                                                        3. สแกน QR Code ด้านบน<br />
+                                                        4. ตรวจสอบจำนวนเงินและโอน<br />
+                                                        5. บันทึกสลิปสำหรับขั้นตอนถัดไป
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        1. เปิดแอปธนาคารมือถือ<br />
+                                                        2. เลือกโอนเงิน<br />
+                                                        3. ระบุข้อมูลบัญชีด้านบน<br />
+                                                        4. โอนจำนวนเงิน ฿{getCurrentProductsTotal().toFixed(2)}<br />
+                                                        5. บันทึกสลิปสำหรับขั้นตอนถัดไป
+                                                    </>
+                                                )}
                                             </small>
                                         </div>
                                     </div>
@@ -1295,10 +1394,10 @@ function SouvenirCheckout() {
                             <button className="btn btn-outline-secondary" onClick={() => setCurrentStep(1)}>
                                 กลับ
                             </button>
-                            <button
+                           <button
                                 className="btn btn-success"
                                 onClick={() => setCurrentStep(3)}
-                                disabled={!qrCodeImage || getTimeLeft() <= 0}
+                                disabled={!orderDetails?.bankInfo || orderDetails.bankInfo.account_name === '-'}
                             >
                                 โอนเงินแล้ว - ไปยังขั้นตอนแนบสลิป
                             </button>
@@ -1308,6 +1407,7 @@ function SouvenirCheckout() {
             </div>
         );
     };
+
 
     const renderSlipUploadStep = () => {
         const items = getCurrentProducts();

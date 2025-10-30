@@ -173,10 +173,11 @@ function AdminEditWebboard() {
                                     </select>
                                 </div>
                                 <div className="d-flex justify-content-end">
-                                    <button type="submit" className="btn btn-primary me-2">บันทึกการแก้ไข</button>
                                     <button type="button" className="btn btn-secondary" onClick={() => navigate('/admin/webboard')}>
                                         ยกเลิก
                                     </button>
+                                    <button type="submit" className="btn btn-primary me-2">บันทึกการแก้ไข</button>
+                                    
                                 </div>
                             </form>
                         </div>

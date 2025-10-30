@@ -3,17 +3,20 @@ import "../css/Donate.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { FaSearch, FaRegClock, FaArrowRight, FaChevronLeft, FaChevronRight } from "react-icons/fa";
-// import { IoIosAddCircleOutline } from "react-icons/io";
+import { FaSearch, FaRegClock, FaArrowRight, FaChevronLeft, FaChevronRight, FaHeart, FaUsers } from "react-icons/fa";
 import { FaPlus } from "react-icons/fa";
 import { AiOutlineClose } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
+import { BiCoin } from 'react-icons/bi';
+import { FaCoins } from 'react-icons/fa6';
 import {HOSTNAME} from '../config.js';
 
 function Donate() {
     const [projects, setProjects] = useState([]);
+    const [recentDonors, setRecentDonors] = useState([]);
     const [filter, setFilter] = useState("all");
     const [filterStatus, setFilterStatus] = useState("all");
+    const [selectedRange, setSelectedRange] = useState("all");
     const [searchTerm, setSearchTerm] = useState("");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -21,6 +24,14 @@ function Donate() {
 
     const navigate = useNavigate();
     const projectsPerPage = 6;
+
+    // const [startMonth, setStartMonth] = useState("");
+    // const [endMonth, setEndMonth] = useState("");
+
+    const [summary, setSummary] = useState({
+        totalProjectsAmount: 0,
+        totalGeneralAmount: 0,
+    });
 
     useEffect(() => {
         const fetchProjects = async () => {
@@ -39,6 +50,31 @@ function Donate() {
         fetchProjects();
     }, []);
 
+    // ดึงคนบริจาคล่าสุด
+    useEffect(() => {
+        const fetchRecentDonation = async () => {
+            try {
+                const response = await axios.get(HOSTNAME + "/donate/recent-donation");
+                setRecentDonors(response.data || []);
+            } catch (err) {
+                console.error("เกิดข้อผิดพลาดในการดึงข้อมูลผู้บริจาค:", err);
+            }
+        };
+        fetchRecentDonation();
+    }, []);
+
+    useEffect(() => {
+        const fetchDonationSummary = async () => {
+            try {
+                const response = await axios.get(HOSTNAME + "/donate/donation-summary");
+                setSummary(response.data || { totalProjectsAmount: 0, totalGeneralAmount: 0 });
+            } catch (err) {
+                console.error("ไม่สามารถโหลดสรุปยอดบริจาคได้:", err);
+            }
+        };
+        fetchDonationSummary();
+    }, []);
+
     const formatCurrency = (amount) => {
         return new Intl.NumberFormat("th-TH", {
             minimumFractionDigits: 0,
@@ -52,6 +88,21 @@ function Donate() {
         const end = new Date(endDate);
         const diffTime = end - now;
         return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    };
+
+    const getTimeSince = (dateString) => {
+        const now = new Date();
+        const donationDate = new Date(dateString);
+        const diffMs = now - donationDate;
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMs / 3600000);
+        const diffDays = Math.floor(diffMs / 86400000);
+
+        if (diffMins < 1) return "เมื่อสักครู่";
+        if (diffMins < 60) return `${diffMins} นาทีที่แล้ว`;
+        if (diffHours < 24) return `${diffHours} ชั่วโมงที่แล้ว`;
+        if (diffDays < 7) return `${diffDays} วันที่แล้ว`;
+        return donationDate.toLocaleDateString("th-TH");
     };
 
     const handleFilterChange = (e) => {
@@ -73,16 +124,36 @@ function Donate() {
         setFilter("all");
         setFilterStatus("all");
         setSearchTerm("");
+        setSelectedRange("all");
         setCurrentPage(1);
+    };
+
+     // ฟังก์ชันช่วยเช็กว่าเดือนอยู่ในช่วงที่เลือกหรือไม่
+    const isInSelectedMonthRange = (date, range) => {
+        if (!date || range === "all") return true;
+        const month = new Date(date).getMonth() + 1; // getMonth() = 0-11
+        const [start, end] = range.split("-").map(Number);
+        return month >= start && month <= end;
     };
 
     // Filter projects
     const filteredProjects = useMemo(() => {
         return projects.filter((project) => {
             const now = new Date();
+            const startDate = project?.start_date ? new Date(project.start_date) : null;
             const endDate = project?.end_date ? new Date(project.end_date) : null;
 
             if (filter !== "all" && project.donation_type !== filter) return false;
+
+            // ฟิลเตอร์ช่วงเดือน
+            if (selectedRange !== "all") {
+                // ถ้าไม่มี start_date หรือ end_date ก็ไม่ผ่าน
+                if (!startDate && !endDate) return false;
+                const startInRange = isInSelectedMonthRange(startDate, selectedRange);
+                const endInRange = isInSelectedMonthRange(endDate, selectedRange);
+                if (!startInRange && !endInRange) return false;
+            }
+
             if (filterStatus === "active" && endDate && now > endDate) return false;
             if (filterStatus === "expired" && endDate && now <= endDate) return false;
 
@@ -92,10 +163,9 @@ function Donate() {
                 const descMatch = project.description?.toLowerCase().includes(searchLower);
                 if (!nameMatch && !descMatch) return false;
             }
-
             return true;
         });
-    }, [projects, filter, filterStatus, searchTerm]);
+    }, [projects, filter, filterStatus, searchTerm, selectedRange]);
 
     // Pagination
     const indexOfLastProject = currentPage * projectsPerPage;
@@ -153,7 +223,6 @@ function Donate() {
                 </span>
             );
         }
-
     };
 
     const handleTagClick = (type) => {
@@ -161,31 +230,15 @@ function Donate() {
         setCurrentPage(1);
     };
 
-    if (error) {
-        return (
-            <div className="donate-error">
-                <i className="fas fa-exclamation-triangle fa-2x mb-3"></i>
-                <h5>เกิดข้อผิดพลาด</h5>
-                <p>{error}</p>
-                <button
-                    className="btn btn-primary"
-                    onClick={() => window.location.reload()}
-                >
-                    ลองใหม่
-                </button>
-            </div>
-        );
-    }
-
     return (
         <div className="donate-page">
             <img src="./image/donation (1).jpg" className="donate-header-image" alt="donation" />
-
             <div className="donate-content-wrapper">
+
                 {/* Filters */}
                 <div className="donate-filters">
                     <div className="row g-3">
-                        <div className="col-md-4">
+                        <div className="col-md-3">
                             <label htmlFor="search" className="form-label">ค้นหาโครงการ:</label>
                             <div className="input-group">
                                 <span className="input-group-text">
@@ -218,6 +271,21 @@ function Donate() {
                         </div>
 
                         <div className="col-md-3">
+                            <label htmlFor="month-range" className="form-label">ช่วงเดือน:</label>
+                            <select
+                                id="month-range"
+                                className="form-select"
+                                value={selectedRange}
+                                onChange={(e) => setSelectedRange(e.target.value)}
+                            >
+                                <option value="all">ทุกเดือน</option>
+                                <option value="1-4">มกราคม - เมษายน</option>
+                                <option value="5-8">พฤษภาคม - สิงหาคม</option>
+                                <option value="9-12">กันยายน - ธันวาคม</option>
+                            </select>
+                        </div>
+
+                        <div className="col-md-3">
                             <label htmlFor="status-filter" className="form-label">สถานะกิจกรรม:</label>
                             <select
                                 id="status-filter"
@@ -238,25 +306,160 @@ function Donate() {
                                 onClick={handleClearFilters}
                                 title="ล้างตัวกรอง"
                             >
-                                <AiOutlineClose />ล้าง
+                                <AiOutlineClose className="me-1" />
+                                ล้าง
                             </button>
                         </div>
                     </div>
                 </div>
 
-                {/* Create donation button */}
+                {/* สรุปยอดบริจาค */}
+                <div className="donation-summary-section">
+                    <div className="donation-summary-header">
+                        {/* <FaHeart className="summary-header-icon" /> */}
+                        <h3>สรุปยอดบริจาคทั้งหมด</h3>
+                    </div>
+
+                    <div className="donation-summary-grid">
+                        <div
+                            className="summary-card summary-card-projects cursor-pointer hover:shadow-lg transition"
+                            onClick={() => navigate("/donate/donation-summary-detail/project")}
+                        >
+                            <div className="summary-card-icon">
+                                <FaCoins />
+                            </div>
+                            <div className="summary-card-content">
+                                <h6 className="summary-card-title text-start">ยอดบริจาคโครงการ</h6>
+                                <p className="summary-card-amount">
+                                    ฿{formatCurrency(summary.totalProjectsAmount)}
+                                </p>
+                                <span className="summary-card-label">จากโครงการทั้งหมด</span>
+                            </div>
+                        </div>
+
+                        {/* การ์ดยอดบริจาคทั่วไป */}
+                        <div
+                            className="summary-card summary-card-general cursor-pointer hover:shadow-lg transition"
+                            onClick={() => navigate("/donate/donation-summary-detail/general")}
+                        >
+                            <div className="summary-card-icon">
+                                <FaHeart />
+                            </div>
+                            <div className="summary-card-content">
+                                <h6 className="summary-card-title text-start">ยอดบริจาคทั่วไป</h6>
+                                <p className="summary-card-amount">
+                                    ฿{formatCurrency(summary.totalGeneralAmount)}
+                                </p>
+                                <span className="summary-card-label">สนับสนุนสมาคมโดยตรง</span>
+                            </div>
+                        </div>
+
+                        {/* การ์ดยอดรวมทั้งหมด */}
+                        <div
+                            className="summary-card summary-card-total cursor-pointer hover:shadow-lg transition"
+                            onClick={() => navigate("/donate/donation-summary-detail/all")}
+                        >
+                            <div className="summary-card-icon">
+                                <BiCoin />
+                            </div>
+                            <div className="summary-card-content">
+                                <h6 className="summary-card-title text-start">ยอดบริจาครวมทั้งหมด</h6>
+                                <p className="summary-card-amount highlight">
+                                    ฿{formatCurrency(summary.totalProjectsAmount + summary.totalGeneralAmount)}
+                                </p>
+                                <span className="summary-card-label">ยอดบริจาครวม</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="general-donation-banner">
+                    <div className="general-donation-content">
+                        <div className="general-donation-icon">
+                            <FaHeart />
+                        </div>
+                        <div className="general-donation-text mb-0">
+                            <h3>บริจาคทั่วไป</h3>
+                            <p className="text-center">สนับสนุนสมาคมศิษย์เก่าวิทยาลัยการคอมพิวเตอร์โดยตรง ไม่ผ่านโครงการเฉพาะ</p>
+                        </div>
+                        <button
+                            className="btn-general-donate"
+                            onClick={() => navigate('/donate/donate-general')}
+                        >
+                            บริจาคเลย
+                            <FaArrowRight className="ms-2" />
+                        </button>
+                    </div>
+                </div>
+
+                {/* ผู้บริจาคล่าสุด */}
+                <div className="recent-donors-section">
+                    <div className="recent-donors-header">
+                        <FaUsers />
+                        <h4>ผู้บริจาคล่าสุด</h4>
+                    </div>
+
+                    {recentDonors.length > 0 ? (
+                        <div className="recent-donors-list">
+                            {recentDonors.map((donor, index) => (
+                                <div key={index} className="donor-item">
+                                    <div className="donor-avatar bg-gray-400 text-white overflow-hidden">
+                                        {donor.profile_image ? (
+                                            <img
+                                                src={HOSTNAME + `/${donor.profile_image}`}
+                                                alt={donor.full_name || "ผู้บริจาค"}
+                                                onError={(e) => e.target.src = HOSTNAME + `/uploads/default-profile.png`}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        ) : (
+                                            donor.full_name ? donor.full_name.charAt(0).toUpperCase() : "?"
+                                        )}
+                                    </div>
+                                    <div className="donor-info">
+                                        <div className="donor-name">
+                                            {donor.full_name || 'ผู้บริจาคไม่ประสงค์ออกนาม'}
+                                        </div>
+                                        <div className="donor-details">
+                                            <span className="donor-amount">฿{formatCurrency(donor.amount)}</span>
+                                            <span className="donor-separator">•</span>
+                                            <span className="donor-time">{getTimeSince(donor.donation_date)}</span>
+                                        </div>
+                                        {donor.project_name && (
+                                            <div className="donor-project">
+                                                โครงการ: {truncateText(donor.project_name, 40)}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <p className="no-donors-message">ยังไม่มีผู้บริจาค</p>
+                    )}
+                </div>
+
                 <div className="donate-create-button-wrapper">
                     <Link to="/donate/donaterequest">
                         <button className="donate-create-button">
                             <FaPlus className="me-2" />
-                            สร้างการบริจาค
+                            สร้างโครงการบริจาค
                         </button>
                     </Link>
                 </div>
 
                 <h2 className="donate-title">
-                    {getFilterTitle(filter)} {filteredProjects.length > 0 && `(${filteredProjects.length})`}
+                    {getFilterTitle(filter)}
+                    {filteredProjects.length > 0 && (
+                        <span className="project-count">({filteredProjects.length})</span>
+                    )}
                 </h2>
+
+                {error && (
+                    <div className="alert alert-danger" role="alert">
+                        <i className="fas fa-exclamation-triangle me-2"></i>
+                        {error}
+                    </div>
+                )}
 
                 <div className="donate-projects-container">
                     {filteredProjects.length === 0 ? (
@@ -273,6 +476,7 @@ function Donate() {
                                     className="btn btn-primary mt-3"
                                     onClick={handleClearFilters}
                                 >
+                                    <AiOutlineClose className="me-2" />
                                     แสดงโครงการทั้งหมด
                                 </button>
                             )}
@@ -317,11 +521,12 @@ function Donate() {
                                                     <span
                                                         className={`donate-tag ${project.donation_type || "default"}`}
                                                         onClick={() => handleTagClick(project.donation_type)}
+                                                        role="button"
+                                                        tabIndex={0}
                                                     >
                                                         {getFilterTitle(project.donation_type)}
                                                     </span>
                                                     <small className="donate-project-date">
-                                                        <i className="far fa-calendar-alt me-1"></i>
                                                         {formattedStartDate} - {formattedEndDate}
                                                     </small>
                                                 </div>
@@ -334,7 +539,6 @@ function Donate() {
                                                     {truncateText(project.description, 120)}
                                                 </p>
 
-                                                {/* Progress section */}
                                                 <div className="donate-progress-section">
                                                     {project.donation_type !== "unlimited" &&
                                                         project.donation_type !== "things" &&
@@ -430,7 +634,6 @@ function Donate() {
                                                     }
                                                 </button>
                                             </div>
-
                                         </div>
                                     );
                                 })}
@@ -439,12 +642,13 @@ function Donate() {
                             {/* Pagination */}
                             {totalPages > 1 && (
                                 <nav aria-label="Page navigation" className="donate-pagination">
-                                    <ul className="pagination">
+                                    <ul className="pagination justify-content-center">
                                         <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
                                             <button
                                                 className="page-link"
                                                 onClick={() => handlePageChange(currentPage - 1)}
                                                 disabled={currentPage === 1}
+                                                aria-label="หน้าก่อนหน้า"
                                             >
                                                 <FaChevronLeft />
                                             </button>
@@ -455,7 +659,12 @@ function Donate() {
                                                 key={number}
                                                 className={`page-item ${number === currentPage ? "active" : ""}`}
                                             >
-                                                <button className="page-link" onClick={() => handlePageChange(number)}>
+                                                <button
+                                                    className="page-link"
+                                                    onClick={() => handlePageChange(number)}
+                                                    aria-label={`หน้า ${number}`}
+                                                    aria-current={number === currentPage ? "page" : undefined}
+                                                >
                                                     {number}
                                                 </button>
                                             </li>
@@ -466,6 +675,7 @@ function Donate() {
                                                 className="page-link"
                                                 onClick={() => handlePageChange(currentPage + 1)}
                                                 disabled={currentPage === totalPages}
+                                                aria-label="หน้าถัดไป"
                                             >
                                                 <FaChevronRight />
                                             </button>
@@ -474,13 +684,10 @@ function Donate() {
                                 </nav>
                             )}
 
-
-                            {/* Page info */}
-                            <div className="donate-page-info">
-                                <small>
-                                    หน้า {currentPage} จาก {totalPages} (แสดง {indexOfFirstProject + 1}-
-                                    {Math.min(indexOfLastProject, filteredProjects.length)} จาก{" "}
-                                    {filteredProjects.length} โครงการ)
+                            <div className="donate-page-info text-center">
+                                <small className="text-muted">
+                                    แสดงหน้า {currentPage} จาก {totalPages}
+                                    {" "}({indexOfFirstProject + 1}-{Math.min(indexOfLastProject, filteredProjects.length)} จาก {filteredProjects.length} โครงการ)
                                 </small>
                             </div>
                         </>

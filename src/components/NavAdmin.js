@@ -87,7 +87,6 @@ function NavAdmin() {
         });
 
         if (result.isConfirmed) {
-            // handleLogout จะ redirect เอง ไม่ต้องทำอะไรเพิ่ม
             handleLogout();
         }
     };
@@ -97,7 +96,6 @@ function NavAdmin() {
             navigate('/login');
             return;
         }
-
     }, [role, user, navigate]);
 
     // แจ้งเตือน
@@ -121,7 +119,6 @@ function NavAdmin() {
         return () => clearInterval(interval);
     }, [userId]);
 
-    // ฟังก์ชันอื่นๆ ยังเหมือนเดิม...
     const markAsRead = (notificationId) => {
         axios.put(HOSTNAME + `/notice/read/${notificationId}`)
             .then(() => {
@@ -194,7 +191,7 @@ function NavAdmin() {
             </div>
         );
     }
-    // ถ้าไม่มี user หลังจาก loading เสร็จแล้ว ก็ไม่แสดงอะไร (จะ redirect ไปแล้ว)
+
     if (!user) {
         return null;
     }
@@ -338,16 +335,13 @@ function NavAdmin() {
                     </div>
                 )}
 
-
-
-
                 {/* Menu Items */}
                 <div className="nav flex-column nav-pills">
                     {[
                         { to: "/admin-home", label: "แดชบอร์ด" },
                         { to: "/admin/verify", label: "ตรวจสอบสลิปการโอนเงิน" },
                         { to: "/admin/activities", label: "กิจกรรมและการเข้าร่วม" },
-                        { to: "/admin/donations", label: "การบริจาคและโครงการ" },
+                        { to: "/admin/donations/donation-list", label: "การบริจาคและโครงการ" },
                         { to: "/admin/webboard", label: "การจัดการเว็บบอร์ด" },
                         { to: "/admin/news", label: "ข่าวสารและประชาสัมพันธ์" },
                         { to: "/admin/souvenir", label: "ของที่ระลึก" },

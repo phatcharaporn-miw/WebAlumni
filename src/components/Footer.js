@@ -4,8 +4,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { NavLink } from "react-router-dom";
 import { IoMdPin, IoMdCall } from "react-icons/io";
 
-
-
 function Footer() {
   return (
     <footer className="footer">

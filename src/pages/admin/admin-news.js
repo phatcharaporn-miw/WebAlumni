@@ -1,16 +1,22 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { useNavigate } from "react-router-dom";
 import '../../css/admin-news.css';
-import { MdDateRange, MdEdit, MdDelete } from "react-icons/md";
+import { MdDateRange} from "react-icons/md";
 import Swal from "sweetalert2";
 import {HOSTNAME} from '../../config.js';
+import { FaSearch } from "react-icons/fa";
+import { AiOutlineClose } from "react-icons/ai";
 
 function AdminNews() {
     const navigate = useNavigate();
     const [news, setNews] = useState([]);
+    const [searchTerm, setSearchTerm] = useState("");
+        const [filter, setFilter] = useState("all");
+        const [filterStatus, setFilterStatus] = useState("all");
+        const [filterYear, setFilterYear] = useState("all");
 
     // ดึงข้อมูลข่าวประชาสัมพันธ์
     useEffect(() => {
@@ -67,6 +73,41 @@ function AdminNews() {
         return `${day}/${month}/${year}`;
     };
 
+    const handleSearchChange = (e) => {
+            setSearchTerm(e.target.value);
+        };
+    
+        const handleYearChange = (e) => {
+            setFilterYear(e.target.value);
+        };
+    
+        const handleClearFilters = () => {
+            setSearchTerm("");
+            setFilterYear("all");
+            setFilterStatus("all");
+            setFilter("all");
+            setCurrentPage(1);
+        };
+    
+        const years = useMemo(() => {
+            const startYear = 2025; // ค.ศ. 2025 = พ.ศ. 2568
+            const currentYear = new Date().getFullYear();
+            const list = [];
+            for (let y = startYear; y <= currentYear; y++) {
+                list.push(y + 543); // แปลงเป็น พ.ศ.
+            }
+            return list.reverse(); 
+        }, []);
+    
+        const filteredNews = news
+            .filter(a => {
+                const newYear = new Date(a.created_at).getFullYear() + 543;
+                const matchesYear = filterYear === "all" ? true : newYear.toString() === filterYear;
+                const matchesSearch = a.title.toLowerCase().includes(searchTerm.toLowerCase());
+                return matchesYear && matchesSearch;
+            })
+            .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
     // Pagination logic
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 6; // จำนวนกิจกรรมต่อหน้า
@@ -80,9 +121,61 @@ function AdminNews() {
     return (
         <div className="news-container p-5">
             <h3 className="admin-title">ข่าวสารและประชาสัมพันธ์</h3>
+            {/* Filters */}
+                            <div className="donate-filters">
+                                <div className="row g-3">
+                                    {/* ค้นหากิจกรรม */}
+                                    <div className="col-md-6">
+                                        <label htmlFor="search" className="form-label">ค้นหาข่าวประขาสัมพันธ์:</label>
+                                        <div className="input-group">
+                                            <span className="input-group-text">
+                                                <FaSearch />
+                                            </span>
+                                            <input
+                                                type="text"
+                                                id="search"
+                                                className="form-control"
+                                                placeholder="ค้นหาข่าวหรือรายละเอียด..."
+                                                value={searchTerm}
+                                                onChange={handleSearchChange}
+                                            />
+                                        </div>
+                                    </div>
+            
+                                    {/* ปี */}
+                                    <div className="col-md-4">
+                                        <label htmlFor="year-filter" className="form-label">ปี:</label>
+                                        <select
+                                            id="year-filter"
+                                            className="form-select"
+                                            value={filterYear}
+                                            onChange={handleYearChange}
+                                        >
+                                            <option value="all">ทุกปี</option>
+                                            {years.map((year) => (
+                                                <option key={year} value={year}>
+                                                    {year}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+            
+                                    {/* ปุ่มล้างตัวกรอง */}
+                                    <div className="col-md-2 d-flex flex-column">
+                                        <label className="form-label invisible">ล้าง</label>
+                                        <button
+                                            className="btn btn-outline-secondary"
+                                            onClick={handleClearFilters}
+                                            title="ล้างตัวกรอง"
+                                        >
+                                            <AiOutlineClose /> ล้าง
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
             <div className="row mb-4">
                 <div className="col-md-12 text-end">
-                    <button className="btn btn-success" onClick={() => navigate("/admin/news/admin-create-news")}>
+                    <button className="btn btn-primary" onClick={() => navigate("/admin/news/admin-create-news")}>
                         เพิ่มข่าวประชาสัมพันธ์
                     </button>
                 </div>
@@ -112,32 +205,30 @@ function AdminNews() {
                                     <p className="news-text flex-grow-1">
                                         {item.content ? item.content.substring(0, 100) + "..." : "ไม่มีเนื้อหา"}
                                     </p>
-                                    <div className="d-flex align-items-center gap-2 mt-3">
+                                    
+                                    <div className="mt-3 d-flex justify-content-between">
                                         <button
-                                            className="btn btn-primary btn-sm "
-                                            onClick={() => navigate(`/admin/news/${item.news_id}`)}
+                                            className="btn btn-outline-danger btn-sm"
+                                            onClick={() =>handleDeleteNews(item.news_id)}
                                         >
-                                            รายละเอียดเพิ่มเติม
+                                            ลบ
                                         </button>
 
-                                        <div className="d-flex align-items-center gap-2">
-                                            <button
-                                                className="btn btn-light rounded-circle p-2 shadow-sm"
-                                                style={{ backgroundColor: "#f1f1f1", width: "40px", height: "40px" }}
-                                                onClick={() => navigate(`/admin/news/edit/${item.news_id}`)}
-                                            >
-                                                <MdEdit className="text-warning" size={18} />
-                                            </button>
-
-                                            <button
-                                                className="btn btn-light rounded-circle p-2 shadow-sm"
-                                                style={{ backgroundColor: "#f1f1f1", width: "40px", height: "40px" }}
-                                                onClick={() => handleDeleteNews(item.news_id)}
-                                            >
-                                                <MdDelete className="text-danger" size={18} />
-                                            </button>
-                                        </div>
+                                        <button
+                                            className="btn btn-outline-warning btn-sm"
+                                            onClick={() => navigate(`/admin/news/edit/${item.news_id}`)}
+                                        >
+                                            แก้ไข
+                                        </button>
+                                        
+                                        <button
+                                            className="btn btn-outline-info btn-sm"
+                                            onClick={() => navigate(`/admin/news/${item.news_id}`)}
+                                        >
+                                            ดูรายละเอียด
+                                        </button>
                                     </div>
+
                                 </div>
                             </div>
                         </div>

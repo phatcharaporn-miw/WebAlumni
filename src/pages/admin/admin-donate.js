@@ -1,26 +1,32 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "../../css/adminDonate.css";
 import { CiSearch } from "react-icons/ci";
+import { FaSearch, FaRegClock, FaArrowRight, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { FaPlus } from "react-icons/fa";
+import { AiOutlineClose } from "react-icons/ai";
 import axios from "axios";
 import { Link, useLocation } from "react-router-dom";
-import {HOSTNAME} from '../../config.js';
+import { HOSTNAME } from '../../config.js';
 
 function AdminDonate() {
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
+    const [filter, setFilter] = useState("all");
     const [filterStatus, setFilterStatus] = useState("all");
+    const [currentPage, setCurrentPage] = useState(1);
     const [sortBy, setSortBy] = useState("date");
     const location = useLocation();
+    const projectsPerPage = 6;
 
     useEffect(() => {
         const fetchProjects = async () => {
             try {
                 setLoading(true);
-                const response = await axios.get(HOSTNAME +"/admin/donate");
+                const response = await axios.get(HOSTNAME + "/admin/donate");
                 const updatedProjects = response.data.map((project) => ({
                     ...project,
                     showFullDescription: false,
@@ -36,16 +42,6 @@ function AdminDonate() {
         fetchProjects();
     }, []);
 
-    // ฟังก์ชันสำหรับค้นหาโครงการ
-    const handleSearchChange = (e) => {
-        setSearchQuery(e.target.value);
-    };
-
-    // ฟังก์ชันเปลี่ยนสถานะฟิลเตอร์
-    const handleFilterChange = (e) => {
-        setFilterStatus(e.target.value);
-    };
-
     const handleSortChange = (e) => {
         setSortBy(e.target.value);
     };
@@ -55,7 +51,7 @@ function AdminDonate() {
         const confirmDelete = window.confirm("คุณแน่ใจหรือไม่ว่าต้องการลบโครงการนี้?");
         if (confirmDelete) {
             try {
-                await axios.delete(HOSTNAME +`/admin/donate/${projectId}`);
+                await axios.delete(HOSTNAME + `/admin/donate/${projectId}`);
                 setProjects(projects.filter((project) => project.project_id !== projectId));
                 alert("ลบโครงการสำเร็จ");
             } catch (error) {
@@ -67,7 +63,7 @@ function AdminDonate() {
     //ฟังก์ชันสำหรับอนุมัติโครงการ
     const Approve = async (projectId) => {
         try {
-            await axios.put(HOSTNAME +`/admin/approveDonate/${projectId}`);
+            await axios.put(HOSTNAME + `/admin/approveDonate/${projectId}`);
             setProjects(projects.map(project =>
                 project.project_id === projectId
                     ? { ...project, status: "1" }
@@ -145,25 +141,91 @@ function AdminDonate() {
         }
     };
 
-    const filteredProjects = getFilteredAndSortedProjects();
+    // const filteredProjects = getFilteredAndSortedProjects();
+
+    const handleFilterChange = (e) => {
+        setFilterStatus(e.target.value);
+        setCurrentPage(1);
+    };
+
+    const handleFilterTypeChange = (e) => {
+        setFilter(e.target.value);
+        setCurrentPage(1);
+    };
+
+    const handleSearchChange = (e) => {
+        setSearchQuery(e.target.value);
+        setCurrentPage(1);
+    };
+
+    const handleClearFilters = () => {
+        setFilter("all");
+        setFilterStatus("all");
+        setSearchQuery("");
+        setCurrentPage(1);
+    };
+
+    // Filter projects
+    const filteredProjects = useMemo(() => {
+        return projects.filter((project) => {
+            const now = new Date();
+            const endDate = project?.end_date ? new Date(project.end_date) : null;
+
+            if (filter !== "all" && project.donation_type !== filter) return false;
+            if (filterStatus === "active" && endDate && now > endDate) return false;
+            if (filterStatus === "expired" && endDate && now <= endDate) return false;
+
+            if (searchQuery.trim()) {
+                const searchLower = searchQuery.toLowerCase();
+                const nameMatch = project.project_name?.toLowerCase().includes(searchLower);
+                const descMatch = project.description?.toLowerCase().includes(searchLower);
+                if (!nameMatch && !descMatch) return false;
+            }
+
+            return true;
+        });
+    }, [projects, filter, filterStatus, searchQuery]);
+
+    // Pagination
+    const indexOfLastProject = currentPage * projectsPerPage;
+    const indexOfFirstProject = indexOfLastProject - projectsPerPage;
+    const currentProjects = filteredProjects.slice(indexOfFirstProject, indexOfLastProject);
+    const totalPages = Math.ceil(filteredProjects.length / projectsPerPage);
+
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
 
     return (
         <div className="donate-activity-container">
             {/* Top Menu Navigation */}
             <div className="mb-4">
                 <nav className="nav Adminnav-tabs">
+                    <Link 
+                        className={`adminnav-link ${location.pathname === '/admin/donations/donation-list' ? 'active' : ''}`} 
+                        to="/admin/donations/donation-list"
+                    >
+                        รายการบริจาคทั้งหมด
+                    </Link>
                     <Link
                         className={`adminnav-link ${location.pathname === '/admin/donations' ? 'active' : ''}`}
                         to="/admin/donations"
                     >
-                        <i className="fas fa-project-diagram me-2"></i>
                         การจัดการโครงการบริจาค
+                    </Link>
+        
+                    <Link 
+                        className={`adminnav-link ${location.pathname === '/admin/donations/walkin-donation' ? 'active' : ''}`} 
+                        to="/admin/donations/walkin-donation"
+                    >
+                        บันทึกการบริจาค Walk-in
                     </Link>
                     <Link
                         className={`adminnav-link ${location.pathname === '/admin/donations/donate-request' ? 'active' : ''}`}
                         to="/admin/donations/donate-request"
                     >
-                        <i className="fas fa-credit-card me-2"></i>
                         เพิ่มโครงการใหม่
                     </Link>
                 </nav>
@@ -171,55 +233,66 @@ function AdminDonate() {
 
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <h2 className="donate-activity-title">การจัดการโครงการบริจาค</h2>
-                <div className="d-flex gap-2">
-                    {/* <Link to="/admin/donations/donate-request" className="btn-admin-donate-request">
-                        <i className="fas fa-plus"></i> เพิ่มโครงการใหม่
-                    </Link> */}
-                </div>
             </div>
 
-            <div className="row mb-4">
-                <div className="col-md-4">
-                    <div className="input-group">
-                        <span className="input-group-text bg-light">
-                            <CiSearch />
-                        </span>
-                        <input
-                            type="text"
-                            className="form-control"
-                            placeholder="ค้นหาโครงการ..."
-                            value={searchQuery}
-                            onChange={handleSearchChange}
-                        />
+            {/* Filters */}
+            <div className="donate-filters">
+                <div className="row g-3">
+                    <div className="col-md-4">
+                        <label htmlFor="search" className="form-label">ค้นหาโครงการ:</label>
+                        <div className="input-group">
+                            <span className="input-group-text">
+                                <FaSearch />
+                            </span>
+                            <input
+                                type="text"
+                                id="search"
+                                className="form-control"
+                                placeholder="ค้นหาชื่อโครงการหรือรายละเอียด..."
+                                value={searchQuery}
+                                onChange={handleSearchChange}
+                            />
+                        </div>
                     </div>
-                </div>
-                <div className="col-md-3">
-                    <select
-                        className="form-select"
-                        value={filterStatus}
-                        onChange={handleFilterChange}
-                    >
-                        <option value="all">สถานะทั้งหมด</option>
-                        <option value="0">รอการอนุมัติ</option>
-                        <option value="1">อนุมัติแล้ว</option>
-                        <option value="2">ไม่อนุมัติ</option>
-                    </select>
-                </div>
 
-                <div className="col-md-3">
-                    <select
-                        className="form-select"
-                        value={sortBy}
-                        onChange={handleSortChange}
-                    >
-                        <option value="date">เรียงตามวันที่</option>
-                        <option value="name">เรียงตามชื่อ</option>
-                        <option value="amount">เรียงตามยอดบริจาค</option>
-                    </select>
-                </div>
-                <div className="col-md-2 d-flex align-items-center">
-                    <div className="text-muted">
-                        พบ {filteredProjects.length} รายการ
+                    <div className="col-md-3">
+                        <label htmlFor="donation-type" className="form-label">ประเภทการบริจาค:</label>
+                        <select
+                            id="donation-type"
+                            className="form-select"
+                            value={filter}
+                            onChange={handleFilterTypeChange}
+                        >
+                            <option value="all">โครงการทั้งหมด</option>
+                            <option value="fundraising">บริจาคแบบระดมทุน</option>
+                            <option value="unlimited">บริจาคแบบไม่จำกัดจำนวน</option>
+                            <option value="things">บริจาคสิ่งของ</option>
+                        </select>
+                    </div>
+
+                    <div className="col-md-3">
+                        <label htmlFor="status-filter" className="form-label">สถานะกิจกรรม:</label>
+                        <select
+                            id="status-filter"
+                            className="form-select"
+                            value={filterStatus}
+                            onChange={handleFilterChange}
+                        >
+                            <option value="all">ทั้งหมด</option>
+                            <option value="active">กำลังจัดอยู่</option>
+                            <option value="expired">สิ้นสุดแล้ว</option>
+                        </select>
+                    </div>
+
+                    <div className="col-md-2 d-flex flex-column">
+                        <label className="form-label invisible">ล้าง</label>
+                        <button
+                            className="btn btn-outline-secondary"
+                            onClick={handleClearFilters}
+                            title="ล้างตัวกรอง"
+                        >
+                            <AiOutlineClose />ล้าง
+                        </button>
                     </div>
                 </div>
             </div>
@@ -274,7 +347,7 @@ function AdminDonate() {
                                                     <div className="col-md-3">
                                                         <div className="donate-admin-item-image-frame">
                                                             <img
-                                                                src={HOSTNAME +`/uploads/${project.image_path}`}
+                                                                src={HOSTNAME + `/uploads/${project.image_path}`}
                                                                 alt={project.project_name}
                                                                 className="img-fluid rounded"
                                                                 onError={(e) => {
@@ -296,12 +369,12 @@ function AdminDonate() {
 
                                                         <div className="tag-date-container">
                                                             <p className={`tagDonante ${project.donation_type || "default"}`}>
-                                                                <i className="fas fa-tag"></i> {getFilterTitle(project.donation_type)}
+                                                                {getFilterTitle(project.donation_type)}
                                                             </p>
                                                         </div>
 
                                                         <p className="text-muted small mb-2">
-                                                            <i className="fas fa-calendar"></i> {formattedStartDate} - {formattedEndDate}
+                                                            {formattedStartDate} - {formattedEndDate}
                                                         </p>
 
                                                         <p className="card-text">
@@ -365,29 +438,29 @@ function AdminDonate() {
                                                         <div className="d-flex gap-2 mt-3">
                                                             {project.status === "0" && (
                                                                 <button
-                                                                    className="btn btn-success btn-sm"
+                                                                    className="btn btn-outline-success btn-sm"
                                                                     onClick={() => Approve(project.project_id)}
                                                                 >
-                                                                    <i className="fas fa-check"></i> อนุมัติ
+                                                                    อนุมัติ
                                                                 </button>
                                                             )}
                                                             <Link
                                                                 to={`/admin/donations/edit/${project.project_id}`}
-                                                                className="btn fasfa-edit btn-sm"
+                                                                className="btn btn-outline-warning btn-sm"
                                                             >
-                                                                <i className="fas fa-edit"></i> แก้ไข
+                                                                แก้ไข
                                                             </Link>
                                                             <button
-                                                                className="btn fasfa-delete btn-sm"
+                                                                className="btn btn-outline-danger btn-sm"
                                                                 onClick={() => Delete(project.project_id)}
                                                             >
-                                                                <i className="fas fa-trash"></i> ลบ
+                                                                ลบ
                                                             </button>
                                                             <Link
                                                                 to={`/admin/donations/donate-detail/${project.project_id}`}
-                                                                className="btn fasfa-info btn-sm"
+                                                                className="btn btn-sm btn-outline-info "
                                                             >
-                                                                <i className="fas fa-eye"></i> ดูรายละเอียด
+                                                                ดูรายละเอียด
                                                             </Link>
                                                         </div>
                                                     </div>
@@ -395,8 +468,56 @@ function AdminDonate() {
                                             </div>
                                         </div>
                                     </div>
+
                                 );
                             })}
+
+                            {/* Page info */}
+                            <div className="donate-page-info">
+                                <small>
+                                    หน้า {currentPage} จาก {totalPages} (แสดง {indexOfFirstProject + 1}-
+                                    {Math.min(indexOfLastProject, filteredProjects.length)} จาก{" "}
+                                    {filteredProjects.length} โครงการ)
+                                </small>
+                            </div>
+                            {/* Pagination */}
+                            {totalPages > 1 && (
+                                <nav aria-label="Page navigation" className="donate-pagination">
+                                    <ul className="pagination">
+                                        <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                                            <button
+                                                className="page-link"
+                                                onClick={() => handlePageChange(currentPage - 1)}
+                                                disabled={currentPage === 1}
+                                            >
+                                                <FaChevronLeft />
+                                            </button>
+                                        </li>
+
+                                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
+                                            <li
+                                                key={number}
+                                                className={`page-item ${number === currentPage ? "active" : ""}`}
+                                            >
+                                                <button className="page-link" onClick={() => handlePageChange(number)}>
+                                                    {number}
+                                                </button>
+                                            </li>
+                                        ))}
+
+                                        <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                                            <button
+                                                className="page-link"
+                                                onClick={() => handlePageChange(currentPage + 1)}
+                                                disabled={currentPage === totalPages}
+                                            >
+                                                <FaChevronRight />
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            )}
+
                         </div>
                     )}
                 </div>

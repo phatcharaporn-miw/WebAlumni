@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import "../css/activity.css"
@@ -9,15 +9,19 @@ import { IoMdClose } from "react-icons/io";
 import { MdEdit, MdDelete } from 'react-icons/md';
 import { Link } from "react-router-dom";
 import { useAuth } from '../context/AuthContext';
-import {HOSTNAME} from '../config.js';
+import { HOSTNAME } from '../config.js';
+import { FaSearch, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { AiOutlineClose } from "react-icons/ai";
 
 function Activity() {
     const [activityId, setActivityId] = useState(null);
     const [activity, setActivity] = useState([]);
     const [selectedStatus, setSelectedStatus] = useState('activity');
     const [showForm, setShowForm] = useState(false);
-    // const userRole = sessionStorage.getItem("userRole");
-    const {user} = useAuth();
+    const [filterYear, setFilterYear] = useState("all");
+    const [filterStatus, setFilterStatus] = useState("all");
+    // const [years, setYears] = useState([]);
+    const { user } = useAuth();
     const userRole = user?.role;
     const userId = user?.user_id;
     const navigate = useNavigate();
@@ -53,20 +57,15 @@ function Activity() {
 
     useEffect(() => {
         // ดึงข้อมูลกิจกรรมที่กำลังจะจัดขึ้น
-        axios.get(HOSTNAME +'/activity/all-activity')
+        axios.get(HOSTNAME + '/activity/all-activity')
             .then(response => {
                 setActivity(response.data.data);
+                // console.log("กิจกรรมทั้งหมด:", response.data);
             })
             .catch(error => {
                 console.error("Error fetching activities:", error);
             });
     }, []);
-
-
-    const handleStatusChange = (e) => {
-        // console.log("Selected status:", e.target.value);
-        setSelectedStatus(e.target.value);
-    };
 
     const handleViewDetails = (activityId) => {
         navigate(`/activity/${activityId}`);
@@ -82,15 +81,6 @@ function Activity() {
         return 0;
     });
 
-    const filteredActivity = sortedActivity.filter((activity) => {
-        const matchesSearch = activity.activity_name
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase());
-        if (selectedStatus === "activity") return matchesSearch;
-        return matchesSearch && activity.status === Number(selectedStatus);// แปลง selectedStatus เป็นตัวเลข
-    });
-
-    // const activityId = formData.activity_id;
 
     const handleFormSubmit = (e) => {
         e.preventDefault();
@@ -115,7 +105,7 @@ function Activity() {
             return;
         }
 
-        axios.post(HOSTNAME +'/activity/activity-form', formData, {
+        axios.post(HOSTNAME + '/activity/activity-form', formData, {
             withCredentials: true,
         })
             .then(response => {
@@ -151,7 +141,7 @@ function Activity() {
     useEffect(() => {
         if (activityId) {
             setHasJoined(false);
-            axios.get(HOSTNAME +`/activity/check-join/${activityId}`, {
+            axios.get(HOSTNAME + `/activity/check-join/${activityId}`, {
                 withCredentials: true,
             })
                 .then((res) => {
@@ -178,7 +168,7 @@ function Activity() {
             cancelButtonText: "ยกเลิก",
         }).then((result) => {
             if (result.isConfirmed) {
-                axios.delete(HOSTNAME +`/activity/delete-activity/${activityId}`, {
+                axios.delete(HOSTNAME + `/activity/delete-activity/${activityId}`, {
                     withCredentials: true,
                 })
                     .then(() => {
@@ -209,6 +199,59 @@ function Activity() {
         }
     };
 
+    const years = useMemo(() => {
+        const startYear = 2025; // ค.ศ. 2025 = พ.ศ. 2568
+        const currentYear = new Date().getFullYear();
+        const list = [];
+        for (let y = startYear; y <= currentYear; y++) {
+            list.push(y + 543); // แปลงเป็น พ.ศ.
+        }
+        return list.reverse(); // แสดงมากไปน้อย
+    }, []);
+
+    const filteredActivity = activity
+        .filter(a => {
+            // แปลงปีเป็น พ.ศ.
+            const activityYear = new Date(a.activity_date).getFullYear() + 543;
+
+            // กรองปี ถ้าเลือก all ให้แสดงทุกปี
+            const matchesYear = filterYear === "all" ? true : activityYear.toString() === filterYear;
+
+            // กรองสถานะ
+            const matchesStatus = filterStatus === "all" ? true : a.status.toString() === filterStatus;
+
+            // กรองคำค้นหา
+            const matchesSearch = a.activity_name.toLowerCase().includes(searchTerm.toLowerCase());
+
+            return matchesYear && matchesStatus && matchesSearch;
+        })
+        .sort((a, b) => {
+            // เรียงสถานะ: 2 (กำลังดำเนินการ) > 0 (กำลังจะจัดขึ้น) > 1 (เสร็จสิ้น)
+            const order = [2, 0, 1];
+            return order.indexOf(a.status) - order.indexOf(b.status);
+        });
+
+
+
+
+    const handleStatusChange = (e) => {
+        setFilterStatus(e.target.value);
+    };
+
+    const handleSearchChange = (e) => {
+        setSearchTerm(e.target.value);
+    };
+
+    const handleYearChange = (e) => {
+        setFilterYear(e.target.value);
+    };
+
+    const handleClearFilters = () => {
+        setSearchTerm("");
+        setFilterYear("all");
+        setFilterStatus("all");
+    };
+
     const formatDate = (dateStr) => {
         if (!dateStr || dateStr === "0000-00-00") return "ไม่ระบุวันที่";
         const date = new Date(dateStr);
@@ -233,7 +276,7 @@ function Activity() {
 
     // Pagination logic
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 3; // จำนวนกิจกรรมต่อหน้า
+    const itemsPerPage = 3;
     const totalPages = Math.ceil(filteredActivity.length / itemsPerPage);
     const paginatedActivity = filteredActivity.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
@@ -278,15 +321,76 @@ function Activity() {
                     </div>
                 </div>
 
-                <div className="d-flex justify-content-between align-items-center mb-3 ">
-                    <select className="form-select w-auto me-2" onChange={handleStatusChange}>
-                        <option value="activity">กิจกรรม</option>
-                        <option value="2">กำลังดำเนินการ</option>
-                        <option value="1">เสร็จสิ้นแล้ว</option>
-                        <option value="0">กำลังจะจัดขึ้น</option>
-                    </select>
+                {/* Filters */}
+                <div className="donate-filters">
+                    <div className="row g-3">
+                        {/* ค้นหากิจกรรม */}
+                        <div className="col-md-4">
+                            <label htmlFor="search" className="form-label">ค้นหากิจกรรม:</label>
+                            <div className="input-group">
+                                <span className="input-group-text">
+                                    <FaSearch />
+                                </span>
+                                <input
+                                    type="text"
+                                    id="search"
+                                    className="form-control"
+                                    placeholder="ค้นหาชื่อกิจกรรมหรือรายละเอียด..."
+                                    value={searchTerm}
+                                    onChange={handleSearchChange}
+                                />
+                            </div>
+                        </div>
 
-                    {userRole === "2" && (
+                        {/* สถานะ */}
+                        <div className="col-md-4">
+                            <label htmlFor="status-filter" className="form-label">สถานะ:</label>
+                            <select
+                                id="status-filter"
+                                className="form-select"
+                                value={filterStatus}
+                                onChange={handleStatusChange}
+                            >
+                                <option value="all">ทั้งหมด</option>
+                                <option value="2">กำลังดำเนินการ</option>
+                                <option value="1">เสร็จสิ้นแล้ว</option>
+                                <option value="0">กำลังจะจัดขึ้น</option>
+                            </select>
+                        </div>
+
+                        {/* ปี */}
+                        <div className="col-md-2">
+                            <label htmlFor="year-filter" className="form-label">ปี:</label>
+                            <select
+                                id="year-filter"
+                                className="form-select"
+                                value={filterYear}
+                                onChange={handleYearChange}
+                            >
+                                <option value="all">ทุกปี</option>
+                                {years.map(year => (
+                                    <option key={year} value={year}>{year}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* ปุ่มล้างตัวกรอง */}
+                        <div className="col-md-2 d-flex flex-column">
+                            <label className="form-label invisible">ล้าง</label>
+                            <button
+                                className="btn btn-outline-secondary"
+                                onClick={handleClearFilters}
+                                title="ล้างตัวกรอง"
+                            >
+                                <AiOutlineClose /> ล้าง
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="d-flex justify-content-between align-items-center mb-3 ">
+
+                    {userRole === 2 && (
                         <div className="ms-auto ">
                             <Link to={`/activity/president-create-activity`} className="text-decoration-none">
                                 <button
@@ -324,7 +428,7 @@ function Activity() {
                                     <div className="card activity-card">
                                         <div className="image-container-act">
                                             <img
-                                                src={activity.image_path ? HOSTNAME +`${activity.image_path}` : "/default-image.png"}
+                                                src={activity.image_path ? HOSTNAME + `${activity.image_path}` : "/default-image.png"}
                                                 className="card-img-top"
                                                 alt="กิจกรรม"
                                             />
@@ -361,7 +465,7 @@ function Activity() {
                                             </div>
 
                                             {/* นายกสมาคม ลบ แก้ไข */}
-                                            {userRole === "2" && (
+                                            {userRole === 2 && (
                                                 <div className="d-flex justify-content-end mt-3">
                                                     <button
                                                         className="btn btn-warning me-2"
@@ -390,26 +494,55 @@ function Activity() {
                         )}
                     </div>
                     {/* Pagination */}
+                    <div className="donate-page-info">
+                        <small>
+                            หน้า {currentPage} จาก {totalPages} (แสดง{" "}
+                            {(currentPage - 1) * itemsPerPage + 1} -{" "}
+                            {Math.min(currentPage * itemsPerPage, filteredActivity.length)} จาก{" "}
+                            {filteredActivity.length} โครงการ)
+                        </small>
+                    </div>
+
+                    {/* Pagination Buttons */}
                     {totalPages > 1 && (
-                        <nav className="d-flex justify-content-center mt-4">
+                        <nav aria-label="Page navigation" className="donate-pagination">
                             <ul className="pagination">
-                                <li className={`page-item${currentPage === 1 ? ' disabled' : ''}`}>
-                                    <button className="page-link" onClick={() => handlePageChange(currentPage - 1)}>&laquo;</button>
+                                <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                                    <button
+                                        className="page-link"
+                                        onClick={() => handlePageChange(currentPage - 1)}
+                                        disabled={currentPage === 1}
+                                    >
+                                        <FaChevronLeft />
+                                    </button>
                                 </li>
-                                {Array.from({ length: totalPages }, (_, i) => (
-                                    <li key={i + 1} className={`page-item${currentPage === i + 1 ? ' active' : ''}`}>
-                                        <button className="page-link" onClick={() => handlePageChange(i + 1)}>{i + 1}</button>
+
+                                {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
+                                    <li
+                                        key={number}
+                                        className={`page-item ${number === currentPage ? "active" : ""}`}
+                                    >
+                                        <button className="page-link" onClick={() => handlePageChange(number)}>
+                                            {number}
+                                        </button>
                                     </li>
                                 ))}
-                                <li className={`page-item${currentPage === totalPages ? ' disabled' : ''}`}>
-                                    <button className="page-link" onClick={() => handlePageChange(currentPage + 1)}>&raquo;</button>
+
+                                <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                                    <button
+                                        className="page-link"
+                                        onClick={() => handlePageChange(currentPage + 1)}
+                                        disabled={currentPage === totalPages}
+                                    >
+                                        <FaChevronRight />
+                                    </button>
                                 </li>
                             </ul>
                         </nav>
                     )}
+
+
                 </div>
-
-
                 {showForm && (
                     <div className="form-overlay">
                         <form className="join-form " onSubmit={handleFormSubmit}>

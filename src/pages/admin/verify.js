@@ -36,6 +36,7 @@ function AdminVerifySlip() {
             const res = await axios.get(HOSTNAME +"/orders/pending-payment", {
                 withCredentials: true
             });
+            // console.log(res.data);
             setOrders(Array.isArray(res.data) ? res.data : []);
         } catch (err) {
             setOrders([]);
@@ -283,8 +284,8 @@ function AdminVerifySlip() {
                         การสั่งซื้อ
                         <span
                             className={`badge ${activeTab === 'purchase' ? 'bg-white text-primary' : 'bg-primary'} ms-1`}
-                        >
-                            {orders.filter(o => o.type === 'purchase' || !o.type).length}
+                            >
+                            {orders.length}
                         </span>
                     </button>
                     <button
@@ -387,7 +388,9 @@ function AdminVerifySlip() {
                                                                 )}
                                                             </div>
                                                             <div>
-                                                                <div className="fw-bold">รายการที่: {order.order_id}</div>
+                                                                <div className="fw-bold">
+                                                                    {order.products?.[0]?.product_name || "ไม่พบชื่อสินค้า"}
+                                                                </div>
                                                                 <small
                                                                     className={`${isDonation ? 'text-success' : 'text-primary'
                                                                         } fw-semibold`}
@@ -440,9 +443,6 @@ function AdminVerifySlip() {
                                                             aria-controls={`slipDetail-${idx}`}
                                                         >
                                                             <span className="d-none d-sm-inline">ตรวจสอบ</span>
-                                                            <span className="d-sm-none">
-                                                                <i className="fas fa-search"></i>
-                                                            </span>
                                                         </button>
                                                     </div>
                                                 </div>
@@ -455,7 +455,6 @@ function AdminVerifySlip() {
                                                         <div className="col-lg-4">
                                                             <div className="card border-2 border-primary border-opacity-25">
                                                                 <div className="card-header bg-primary bg-opacity-10 text-center py-2">
-                                                                    <i className="fas fa-receipt me-2 text-primary"></i>
                                                                     <small className="text-primary fw-bold">
                                                                         สลิปการโอน
                                                                     </small>
@@ -495,7 +494,6 @@ function AdminVerifySlip() {
                                                                         </>
                                                                     ) : (
                                                                         <div className="text-muted py-3">
-                                                                            <i className="fas fa-image fa-2x mb-2 opacity-25"></i>
                                                                             <p className="small">ไม่มีสลิป</p>
                                                                         </div>
                                                                     )}
@@ -508,9 +506,6 @@ function AdminVerifySlip() {
                                                                 <div className="card-body p-3">
                                                                     {/* หัวข้อ */}
                                                                     <h6 className="fw-bold text-primary mb-3 d-flex align-items-center">
-                                                                        <i
-                                                                            className={`${isDonation ? 'fas fa-heart' : 'fas fa-user'} me-2`}
-                                                                        ></i>
                                                                         {isDonation ? 'ผู้บริจาค' : 'ผู้สั่งซื้อ'}
                                                                     </h6>
 
@@ -705,6 +700,7 @@ function AdminVerifySlip() {
                                 })}
                             </div>
                         </div>
+
                     );
                 })()}
             </div>
@@ -736,7 +732,6 @@ function AdminVerifySlip() {
                                             </div>
                                             <div className="col-6 col-md-3 d-none d-md-block">
                                                 <div>
-                                                    {/* <div className="fw-semibold text-truncate">ชื่อ{payment.project_name}</div> */}
                                                     <small className="text-muted">
                                                         {formatDate(payment.start_date)}
                                                     </small>
@@ -807,7 +802,6 @@ function AdminVerifySlip() {
                                                                 </>
                                                             ) : (
                                                                 <div className="text-muted py-3">
-                                                                    <i className="fas fa-image fa-2x mb-2 opacity-25"></i>
                                                                     <p className="small">ไม่มีสลิป</p>
                                                                 </div>
                                                             )}

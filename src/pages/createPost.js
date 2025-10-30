@@ -181,8 +181,15 @@ function CreatePost() {
 
     // ฟังก์ชัน handleCancel สำหรับปุ่มยกเลิก
     const handleCancel = () => {
-        navigate("/webboard"); 
-    };
+    // ถ้า role = 1 ให้ไปหน้า /admin/webboard
+    if (user && (user.role === '1' || user.role === 1)) {
+      navigate('/admin/webboard');
+      return;
+    }
+
+    // กรณีอื่น ๆ ให้กลับไปหน้าเดิมหรือหน้าอื่นตามต้องการ
+    navigate(-1); // หรือ navigate('/souvenir')
+  };
 
     return (
         <section className="createPost-page">

@@ -667,7 +667,10 @@ function AlumniProfileSouvenir() {
                                     <div className="card border-0 shadow-sm mb-3 rounded-3" key={order.order_id || idx}>
                                         <div className="card-body d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
                                             <div className="mb-2 mb-md-0">
-                                                <h6 className="fw-bold mb-1">รหัสคำสั่งซื้อ #{order.order_id}</h6>
+                                                {/* <h6 className="fw-bold mb-1">{order.product_name}</h6> */}
+                                                {order.products.map((item, i) => (
+                                                    <h6 key={i} className="fw-bold mb-1">{item.product_name}</h6>
+                                                ))}
                                                 <small className="text-muted">
                                                     วันที่:{" "}
                                                     {order.order_date
@@ -1130,10 +1133,10 @@ function AlumniProfileSouvenir() {
                                                                         </div>
 
                                                                         {/* สินค้า */}
-                                                                        <div className="mb-3 text-start">
+                                                                        {/* <div className="mb-3 text-start">
                                                                             <label className="form-label fw-bold">สินค้า</label>
                                                                             <p>{selectedOrder.product_name}</p>
-                                                                        </div>
+                                                                        </div> */}
 
                                                                         {/* ที่อยู่จัดส่ง */}
                                                                         <div className="mb-3 text-start">

@@ -150,7 +150,6 @@ const formatDate = (dateStr) => {
 
                 {/* Content Section */}
                 <div className="card-body p-0">
-                    {/* Activity Title (if no image) */}
                     {!activity.image_path && (
                         <div className="bg-primary text-white text-center py-5">
                             <h1 className="display-4 fw-bold mb-0">{activity.activity_name}</h1>
@@ -166,7 +165,7 @@ const formatDate = (dateStr) => {
                             <div className="col-md-3">
                                 <div className="card border-0 bg-light h-100">
                                     <div className="card-body text-center">
-                                        <FaCalendarAlt className="text-primary mb-2" size={24} />
+                                        {/* <FaCalendarAlt className="text-primary mb-2" size={24} /> */}
                                         <h6 className="card-title text-muted mb-1">วันที่เริ่ม</h6>
                                         <p className="card-text fw-bold">{formatDate(activity.activity_date)}</p>
                                     </div>
@@ -175,7 +174,7 @@ const formatDate = (dateStr) => {
                             <div className="col-md-3">
                                 <div className="card border-0 bg-light h-100">
                                     <div className="card-body text-center">
-                                        <FaClock className="text-warning mb-2" size={24} />
+                                        {/* <FaClock className="text-warning mb-2" size={24} /> */}
                                         <h6 className="card-title text-muted mb-1">เวลา</h6>
                                         <p className="card-text fw-bold">{formatTime(activity.start_time, activity.end_time)}</p>
                                     </div>
@@ -184,7 +183,7 @@ const formatDate = (dateStr) => {
                             <div className="col-md-3">
                                 <div className="card border-0 bg-light h-100">
                                     <div className="card-body text-center">
-                                        <FaCalendarAlt className="text-danger mb-2" size={24} />
+                                        {/* <FaCalendarAlt className="text-danger mb-2" size={24} /> */}
                                         <h6 className="card-title text-muted mb-1">วันที่สิ้นสุด</h6>
                                         <p className="card-text fw-bold">
                                             {activity.end_date && activity.end_date !== "0000-00-00"
@@ -197,7 +196,6 @@ const formatDate = (dateStr) => {
                             <div className="col-md-3">
                                 <div className="card border-0 bg-light h-100">
                                     <div className="card-body text-center">
-                                        {statusInfo.icon}
                                         <h6 className="card-title text-muted mb-1">สถานะ</h6>
                                         <span className={`badge ${statusInfo.badge} fs-6 px-2 py-1 rounded-pill`}>
                                             {statusInfo.text}
@@ -209,12 +207,10 @@ const formatDate = (dateStr) => {
 
                         {/* Main Content */}
                         <div className="row">
-                            {/* Description */}
                             <div className="col-lg-8 mb-4">
                                 <div className="card border-0 shadow-sm h-100">
                                     <div className="card-header bg-white border-0 pb-0">
                                         <h3 className="text-primary mb-0 d-flex align-items-center">
-                                            <FaInfoCircle className="me-2" />
                                             รายละเอียดกิจกรรม
                                         </h3>
                                     </div>
@@ -233,33 +229,30 @@ const formatDate = (dateStr) => {
                                 <div className="card border-0 shadow-sm h-100">
                                     <div className="card-header bg-white border-0 pb-0">
                                         <h3 className="text-primary mb-0 d-flex align-items-center">
-                                            <FaUsers className="me-2" />
                                             ข้อมูลเพิ่มเติม
                                         </h3>
                                     </div>
                                     <div className="card-body">
                                         <div className="list-group list-group-flush">
                                             <div className="list-group-item d-flex align-items-center border-0 px-0">
-                                                <FaBuilding className="me-3 text-danger" />
                                                 <div>
                                                     <small className="text-muted d-block">สาขา</small>
                                                     {activity.department_restriction|| "ไม่ระบุ"}
                                                 </div>
                                             </div>
                                             <div className="list-group-item d-flex align-items-center border-0 px-0">
-                                                <FaUsers className="me-3 text-info" />
                                                 <div>
                                                     <small className="text-muted d-block">ผู้เข้าร่วม</small>
                                                     {activity.current_participants}/{activity.max_participants || "ไม่จำกัด"}
                                                 </div>
                                             </div>
-                                            <div className="list-group-item d-flex align-items-center border-0 px-0">
+                                            {/* <div className="list-group-item d-flex align-items-center border-0 px-0">
                                                 <FaInfoCircle className="me-3 text-secondary" />
                                                 <div>
                                                     <small className="text-muted d-block">รหัสกิจกรรม</small>
                                                     #{activityId}
                                                 </div>
-                                            </div>
+                                            </div> */}
                                         </div>
                                     </div>
                                 </div>

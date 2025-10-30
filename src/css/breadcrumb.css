@@ -2,7 +2,7 @@
     padding-top: 10px; 
     overflow-x: auto;
   }
- 
+
 .breadcrumb {
   display: flex;
   flex-wrap: wrap;
@@ -34,7 +34,7 @@
 
 
 .breadcrumb-item span {
-  color: #495057; 
+  color: #0F75BC; 
   font-weight: bold; 
   text-decoration: underline; 
 }

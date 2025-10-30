@@ -5,6 +5,8 @@ import '../../css/major-detail.css';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import {HOSTNAME} from '../../config.js';
+import { FaSearch } from "react-icons/fa";
+
 
 function AdminAlumniView() {
     const { major } = useParams();
@@ -103,42 +105,13 @@ function AdminAlumniView() {
         document.body.removeChild(link);
     };
 
-    // useEffect(() => {
-    //     axios.get(HOSTNAME +"/alumni/outstanding-alumni")
-    //         .then((res) => setAlumniData(res.data))
-    //         .catch((err) => console.error("โหลดศิษย์เก่าดีเด่นล้มเหลว:", err));
-    // }, []);
-
-    // const handleAlumniClick = (userId) => navigate(`/admin/users/user-profile/${userId}`);
-
     return (
         <section className="alumni-container p-5">
             <h3 className="admin-title">ทำเนียบศิษย์เก่าสาขา {displayMajor}</h3>
+            
 
-            <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-                {/* Dropdown ทางซ้าย */}
-                <div style={{ minWidth: "250px", maxWidth: "100%" }}>
-                    <select
-                        id="majorSelect"
-                        className="form-select"
-                        onChange={(e) =>
-                            navigate(`/admin/admin-alumni/admin-alumniView/${e.target.value}`)
-                        }
-                    >
-                        <option value="">-- เลือกสาขา --</option>
-                        {majors.map((major, idx) => (
-                            <option key={idx} value={major.slug}>
-                                {major.title}
-                            </option>
-                        ))}
-                    </select>
-                </div>
 
-                {/* ปุ่มดาวน์โหลดทางขวา */}
-                <button className="btn btn-outline-success" onClick={exportToCSV}>
-                    ดาวน์โหลดรายชื่อ
-                </button>
-            </div>
+
 
             <div className="major-detail">
                 <ul className="nav nav-tabs mb-4">
@@ -154,15 +127,58 @@ function AdminAlumniView() {
                     ))}
                 </ul>
 
-                <div className="search-box mb-4">
-                    <input
-                        type="text"
-                        className="form-control w-25"
-                        placeholder="ค้นหา..."
-                        value={searchTerm}
-                        onChange={(e) => handleSearch(e.target.value)}
-                    />
-                </div>
+                <div className="donate-filters mb-4">
+  <div className="row g-3 align-items-end">
+    {/* Dropdown เลือกสาขา */}
+    <div className="col-md-4">
+      <label htmlFor="majorSelect" className="form-label">เลือกสาขา:</label>
+      <select
+        id="majorSelect"
+        className="form-select"
+        onChange={(e) =>
+          navigate(`/admin/admin-alumni/admin-alumniView/${e.target.value}`)
+        }
+      >
+        <option value="">-- เลือกสาขา --</option>
+        {majors.map((major, idx) => (
+          <option key={idx} value={major.slug}>
+            {major.title}
+          </option>
+        ))}
+      </select>
+    </div>
+
+    {/* Search Box */}
+    <div className="col-md-4">
+      <label htmlFor="searchAlumni" className="form-label">ค้นหา:</label>
+      <div className="input-group">
+        <span className="input-group-text">
+          <FaSearch />
+        </span>
+        <input
+          type="text"
+          id="searchAlumni"
+          className="form-control"
+          placeholder="ค้นหาชื่อศิษย์เก่า..."
+          value={searchTerm}
+          onChange={(e) => handleSearch(e.target.value)}
+        />
+      </div>
+    </div>
+
+    {/* ปุ่มดาวน์โหลดชิดขวา */}
+    <div className="col-md-4 d-flex flex-column">
+      <label className="form-label invisible">ดาวน์โหลด</label>
+      <button
+        className="btn btn-outline-success w-100"
+        onClick={exportToCSV}
+      >
+        ดาวน์โหลดรายชื่อ
+      </button>
+    </div>
+  </div>
+</div>
+
 
                 <div className="students">
                     <table className="table table-bordered">
@@ -199,31 +215,6 @@ function AdminAlumniView() {
                 </div>
             </div>
 
-            {/* <div className="outstanding">
-                <h5 className="mb-4">ศิษย์เก่าดีเด่น</h5>
-                <div className="row">
-                    {alumniData.map((alumni, index) => (
-                        <div
-                            key={index}
-                            className="col-md-6 col-lg-4 mb-4"
-                            onClick={() => handleAlumniClick(alumni.user_id)}
-                            style={{ cursor: "pointer" }}
-                        >
-                            <div className="d-flex align-items-center shadow p-3 rounded-3 bg-light">
-                                <img
-                                    src={alumni.image_path ? HOSTNAME +`/${alumni.image_path}` : "/default-profile-pic.jpg"}
-                                    alt={alumni.name}
-                                    className="rounded-circle me-3"
-                                    style={{ width: "70px", height: "70px", objectFit: "cover", border: "2px solid #0F75BC" }}
-                                />
-                                <div>
-                                    <h6 className="mb-1">{alumni.name}</h6>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div> */}
         </section>
     );
 }

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
@@ -8,7 +8,8 @@ import { FaEye } from "react-icons/fa";
 import "../../css/admin-webboard.css";
 import Swal from "sweetalert2";
 import Modal from 'react-modal';
-// import moment from "moment";
+import { FaSearch } from "react-icons/fa";
+import { AiOutlineClose } from "react-icons/ai";
 import { useAuth } from '../../context/AuthContext';
 import {HOSTNAME} from '../../config.js';
 
@@ -23,6 +24,14 @@ function AdminWebboard() {
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [likedUsers, setLikedUsers] = useState([]);
     const [modalPostTitle, setModalPostTitle] = useState("");
+    const [category, setCategory] = useState([]);
+
+     // filter
+      const [searchTerm, setSearchTerm] = useState("");
+      const [filter, setFilter] = useState("all");
+    //   const [filterStatus, setFilterStatus] = useState("all");
+    //   const [filterYear, setFilterYear] = useState("");
+    //   const [years, setYears] = useState([]);
 
     // Function to close the modal
     const closeModal = () => {
@@ -45,6 +54,23 @@ function AdminWebboard() {
                 console.error('เกิดข้อผิดพลาดในการดึงข้อมูลกระทู้:', error.message);
             });
     }, []);
+
+    // ดึงcategory
+      useEffect(() => {
+        axios.get(HOSTNAME + `/category/category-all`, {
+          withCredentials: true
+        })
+          .then(response => {
+            if (response.data.success) {
+              setCategory(response.data.data);
+            } else {
+              console.error('เกิดข้อผิดพลาดในการดึงหมวดหมู่:', response.data.message);
+            }
+          })
+          .catch(error => {
+            console.error('เกิดข้อผิดพลาดในการดึงหมวดหมู่:', error.message);
+          });
+      }, []);
 
     // Sorting posts by created date
     const sortedPosts = [...webboard].sort((a, b) => {
@@ -91,6 +117,45 @@ function AdminWebboard() {
         });
     };
 
+    const handleSearchChange = (e) => {
+        setSearchTerm(e.target.value);
+        setCurrentPage(1);
+      };
+    
+      const handleClearFilters = () => {
+        setFilter("all");
+        setSearchTerm("");
+        setSortOrder("latest");
+        setCurrentPage(1);
+      };
+    
+      /// แก้ logic การกรอง (filteredPosts) ให้รองรับการกรองตาม category_id แทน donation_type
+      const filteredPosts = useMemo(() => {
+        let results = webboard.filter((post) => {
+          const searchLower = searchTerm.toLowerCase();
+          const matchesSearch =
+            post.title?.toLowerCase().includes(searchLower) ||
+            post.content?.toLowerCase().includes(searchLower) ||
+            post.full_name?.toLowerCase().includes(searchLower);
+    
+          // ถ้า filter เป็น 'all' ให้ผ่านทุกโพสต์
+          // ถ้าเป็นค่า category_id ให้เช็ค post.category_id
+          const matchesCategory =
+            filter === "all" ? true : String(post.category_id) === String(filter);
+    
+          return matchesSearch && matchesCategory;
+        });
+    
+        // เรียงลำดับตาม sortOrder ที่มีอยู่
+        if (sortOrder === "latest") {
+          results.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        } else if (sortOrder === "oldest") {
+          results.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+        }
+    
+        return results;
+      }, [webboard, searchTerm, filter, sortOrder]);
+
     const formatDate = (dateStr) => {
         if (!dateStr || dateStr === "0000-00-00") return "ไม่ระบุวันที่";
         const date = new Date(dateStr);
@@ -103,8 +168,9 @@ function AdminWebboard() {
     // Pagination logic
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 6; // จำนวนกิจกรรมต่อหน้า
-    const totalPages = Math.ceil(sortedPosts.length / itemsPerPage);
-    const paginatedPosts = sortedPosts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+    const totalPages = Math.ceil(filteredPosts.length / itemsPerPage);
+    const paginatedPosts = filteredPosts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
 
     const handlePageChange = (page) => {
         if (page >= 1 && page <= totalPages) setCurrentPage(page);
@@ -113,6 +179,75 @@ function AdminWebboard() {
     return (
         <div className="webboard-container p-5">
             <h3 className="admin-title">การจัดการเว็บบอร์ด</h3>
+
+            {/* Filters */}
+                  <div className="donate-filters">
+                    <div className="row g-3">
+                      {/* ค้นหา */}
+                      <div className="col-md-4">
+                        <label htmlFor="search" className="form-label">ค้นหากระทู้:</label>
+                        <div className="input-group">
+                          <span className="input-group-text">
+                            <FaSearch />
+                          </span>
+                          <input
+                            type="text"
+                            id="search"
+                            className="form-control"
+                            // style={{ maxWidth: 350, marginLeft: "auto" }}
+                            placeholder="ค้นหากระทู้หรือเนื้อหา..."
+                            value={searchTerm}
+                            onChange={handleSearchChange}
+                          />
+                        </div>
+                      </div>
+            
+                      {/* หมวดหมู่ */}
+                      <div className="col-md-3">
+                        <label htmlFor="category-filter" className="form-label">หมวดหมู่:</label>
+                        <select
+                          id="category-filter"
+                          className="form-select"
+                          value={filter}
+                          onChange={(e) => { setFilter(e.target.value); setCurrentPage(1); }}
+                        >
+                          <option value="all">ทั้งหมด</option>
+                          {category && category.length > 0 && category.map(cat => (
+                            <option key={cat.category_id} value={String(cat.category_id)}>
+                              {cat.category_name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+            
+                      {/* เรียงลำดับ */}
+                      <div className="col-md-3">
+                        <label htmlFor="sort-order" className="form-label">ลำดับ:</label>
+                        <select
+                          id="sort-order"
+                          className="form-select"
+                          value={sortOrder}
+                          onChange={(e) => setSortOrder(e.target.value)}
+                        >
+                          <option value="latest">ล่าสุด</option>
+                          <option value="oldest">เก่าสุด</option>
+                        </select>
+                      </div>
+            
+                      {/* ปุ่มล้าง */}
+                      <div className="col-md-2 d-flex flex-column">
+                        <label className="form-label invisible">ล้าง</label>
+                        <button
+                          className="btn btn-outline-secondary"
+                          onClick={handleClearFilters}
+                          title="ล้างตัวกรอง"
+                        >
+                          <AiOutlineClose /> ล้าง
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
             <div className="row mb-4">
                 <div className="col-md-12 text-end">
                     <button className="btn btn-primary" onClick={() => navigate('/admin/webboard/createPost')}>
@@ -141,7 +276,7 @@ function AdminWebboard() {
                                                     setModalIsOpen(true);
                                                 }}
                                             >
-                                                รายชื่อผู้กดใจในกระทู้: {post.liked_users.split(', ').length} คน
+                                                {/* รายชื่อผู้กดใจในกระทู้: {post.liked_users.split(', ').length} คน */}
                                             </button>
                                         )}
                                     </p>
@@ -158,22 +293,24 @@ function AdminWebboard() {
 
                                     <div className="mt-3 d-flex justify-content-between">
                                         <button
-                                            className="btn btn-outline-primary btn-sm"
-                                            onClick={() => navigate(`/admin/webboard/${post.webboard_id}`)}
+                                            className="btn btn-outline-danger btn-sm"
+                                            onClick={() => handleDeletePost(post.webboard_id)}
                                         >
-                                            ดูรายละเอียด
+                                            ลบ
                                         </button>
+
                                         <button
                                             className="btn btn-outline-warning btn-sm"
                                             onClick={() => navigate(`/admin/webboard/edit/${post.webboard_id}`)}
                                         >
                                             แก้ไข
                                         </button>
+                                        
                                         <button
-                                            className="btn btn-outline-danger btn-sm"
-                                            onClick={() => handleDeletePost(post.webboard_id)}
+                                            className="btn btn-outline-info btn-sm"
+                                            onClick={() => navigate(`/admin/webboard/${post.webboard_id}`)}
                                         >
-                                            ลบ
+                                            ดูรายละเอียด
                                         </button>
                                     </div>
                                 </div>

@@ -55,7 +55,7 @@ function Home() {
   const [showReplyForm, setShowReplyForm] = useState(null);
   const [replyingTo, setReplyingTo] = useState(null); // เก็บ comment_id ที่กำลังตอบกลับ
   const [replyText, setReplyText] = useState(''); // เก็บข้อความตอบกลับ
-  const [expandedReplies, setExpandedReplies] = useState({}); //ซ่อนการตอบกลับ
+  // const [expandedReplies, setExpandedReplies] = useState({}); 
   const navigate = useNavigate();
   const [projects, setProjects] = useState([]);
   const [filter, setFilter] = useState("all");
@@ -128,7 +128,6 @@ function Home() {
   };
 
   const [stats, setStats] = useState({
-    totalParticipants: 0,
     ongoingActivity: 0,
     ongoingProject: 0,
     totalDonations: 0,
@@ -161,7 +160,6 @@ function Home() {
     axios.get(HOSTNAME + "/admin/activity-per-month")
       .then(res => {
         if (Array.isArray(res.data)) {
-          // สร้าง labels เป็น "เดือน ปี" (ภาษาไทย)
           const monthNamesThai = [
             "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน",
             "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม",
@@ -196,7 +194,7 @@ function Home() {
           labels,
           datasets: [{
             data,
-            backgroundColor: ['#98d662ff', '#6f42c1', '#241f12ff'], // example colors
+            backgroundColor: ['#98d662ff', '#6f42c1', '#241f12ff'], 
           }],
         });
       });
@@ -213,60 +211,68 @@ function Home() {
     }, 1000);
   }, []);
 
-  const CardInfo = ({ title, value, type = "activity", center = false, icon: CustomIcon, colClass = "col-md-3" }) => {
-    const getCardStyle = () => {
-      switch (type) {
-        case "donation":
-          return {
-            background: 'linear-gradient(135deg, #28a745 0%, #20c997 100%)',
-            color: 'white',
-            iconColor: 'white'
-          };
-        case "project":
-          return {
-            background: 'linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%)',
-            color: 'white',
-            iconColor: 'white'
-          };
-        case "alumni":
-          return {
-            background: 'linear-gradient(135deg, #fd7e14 0%, #ffc107 100%)',
-            color: 'white',
-            iconColor: 'white'
-          };
-        default:
-          return {
-            background: 'linear-gradient(135deg, #0d6efd 0%, #6610f2 100%)',
-            color: 'white',
-            iconColor: 'white'
-          };
-      }
-    };
-
-    const cardStyle = getCardStyle();
-    const Icon = CustomIcon || (type === "donation" ? MdVolunteerActivism : MdEvent);
-
+  const CardInfo = ({ title, value, type = "activity", center = false, icon: CustomIcon, colClass = "col-md-3", onClick }) => {
+      const getCardStyle = () => {
+        switch (type) {
+          case "donation":
+            return {
+              background: 'linear-gradient(135deg, #28a745 0%, #20c997 100%)',
+              color: 'white',
+              iconColor: 'white'
+            };
+          case "project":
+            return {
+              background: 'linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%)',
+              color: 'white',
+              iconColor: 'white'
+            };
+          case "alumni":
+            return {
+              background: 'linear-gradient(135deg, #fd7e14 0%, #ffc107 100%)',
+              color: 'white',
+              iconColor: 'white'
+            };
+          default:
+            return {
+              background: 'linear-gradient(135deg, #0d6efd 0%, #6610f2 100%)',
+              color: 'white',
+              iconColor: 'white'
+            };
+        }
+      };
+  
+      const cardStyle = getCardStyle();
+      const Icon = CustomIcon || (type === "donation" ? MdVolunteerActivism : MdEvent);
+  
     return (
-      <div className={`${colClass} mb-4`}>
-        <div
-          className={`card p-4 border-0 shadow-lg position-relative overflow-hidden ${center ? 'text-center' : 'text-start'}`}
-          style={{
-            background: cardStyle.background,
-            color: cardStyle.color,
-          }}>
-          <div className="position-absolute top-0 end-0 p-3 opacity-25">
-            <Icon size={60} />
+        <div className={`${colClass} mb-4`}>
+          <div
+            onClick={onClick}
+            className={`card p-4 border-0 shadow-lg position-relative overflow-hidden ${center ? 'text-center' : 'text-start'}`}
+            style={{
+              background: cardStyle.background,
+              color: cardStyle.color,
+              cursor: onClick ? "pointer" : "default",
+              transition: "transform 0.2s",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.03)")}
+            onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+          >
+            <div className="d-flex align-items-center mb-3">
+              <Icon size={28} className="me-3" style={{ color: cardStyle.iconColor }} />
+              <h6 className="mb-0 fw-bold">{title}</h6>
+            </div>
+            <h2 className="fw-bold mb-0">{value}</h2>
+            {onClick && (
+              <small className="text-light opacity-75 mt-2 d-block">
+                คลิกเพื่อดูรายละเอียด →
+              </small>
+            )}
           </div>
-          <div className="d-flex align-items-center mb-3">
-            <Icon size={28} className="me-3" style={{ color: cardStyle.iconColor }} />
-            <h6 className="mb-0 fw-bold">{title}</h6>
-          </div>
-          <h2 className="fw-bold mb-0">{value}</h2>
         </div>
-      </div>
-    );
-  };
-
+      );
+    };
+    
   const LoadingSpinner = () => (
     <div className="d-flex justify-content-center align-items-center" style={{ height: '200px' }}>
       <div className="spinner-border text-primary" role="status">
@@ -363,7 +369,7 @@ function Home() {
 
             // format number ให้มี , คั่นหลักพัน
             const formattedValue = value.toLocaleString();
-            return `${tooltipItem.label}: ฿${formattedValue} (${percent}%)`; //คืนค่า string ที่จะแสดงใน tooltip
+            return `${tooltipItem.label}: ฿${formattedValue} (${percent}%)`; //คืนค่า string 
           },
         },
       },
@@ -852,7 +858,7 @@ function Home() {
           {/* Slide 1: LCP optimized */}
           <div className="carousel-item active">
             <img
-              src="/image/2.jpeg"
+              src="/image/header-golf.png"
               alt="slide1"
               className="id-block w-100"
               width="1280"
@@ -1118,45 +1124,38 @@ function Home() {
             <div className="title-underline"></div>
           </h3>
           <div className="container">
-            {/* Stats Cards */}
-            <div className="row mb-5">
-              <CardInfo
-                title="ผู้เข้าร่วมกิจกรรมทั้งหมด"
-                value={`${stats.totalParticipants.toLocaleString()} คน`}
-                type="activity"
-                icon={MdPeople}
-              />
-              <CardInfo
-                title="กิจกรรมที่กำลังดำเนินการ"
-                value={`${stats.ongoingActivity} กิจกรรม`}
-                type="activity"
-                icon={MdEvent}
-              />
-              <CardInfo
-                title="ยอดบริจาครวมทั้งหมด"
-                value={`${formatCurrency(stats.totalDonations)} บาท`}
-                type="donation"
-                icon={MdVolunteerActivism}
-              />
-              <CardInfo
-                title="โครงการที่เปิดรับบริจาค"
-                value={`${stats.ongoingProject} โครงการ`}
-                type="project"
-                icon={MdTrendingUp}
-              />
-            </div>
 
-            {/* Alumni Section */}
-            <div className="row">
-              <CardInfo
-                title="จำนวนศิษย์เก่าทั้งหมด"
-                value={`${alumniCount.toLocaleString()} คน`}
-                center
-                type="alumni"
-                icon={MdPeople}
-                colClass="col-12"
-              />
-            </div>
+            {/* Stats Cards */}
+                  <div className="row mb-5">
+                    <CardInfo
+                      title="จำนวนศิษย์เก่าทั้งหมด"
+                      value={`${alumniCount.toLocaleString()} คน`}
+                      type="alumni"
+                      icon={MdPeople}
+                      onClick={() => navigate("/dashboard-alumni")}
+                    />
+                    <CardInfo
+                      title="กิจกรรมที่กำลังดำเนินการ"
+                      value={`${(stats?.ongoingActivity || 0).toLocaleString()} กิจกรรม`}
+                      type="activity"
+                      icon={MdEvent}
+                      onClick={() => navigate("/dashboard-activity")}
+                    />
+                    <CardInfo
+                      title="ยอดบริจาครวมทั้งหมด"
+                      value={`${formatCurrency(stats?.totalDonations || 0)} บาท`}
+                      type="donation"
+                      icon={MdVolunteerActivism}
+                      onClick={() => navigate("/dashboard-donation")}
+                    />
+                    <CardInfo
+                      title="โครงการที่เปิดรับบริจาค"
+                      value={`${(stats?.ongoingProject || 0).toLocaleString()} โครงการ`}
+                      type="project"
+                      icon={MdTrendingUp}
+                      onClick={() => navigate("/dashboard-project")}
+                    />
+                  </div>
 
             {/* Charts Section */}
             <div className="row mb-5">
@@ -1187,7 +1186,7 @@ function Home() {
               </div>
             </div>
           </div>
-          <div className="border-top">
+          {/* <div className="border-top">
             <div className="container">
               <div className="row">
                 <div className="col-12 text-end">
@@ -1200,7 +1199,7 @@ function Home() {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
 
         {/* ส่วนของเว็บบอร์ด */}
@@ -1294,7 +1293,6 @@ function Home() {
                       <h5 className="text-muted mb-3">ยังไม่มีกระทู้</h5>
                       <p className="text-muted">เมื่อมีการโพสต์กระทู้ จะแสดงที่นี่</p>
                       <a href="/webboard" className="btn btn-outline-primary">
-                        <i className="fas fa-plus me-2"></i>
                         สร้างกระทู้แรก
                       </a>
                     </div>
@@ -1308,13 +1306,11 @@ function Home() {
                   <div className="row align-items-center">
                     <div className="col-md-8">
                       <small className="text-muted">
-                        <i className="fas fa-info-circle me-1"></i>
                         แสดง 2 จาก {webboard.length} กระทู้ยอดนิยม • อัปเดตล่าสุด {new Date().toLocaleDateString('th-TH')}
                       </small>
                     </div>
                     <div className="col-md-4 text-md-end mt-2 mt-md-0">
                       <a href="/webboard" className="btn btn-outline-primary btn-sm">
-                        <i className="fas fa-arrow-right me-2"></i>
                         ดูกระทู้ทั้งหมด
                       </a>
                     </div>
@@ -1852,17 +1848,6 @@ function Home() {
                             "เชื่อมโยงศิษย์เก่า ก้าวทันเทคโนโลยี สนับสนุนสังคมดิจิทัล"
                           </p>
                         </blockquote>
-                        {/* <div className="mt-3">
-                          <div className="d-inline-block bg-primary opacity-25 rounded-circle me-2"
-                            style={{ width: '8px', height: '8px' }}>
-                          </div>
-                          <div className="d-inline-block bg-success opacity-25 rounded-circle me-2"
-                            style={{ width: '8px', height: '8px' }}>
-                          </div>
-                          <div className="d-inline-block bg-warning opacity-25 rounded-circle"
-                            style={{ width: '8px', height: '8px' }}>
-                          </div>
-                        </div> */}
                       </div>
                     </div>
                   </div>
@@ -1963,8 +1948,7 @@ function Home() {
                         e.target.style.boxShadow = '0 4px 15px rgba(0,123,255,0.3)';
                       }}
                     >
-                      <i className="fas fa-history me-2"></i>
-                      📖 ประวัติความเป็นมา
+                      ประวัติความเป็นมา
 
                       {/* Button shine effect */}
                       <div className="position-absolute top-0 start-0 w-100 h-100 opacity-25"

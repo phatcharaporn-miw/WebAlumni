@@ -35,8 +35,6 @@ function Alumni() {
         navigate(`/alumni/${userId}`);
     };
 
-    
-
     return (
         <section className="container">
             <div className="alumni-page">
@@ -89,7 +87,7 @@ function Alumni() {
                     ))}
                 </div>
 
-                <h5 className="alumni-title mb-4 fs-3 fw-bold">ศิษย์เก่าผู้มีคุณูปการ</h5>
+                {/* <h5 className="alumni-title mb-4 fs-3 fw-bold">ศิษย์เก่าผู้มีคุณูปการ</h5>
                 <div className="person text-center my-5">
                     <div className="row" id="person-card">
                         <div className="col-sm-6 col-md-4 col-lg-3 mb-4">
@@ -121,51 +119,9 @@ function Alumni() {
                             </div>
                         </div>
                     </div>
-                </div>
-
-                {/* <div className="outstanding my-5">
-                    <h5 className="alumni-title">ศิษย์เก่าดีเด่น</h5>
-
-                    {loading ? (
-                        <div className="text-center my-5">
-                            <div className="spinner-border text-primary" role="status">
-                                <span className="visually-hidden">Loading...</span>
-                            </div>
-                        </div>
-                    ) : (
-                        <div className="row mt-5">
-                            {alumniData.map((alumni, index) => (
-                                <div
-                                    className="col-md-6 mb-4"
-                                    key={index}
-                                    onClick={() => handleAlumniClick(alumni.user_id)}
-                                    style={{ cursor: 'pointer' }}
-                                >
-                                    <div className="d-flex align-items-center" id="alumni-row">
-                                        <img
-                                            src={alumni.image_path ? HOSTNAME +`/${alumni.image_path}` : "/default-profile-pic.jpg"}
-                                            alt={alumni.name}
-                                            loading="lazy"
-                                            onError={(e) => e.target.src = "/default-profile-pic.jpg"}
-                                            className="img-fluid rounded-circle me-3"
-                                            style={{
-                                                width: "80px",
-                                                height: "80px",
-                                                objectFit: "cover",
-                                                border: "2px solid #0F75BC"
-                                            }}
-                                        />
-                                        <div>
-                                            <h5 className="mb-1">{alumni.name}</h5>
-                                            <p className="mb-0 text-muted">{alumni.position || "ไม่มีข้อมูลตำแหน่ง"}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
                 </div> */}
-                {/* Outstanding Alumni Section */}
+
+                
                 <div className="outstanding mb-5">
                     <h5 className="alumni-title mb-4 fs-3 fw-bold">ศิษย์เก่าดีเด่น</h5>
 

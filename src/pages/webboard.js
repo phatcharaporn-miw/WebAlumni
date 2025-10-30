@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useLocation, useParams } from 'react-router-dom';
 import { HOSTNAME } from "../config.js";
 import Modal from 'react-modal';
@@ -19,6 +19,8 @@ import { th } from 'date-fns/locale';
 import Swal from "sweetalert2";
 import { MdDelete } from "react-icons/md";
 import { useAuth } from "../context/AuthContext";
+import { FaSearch } from "react-icons/fa";
+import { AiOutlineClose } from "react-icons/ai";
 Modal.setAppElement('#root');
 
 
@@ -39,8 +41,10 @@ function Webboard() {
   const [replyingTo, setReplyingTo] = useState(null); // เก็บ comment_id ที่กำลังตอบกลับ
   const [replyText, setReplyText] = useState(''); // เก็บข้อความตอบกลับ
   const [recommendedPosts, setRecommendedPosts] = useState([]); //กระทู้ที่แนะนำ
+  // filter
   const [searchTerm, setSearchTerm] = useState("");
-  const { user} = useAuth();
+  const [filter, setFilter] = useState("all");
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -53,7 +57,7 @@ function Webboard() {
 
   //ดึงข้อมูล webboard
   useEffect(() => {
-    axios.get(HOSTNAME +'/web/webboard', {
+    axios.get(HOSTNAME + '/web/webboard', {
       withCredentials: true,
     })
       .then((response) => {
@@ -88,7 +92,7 @@ function Webboard() {
   // ดึงข้อมูลกดใจกระทู้เมื่อผู้ใช้เข้าสู่ระบบ
   useEffect(() => {
     if (isLoggedin && user && user.user_id) {
-      axios.get(HOSTNAME +`/web/favorite`, {
+      axios.get(HOSTNAME + `/web/favorite`, {
         params: { userId: user.user_id },
         withCredentials: true,
       })
@@ -123,7 +127,7 @@ function Webboard() {
     }
 
     // ส่งคำขอกดถูกใจหรือยกเลิกถูกใจ
-    axios.post(HOSTNAME +`/web/webboard/${postId}/favorite`, {}, {
+    axios.post(HOSTNAME + `/web/webboard/${postId}/favorite`, {}, {
       withCredentials: true,
     })
       .then((response) => {
@@ -164,7 +168,7 @@ function Webboard() {
         )
       );
 
-      const response = await axios.get(HOSTNAME +`/web/webboard/${post.webboard_id}`, {
+      const response = await axios.get(HOSTNAME + `/web/webboard/${post.webboard_id}`, {
         withCredentials: true,
       });
 
@@ -215,13 +219,13 @@ function Webboard() {
       return;
     }
 
-    axios.post(HOSTNAME +`/web/webboard/${selectedPost.webboard_id}/comment`, {
+    axios.post(HOSTNAME + `/web/webboard/${selectedPost.webboard_id}/comment`, {
       comment_detail: commentText,
     }, {
       withCredentials: true
     })
       .then((response) => {
-        const newComment = response.data.comment; 
+        const newComment = response.data.comment;
 
         const userProfileImage = user.image_path || "/default-profile.png";
         const userId = user.id || null;
@@ -229,8 +233,8 @@ function Webboard() {
         const formattedNewComment = {
           ...newComment,
           profile_image: newComment.profile_image || userProfileImage,
-          full_name: newComment.full_name, 
-          user_id: newComment.user_id || userId, 
+          full_name: newComment.full_name,
+          user_id: newComment.user_id || userId,
           created_at: newComment.created_at || new Date().toISOString(),
           comment_detail: newComment.comment_detail || commentText,
           replies: [],
@@ -282,7 +286,7 @@ function Webboard() {
 
     try {
       const response = await axios.post(
-        HOSTNAME +`/web/webboard/${selectedPost.webboard_id}/comment/${commentId}/reply`,
+        HOSTNAME + `/web/webboard/${selectedPost.webboard_id}/comment/${commentId}/reply`,
         {
           comment_id: commentId,
           reply_detail: replyText.trim(),
@@ -367,7 +371,7 @@ function Webboard() {
     }).then((result) => {
       if (result.isConfirmed) {
         axios
-          .delete(HOSTNAME +`/web/webboard/${selectedPost.webboard_id}/comment/${commentId}`, {
+          .delete(HOSTNAME + `/web/webboard/${selectedPost.webboard_id}/comment/${commentId}`, {
             withCredentials: true,
           })
           .then((response) => {
@@ -398,19 +402,9 @@ function Webboard() {
 
   // ลบการตอบกลับความคิดเห็น
   const handleDeleteReply = (replyId, commentId) => {
-    axios.delete(HOSTNAME +`/web/webboard/${selectedPost.webboard_id}/comment/${commentId}/reply/${replyId}`, {
+    axios.delete(HOSTNAME + `/web/webboard/${selectedPost.webboard_id}/comment/${commentId}/reply/${replyId}`, {
       withCredentials: true
     })
-      // Swal.fire({
-      //   title: "ยืนยันการลบ",
-      //   text: "คุณต้องการลบการตอบกลับนี้หรือไม่?",
-      //   icon: "warning",
-      //   showCancelButton: true,
-      //   confirmButtonColor: "#d33",
-      //   cancelButtonColor: "#3085d6",
-      //   confirmButtonText: "ใช่, ลบเลย",
-      //   cancelButtonText: "ยกเลิก",
-      // })
       .then(response => {
         if (response.data.success) {
           console.log('ลบการตอบกลับสำเร็จ');
@@ -436,7 +430,7 @@ function Webboard() {
   // search เปิด modal ถ้ามี id
   useEffect(() => {
     if (id) {
-      axios.get(HOSTNAME +`/web/webboard/${id}`, {
+      axios.get(HOSTNAME + `/web/webboard/${id}`, {
         withCredentials: true
       })
         .then((res) => {
@@ -453,15 +447,63 @@ function Webboard() {
     }
   }, [id]);
 
+  const handleFilterTypeChange = (e) => {
+    setFilter(e.target.value);
+    setCurrentPage(1);
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1);
+  };
+
+  const handleClearFilters = () => {
+    setFilter("all");
+    setSearchTerm("");
+    setSortOrder("latest");
+    setCurrentPage(1);
+  };
+
+  /// แก้ logic การกรอง (filteredPosts) ให้รองรับการกรองตาม category_id แทน donation_type
+  const filteredPosts = useMemo(() => {
+    let results = webboard.filter((post) => {
+      const searchLower = (searchTerm || "").toLowerCase();
+      const matchesSearch =
+        post.title?.toLowerCase().includes(searchLower) ||
+        post.content?.toLowerCase().includes(searchLower) ||
+        post.full_name?.toLowerCase().includes(searchLower);
+
+      // ถ้าเป็นค่า category_id ให้เช็ค post.category_id
+      const matchesCategory =
+        filter === "all" ? true : String(post.category_id) === String(filter);
+
+      return matchesSearch && matchesCategory;
+    });
+    // ถ้าเปิดแสดงเฉพาะที่กดใจ ให้กรองด้วย likedPosts
+    if (showFavorites) {
+      results = results.filter(post => likedPosts.includes(post.webboard_id));
+    }
+
+    // เรียงลำดับตาม sortOrder ที่มีอยู่
+    if (sortOrder === "latest") {
+      results.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    } else if (sortOrder === "oldest") {
+      results.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+    }
+
+    return results;
+  }, [webboard, searchTerm, filter, sortOrder, likedPosts, showFavorites]);
+  
+
   const closeModal = () => {
     setModalIsOpen(false);
     setSelectedPost(null);
-    navigate("/webboard"); // ปิดแล้วกลับหน้า list
+    navigate("/webboard"); 
   };
 
   // ดึงcategory
   useEffect(() => {
-    axios.get(HOSTNAME +`/category/category-all`, {
+    axios.get(HOSTNAME + `/category/category-all`, {
       withCredentials: true
     })
       .then(response => {
@@ -486,20 +528,11 @@ function Webboard() {
     const hue = (id * 137) % 360;
     return `hsl(${hue}, 70%, 60%)`;
   };
-
-  const POSTS_PER_PAGE = 4;
   const [currentPage, setCurrentPage] = useState(1);
 
-  // คำนวณโพสต์ที่จะแสดงในหน้านี้
-  const filteredPosts = sortedPosts.filter(post =>
-    (!showFavorites || (Array.isArray(likedPosts) && likedPosts.includes(post.webboard_id))) &&
-    (post.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      post.content?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      post.full_name?.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
-  const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
-  const paginatedPosts = filteredPosts.slice((currentPage - 1) * POSTS_PER_PAGE, currentPage * POSTS_PER_PAGE);
-
+  const itemsPerPage = 4;
+  const totalPages = Math.ceil(filteredPosts.length / itemsPerPage);
+  const paginatedPosts = filteredPosts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
   const handlePageChange = (page) => {
     if (page >= 1 && page <= totalPages) setCurrentPage(page);
   };
@@ -541,25 +574,71 @@ function Webboard() {
           </div>
         </div>
       </div>
-      <div className="d-flex align-items-center mb-3" style={{ gap: 16 }}>
-        <select
-          className="border rounded p-2"
-          value={sortOrder}
-          onChange={(e) => setSortOrder(e.target.value)}
-          style={{ minWidth: 120 }}
-        >
-          <option value="latest">ล่าสุด</option>
-          <option value="oldest">เก่าสุด</option>
-        </select>
-        <div style={{ flex: 1 }}></div>
-        <input
-          type="text"
-          className="form-control"
-          style={{ maxWidth: 350, marginLeft: "auto" }}
-          placeholder="ค้นหากระทู้หรือเนื้อหา..."
-          value={searchTerm}
-          onChange={e => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-        />
+      {/* Filters */}
+      <div className="donate-filters">
+        <div className="row g-3">
+          {/* ค้นหา */}
+          <div className="col-md-4">
+            <label htmlFor="search" className="form-label">ค้นหากระทู้:</label>
+            <div className="input-group">
+              <span className="input-group-text">
+                <FaSearch />
+              </span>
+              <input
+                type="text"
+                id="search"
+                className="form-control"
+                placeholder="ค้นหากระทู้หรือเนื้อหา..."
+                value={searchTerm}
+                onChange={handleSearchChange}
+              />
+            </div>
+          </div>
+
+          {/* หมวดหมู่ */}
+          <div className="col-md-3">
+            <label htmlFor="category-filter" className="form-label">หมวดหมู่:</label>
+            <select
+              id="category-filter"
+              className="form-select"
+              value={filter}
+              onChange={(e) => { setFilter(e.target.value); setCurrentPage(1); }}
+            >
+              <option value="all">ทั้งหมด</option>
+              {category && category.length > 0 && category.map(cat => (
+                <option key={cat.category_id} value={String(cat.category_id)}>
+                  {cat.category_name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* เรียงลำดับ */}
+          <div className="col-md-3">
+            <label htmlFor="sort-order" className="form-label">ลำดับ:</label>
+            <select
+              id="sort-order"
+              className="form-select"
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value)}
+            >
+              <option value="latest">ล่าสุด</option>
+              <option value="oldest">เก่าสุด</option>
+            </select>
+          </div>
+
+          {/* ปุ่มล้าง */}
+          <div className="col-md-2 d-flex flex-column">
+            <label className="form-label invisible">ล้าง</label>
+            <button
+              className="btn btn-outline-secondary"
+              onClick={handleClearFilters}
+              title="ล้างตัวกรอง"
+            >
+              <AiOutlineClose /> ล้าง
+            </button>
+          </div>
+        </div>
       </div>
 
       <div className="row" id="row-webboard" style={{ position: "relative", minHeight: "700px" }}>
@@ -586,7 +665,7 @@ function Webboard() {
                 <div onClick={() => handlePostClick(post)} style={{ cursor: "pointer" }}>
                   {/* โปรไฟล์ + ชื่อผู้ใช้ */}
                   <div className="d-flex mt-3">
-                    <img src={post.profile_image ? HOSTNAME +`/${post.profile_image}` : "/default-profile.png"} alt="User" className="rounded-circle me-3" width="50" height="50" onError={(e) => e.target.src = "/default-profile.png"} />
+                    <img src={post.profile_image ? HOSTNAME + `/${post.profile_image}` : "/default-profile.png"} alt="User" className="rounded-circle me-3" width="50" height="50" onError={(e) => e.target.src = "/default-profile.png"} />
                     <div>
                       <h5 className="fw-bold mb-1">{post.title}</h5>
                       <p className="text-muted mb-1 small">จากคุณ <span className="fw-semibold">{post.full_name || "ไม่ระบุชื่อ"}</span></p>
@@ -616,37 +695,8 @@ function Webboard() {
               <p className="text-center text-muted fs-5">ยังไม่มีกระทู้ในขณะนี้</p>
             </div>
           )}
-
         </div>
 
-        {/* Pagination: fix to bottom of .row */}
-        {totalPages > 1 && (
-          <nav
-            className="d-flex justify-content-center"
-            style={{
-              position: "absolute",
-              left: 0,
-              right: 0,
-              bottom: 0,
-              marginBottom: "10px",
-              zIndex: 10,
-            }}
-          >
-            <ul className="pagination mb-0">
-              <li className={`page-item${currentPage === 1 ? ' disabled' : ''}`}>
-                <button className="page-link" onClick={() => handlePageChange(currentPage - 1)}>&laquo;</button>
-              </li>
-              {Array.from({ length: totalPages }, (_, i) => (
-                <li key={i + 1} className={`page-item${currentPage === i + 1 ? ' active' : ''}`}>
-                  <button className="page-link" onClick={() => handlePageChange(i + 1)}>{i + 1}</button>
-                </li>
-              ))}
-              <li className={`page-item${currentPage === totalPages ? ' disabled' : ''}`}>
-                <button className="page-link" onClick={() => handlePageChange(currentPage + 1)}>&raquo;</button>
-              </li>
-            </ul>
-          </nav>
-        )}
 
         <Modal isOpen={modalIsOpen} onRequestClose={closeModal} className="custom-modal" style={{ overlay: { backgroundColor: 'rgba(0, 0, 0, 0.75)' } }}>
           {selectedPost && (
@@ -672,7 +722,7 @@ function Webboard() {
               {/* โปรไฟล์ + ชื่อผู้ใช้ */}
               <div className="d-flex mt-4">
                 <img
-                  src={selectedPost.profile_image ? HOSTNAME +`/${selectedPost.profile_image}` : "/default-profile.png"}
+                  src={selectedPost.profile_image ? HOSTNAME + `/${selectedPost.profile_image}` : "/default-profile.png"}
                   alt="User"
                   className="rounded-circle me-3"
                   width="50"
@@ -693,7 +743,7 @@ function Webboard() {
 
               {/* รูปภาพประกอบ*/}
               {selectedPost.image_path && (
-                <img src={selectedPost.image_path ? HOSTNAME +`/${selectedPost.image_path.replace(/^\/+/, '')}` : "/default-image.png"} alt="Post" className="img-fluid rounded-3" onError={(e) => e.target.style.display = 'none'} />
+                <img src={selectedPost.image_path ? HOSTNAME + `/${selectedPost.image_path.replace(/^\/+/, '')}` : "/default-image.png"} alt="Post" className="img-fluid rounded-3" onError={(e) => e.target.style.display = 'none'} />
               )}
 
               {/* จำนวนผู้เข้าชม */}
@@ -711,7 +761,7 @@ function Webboard() {
                         <img
                           src={comment.profile_image.startsWith('http') || comment.profile_image === '/default-profile.png'
                             ? comment.profile_image
-                            : HOSTNAME +`/${comment.profile_image}`}
+                            : HOSTNAME + `/${comment.profile_image}`}
                           alt="User"
                           className="rounded-circle me-3 border"
                           width="45"
@@ -787,7 +837,7 @@ function Webboard() {
                                     <img
                                       src={reply.profile_image?.startsWith('http') || reply.profile_image === '/default-profile.png'
                                         ? reply.profile_image
-                                        : HOSTNAME +`/${reply.profile_image}`}
+                                        : HOSTNAME + `/${reply.profile_image}`}
                                       alt="User"
                                       className="rounded-circle me-3 border"
                                       width="35"
@@ -892,7 +942,7 @@ function Webboard() {
             <div
               className="d-flex align-items-center text-dark"
               style={{ cursor: "pointer" }}
-              onClick={() => setShowFavorites(false)}
+              onClick={() => { setShowFavorites(false); setCurrentPage(1); }}
             >
               <BiSolidComment className="me-2" /> กระทู้ทั้งหมด
             </div>
@@ -901,7 +951,7 @@ function Webboard() {
               <div
                 className="d-flex align-items-center text-dark"
                 style={{ cursor: "pointer" }}
-                onClick={() => setShowFavorites(!showFavorites)}
+                onClick={() => { setShowFavorites(prev => !prev); setCurrentPage(1); }}
               >
                 {showFavorites ? (
                   <MdFavorite className="text-danger me-2" />
@@ -975,9 +1025,17 @@ function Webboard() {
           </div>
         </div>
 
+        <div className="donate-page-info mb-4">
+          <small>
+            หน้า {currentPage} จาก {totalPages} (แสดง{" "}
+            {(currentPage - 1) * itemsPerPage + 1} -{" "}
+            {Math.min(currentPage * itemsPerPage, filteredPosts.length)} จาก{" "}
+            {filteredPosts.length} โครงการ)
+          </small>
+        </div>
         {totalPages > 1 && (
           <nav
-            className="d-flex justify-content-center"
+            className="d-flex justify-content-center "
             style={{
               position: "absolute",
               left: 0,
@@ -986,7 +1044,7 @@ function Webboard() {
               marginBottom: "10px"
             }}
           >
-            <ul className="pagination mb-0">
+            <ul className="pagination">
               <li className={`page-item${currentPage === 1 ? ' disabled' : ''}`}>
                 <button className="page-link" onClick={() => handlePageChange(currentPage - 1)}>&laquo;</button>
               </li>

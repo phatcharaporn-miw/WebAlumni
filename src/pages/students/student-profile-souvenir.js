@@ -85,24 +85,35 @@ function StudentProfileSouvenir() {
 
 
     // ดึงประวัติการสั่งซื้อ
+    // useEffect(() => {
+    //     if (userId) {
+    //         axios.get(HOSTNAME + `/orders/orders-user/${userId}`)
+    //             .then(response => {
+    //                 setOrderHistory(response.data);
+    //                 console.log(response.data);
+
+
+    //             })
+    //             .catch(error => {
+    //                 console.error("Error fetching order history:", error);
+    //             })
+    //             .finally(() => {
+    //                 setLoading(false);
+    //             });
+    //     }
+    // }, [userId]);
+
     useEffect(() => {
-        if (userId) {
-            axios.get(HOSTNAME + `/orders/orders-user/${userId}`)
-                .then(response => {
-                    setOrderHistory(response.data);
-                    console.log(response.data);
+        if (!userId) return;
 
-
-                })
-                .catch(error => {
-                    console.error("Error fetching order history:", error);
-                })
-                .finally(() => {
-                    setLoading(false);
-                });
-        }
+        axios.get(`${HOSTNAME}/orders/orders-user/${userId}`)
+            .then(res => {
+                setOrderHistory(res.data);
+                console.log("ข้อมูลคำสั่งซื้อ:", res.data);
+            })
+            .catch(err => console.error("Error fetching order history:", err))
+            .finally(() => setLoading(false));
     }, [userId]);
-
 
 
     // กำหนด mapping ของบริษัทกับ URL
@@ -144,42 +155,42 @@ function StudentProfileSouvenir() {
 
     // Submit การยืนยันรับสินค้า
     const handleProofSubmit = async () => {
-    console.log("selectedOrderForConfirm:", selectedOrderForConfirm);
+        console.log("selectedOrderForConfirm:", selectedOrderForConfirm);
 
-    setIsProofUploading(true);
+        setIsProofUploading(true);
 
-    const formData = new FormData();
-    if (proofFile) {
-        formData.append('proofImage', proofFile);
-    }
-
-    try {
-        const response = await fetch(
-            `${HOSTNAME}/orders/${selectedOrderForConfirm}/upload-proof`,
-            {
-                method: 'POST',
-                body: formData
-            }
-        );
-
-        const result = await response.json();
-
-        if (result.success) {
-            Swal.fire('สำเร็จ', 'ยืนยันการได้รับสินค้าแล้ว', 'success');
-            setShowProofModal(false);
-            setProofFile(null);
-            // โหลดข้อมูลใหม่
-            setOrderHistory(); //โหลดซ้ำ
-        } else {
-            alert(result.message || "เกิดข้อผิดพลาด");
+        const formData = new FormData();
+        if (proofFile) {
+            formData.append('proofImage', proofFile);
         }
-    } catch (error) {
-        console.error("Error:", error);
-        alert("เกิดข้อผิดพลาดในการยืนยันการรับสินค้า");
-    } finally {
-        setIsProofUploading(false);
-    }
-};
+
+        try {
+            const response = await fetch(
+                `${HOSTNAME}/orders/${selectedOrderForConfirm}/upload-proof`,
+                {
+                    method: 'POST',
+                    body: formData
+                }
+            );
+
+            const result = await response.json();
+
+            if (result.success) {
+                Swal.fire('สำเร็จ', 'ยืนยันการได้รับสินค้าแล้ว', 'success');
+                setShowProofModal(false);
+                setProofFile(null);
+                // โหลดข้อมูลใหม่
+                setOrderHistory(); //โหลดซ้ำ
+            } else {
+                alert(result.message || "เกิดข้อผิดพลาด");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            alert("เกิดข้อผิดพลาดในการยืนยันการรับสินค้า");
+        } finally {
+            setIsProofUploading(false);
+        }
+    };
 
 
     const reuploadSlip = (orderId) => {
@@ -553,7 +564,7 @@ function StudentProfileSouvenir() {
         // ดัก event ของ bootstrap collapse
         const handleShow = (e) => {
             const idx = e.target.id.split('-')[1]; // ดึง index จาก id
-            setSelectedOrder(orderHistory[idx]);   
+            setSelectedOrder(orderHistory[idx]);
         };
 
         const handleHide = () => {
@@ -667,7 +678,9 @@ function StudentProfileSouvenir() {
                                     <div className="card border-0 shadow-sm mb-3 rounded-3" key={order.order_id || idx}>
                                         <div className="card-body d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
                                             <div className="mb-2 mb-md-0">
-                                                <h6 className="fw-bold mb-1">รหัสคำสั่งซื้อ #{order.order_id}</h6>
+                                                {order.products.map((item, i) => (
+                                                    <h6 key={i} className="fw-bold mb-1">{item.product_name}</h6>
+                                                ))}
                                                 <small className="text-muted">
                                                     วันที่:{" "}
                                                     {order.order_date
@@ -1086,10 +1099,6 @@ function StudentProfileSouvenir() {
                                                         </div>
                                                     )}
 
-
-
-
-
                                                     {/* ยกเลิกการสั่งซื้อ */}
                                                     <div>
                                                         {order.order_status === "processing" && (
@@ -1120,26 +1129,20 @@ function StudentProfileSouvenir() {
 
                                                                     <div className="modal-body">
                                                                         {/* วันที่สั่งซื้อ */}
-                                                                        <div className="mb-3 text-start">
+                                                                        {/* <div className="mb-3 text-start">
                                                                             <label className="form-label fw-bold">วันที่สั่งซื้อ</label>
                                                                             <p>
                                                                                 {selectedOrder.order_date
                                                                                     ? `${formatDate(selectedOrder.order_date)}`
                                                                                     : "ยังไม่ทราบวันที่สั่งซื้อ"}
                                                                             </p>
-                                                                        </div>
+                                                                        </div> */}
 
                                                                         {/* สินค้า */}
-                                                                        <div className="mb-3 text-start">
+                                                                        {/* <div className="mb-3 text-start">
                                                                             <label className="form-label fw-bold">สินค้า</label>
                                                                             <p>{selectedOrder.product_name}</p>
-                                                                        </div>
-
-                                                                        {/* ที่อยู่จัดส่ง */}
-                                                                        <div className="mb-3 text-start">
-                                                                            <label className="form-label fw-bold">ที่อยู่จัดส่ง</label>
-                                                                            <p>{selectedOrder.address}</p>
-                                                                        </div>
+                                                                        </div> */}
 
                                                                         {/* เหตุผล */}
                                                                         <div className="mb-3 text-start">
@@ -1171,6 +1174,7 @@ function StudentProfileSouvenir() {
                                                                 </div>
                                                             </div>
                                                         )}
+
                                                     </div>
 
                                                     {/* โดนปฏิเสธการชำระเงิน */}
@@ -1376,7 +1380,7 @@ function StudentProfileSouvenir() {
                         <div className="modal-body" style={{ padding: '1rem' }}>
                             <div className="alert alert-info mb-3">
                                 <small>
-                                    <strong>หมายเหตุ:</strong> กรุณาอัปโหลดรูปภาพหลักฐานการได้รับสินค้า 
+                                    <strong>หมายเหตุ:</strong> กรุณาอัปโหลดรูปภาพหลักฐานการได้รับสินค้า
                                     (เช่น รูปถ่ายสินค้าที่ได้รับ หรือหลักฐานการเซ็นรับสินค้า)
                                 </small>
                             </div>
@@ -1460,17 +1464,17 @@ const ORDER_STATUS_LABEL = {
 };
 
 const BADGE_CLASS = {
-    pending_verification: "text-dark bg-secondary bg-opacity-10", 
-    processing: "text-warning bg-warning bg-opacity-10",          
-    shipping: "text-primary bg-primary bg-opacity-10",            
+    pending_verification: "text-dark bg-secondary bg-opacity-10",
+    processing: "text-warning bg-warning bg-opacity-10",
+    shipping: "text-primary bg-primary bg-opacity-10",
     delivered: "text-success bg-success bg-opacity-10",
-    resolved: "text-success bg-success bg-opacity-10",        
-    issue_reported: "text-white bg-danger",                       
-    refund_approved: "text-success bg-success bg-opacity-10",          
-    resend_processing: "text-primary bg-primary bg-opacity-10",    
-    issue_rejected: "text-danger bg-danger bg-opacity-25",        
-    return_pending: "text-warning bg-warning bg-opacity-10",         
-    return_approved: "text-success bg-success bg-opacity-10",     
+    resolved: "text-success bg-success bg-opacity-10",
+    issue_reported: "text-white bg-danger",
+    refund_approved: "text-success bg-success bg-opacity-10",
+    resend_processing: "text-primary bg-primary bg-opacity-10",
+    issue_rejected: "text-danger bg-danger bg-opacity-25",
+    return_pending: "text-warning bg-warning bg-opacity-10",
+    return_approved: "text-success bg-success bg-opacity-10",
     return_rejected: "text-danger bg-danger bg-opacity-25",
     cancelled: "text-dark bg-dark bg-opacity-25",
     repeal_pending: "text-dark bg-dark bg-opacity-25",

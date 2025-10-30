@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { FaFilter, FaPlay, FaCheck, FaClock } from "react-icons/fa";
 import { CiSearch } from "react-icons/ci";
 import "../../css/admin-activity.css";
+import { useAuth } from '../../context/AuthContext';
 
 
 function AdminActivity() {
@@ -17,7 +18,9 @@ function AdminActivity() {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
     const [filterStatus, setFilterStatus] = useState("all");
-
+    const {user} = useAuth();
+    const userId = user?.user_id;
+    
     useEffect(() => {
         if (activeTab === "summary") {
             axios.get(HOSTNAME +"/admin/activity-summary", {
@@ -162,7 +165,7 @@ function AdminActivity() {
                                 <FaCheck className="me-1" /> เสร็จสิ้นแล้ว
                             </button>
                         </div>
-                        <button className="btn btn-success" onClick={() => navigate("/admin/activities/admin-create-activity")}>
+                        <button className="btn btn-primary" onClick={() => navigate("/admin/activities/admin-create-activity")}>
                             เพิ่มกิจกรรม
                         </button>
                     </div>

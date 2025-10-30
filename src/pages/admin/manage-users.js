@@ -75,6 +75,32 @@ function UserManagement() {
     }
   };
 
+  // นำเข้าข้อมูลศิษย์เก่า ไฟล์ excel
+      const handleExcelUpload = async (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+  
+          const formData = new FormData();
+          formData.append("excelFile", file);
+  
+          try {
+              const res = await axios.post(HOSTNAME + "/alumni/upload-excel", formData, {
+                  headers: {
+                      "Content-Type": "multipart/form-data",
+                  },
+              });
+  
+              if (res.data.success) {
+                  Swal.fire("สำเร็จ", "นำเข้าข้อมูลสำเร็จแล้ว!", "success");
+              } else {
+                  Swal.fire("ผิดพลาด", res.data.message || "ไม่สามารถนำเข้าข้อมูลได้", "error");
+              }
+          } catch (error) {
+              console.error(error);
+              Swal.fire("ผิดพลาด", "เกิดข้อผิดพลาดในการอัปโหลดไฟล์", "error");
+          }
+      };
+
 
   const handleViewProfile = (userId) => {
     navigate(`/admin/users/user-profile/${userId}`);
@@ -108,13 +134,23 @@ function UserManagement() {
           </div>
 
           {/* ปุ่มเพิ่ม */}
-          <button
+          {/* <button
             className="btn btn-primary mb-2"
             onClick={() => navigate("/admin/users/add-user")}
           >
             เพิ่มผู้ใช้ใหม่
-          </button>
-        </div>
+          </button> */}
+        <label htmlFor="excelUpload" className="btn btn-success">
+            นำเข้าข้อมูลจาก Excel
+        </label>
+        <input
+            type="file"
+            id="excelUpload"
+            accept=".xlsx, .xls"
+            onChange={handleExcelUpload}
+            style={{ display: "none" }}
+        />
+      </div>
 
 
         <div className="table-responsive">

@@ -51,34 +51,61 @@ export const CartProvider = ({ children }) => {
   };
 
   // ฟังก์ชันเพิ่มสินค้าลงตะกร้า - ใช้ API ใหม่
-  const addToCart = async (productId, quantity) => {
-    // ตรวจสอบจาก user state แทน sessionStorage
-    if (!userId ) {
-      throw new Error('กรุณาเข้าสู่ระบบก่อน');
-    }
-    setIsLoading(true);
+  // const addToCart = async (productId, quantity) => {
+  //   // ตรวจสอบจาก user state แทน sessionStorage
+  //   if (!userId ) {
+  //     throw new Error('กรุณาเข้าสู่ระบบก่อน');
+  //   }
+  //   setIsLoading(true);
     
-    try {
-      const response = await axios.post(HOSTNAME +"/souvenir/cart/add", {
-        user_id: userId,
-        product_id: productId,
-        quantity: quantity
-        // ไม่ต้องส่ง total เพราะ backend คำนวณเอง
-      }, {
-        withCredentials: true
-      });
+  //   try {
+  //     const response = await axios.post(HOSTNAME +"/souvenir/cart/add", {
+  //       user_id: userId,
+  //       product_id: productId,
+  //       quantity: quantity
+  //       // ไม่ต้องส่ง total เพราะ backend คำนวณเอง
+  //     }, {
+  //       withCredentials: true
+  //     });
 
-      // อัปเดตจำนวนตะกร้าทันที
-      await getCartCount();
+  //     // อัปเดตจำนวนตะกร้าทันที
+  //     await getCartCount();
       
-      return response.data;
-    } catch (error) {
-      console.error("เกิดข้อผิดพลาดในการเพิ่มสินค้าลงในตะกร้า:", error);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  //     return response.data;
+  //   } catch (error) {
+  //     console.error("เกิดข้อผิดพลาดในการเพิ่มสินค้าลงในตะกร้า:", error);
+  //     throw error;
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
+  const addToCart = async (productId, quantity) => {
+  if (!userId) {
+    throw new Error('กรุณาเข้าสู่ระบบก่อน');
+  }
+  setIsLoading(true);
+  
+  try {
+    const response = await axios.post(
+      HOSTNAME + "/souvenir/cart/add",
+      {
+        product_id: productId,
+        quantity: quantity,
+      },
+      { withCredentials: true } 
+    );
+
+    await getCartCount();
+    return response.data;
+  } catch (error) {
+    console.error("เกิดข้อผิดพลาดในการเพิ่มสินค้าลงในตะกร้า:", error);
+    throw error;
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   // ฟังก์ชันอัปเดตจำนวนสินค้าในตะกร้า 
   const updateCart = async (productId, quantity) => {

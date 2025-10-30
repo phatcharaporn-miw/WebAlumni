@@ -21,6 +21,7 @@ function DonateRequest() {
         endDate: "",
         donationType: "",
         image: null,
+        paymentMethod: "",
         bankName: "",
         accountName: "",
         accountNumber: "",
@@ -39,39 +40,6 @@ function DonateRequest() {
         const { name, value } = e.target;
         setFormData(prevData => ({ ...prevData, [name]: value }));
     };
-
-    //สำหรับจัดการการเปลี่ยนแปลงวันที่
-    const handleChangeDate = (e) => {
-        const { name, value } = e.target;
-        const today = new Date().toISOString().split('T')[0];
-
-        // ตรวจสอบว่าไม่สามารถเลือกวันที่ย้อนหลังได้
-        if (name === 'startDate' || name === 'endDate') {
-            if (value < today) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: "ไม่สามารถเลือกวันที่ย้อนหลังได้",
-                    confirmButtonText: "ตกลง",
-                });
-                return;
-            }
-
-            // สำหรับ endDate ต้องไม่เก่ากว่า startDate
-            if (name === 'endDate' && formData.startDate && value < formData.startDate) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'วันที่สิ้นสุดต้องไม่เก่ากว่าวันที่เริ่มต้น',
-                    confirmButtonText: "ตกลง",
-                });
-                return;
-            }
-        }
-
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
-    }
 
     const handleFileChange = (e) => {
         const { files } = e.target;
@@ -99,6 +67,7 @@ function DonateRequest() {
         data.append("startDate", formData.startDate);
         data.append("endDate", formData.endDate);
         data.append("donationType", formData.donationType);
+        data.append("paymentMethod", formData.paymentMethod);
         data.append("bankName", formData.bankName);
         data.append("accountName", formData.accountName);
         data.append("accountNumber", formData.accountNumber);
@@ -114,83 +83,19 @@ function DonateRequest() {
             return;
         }
 
-        // Debug: ดูข้อมูลที่ส่งไป
-        console.log("Data being sent:");
-        for (let [key, value] of data.entries()) {
-            console.log(key, value);
-        }
-
         try {
-            const formDataToSend = new FormData();
-
-            formDataToSend.append("userId", userId);
-            formDataToSend.append("projectName", formData.projectName);
-            formDataToSend.append("description", formData.description);
-            formDataToSend.append("targetAmount", formData.targetAmount || 0);
-            formDataToSend.append("currentAmount", formData.currentAmount || 0);
-            formDataToSend.append("startDate", formData.startDate);
-            formDataToSend.append("endDate", formData.endDate);
-            formDataToSend.append("donationType", formData.donationType);
-            formDataToSend.append("bankName", formData.bankName);
-            formDataToSend.append("accountName", formData.accountName);
-            formDataToSend.append("accountNumber", formData.accountNumber);
-            formDataToSend.append("numberPromtpay", formData.numberPromtpay);
-            formDataToSend.append("forThings", formData.forThings);
-            formDataToSend.append("typeThings", formData.typeThings);
-            formDataToSend.append("quantityThings", formData.quantityThings);
-
-            if (formData.image) {
-                formDataToSend.append("image", formData.image);
-            }
-
-            const response = await axios.post(HOSTNAME + "/donate/donateRequest", formDataToSend, {
-                headers: { "Content-Type": "multipart/form-data" },
-                withCredentials: true,
+            const response = await axios.post(HOSTNAME + '/donate/donateRequest', data, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            }, {
+                withCredentials: true
             });
-
-            Swal.fire({
-                title: "ส่งคำขอโครงการบริจาคสำเร็จ!",
-                text: "โปรดรอการอนุมัติจากผู้ดูแลระบบ",
-                icon: "success",
-                confirmButtonText: "ตกลง",
-            }).then(() => {
-                setFormData({
-                    projectName: "",
-                    description: "",
-                    targetAmount: "",
-                    currentAmount: "",
-                    startDate: "",
-                    endDate: "",
-                    donationType: "",
-                    bankName: "",
-                    accountName: "",
-                    accountNumber: "",
-                    numberPromtpay: "",
-                    forThings: "",
-                    typeThings: "",
-                    quantityThings: "",
-                    image: null,
-                });
-                setOpen(false);
-                setSuccessMessage("ส่งคำขอโครงการบริจาคสำเร็จ! โปรดรอการอนุมัติจากผู้ดูแลระบบ");
-                setErrorMessage("");
-                setIsSubmitting(false);
-
-                if (role === 3) {
-                    navigate("/alumni-profile/alumni-request");
-                } else if (role === 4) {
-                    navigate("/student-profile/student-request");
-                } else if (role === "2") {
-                    navigate("/president-profile/president-request");
-                } else {
-                    navigate("/");
-                }
-            });
+            alert("เพิ่มโครงการบริจาคสำเร็จ!");
+            // navigate("/donate");
+            navigate("/alumni-profile/alumni-request");
         } catch (error) {
             console.error("Error:", error);
             alert(error.response?.data?.error || "เกิดข้อผิดพลาด");
         }
-
     };
 
     const [open, setOpen] = React.useState(false);
@@ -340,20 +245,18 @@ function DonateRequest() {
                                     name="startDate"
                                     type="date"
                                     value={formData.startDate}
-                                    onChange={handleChangeDate}
+                                    onChange={handleChange}
                                     required
                                     min={new Date().toISOString().split('T')[0]}
-                                    onKeyDown={(e) => e.preventDefault()}
                                 />
                                 <span className="title-time">สิ้นสุด:</span>
                                 <input
                                     name="endDate"
                                     type="date"
                                     value={formData.endDate}
-                                    onChange={handleChangeDate}
+                                    onChange={handleChange}
                                     required
                                     min={formData.startDate ? formData.startDate : new Date().toISOString().split('T')[0]}
-                                    onKeyDown={(e) => e.preventDefault()}
                                 />
                             </div>
                         </p>
@@ -371,6 +274,20 @@ function DonateRequest() {
 
                         <p>
                             <label htmlFor="bankName">ข้อมูลบัญชีธนาคาร<span className="important">*</span></label><br />
+                            <div>
+                                ช่องทางการชำระเงิน:
+                                <select
+                                    className="data-requestSouvenir-input"
+                                    name="paymentMethod"
+                                    value={formData.paymentMethod}
+                                    onChange={handleChange}
+                                    required
+                                >
+                                    <option value="" disabled>เลือกช่องทางการชำระเงิน</option>
+                                    <option value="พร้อมเพย์">พร้อมเพย์</option>
+                                    <option value="บัญชีธนาคาร">บัญชีธนาคาร</option>
+                                </select>
+                            </div>
                             ธนาคาร:<br />
                             <input
                                 id="bankName"
@@ -461,6 +378,11 @@ function DonateRequest() {
                                 />
                             </div>
                         )}
+                        <strong>ช่องทางการชำระเงิน:</strong> {formData.paymentMethod} <br />
+                        <strong>ธนาคาร:</strong> {formData.bankName} <br />
+                        <strong>ชื่อบัญชี:</strong> {formData.accountName} <br />
+                        <strong>เลขบัญชี:</strong> {formData.accountNumber} <br />
+                        <strong>พร้อมเพย์:</strong> {formData.numberPromtpay} <br />
                     </Typography>
 
                     <div style={{ marginTop: '20px', textAlign: 'right' }}>

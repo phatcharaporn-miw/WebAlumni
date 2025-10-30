@@ -55,7 +55,7 @@ function AlumniHome() {
   const [showReplyForm, setShowReplyForm] = useState(null);
   const [replyingTo, setReplyingTo] = useState(null); // เก็บ comment_id ที่กำลังตอบกลับ
   const [replyText, setReplyText] = useState(''); // เก็บข้อความตอบกลับ
-  const [expandedReplies, setExpandedReplies] = useState({}); //ซ่อนการตอบกลับ
+  // const [expandedReplies, setExpandedReplies] = useState({}); 
   const navigate = useNavigate();
   const [projects, setProjects] = useState([]);
   const [filter, setFilter] = useState("all");
@@ -67,7 +67,7 @@ function AlumniHome() {
   useEffect(() => {
     const checkUser = async () => {
       try {
-        const res = await axios.get( HOSTNAME + "/users/profile", { withCredentials: true });
+        const res = await axios.get(HOSTNAME + "/users/profile", { withCredentials: true });
         if (res.data.success) {
           setIsLoggedin(true);
           console.log("ผู้ใช้ล็อกอินแล้ว");
@@ -128,7 +128,6 @@ function AlumniHome() {
   };
 
   const [stats, setStats] = useState({
-    totalParticipants: 0,
     ongoingActivity: 0,
     ongoingProject: 0,
     totalDonations: 0,
@@ -157,31 +156,10 @@ function AlumniHome() {
       .then((res) => setStats(res.data))
       .catch((err) => console.error("Error fetching dashboard stats:", err));
 
-    // // Activity per year graph
-    // axios.get(" + /admin/activity-per-year")
-    //   .then(res => {
-    //     if (Array.isArray(res.data)) {
-    //       const labels = res.data.map(item => `ปี ${item.year + 543}`);
-    //       const data = res.data.map(item => item.total_activities);
-    //       setBarData({
-    //         labels,
-    //         datasets: [{
-    //           label: 'จำนวนกิจกรรม',
-    //           data,
-    //           backgroundColor: 'rgba(13, 110, 253, 0.8)',
-    //           borderColor: 'rgba(13, 110, 253, 1)',
-    //           borderWidth: 2,
-    //           borderRadius: 6,
-    //           borderSkipped: false,
-    //         }],
-    //       });
-    //     }
-    //   });
     // Activity per month graph
     axios.get(HOSTNAME + "/admin/activity-per-month")
       .then(res => {
         if (Array.isArray(res.data)) {
-          // สร้าง labels เป็น "เดือน ปี" (ภาษาไทย)
           const monthNamesThai = [
             "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน",
             "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม",
@@ -216,7 +194,7 @@ function AlumniHome() {
           labels,
           datasets: [{
             data,
-            backgroundColor: ['#98d662ff', '#6f42c1', '#241f12ff'], // example colors
+            backgroundColor: ['#98d662ff', '#6f42c1', '#241f12ff'], 
           }],
         });
       });
@@ -233,60 +211,68 @@ function AlumniHome() {
     }, 1000);
   }, []);
 
-  const CardInfo = ({ title, value, type = "activity", center = false, icon: CustomIcon, colClass = "col-md-3" }) => {
-    const getCardStyle = () => {
-      switch (type) {
-        case "donation":
-          return {
-            background: 'linear-gradient(135deg, #28a745 0%, #20c997 100%)',
-            color: 'white',
-            iconColor: 'white'
-          };
-        case "project":
-          return {
-            background: 'linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%)',
-            color: 'white',
-            iconColor: 'white'
-          };
-        case "alumni":
-          return {
-            background: 'linear-gradient(135deg, #fd7e14 0%, #ffc107 100%)',
-            color: 'white',
-            iconColor: 'white'
-          };
-        default:
-          return {
-            background: 'linear-gradient(135deg, #0d6efd 0%, #6610f2 100%)',
-            color: 'white',
-            iconColor: 'white'
-          };
-      }
-    };
-
-    const cardStyle = getCardStyle();
-    const Icon = CustomIcon || (type === "donation" ? MdVolunteerActivism : MdEvent);
-
+  const CardInfo = ({ title, value, type = "activity", center = false, icon: CustomIcon, colClass = "col-md-3", onClick }) => {
+      const getCardStyle = () => {
+        switch (type) {
+          case "donation":
+            return {
+              background: 'linear-gradient(135deg, #28a745 0%, #20c997 100%)',
+              color: 'white',
+              iconColor: 'white'
+            };
+          case "project":
+            return {
+              background: 'linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%)',
+              color: 'white',
+              iconColor: 'white'
+            };
+          case "alumni":
+            return {
+              background: 'linear-gradient(135deg, #fd7e14 0%, #ffc107 100%)',
+              color: 'white',
+              iconColor: 'white'
+            };
+          default:
+            return {
+              background: 'linear-gradient(135deg, #0d6efd 0%, #6610f2 100%)',
+              color: 'white',
+              iconColor: 'white'
+            };
+        }
+      };
+  
+      const cardStyle = getCardStyle();
+      const Icon = CustomIcon || (type === "donation" ? MdVolunteerActivism : MdEvent);
+  
     return (
-      <div className={`${colClass} mb-4`}>
-        <div
-          className={`card p-4 border-0 shadow-lg position-relative overflow-hidden ${center ? 'text-center' : 'text-start'}`}
-          style={{
-            background: cardStyle.background,
-            color: cardStyle.color,
-          }}>
-          <div className="position-absolute top-0 end-0 p-3 opacity-25">
-            <Icon size={60} />
+        <div className={`${colClass} mb-4`}>
+          <div
+            onClick={onClick}
+            className={`card p-4 border-0 shadow-lg position-relative overflow-hidden ${center ? 'text-center' : 'text-start'}`}
+            style={{
+              background: cardStyle.background,
+              color: cardStyle.color,
+              cursor: onClick ? "pointer" : "default",
+              transition: "transform 0.2s",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.03)")}
+            onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+          >
+            <div className="d-flex align-items-center mb-3">
+              <Icon size={28} className="me-3" style={{ color: cardStyle.iconColor }} />
+              <h6 className="mb-0 fw-bold">{title}</h6>
+            </div>
+            <h2 className="fw-bold mb-0">{value}</h2>
+            {onClick && (
+              <small className="text-light opacity-75 mt-2 d-block">
+                คลิกเพื่อดูรายละเอียด →
+              </small>
+            )}
           </div>
-          <div className="d-flex align-items-center mb-3">
-            <Icon size={28} className="me-3" style={{ color: cardStyle.iconColor }} />
-            <h6 className="mb-0 fw-bold">{title}</h6>
-          </div>
-          <h2 className="fw-bold mb-0">{value}</h2>
         </div>
-      </div>
-    );
-  };
-
+      );
+    };
+    
   const LoadingSpinner = () => (
     <div className="d-flex justify-content-center align-items-center" style={{ height: '200px' }}>
       <div className="spinner-border text-primary" role="status">
@@ -383,7 +369,7 @@ function AlumniHome() {
 
             // format number ให้มี , คั่นหลักพัน
             const formattedValue = value.toLocaleString();
-            return `${tooltipItem.label}: ฿${formattedValue} (${percent}%)`; //คืนค่า string ที่จะแสดงใน tooltip
+            return `${tooltipItem.label}: ฿${formattedValue} (${percent}%)`; //คืนค่า string 
           },
         },
       },
@@ -439,7 +425,7 @@ function AlumniHome() {
       return; // ไม่บันทึกสถานะหากไม่ได้เข้าสู่ระบบ
     }
 
-    axios.post( HOSTNAME + `/web/webboard/${postId}/favorite`, {}, {
+    axios.post(HOSTNAME + `/web/webboard/${postId}/favorite`, {}, {
       withCredentials: true,
     })
       .then((response) => {
@@ -544,8 +530,8 @@ function AlumniHome() {
         const formattedNewComment = {
           ...newComment,
           profile_image: newComment.profile_image || userProfileImage,
-          full_name: newComment.full_name, // ใช้ full_name จาก backend
-          user_id: newComment.user_id || userId, // ใช้ user_id จาก backend 
+          full_name: newComment.full_name,
+          user_id: newComment.user_id || userId,
           created_at: newComment.created_at || new Date().toISOString(),
           comment_detail: newComment.comment_detail || commentText,
           replies: [],
@@ -616,12 +602,12 @@ function AlumniHome() {
             if (comment.comment_id === commentId) {
               // สร้าง reply object ใหม่
               const newReply = {
-                reply_id: response.data.reply_id || Date.now(), // ใช้ ID จาก response หรือ timestamp
+                reply_id: response.data.reply_id || Date.now(),
                 comment_id: commentId,
                 user_id: user.user_id,
                 reply_detail: replyText.trim(),
                 created_at: new Date().toISOString(),
-                full_name: user.full_name || "คุณ", // ดึงชื่อจาก sessionStorage
+                full_name: user.full_name || "คุณ",
                 profile_image: user.image_path || "/default-profile.png"
               };
 
@@ -698,7 +684,7 @@ function AlumniHome() {
 
   // ลบการตอบกลับความคิดเห็น
   const handleDeleteReply = (replyId, commentId) => {
-    axios.delete(HOSTNAME +`/web/webboard/${selectedPost.webboard_id}/comment/${commentId}/reply/${replyId}`, {
+    axios.delete(HOSTNAME + `/web/webboard/${selectedPost.webboard_id}/comment/${commentId}/reply/${replyId}`, {
       withCredentials: true
     })
       .then(response => {
@@ -730,7 +716,7 @@ function AlumniHome() {
 
   // ดึงcategory
   useEffect(() => {
-    axios.get(HOSTNAME +`/category/category-all`)
+    axios.get(HOSTNAME + `/category/category-all`)
       .then(response => {
         if (response.data.success) {
           setCategory(response.data.data);
@@ -745,7 +731,7 @@ function AlumniHome() {
   }, []);
 
   const handleCategoryClick = (categoryId) => {
-    navigate(HOSTNAME +`/webboard/category/${categoryId}`)
+    navigate(HOSTNAME + `/webboard/category/${categoryId}`)
   };
 
   // กำหนดสีหมวดหมู่
@@ -756,7 +742,7 @@ function AlumniHome() {
   };
 
   const handleReadMore = (newsId) => {
-    navigate(HOSTNAME +`/news/${newsId}`);
+    navigate(`/news/${newsId}`);
   };
 
   const calculateDaysRemaining = (endDate) => {
@@ -872,7 +858,7 @@ function AlumniHome() {
           {/* Slide 1: LCP optimized */}
           <div className="carousel-item active">
             <img
-              src="/image/2.jpeg"
+              src="/image/header-act.png"
               alt="slide1"
               className="id-block w-100"
               width="1280"
@@ -1138,45 +1124,38 @@ function AlumniHome() {
             <div className="title-underline"></div>
           </h3>
           <div className="container">
-            {/* Stats Cards */}
-            <div className="row mb-5">
-              <CardInfo
-                title="ผู้เข้าร่วมกิจกรรมทั้งหมด"
-                value={`${stats.totalParticipants.toLocaleString()} คน`}
-                type="activity"
-                icon={MdPeople}
-              />
-              <CardInfo
-                title="กิจกรรมที่กำลังดำเนินการ"
-                value={`${stats.ongoingActivity} กิจกรรม`}
-                type="activity"
-                icon={MdEvent}
-              />
-              <CardInfo
-                title="ยอดบริจาครวมทั้งหมด"
-                value={`${formatCurrency(stats.totalDonations)} บาท`}
-                type="donation"
-                icon={MdVolunteerActivism}
-              />
-              <CardInfo
-                title="โครงการที่เปิดรับบริจาค"
-                value={`${stats.ongoingProject} โครงการ`}
-                type="project"
-                icon={MdTrendingUp}
-              />
-            </div>
 
-            {/* Alumni Section */}
-            <div className="row">
-              <CardInfo
-                title="จำนวนศิษย์เก่าทั้งหมด"
-                value={`${alumniCount.toLocaleString()} คน`}
-                center
-                type="alumni"
-                icon={MdPeople}
-                colClass="col-12"
-              />
-            </div>
+            {/* Stats Cards */}
+                  <div className="row mb-5">
+                    <CardInfo
+                      title="จำนวนศิษย์เก่าทั้งหมด"
+                      value={`${alumniCount.toLocaleString()} คน`}
+                      type="alumni"
+                      icon={MdPeople}
+                      onClick={() => navigate("/dashboard-alumni")}
+                    />
+                    <CardInfo
+                      title="กิจกรรมที่กำลังดำเนินการ"
+                      value={`${(stats?.ongoingActivity || 0).toLocaleString()} กิจกรรม`}
+                      type="activity"
+                      icon={MdEvent}
+                      onClick={() => navigate("/dashboard-activity")}
+                    />
+                    <CardInfo
+                      title="ยอดบริจาครวมทั้งหมด"
+                      value={`${formatCurrency(stats?.totalDonations || 0)} บาท`}
+                      type="donation"
+                      icon={MdVolunteerActivism}
+                      onClick={() => navigate("/dashboard-donation")}
+                    />
+                    <CardInfo
+                      title="โครงการที่เปิดรับบริจาค"
+                      value={`${(stats?.ongoingProject || 0).toLocaleString()} โครงการ`}
+                      type="project"
+                      icon={MdTrendingUp}
+                      onClick={() => navigate("/dashboard-project")}
+                    />
+                  </div>
 
             {/* Charts Section */}
             <div className="row mb-5">
@@ -1207,18 +1186,20 @@ function AlumniHome() {
               </div>
             </div>
           </div>
-          <div className="p-3 border-top">
-            <div className="row align-items-center">
-              <div className="col-12 d-flex justify-content-end mt-2">
-                <a 
-                  href="/dashboard-static" 
-                  className="btn btn-outline-primary btn-sm"
-                >
-                  ดูข้อมูลเพิ่มเติม
-                </a>
+          {/* <div className="border-top">
+            <div className="container">
+              <div className="row">
+                <div className="col-12 text-end">
+                  <a
+                    href="/dashboard-stat"
+                    className="btn btn-outline-primary btn-sm"
+                  >
+                    ดูข้อมูลเพิ่มเติม
+                  </a>
+                </div>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
 
         {/* ส่วนของเว็บบอร์ด */}
@@ -1266,7 +1247,7 @@ function AlumniHome() {
                             {/* โปรไฟล์ + ชื่อผู้ใช้ */}
                             <div className="d-flex mb-3">
                               <img
-                                src={post.profile_image ? HOSTNAME +`/${post.profile_image}` : "/default-profile.png"}
+                                src={post.profile_image ? HOSTNAME + `/${post.profile_image}` : "/default-profile.png"}
                                 alt="User"
                                 className="rounded-circle me-3"
                                 width="50"
@@ -1312,7 +1293,6 @@ function AlumniHome() {
                       <h5 className="text-muted mb-3">ยังไม่มีกระทู้</h5>
                       <p className="text-muted">เมื่อมีการโพสต์กระทู้ จะแสดงที่นี่</p>
                       <a href="/webboard" className="btn btn-outline-primary">
-                        <i className="fas fa-plus me-2"></i>
                         สร้างกระทู้แรก
                       </a>
                     </div>
@@ -1326,13 +1306,11 @@ function AlumniHome() {
                   <div className="row align-items-center">
                     <div className="col-md-8">
                       <small className="text-muted">
-                        <i className="fas fa-info-circle me-1"></i>
                         แสดง 2 จาก {webboard.length} กระทู้ยอดนิยม • อัปเดตล่าสุด {new Date().toLocaleDateString('th-TH')}
                       </small>
                     </div>
                     <div className="col-md-4 text-md-end mt-2 mt-md-0">
                       <a href="/webboard" className="btn btn-outline-primary btn-sm">
-                        <i className="fas fa-arrow-right me-2"></i>
                         ดูกระทู้ทั้งหมด
                       </a>
                     </div>
@@ -1870,17 +1848,6 @@ function AlumniHome() {
                             "เชื่อมโยงศิษย์เก่า ก้าวทันเทคโนโลยี สนับสนุนสังคมดิจิทัล"
                           </p>
                         </blockquote>
-                        {/* <div className="mt-3">
-                          <div className="d-inline-block bg-primary opacity-25 rounded-circle me-2"
-                            style={{ width: '8px', height: '8px' }}>
-                          </div>
-                          <div className="d-inline-block bg-success opacity-25 rounded-circle me-2"
-                            style={{ width: '8px', height: '8px' }}>
-                          </div>
-                          <div className="d-inline-block bg-warning opacity-25 rounded-circle"
-                            style={{ width: '8px', height: '8px' }}>
-                          </div>
-                        </div> */}
                       </div>
                     </div>
                   </div>
@@ -1981,8 +1948,7 @@ function AlumniHome() {
                         e.target.style.boxShadow = '0 4px 15px rgba(0,123,255,0.3)';
                       }}
                     >
-                      <i className="fas fa-history me-2"></i>
-                      📖 ประวัติความเป็นมา
+                      ประวัติความเป็นมา
 
                       {/* Button shine effect */}
                       <div className="position-absolute top-0 start-0 w-100 h-100 opacity-25"

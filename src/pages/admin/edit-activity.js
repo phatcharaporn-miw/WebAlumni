@@ -33,7 +33,6 @@ function EditActivity() {
                         end_time: response.data.data.end_time,
                         description: response.data.data.description,
                         status: response.data.data.status,
-                        // image:response.data.data.image || null,
                     });
                 } else {
                     console.error("เกิดข้อผิดพลาดในการดึงข้อมูลกิจกรรม:", response.data.message);

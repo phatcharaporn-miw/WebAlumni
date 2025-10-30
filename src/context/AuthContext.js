@@ -56,7 +56,6 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Initialize auth เมื่อ component mount
-  // Initialize auth เมื่อ component mount
 useEffect(() => {
   const initAuth = async () => {      
     const savedUser = sessionStorage.getItem("user");
@@ -75,7 +74,7 @@ useEffect(() => {
     console.log('Session valid:', isValidSession);
 
     setIsLoading(false);
-    setInitDone(true);   // ✅ บอกว่าพร้อมแล้ว
+    setInitDone(true); 
     console.log('Auth initialized');
   };
 
@@ -111,31 +110,6 @@ useEffect(() => {
     }
   };
 
-  // const handleLogout = async () => {
-  //   try {
-  //     setIsLoggingOut(true);
-  //     console.log('🚪 Logging out...');
-      
-  //     // ล้าง state ก่อน
-  //     setUser(null);
-  //     setNotifications(0);
-  //     sessionStorage.removeItem("user");
-      
-  //     // แจ้ง tabs อื่น
-  //     localStorage.setItem('logout-event', Date.now().toString());
-  //     localStorage.removeItem('logout-event');
-      
-  //     // เรียก API logout
-  //     await axios.post(HOSTNAME +"/api/logout", {}, { withCredentials: true });
-      
-  //   } catch (error) {
-  //     console.error('❌ Logout error:', error);
-  //   } finally {
-  //     setIsLoggingOut(false);
-  //     navigate('/');
-  //   }
-  // };
-
   const handleLogout = async () => {
   try {
     setIsLoggingOut(true);
@@ -164,7 +138,7 @@ useEffect(() => {
 };
 
 
-  // Listen for cross-tab logout
+  // cross-tab logout
   useEffect(() => {
     const handleStorageChange = (e) => {
       if (e.key === 'logout-event') {

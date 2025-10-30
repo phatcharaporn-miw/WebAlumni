@@ -27,6 +27,16 @@ export const breadcrumbMapping = {
     "/check-fullName": "ตรวจสอบข้อมูล",
     "/search": "ผลการค้นหา",
     "/donate/donatedetail/donateconfirm": "ยืนยันข้อมูลการบริจาค",
+    "/dashboard-activity": "กิจกรรมที่กำลังดำเนินการ",
+    "/dashboard-participants": "จำนวนผู้เข้าร่วมกิจกรรมทั้งหมด",
+    "/dashboard-donation": "ยอดบริจาคทั้งหมด",
+    "/dashboard-project": "โครงการที่เปิดรับบริจาค",
+    "/dashboard-alumni": "รายชื่อศิษย์เก่าทั้งหมด",
+    "/donate/donate-general": "บริจาคทั่วไป",
+    "/donate/donation-summary-detail": "ยอดบริจาคโครงการ",
+    "/donate/donation-summary-detail/project": "ยอดบริจาคโครงการ",
+    "/donate/donation-summary-detail/general": "ยอดบริจาคทั่วไป",
+    "/donate/donation-summary-detail/all": "ยอดบริจาครวมทั้งหมด",
 
     // ส่วนของศิษย์เก่า
     "/alumni-profile": "โปรไฟล์",

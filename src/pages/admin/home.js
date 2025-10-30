@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import {HOSTNAME} from '../../config.js';
+import { useNavigate } from "react-router-dom";
+import { HOSTNAME } from '../../config.js';
 import axios from "axios";
 import { MdVolunteerActivism, MdEvent, MdPeople, MdTrendingUp } from "react-icons/md";
 import { Bar, Pie } from 'react-chartjs-2';
@@ -16,19 +17,20 @@ import {
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend, ArcElement);
 
 function AdminHome() {
+  const navigate = useNavigate();
+
   const [stats, setStats] = useState({
-    totalParticipants: 0,
     ongoingActivity: 0,
     ongoingProject: 0,
     totalDonations: 0,
   });
 
   const formatCurrency = (amount) => {
-      return new Intl.NumberFormat("th-TH", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }).format(amount || 0);
-    };
+    return new Intl.NumberFormat("th-TH", {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount || 0);
+  };
 
   const [alumniCount, setAlumniCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -38,50 +40,50 @@ function AdminHome() {
     datasets: [],
   });
 
- 
- const [pieData, setPieData] = useState({
-      labels: [],
-      datasets: [],
+
+  const [pieData, setPieData] = useState({
+    labels: [],
+    datasets: [],
   });
 
   useEffect(() => {
     // Dashboard Stats
-    axios.get(HOSTNAME +"/admin/dashboard-stats")
+    axios.get(HOSTNAME + "/admin/dashboard-stats")
       .then((res) => setStats(res.data))
       .catch((err) => console.error("Error fetching dashboard stats:", err));
 
     // Activity per month graph
-axios.get(HOSTNAME +"/admin/activity-per-month")
-  .then(res => {
-    if (Array.isArray(res.data)) {
-      // สร้าง labels เป็น "เดือน ปี" (ภาษาไทย)
-      const monthNamesThai = [
-        "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน",
-        "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม",
-        "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
-      ];
+    axios.get(HOSTNAME + "/admin/activity-per-month")
+      .then(res => {
+        if (Array.isArray(res.data)) {
+          // สร้าง labels เป็น "เดือน ปี" (ภาษาไทย)
+          const monthNamesThai = [
+            "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน",
+            "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม",
+            "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
+          ];
 
-      const labels = res.data.map(item => `${monthNamesThai[item.month_number - 1]} ${item.year + 543}`);
-      const data = res.data.map(item => item.total_activities);
+          const labels = res.data.map(item => `${monthNamesThai[item.month_number - 1]} ${item.year + 543}`);
+          const data = res.data.map(item => item.total_activities);
 
-      setBarData({
-        labels,
-        datasets: [{
-          label: 'จำนวนกิจกรรม',
-          data,
-          backgroundColor: 'rgba(13, 110, 253, 0.8)',
-          borderColor: 'rgba(13, 110, 253, 1)',
-          borderWidth: 2,
-          borderRadius: 6,
-          borderSkipped: false,
-        }],
+          setBarData({
+            labels,
+            datasets: [{
+              label: 'จำนวนกิจกรรม',
+              data,
+              backgroundColor: 'rgba(13, 110, 253, 0.8)',
+              borderColor: 'rgba(13, 110, 253, 1)',
+              borderWidth: 2,
+              borderRadius: 6,
+              borderSkipped: false,
+            }],
+          });
+        }
       });
-    }
-  });
 
 
     // สถิติการบริจาค
-    axios.get(HOSTNAME +"/admin/donation-stats")
+    axios.get(HOSTNAME + "/admin/donation-stats")
       .then((res) => {
         const labels = res.data.map(item => item.donation_type);
         const data = res.data.map(item => item.total);
@@ -89,7 +91,7 @@ axios.get(HOSTNAME +"/admin/activity-per-month")
           labels,
           datasets: [{
             data,
-            backgroundColor: ['#98d662ff', '#6f42c1', '#241f12ff'], 
+            backgroundColor: ['#98d662ff', '#6f42c1', '#241f12ff'],
             borderColor: ['#98d662ff', '#6f42c1', '#241f12ff'],
             borderWidth: 2,
           }],
@@ -98,7 +100,7 @@ axios.get(HOSTNAME +"/admin/activity-per-month")
 
 
     // Total alumni count
-    axios.get(HOSTNAME +"/admin/total-alumni")
+    axios.get(HOSTNAME + "/admin/total-alumni")
       .then(res => setAlumniCount(res.data.totalAlumni));
   }, []);
 
@@ -109,7 +111,7 @@ axios.get(HOSTNAME +"/admin/activity-per-month")
     }, 1000);
   }, []);
 
-  const CardInfo = ({ title, value, type = "activity", center = false, icon: CustomIcon, colClass = "col-md-3" }) => {
+  const CardInfo = ({ title, value, type = "activity", center = false, icon: CustomIcon, colClass = "col-md-3", onClick }) => {
     const getCardStyle = () => {
       switch (type) {
         case "donation":
@@ -145,20 +147,30 @@ axios.get(HOSTNAME +"/admin/activity-per-month")
     return (
       <div className={`${colClass} mb-4`}>
         <div
+          onClick={onClick}
           className={`card p-4 border-0 shadow-lg position-relative overflow-hidden ${center ? 'text-center' : 'text-start'}`}
           style={{
             background: cardStyle.background,
             color: cardStyle.color,
+            cursor: onClick ? "pointer" : "default",
+            transition: "transform 0.2s",
           }}
+          onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.03)")}
+          onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
         >
-          <div className="position-absolute top-0 end-0 p-3 opacity-25">
+          {/* <div className="position-absolute top-0 end-0 p-3 opacity-25">
             <Icon size={60} />
-          </div>
+          </div> */}
           <div className="d-flex align-items-center mb-3">
             <Icon size={28} className="me-3" style={{ color: cardStyle.iconColor }} />
             <h6 className="mb-0 fw-bold">{title}</h6>
           </div>
           <h2 className="fw-bold mb-0">{value}</h2>
+          {onClick && (
+            <small className="text-light opacity-75 mt-2 d-block">
+              คลิกเพื่อดูรายละเอียด →
+            </small>
+          )}
         </div>
       </div>
     );
@@ -249,7 +261,7 @@ axios.get(HOSTNAME +"/admin/activity-per-month")
             const dataset = tooltipItem.dataset;
 
             // console.log('Tooltip Item:', dataset);
-             // บังคับแปลงเป็นตัวเลข
+            // บังคับแปลงเป็นตัวเลข
             const dataValues = dataset.data.map(d => Number(d));
 
             // คำนวณผลรวมทั้งหมดของ slice
@@ -260,7 +272,7 @@ axios.get(HOSTNAME +"/admin/activity-per-month")
 
             // format number ให้มี , คั่นหลักพัน
             const formattedValue = value.toLocaleString();
-            return `${tooltipItem.label}: ฿${formattedValue} (${percent}%)`; 
+            return `${tooltipItem.label}: ฿${formattedValue} (${percent}%)`;
           },
         },
       },
@@ -281,43 +293,35 @@ axios.get(HOSTNAME +"/admin/activity-per-month")
       {/* Stats Cards */}
       <div className="row mb-5">
         <CardInfo
-          title="ผู้เข้าร่วมกิจกรรมทั้งหมด"
-          value={`${stats.totalParticipants.toLocaleString()} คน`}
-          type="activity"
+          title="จำนวนศิษย์เก่าทั้งหมด"
+          value={`${alumniCount.toLocaleString()} คน`}
+          type="alumni"
           icon={MdPeople}
+          onClick={() => navigate("/admin-home/dashboard-alumni")}
         />
         <CardInfo
           title="กิจกรรมที่กำลังดำเนินการ"
-          value={`${stats.ongoingActivity} กิจกรรม`}
+          value={`${(stats?.ongoingActivity || 0).toLocaleString()} กิจกรรม`}
           type="activity"
           icon={MdEvent}
+          onClick={() => navigate("/admin-home/dashboard-activity")}
         />
         <CardInfo
           title="ยอดบริจาครวมทั้งหมด"
-          value={`${formatCurrency(stats.totalDonations)} บาท`}
+          value={`${formatCurrency(stats?.totalDonations || 0)} บาท`}
           type="donation"
           icon={MdVolunteerActivism}
+          onClick={() => navigate("/admin-home/dashboard-donation")}
         />
         <CardInfo
           title="โครงการที่เปิดรับบริจาค"
-          value={`${stats.ongoingProject} โครงการ`}
+          value={`${(stats?.ongoingProject || 0).toLocaleString()} โครงการ`}
           type="project"
           icon={MdTrendingUp}
+          onClick={() => navigate("/admin-home/dashboard-project")}
         />
       </div>
-      
-      {/* Alumni Section */}
-      <div className="row">
-        {/* <div className="col-12"> */}
-        <CardInfo
-          title="จำนวนศิษย์เก่าทั้งหมด"
-          value={`${alumniCount.toLocaleString()} คน`}
-          center
-          type="alumni"
-          icon={MdPeople}
-          colClass="col-12"
-        />
-      </div>
+
 
       {/* Charts Section */}
       <div className="row mb-5">
@@ -346,8 +350,6 @@ axios.get(HOSTNAME +"/admin/activity-per-month")
           </div>
         </div>
       </div>
-
-      
     </div>
   );
 }

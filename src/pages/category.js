@@ -14,6 +14,8 @@ import Swal from "sweetalert2";
 import { MdDelete } from "react-icons/md";
 import { useAuth } from '../context/AuthContext';
 import {HOSTNAME} from '../config.js';
+import { FaSearch } from "react-icons/fa";
+import { AiOutlineClose } from "react-icons/ai";
 // css
 import '../css/webboard.css';
 // bootstrap
@@ -37,6 +39,8 @@ function Category() {
   const [favoritePosts, setFavoritePosts] = useState([]);
   const [replyText, setReplyText] = useState(''); // เก็บข้อความตอบกลับ
   const [showReplyForm, setShowReplyForm] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filter, setFilter] = useState("all");  
   const {user} = useAuth();
   const userId = user?.user_id;
   const navigate = useNavigate();
@@ -69,12 +73,35 @@ function Category() {
       });
   }, [categoryId]);
 
+  // filter and search
+  const handleSearchChange = (e) => {
+  setSearchTerm(e.target.value);
+};
+
+const handleClearFilters = () => {
+  setSearchTerm("");
+  setFilter("all"); 
+  setSortOrder("latest");
+};
+
   //เรียงลำดับโพสต์ตามวันที่
   const sortedPosts = [...webboard].sort((a, b) => {
     if (sortOrder === "latest") return new Date(b.created_at) - new Date(a.created_at);
     if (sortOrder === "oldest") return new Date(a.created_at) - new Date(b.created_at);
     return 0;
   });
+
+const filteredPosts = sortedPosts.filter(post => {
+  const matchesSearch = searchTerm === "" || 
+    post.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    post.content?.toLowerCase().includes(searchTerm.toLowerCase());
+
+  const matchesFilter = filter === "all" || 
+    String(post.category_id) === String(filter);
+
+  return matchesSearch && matchesFilter;
+});
+
 
   // ดึงข้อมูลกระทู้ที่ถูกกดหัวใจ
   useEffect(() => {
@@ -407,20 +434,56 @@ function Category() {
       <div className="category-page">
         <h3 className="category-title">กระทู้ในหมวดหมู่: {categoryName}</h3>
 
-        <select className="border rounded p-2 mb-3" value={sortOrder} onChange={(e) => setSortOrder(e.target.value)}>
-          <option value="latest">ล่าสุด</option>
-          <option value="oldest">เก่าสุด</option>
-        </select>
-        {/* <div className="d-flex align-items-center mb-3 ms-3">
-          <input
-            type="checkbox"
-            id="showFavorites"
-            checked={showFavorites}
-            onChange={() => setShowFavorites(!showFavorites)}
-            className="me-2"
-          />
-          <label htmlFor="showFavorites" className="mb-0">แสดงเฉพาะกระทู้ที่ถูกใจ</label>
-        </div> */}
+         {/* Filters */}
+      <div className="donate-filters">
+        <div className="row g-3">
+          {/* ค้นหา */}
+          <div className="col-md-6">
+            <label htmlFor="search" className="form-label">ค้นหากระทู้:</label>
+            <div className="input-group">
+              <span className="input-group-text">
+                <FaSearch />
+              </span>
+              <input
+                type="text"
+                id="search"
+                className="form-control"
+                placeholder="ค้นหากระทู้หรือเนื้อหา..."
+                value={searchTerm}
+                onChange={handleSearchChange}
+              />
+            </div>
+          </div>
+
+          
+          {/* เรียงลำดับ */}
+          <div className="col-md-4">
+            <label htmlFor="sort-order" className="form-label">ลำดับ:</label>
+            <select
+              id="sort-order"
+              className="form-select"
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value)}
+            >
+              <option value="latest">ล่าสุด</option>
+              <option value="oldest">เก่าสุด</option>
+            </select>
+          </div>
+
+          {/* ปุ่มล้าง */}
+          <div className="col-md-2 d-flex flex-column">
+            <label className="form-label invisible">ล้าง</label>
+            <button
+              className="btn btn-outline-secondary"
+              onClick={handleClearFilters}
+              title="ล้างตัวกรอง"
+            >
+              <AiOutlineClose /> ล้าง
+            </button>
+          </div>
+        </div>
+  </div>
+
 
         <div className="row justify-content-center">
           <div className="col-md-7 mb-4">

@@ -304,28 +304,6 @@ function Header() {
   // fallback image
   const profileImg = user?.profilePicture || "/default-profile.png";
 
-  // const goToNotificationDetail = (notification) => {
-  //   markAsRead(notification.notification_id);
-
-  //   switch (notification.type) {
-  //     case 'like':
-  //     case 'comment':
-  //       navigate(`/webboard/post/${notification.related_id}`);
-  //       break;
-  //     case 'approve':
-  //       navigate(`/souvenir/souvenirDetail/${notification.related_id}`);
-  //       break;
-  //     case 'souvenir_request':
-  //       navigate(`/president-profile/president-approve`);
-  //       break;
-  //     case 'project':
-  //       navigate(`/projects/projectDetail/${notification.related_id}`);
-  //       break;
-  //     default:
-  //       Swal.fire('ไม่สามารถเปิดหน้าที่เกี่ยวข้องได้', '', 'warning');
-  //   }
-  // };
-
   return (
     <header className="header">
       <div className="header-top">

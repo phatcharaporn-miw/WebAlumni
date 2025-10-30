@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import { IoIosAddCircleOutline } from "react-icons/io";
 import { FaRegEdit } from "react-icons/fa";
-import { MdDelete } from "react-icons/md";
 import { CiSearch } from "react-icons/ci";
-import { BsCheck2Square } from "react-icons/bs";
 import "../../css/admin.css";
 import Swal from "sweetalert2";
 import { useAuth } from '../../context/AuthContext';
 import { HOSTNAME } from '../../config.js';
+import { FaSearch } from "react-icons/fa";
+import { AiOutlineClose } from "react-icons/ai";
 
 function Souvenir() {
     const [products, setProducts] = useState([]);
@@ -33,10 +32,13 @@ function Souvenir() {
     }, [user_id]);
 
     const handleOpen = (product) => {
-        setSelectedProduct(product);
-        setOpen(true);
-    };
-    const handleClose = () => setOpen(false);
+  setSelectedProduct(product);
+};
+
+const handleClose = () => {
+  setSelectedProduct(null);
+};
+
 
     const handleDetail = (product) => {
         setSelectedProduct(product);
@@ -138,6 +140,28 @@ function Souvenir() {
         });
     };
 
+const handleEditSubmit = (e) => {
+    e.preventDefault(); // ป้องกันการโหลดหน้าซ้ำเมื่อกด Submit
+
+    axios.put(HOSTNAME + `/admin/editSouvenir/${selectedProduct.product_id}`, selectedProduct)
+        .then(response => {
+            console.log("บันทึกข้อมูลสินค้าสำเร็จ:", response.data);
+            // อัปเดต State ในตาราง
+            setProducts(prevProducts =>
+                prevProducts.map(product =>
+                    product.product_id === selectedProduct.product_id
+                        ? { ...product, ...selectedProduct }
+                        : product
+                )
+            );
+            handleClose();
+        })
+        .catch(error => {
+            console.error("เกิดข้อผิดพลาดในการบันทึก:", error);
+            // อาจเพิ่มการแจ้งเตือนข้อผิดพลาด
+        });
+};
+
     const getStatusColor = (status) => status === "1" ? "green" : "red";
 
     const roleNames = { 1: "แอดมิน", 2: "นายกสมาคม", 3: "สมาชิกทั่วไป" };
@@ -161,49 +185,76 @@ function Souvenir() {
             </div>
 
             {/* Controls Section */}
-            <div className="row mb-4">
-                <div className="col-md-3">
-                    <label className="form-label fw-semibold">เรียงตามวันที่:</label>
-                    <select
-                        className="form-select"
-                        onChange={(e) => {
-                            const sorted = [...products].sort((a, b) =>
-                                e.target.value === "newest" ? new Date(b.created_at) - new Date(a.created_at)
-                                    : new Date(a.created_at) - new Date(b.created_at)
-                            );
-                            setProducts(sorted);
-                        }}
-                    >
-                        <option value="newest">ล่าสุด</option>
-                        <option value="oldest">เก่าสุด</option>
-                    </select>
-                </div>
+            <div className="donate-filters mb-4">
+  <div className="row g-3">
+    {/* ค้นหาสินค้า */}
+    <div className="col-md-6">
+      <label htmlFor="search" className="form-label fw-semibold">
+        ค้นหาสินค้า:
+      </label>
+      <div className="input-group">
+        <span className="input-group-text">
+          <FaSearch />
+        </span>
+        <input
+          type="text"
+          id="search"
+          className="form-control"
+          placeholder="ค้นหาชื่อสินค้าหรือรายละเอียด..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
+    </div>
 
-                <div className="col-md-6">
-                    <label className="form-label fw-semibold">ค้นหาสินค้า:</label>
-                    <div className="input-group">
-                        <span className="input-group-text bg-light">
-                            <CiSearch />
-                        </span>
-                        <input
-                            type="text"
-                            className="form-control"
-                            placeholder="ค้นหาชื่อสินค้า"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                    </div>
-                </div>
+    {/*เรียงตามวันที่ */}
+    <div className="col-md-4">
+      <label htmlFor="sort" className="form-label fw-semibold">
+        เรียงตามวันที่:
+      </label>
+      <select
+        id="sort"
+        className="form-select"
+        onChange={(e) => {
+          const sorted = [...products].sort((a, b) =>
+            e.target.value === "newest"
+              ? new Date(b.created_at) - new Date(a.created_at)
+              : new Date(a.created_at) - new Date(b.created_at)
+          );
+          setProducts(sorted);
+        }}
+      >
+        <option value="newest">ล่าสุด</option>
+        <option value="oldest">เก่าสุด</option>
+      </select>
+    </div>
 
-                <div className="col-md-3 d-flex align-items-end mb-2">
-                    <Link to="/admin/souvenir/souvenir_request" className="text-decoration-none w-100">
-                        <button className="btn btn-primary w-100 d-flex align-items-center justify-content-center">
-                            <IoIosAddCircleOutline className="me-2" />
-                            เพิ่มของที่ระลึก
-                        </button>
-                    </Link>
-                </div>
-            </div>
+    {/* ปุ่มล้างตัวกรอง / เพิ่มของที่ระลึก */}
+    <div className="col-md-2 d-flex flex-column">
+      <label className="form-label invisible">เพิ่ม</label>
+      <div className="d-flex gap-2">
+        <button
+          className="btn btn-outline-secondary flex-fill"
+          onClick={() => setSearchTerm("")}
+          title="ล้างตัวกรอง"
+        >
+          <AiOutlineClose /> ล้าง
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<div className="col-md-3 offset-md-9 d-flex align-items-end mb-2">
+  <Link
+    to="/admin/souvenir/souvenir_request"
+    className="text-decoration-none w-100"
+  >
+    <button className="btn btn-primary w-100 d-flex align-items-center justify-content-center">
+      เพิ่มของที่ระลึก
+    </button>
+  </Link>
+</div>
+
 
             <div className="row g-4 ">
                 {/* สินค้าของสมาคม */}
@@ -278,27 +329,27 @@ function Souvenir() {
                                                         className="btn btn-outline-success btn-sm"
                                                         onClick={() => handleApprove(product.product_id)}
                                                     >
-                                                        <BsCheck2Square className="me-1" /> อนุมัติ
+                                                        อนุมัติ
                                                     </button>
                                                 )}
                                                 <button
-                                                    className="btn btn-outline-primary btn-sm"
+                                                    className="btn btn-outline-warning btn-sm"
                                                     onClick={() => handleOpen(product)}
                                                 >
-                                                    <FaRegEdit className="me-1" /> แก้ไข
+                                                    แก้ไข
                                                 </button>
                                                 <button
                                                     className="btn btn-outline-danger btn-sm"
                                                     onClick={() => handleDelete(product.product_id)}
                                                 >
-                                                    <MdDelete className="me-1" /> ลบ
+                                                    ลบ
                                                 </button>
                                                 <Link
                                                     to={`/admin/souvenir/product-slot/${product.product_id}`}
-                                                    className="btn btn-outline-warning btn-sm"
+                                                    className="btn btn-outline-primary btn-sm"
                                                     onClick={(e) => e.stopPropagation()}
                                                 >
-                                                    <IoIosAddCircleOutline className="me-1" /> เพิ่มสล็อตสินค้า
+                                                    เพิ่มสล็อตสินค้า
                                                 </Link>
                                             </div>
                                         </div>
@@ -381,27 +432,27 @@ function Souvenir() {
                                                         className="btn btn-outline-success btn-sm"
                                                         onClick={() => handleApprove(product.product_id)}
                                                     >
-                                                        <BsCheck2Square className="me-1" /> อนุมัติ
+                                                        อนุมัติ
                                                     </button>
                                                 )}
                                                 <button
-                                                    className="btn btn-outline-primary btn-sm"
+                                                    className="btn btn-outline-warning btn-sm"
                                                     onClick={() => handleOpen(product)}
                                                 >
-                                                    <FaRegEdit className="me-1" /> แก้ไข
+                                                    แก้ไข
                                                 </button>
                                                 <button
                                                     className="btn btn-outline-danger btn-sm"
                                                     onClick={() => handleDelete(product.product_id)}
                                                 >
-                                                    <MdDelete className="me-1" /> ลบ
+                                                    ลบ
                                                 </button>
                                                 <Link
                                                     to={`/admin/souvenir/product-slot/${product.product_id}`}
-                                                    className="btn btn-outline-warning btn-sm"
+                                                    className="btn btn-outline-primary btn-sm"
                                                     onClick={(e) => e.stopPropagation()}
                                                 >
-                                                    <IoIosAddCircleOutline className="me-1" /> เพิ่มสล็อตสินค้า
+                                                     เพิ่มสล็อตสินค้า
                                                 </Link>
                                             </div>
                                         </div>
@@ -421,145 +472,118 @@ function Souvenir() {
             </div>
 
 
-            {/* Modal */}
-            <div
-                className={`modal fade ${open ? 'show' : ''}`}
-                style={{ display: open ? 'block' : 'none' }}
-                tabIndex="-1"
-                role="dialog"
-            >
-                <div className="modal-dialog modal-lg" role="document">
-                    <div className="modal-content p-0">
-                        <div className="modal-header bg-primary text-white">
-                            <h5 className="modal-title fw-bold">
-                                <FaRegEdit className="me-2" />
-                                แก้ไขข้อมูลสินค้า
-                            </h5>
-                            <button
-                                type="button"
-                                className="btn-close btn-close-white"
-                                onClick={handleClose}
-                            ></button>
-                        </div>
+{/* modal */}
+{/* ตรวจสอบว่ามี selectedProduct ก่อนแสดง Modal */}
+{selectedProduct && (
+<div className="custom-modal-overlay fade show d-block" tabIndex="-1">
+    <div className="custom-modal-slot"
+        onClick={(e) => e.stopPropagation()}
+    >
+        <form onSubmit={handleEditSubmit}>
+            <div className="custom-edit-header">
+                <h5 className="modal-title fw-bold">
+                    <FaRegEdit className="me-2" />
+                    แก้ไขของที่ระลึก
+                </h5>
+                <button
+                    type="button"
+                    className="btn-close btn-close-black"
+                    onClick={handleClose}
+                ></button>
+            </div>
+            <div className="custom-edit-body">
 
-                        {selectedProduct && (
-                            <div className="modal-body">
-                                <form>
-                                    {/* Product Image */}
-                                    <div className="row mb-4">
-                                        <div className="col-12 d-flex justify-content-center">
-                                            <div
-                                                className="border rounded p-3 bg-light"
-                                                style={{ width: "250px", height: "200px" }}
-                                            >
-                                                <img
-                                                    src={HOSTNAME + `/uploads/${selectedProduct.image}`}
-                                                    alt={selectedProduct.image}
-                                                    onError={(e) => (e.target.src = "/image/default.jpg")}
-                                                    className="w-100 h-100 rounded"
-                                                    style={{ objectFit: "contain" }}
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Form Fields */}
-                                    <div className="row">
-                                        <div className="col-md-6 mb-3">
-                                            <label className="form-label fw-semibold">
-                                                ชื่อสินค้า
-                                            </label>
-                                            <input
-                                                type="text"
-                                                className="form-control w-100"
-                                                value={selectedProduct.product_name}
-                                                onChange={(e) => setSelectedProduct({
-                                                    ...selectedProduct,
-                                                    product_name: e.target.value,
-                                                })}
-                                                placeholder="กรอกชื่อสินค้า"
-                                            />
-                                        </div>
-
-                                        <div className="col-md-6 mb-3">
-                                            <label className="form-label fw-semibold">
-                                                ราคา (บาท)
-                                            </label>
-                                            <div className="input-group">
-                                                <span className="input-group-text">฿</span>
-                                                <input
-                                                    type="number"
-                                                    className="form-control"
-                                                    value={selectedProduct.price}
-                                                    onChange={(e) => setSelectedProduct({
-                                                        ...selectedProduct,
-                                                        price: e.target.value,
-                                                    })}
-                                                    placeholder="0.00"
-                                                    min="0"
-                                                    step="0.01"
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <div className="col-md-6 mb-3">
-                                            <label className="form-label fw-semibold">
-                                                สถานะสินค้า
-                                            </label>
-                                            <select
-                                                className="form-select"
-                                                value={selectedProduct.status}
-                                                onChange={(e) => setSelectedProduct({
-                                                    ...selectedProduct,
-                                                    status: e.target.value,
-                                                })}
-                                            >
-                                                <option value="1">กำลังจำหน่าย</option>
-                                                <option value="0">ยังไม่จำหน่าย</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        )}
-
-                        <div className="modal-footer bg-light d-flex justify-content-center gap-2 pt-3">
-                            <button
-                                type="button"
-                                className="btn btn-outline-secondary px-4 rounded-3"
-                                onClick={handleClose}
-                            >
-                                ยกเลิก
-                            </button>
-                            <button
-                                type="submit"
-                                className="btn btn-primary px-4 rounded-3 shadow-sm"
-                                onClick={() => {
-                                    axios.put(HOSTNAME + `/admin/editSouvenir/${selectedProduct.product_id}`, selectedProduct)
-                                        .then(response => {
-                                            console.log("บันทึกข้อมูลสินค้าสำเร็จ:", response.data);
-                                            setProducts(prevProducts =>
-                                                prevProducts.map(product =>
-                                                    product.product_id === selectedProduct.product_id
-                                                        ? { ...product, ...selectedProduct }
-                                                        : product
-                                                )
-                                            );
-                                            handleClose();
-                                        })
-                                        .catch(error => {
-                                            console.error("เกิดข้อผิดพลาดในการบันทึก:", error);
-                                        });
-                                }}
-                            >
-                                บันทึกข้อมูล
-                            </button>
+                <div className="row mb-4">
+                    <div className="col-12 d-flex justify-content-center">
+                        <div
+                            className="border rounded p-3 bg-light"
+                            style={{ width: "250px", height: "200px" }}
+                        >
+                            <img
+                                src={HOSTNAME + `/uploads/${selectedProduct.image}`}
+                                alt={selectedProduct.image}
+                                onError={(e) => (e.target.src = "/image/default.jpg")}
+                                className="w-100 h-100 rounded"
+                                style={{ objectFit: "contain" }}
+                            />
                         </div>
                     </div>
                 </div>
+
+                <div className="mb-3">
+                    <label className="form-label fw-semibold">
+                        ชื่อสินค้า
+                    </label>
+                    <input
+                        type="text"
+                        className="form-control w-100"
+                        value={selectedProduct.product_name}
+                        onChange={(e) => setSelectedProduct({
+                            ...selectedProduct,
+                            product_name: e.target.value,
+                        })}
+                        placeholder="กรอกชื่อสินค้า"
+                    />
+                </div>
+                <div className="mb-3">
+                    <label className="form-label fw-semibold">
+                        ราคา (บาท)
+                    </label>
+                    <div className="input-group">
+                        <span className="input-group-text">฿</span>
+                        <input
+                            type="number"
+                            className="form-control"
+                            value={selectedProduct.price}
+                            onChange={(e) => setSelectedProduct({
+                                ...selectedProduct,
+                                price: e.target.value,
+                            })}
+                            placeholder="0.00"
+                            min="0"
+                            step="0.01"
+                        />
+                    </div>
+                </div>
+                
+                <div className="mb-3">
+                    <label className="form-label fw-semibold">
+                        สถานะสินค้า
+                    </label>
+                    <select
+                        className="form-select"
+                        value={selectedProduct.status}
+                        onChange={(e) => setSelectedProduct({
+                            ...selectedProduct,
+                            status: e.target.value,
+                        })}
+                    >
+                        <option value="1">กำลังจำหน่าย</option>
+                        <option value="0">ยังไม่จำหน่าย</option>
+                    </select>
+                </div>
             </div>
-            {/* Modal Backdrop */}
-            {open && <div className="modal-backdrop fade show" onClick={handleClose}></div>}
+            <div className="custom-edit-footer">
+                <button
+                    type="button"
+                    className="btn btn-secondary px-4 rounded-3"
+                    onClick={handleClose}
+                >
+                    ยกเลิก
+                </button>
+                <button
+                    type="submit"
+                    className="btn btn-success px-4 rounded-3 shadow-sm"
+                >
+                    บันทึก
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+)}
+
+           
         </div>
     );
 }

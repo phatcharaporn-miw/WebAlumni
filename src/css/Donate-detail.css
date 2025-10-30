@@ -84,6 +84,7 @@
     right: 0;
     bottom: 0;
 }
+
 .progress-percent {
     position: absolute;
     top: -25px;
@@ -92,17 +93,19 @@
     color: #0F75BC;
     font-weight: 600;
 }
-.donate-detail-details{
-        display: flex;
-        justify-content: space-between;
-        font-size: 14px;
-        color: #085A9C;
-        margin: 0 0 5px 0;
+
+.donate-detail-details {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: #085A9C;
+    margin: 0 0 5px 0;
 }
+
 .donate-detail-discription {
-    display: grid; 
+    display: grid;
     text-align: justify;
-    gap: 2px; 
+    gap: 2px;
     font-size: 13px;
     margin-bottom: 10px;
 }
@@ -256,19 +259,18 @@
 }
 
 /* QR Code Section */
-.group-promptPay-layout {
+.group-promptPay-layout , .bank-info-container {
     background: linear-gradient(135deg, rgba(15, 117, 188, 0.05), rgba(8, 90, 156, 0.1));
     padding: 20px;
     border-radius: 15px;
-    /* border: 1px solid rgba(15, 117, 188, 0.2); */
     margin-top: 7px;
 }
 
-.title-promptPay-layout {
+.title-promptPay-layout ,.title-bank-layout {
     margin-bottom: 15px;
 }
 
-.title-promptPay-layout p {
+.title-promptPay-layout p ,.title-bank-layout p {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -288,8 +290,62 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
+.title-bank-layout {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    color: #1e3a8a;
+    font-size: 16px;
+}
+
+.bank-info-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.bank-info-line {
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    border-radius: 10px;
+    gap: 8px;
+    flex-wrap: wrap;
+    font-size: 15px;
+}
+
+.bank-info-line strong {
+    color: #374151;
+}
+
+.bank-info-line span {
+    font-weight: 500;
+    color: #111827;
+}
+
+.copy-btn {
+    background-color: #0F75BC;
+    color: white;
+    border: none;
+    padding: 4px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.copy-btn:hover {
+    background-color: #085A9C;
+}
+
+.copy-btn:active {
+    transform: scale(0.95);
+}
+
+
 /* กรณีโครงการหมดเลยวันแล้ว */
-/* Container ตัวเลือกอื่น */
 .expired-options {
     display: flex;
     flex-direction: column;
@@ -337,7 +393,8 @@
 }
 
 .option-button.primary {
-    background-color: #1976d2; /* สีน้ำเงิน */
+    background-color: #1976d2;
+    /* สีน้ำเงิน */
     color: white;
 }
 
@@ -387,11 +444,12 @@
 
 /* Card สรุปโครงการ */
 .summary-card {
-    width: 100%; /* กว้างเต็ม container */
+    width: 100%;
+    /* กว้างเต็ม container */
     max-width: 100%;
     padding: 20px;
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     background-color: #fff;
     margin: 10px 0;
 }
@@ -404,7 +462,7 @@
 
 .summary-card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
 /* หัวข้อใน card */
@@ -433,7 +491,8 @@
     display: block;
     font-size: 1.4rem;
     font-weight: 600;
-    color: #1976d2; /* สีฟ้า */
+    color: #1976d2;
+    /* สีฟ้า */
 }
 
 .stat-label {
@@ -459,15 +518,18 @@
 }
 
 .progress-fill.partial {
-    background-color: #1976d2; /* สีฟ้า */
+    background-color: #1976d2;
+    /* สีฟ้า */
 }
 
 .progress-fill.complete {
-    background-color: #4caf50; /* สีเขียว */
+    background-color: #4caf50;
+    /* สีเขียว */
 }
 
 /* ข้อความสถานะ */
-.success-message, .partial-message {
+.success-message,
+.partial-message {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -486,7 +548,8 @@
 }
 
 /* ไอคอน */
-.check-icon, .PartyPopper-icon {
+.check-icon,
+.PartyPopper-icon {
     font-size: 1.3rem;
 }
 
@@ -726,12 +789,13 @@
     width: 100%;
 }
 
-.donate-bt{
+.donate-bt {
     background-color: #085A9C;
     color: white;
 }
-.donate-detail-form-items{
-    border: 2px solid rgba(8, 90, 156, 0.6); 
+
+.donate-detail-form-items {
+    border: 2px solid rgba(8, 90, 156, 0.6);
     padding: 5%;
     border-radius: 10px;
     margin-bottom: 5%;

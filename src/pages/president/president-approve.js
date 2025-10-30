@@ -252,7 +252,7 @@ function Approve() {
                             <hr className="w-100" />
                             <div className="menu d-block mt-3 w-100">
                                 <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/president-profile")}>โปรไฟล์ของฉัน</div>
-                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/president-profile/president-manage-orders")}>จัดการคำสั่งซื้อของที่ระลึก</div>
+                                {/* <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/president-profile/president-manage-orders")}>จัดการคำสั่งซื้อของที่ระลึก</div> */}
                                 <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/president-profile/president-profile-webboard")}>กระทู้ที่สร้าง</div>
                                 <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/president-profile/president-profile-donation")}>ประวัติการบริจาค</div>
                                 <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/president-profile/president-profile-activity")}>ประวัติการเข้าร่วมกิจกรรม</div>
@@ -268,9 +268,6 @@ function Approve() {
                         <div className="bg-white rounded-4 shadow-sm p-4 mb-4">
                             <div className="d-flex justify-content-between align-items-center">
                                 <div className="d-flex align-items-center">
-                                    <div className="bg-success bg-opacity-10 rounded-circle p-2 me-3">
-                                        <i className="fas fa-calendar-check text-success fs-5"></i>
-                                    </div>
                                     <div>
                                         <h4 className="fw-bold mb-1">การอนุมัติ</h4>
                                         <p className="text-muted mb-0 small">รวบรวมการการอนุมัติ</p>
@@ -348,28 +345,28 @@ function Approve() {
                                                             className="btn btn-sm btn-outline-success rounded-pill w-100"
                                                             onClick={() => handleApprove(product.product_id)}
                                                         >
-                                                            <FaCheckCircle className="me-1" /> อนุมัติ
+                                                            อนุมัติ
                                                         </button>
                                                         <button
                                                             className="btn btn-sm btn-outline-danger rounded-pill w-100"
                                                             onClick={() => handleReject(product.product_id)}
                                                         >
-                                                            <FaTrash className="me-1" /> ปฏิเสธ
+                                                            ปฏิเสธ
                                                         </button>
                                                     </>
                                                 ) : (
                                                     <>
                                                         <button
-                                                            className="btn btn-sm btn-outline-primary rounded-pill w-100"
+                                                            className="btn btn-sm btn-outline-warning rounded-pill w-100"
                                                             onClick={() => handleOpen(product)}
                                                         >
-                                                            <FaEdit className="me-1" /> แก้ไข
+                                                            แก้ไข
                                                         </button>
                                                         <button
                                                             className="btn btn-sm btn-outline-danger rounded-pill w-100"
                                                             onClick={() => handleDelete(product.product_id)}
                                                         >
-                                                            <FaTrash className="me-1" /> ลบ
+                                                            ลบ
                                                         </button>
                                                     </>
                                                 )}

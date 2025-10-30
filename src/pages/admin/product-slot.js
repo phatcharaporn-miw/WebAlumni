@@ -11,8 +11,6 @@ function ProductSlots() {
     const [newSlot, setNewSlot] = useState({
         slot_name: "",
         quantity: "",
-        start_date: "",
-        end_date: "",
     });
     const [editSlot, setEditSlot] = useState(null); // เก็บ slot ที่กำลังแก้ไข
     const [showModal, setShowModal] = useState(false);
@@ -40,7 +38,7 @@ function ProductSlots() {
         try {
             await axios.post(HOSTNAME +`/admin/products/add-slot/${productId}`, newSlot);
             Swal.fire("สำเร็จ!", "เพิ่มสล็อตสินค้าเรียบร้อยแล้ว", "success");
-            setNewSlot({ slot_name: "", quantity: "", start_date: "", end_date: "" });
+            setNewSlot({ slot_name: "", quantity: ""});
             setShowModal(false);
             fetchSlots();
         } catch (err) {
@@ -88,10 +86,10 @@ function ProductSlots() {
         <div className="container p-4">
             <h3 className="admin-title">สล็อตสินค้า</h3>
             <div className="col-md-2 d-flex align-items-end m-2 ms-auto">
-                <button className="btn btn-success w-100 d-flex align-items-center justify-content-center"
+                <button className="btn btn-primary w-100 d-flex align-items-center justify-content-center"
                     onClick={() => setShowModal(true)}
                 >
-                    เพิ่มของที่ระลึก
+                    เพิ่มสล็อตสินค้า
                 </button>
             </div>
 
@@ -136,32 +134,7 @@ function ProductSlots() {
                                         required
                                     />
                                 </div>
-                                <div className="col-md-6">
-                                    <small className="text-muted">วันที่เริ่ม</small>
-                                    <input
-                                        type="date"
-                                        className="form-control w-100"
-                                        value={newSlot.start_date}
-                                        onChange={(e) =>
-                                            setNewSlot({ ...newSlot, start_date: e.target.value })
-                                        }
-                                        onKeyDown={(e) => e.preventDefault()} 
-                                        min={new Date().toISOString().split("T")[0]}
-                                    />
-                                </div>
-                                <div className="col-md-6">
-                                    <small className="text-muted">วันที่สิ้นสุด</small>
-                                    <input
-                                        type="date"
-                                        className="form-control w-100"
-                                        value={newSlot.end_date}
-                                        onChange={(e) =>
-                                            setNewSlot({ ...newSlot, end_date: e.target.value })
-                                        }
-                                        onKeyDown={(e) => e.preventDefault()} 
-                                        min={new Date().toISOString().split("T")[0]}
-                                    />
-                                </div>
+                                
                             </div>
                             <div className="custom-modal-footer">
                                 <button
@@ -185,12 +158,11 @@ function ProductSlots() {
             <table className="table table-bordered">
                 <thead className="table-light">
                     <tr>
+                        <th>วันที่</th>
                         <th>ชื่อล็อต</th>
                         <th>จำนวนทั้งหมด</th>
                         <th>ขายไปแล้ว</th>
                         <th>คงเหลือ</th>
-                        <th>วันที่เริ่ม</th>
-                        <th>วันที่สิ้นสุด</th>
                         <th>สถานะ</th>
                         <th>การจัดการ</th>
                     </tr>
@@ -200,6 +172,7 @@ function ProductSlots() {
                         const remaining = slot.quantity - slot.sold;
                         return (
                             <tr key={slot.slot_id}>
+                                <td className="text-center">{slot.created_at ? new Date(slot.created_at).toLocaleDateString('th-TH') : '-'}</td>
                                 <td>{slot.slot_name}</td>
                                 <td className="text-center">{slot.quantity}</td>
                                 <td className="text-center">{slot.sold}</td>
@@ -210,8 +183,7 @@ function ProductSlots() {
                                         remaining
                                     )}
                                 </td>
-                                <td className="text-center">{slot.start_date ? new Date(slot.start_date).toLocaleDateString('th-TH') : '-'}</td>
-                                <td className="text-center">{slot.end_date ? new Date(slot.end_date).toLocaleDateString('th-TH') : '-'}</td>
+
                                 <td className="text-center">
                                     <span className={`badge ${slot.status === "active"
                                         ? "bg-success bg-opacity-10 text-success"
@@ -227,13 +199,13 @@ function ProductSlots() {
                                 </td>
                                 <td className="text-center">
                                     <button
-                                        className="btn btn-sm btn-primary me-2"
+                                        className="btn btn-sm btn-outline-warning me-2"
                                         onClick={() => setEditSlot(slot)}
                                     >
                                         แก้ไข
                                     </button>
                                     <button
-                                        className="btn btn-sm btn-danger"
+                                        className="btn btn-sm btn-outline-danger"
                                         onClick={() => handleDeleteSlot(slot.slot_id)}
                                     >
                                         ลบ
@@ -249,9 +221,9 @@ function ProductSlots() {
 
             {/* Modal แก้ไข slot */}
             {editSlot && (
-                <div className="custom-edit-modal fade show d-block" tabIndex="-1">
-                    <div className="custom-edit-dialog">
-                        <div className="custom-edit--content">
+                <div className="custom-modal-overlay fade show d-block" tabIndex="-1">
+                    <div className="custom-modal-slot">
+                        {/* <div className="custom-edit-content"> */}
                             <form onSubmit={handleEditSubmit}>
                                 <div className="custom-edit-header">
                                     <h5 className="custom-edit-title">แก้ไขสล็อต</h5>
@@ -276,28 +248,7 @@ function ProductSlots() {
                                             onChange={(e) => setEditSlot({ ...editSlot, quantity: e.target.value })}
                                         />
                                     </div>
-                                    <div className="mb-3">
-                                        <label className="form-label">วันที่เริ่ม</label>
-                                        <input
-                                            type="date"
-                                            className="form-control w-100"
-                                            value={editSlot.start_date ? editSlot.start_date.split("T")[0] : ""}
-                                            onChange={(e) => setEditSlot({ ...editSlot, start_date: e.target.value })}
-                                            onKeyDown={(e) => e.preventDefault()} 
-                                            min={new Date().toISOString().split("T")[0]}
-                                        />
-                                    </div>
-                                    <div className="mb-3">
-                                        <label className="form-label">วันที่สิ้นสุด</label>
-                                        <input
-                                            type="date"
-                                            className="form-control w-100"
-                                            value={editSlot.end_date ? editSlot.end_date.split("T")[0] : ""}
-                                            onChange={(e) => setEditSlot({ ...editSlot, end_date: e.target.value })}
-                                            onKeyDown={(e) => e.preventDefault()} 
-                                            min={new Date().toISOString().split("T")[0]}
-                                        />
-                                    </div>
+                                    
                                     <div className="mb-3">
                                         <label className="form-label">สถานะ</label>
                                         <select
@@ -313,10 +264,10 @@ function ProductSlots() {
                                 </div>
                                 <div className="custom-edit-footer">
                                     <button type="button" className="btn btn-secondary" onClick={() => setEditSlot(null)}>ยกเลิก</button>
-                                    <button type="submit" className="btn btn-primary">บันทึก</button>
+                                    <button type="submit" className="btn btn-success">บันทึก</button>
                                 </div>
                             </form>
-                        </div>
+                        {/* </div> */}
                     </div>
                 </div>
             )}

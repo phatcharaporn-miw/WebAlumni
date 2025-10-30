@@ -147,7 +147,7 @@ function Login() {
               {passwordError && <span className="error-message">{passwordError}</span>}
             </p>
             <div className="fn-login">
-              <Link to="/register"><p className="regist">สมัครสมาชิก</p></Link>
+              <Link to="/register"><p className="regist">ลงทะเบียน</p></Link>
               <Link to="/forgotPassword"><p className="forget-pass">ลืมรหัสผ่าน?</p></Link>
             </div>
 

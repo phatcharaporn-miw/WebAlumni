@@ -125,14 +125,14 @@ function AdminActivityDetail() {
                         className="btn btn-warning"
                         onClick={() => navigate(`/admin/activities/edit/${activityId}`)}
                     >
-                        <MdEdit className="me-2" /> แก้ไขกิจกรรม
+                        แก้ไขกิจกรรม
 
                     </button>
                     <button
                         className="btn btn-danger"
                         onClick={handleDeleteActivity}
                     >
-                        <MdDelete className="me-2" /> ลบกิจกรรม
+                        ลบกิจกรรม
                     </button>
                 </div>
             </div>

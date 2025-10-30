@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import {HOSTNAME} from '../config.js';
+import { HOSTNAME } from '../config.js';
 import "../css/Donate-detail.css";
 import { MdDateRange, MdOutlinePayment } from "react-icons/md";
 import { ImUser } from "react-icons/im";
@@ -8,7 +8,9 @@ import { GiPartyPopper } from "react-icons/gi";
 import { IoInformationCircleOutline, IoNewspaperOutline, IoReceiptOutline } from "react-icons/io5";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { PiCoinsFill } from "react-icons/pi";
-import { FaCheck, FaTimes, FaEye, FaEyeSlash } from "react-icons/fa";
+import { FiCopy } from "react-icons/fi";
+import { FaCheck, FaTimes } from "react-icons/fa";
+import { RiBankLine } from 'react-icons/ri';
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from '../context/AuthContext';
 import axios from "axios";
@@ -25,10 +27,6 @@ const QR_DEBOUNCE_DELAY = 500;
 const formatCurrency = (amount) => {
     return new Intl.NumberFormat('th-TH').format(amount);
 };
-// const formatDate = (date, locale = 'th-TH') => {
-//     const options = { year: 'numeric', month: 'long', day: 'numeric' };
-//     return new Date(date).toLocaleDateString(locale, options);
-// };
 
 const formatDate = (date) => {
     const d = new Date(date);
@@ -78,7 +76,7 @@ function DonateDetail() {
         user_id: userId || "",
         project_id: projectId || "",
         file: null,
-        name: "",          // ตั้งค่าว่างไว้ก่อน
+        name: "",
         company_name: "",
         tax_number: "",
         slipText: "",
@@ -88,10 +86,9 @@ function DonateDetail() {
     });
 
     const [qrCode, setQrCode] = useState(null);
-    // state สำหรับเก็บ address ที่บันทึกไว้ (เฉพาะ corporate)
     const [savedAddresses, setSavedAddresses] = useState([]);
-    // const [ocrLoading, setOcrLoading] = useState(false);
     const [corporateAddresses, setCorporateAddresses] = useState([]);
+    const [addressesOffical, setAddressesOffical] = useState([]);
 
     const [selectedTaxId, setSelectedTaxId] = useState("");
     const [loading, setLoading] = useState(true);
@@ -99,11 +96,41 @@ function DonateDetail() {
     const [errors, setErrors] = useState({});
     const [qrGenerating, setQrGenerating] = useState(false);
     const [filePreview, setFilePreview] = useState(null);
-    const [editMode, setEditMode] = useState(false);
     const [networkError, setNetworkError] = useState(false);
     const [retryCount, setRetryCount] = useState(0);
     const [hasSavedData, setHasSavedData] = useState(false);
     const [file, setFile] = useState(null);
+
+    const formatDate = (date) => {
+        const d = new Date(date);
+        const day = String(d.getDate()).padStart(2, '0');
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const year = d.getFullYear() + 543;
+        return `${day}/${month}/${year}`;
+    };
+
+    const validateTaxId = (taxId) => {
+        if (!/^\d{13}$/.test(taxId)) return false;
+        const digits = taxId.split('').map(Number);
+        let sum = 0;
+        for (let i = 0; i < 12; i++) {
+            sum += digits[i] * (13 - i);
+        }
+        const checkDigit = (11 - (sum % 11)) % 10;
+        return checkDigit === digits[12];
+    };
+
+    // จัดรูปแบบพวกข้อมูล
+    const formatCurrency = (amount) => {
+        return new Intl.NumberFormat('th-TH').format(amount);
+    };
+
+    // คำนวนวันที่เหลือของโครงการ
+    const calculateDaysRemaining = (endDate) => {
+        const now = new Date();
+        const end = new Date(endDate);
+        return Math.ceil((end - now) / (1000 * 60 * 60 * 24));
+    };
 
     // เรียกตอนกด "ต้องการใบกำกับ"
     const handleShowTaxForm = () => {
@@ -188,7 +215,7 @@ function DonateDetail() {
     useEffect(() => {
         const loadSavedFormData = () => {
             try {
-                const savedData = sessionStorage.getItem(FORM_DATA_KEY);
+                const savedData = localStorage.getItem(FORM_DATA_KEY);
                 if (savedData && location.state?.fromConfirm) {
                     const parsedData = JSON.parse(savedData);
 
@@ -246,7 +273,6 @@ function DonateDetail() {
             if (!userId) return;
             try {
                 const res = await axios.get(HOSTNAME + `/donate/tax_addresses/user/${userId}`);
-                // console.log("API Response:", res.data); // ตรวจสอบ data
                 setCorporateAddresses(res.data || []);
             } catch (err) {
                 console.error("Error fetching addresses:", err);
@@ -254,6 +280,22 @@ function DonateDetail() {
             }
         };
         fetchAddresses();
+    }, [userId]);
+
+    // ดึงทีอยู่ is_official
+    useEffect(() => {
+        const fetchAddressesOffical = async () => {
+            if (!userId) return;
+            try {
+                const res = await axios.get(HOSTNAME + `/donate/officialAddress`);
+                setAddressesOffical(res.data || []);
+                console.log("Official Address:", res.data);
+            } catch (err) {
+                console.error("Error fetching addressesOffical:", err);
+                setAddressesOffical([]);
+            }
+        };
+        fetchAddressesOffical();
     }, [userId]);
 
     useEffect(() => {
@@ -307,7 +349,7 @@ function DonateDetail() {
         }
     }, []);
 
-    // Load project data with error handling
+
     useEffect(() => {
         const loadProjectData = async () => {
             if (!projectId) {
@@ -518,8 +560,8 @@ function DonateDetail() {
                     tax_number: selected.tax_number || "",
                     phone: selected.phone || "",
                     email: selected.email || "",
-                    useExistingTax: true,  
-                    taxId: selected.tax_id 
+                    useExistingTax: true,
+                    taxId: selected.tax_id
                 }));
             }
         } else {
@@ -583,7 +625,7 @@ function DonateDetail() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!userId) {
-            Swal.fire("แจ้งเตือน", "กรุณาเข้าสู่ระบบก่อนทำการบริจาค", "warning");
+            alert("กรุณาเข้าสู่ระบบก่อนทำการบริจาค");
             navigate("/login");
             return;
         }
@@ -609,7 +651,7 @@ function DonateDetail() {
                 selectedTaxId,
                 filePreview,
             };
-            sessionStorage.setItem(FORM_DATA_KEY, JSON.stringify(dataToSave));
+            localStorage.setItem(FORM_DATA_KEY, JSON.stringify(dataToSave));
 
             navigate(`/donate/donatedetail/donateconfirm/${projectId}`, {
                 state: {
@@ -790,7 +832,7 @@ function DonateDetail() {
                         </div>
 
                         {userId && (
-                            <div className="option-card"> 
+                            <div className="option-card">
                                 <h7>ประวัติการบริจาคของฉัน</h7>
                                 <p>ตรวจสอบประวัติการบริจาคทั้งหมดของคุณ</p>
                                 <button
@@ -808,8 +850,7 @@ function DonateDetail() {
                             <button
                                 className="option-button secondary"
                                 onClick={() => {
-                                    // alert('ฟีเจอร์นี้จะเปิดใช้งานเร็วๆ นี้');
-                                    Swal.fire("แจ้งเตือน", "ฟีเจอร์นี้จะเปิดใช้งานเร็วๆ นี้", "question");
+                                    alert('ฟีเจอร์นี้จะเปิดใช้งานเร็วๆ นี้');
                                 }}
                             >
                                 ติดตามผล
@@ -851,16 +892,19 @@ function DonateDetail() {
             </div>
         );
     }
+
     // โครงการที่กำลังดำเนินการอยู่
     return (
         <div className="donate-detail-content">
             <div className="donate-detail-content-item">
                 <h5>{projectData.project_name}</h5>
                 <img
-                    src={`${API_BASE_URL}/uploads/${projectData.image_path}`}
-                    alt="กิจกรรม"
+                    src={`${HOSTNAME}/uploads/${projectData.image_path}`}
+                    alt={projectData.project_name}
                     onError={(e) => {
-                        e.target.src = `${process.env.PUBLIC_URL}/image/default.png`;
+                        if (e.target.src !== window.location.origin + "/image/default.jpg") {
+                            e.target.src = "/image/default.jpg";
+                        }
                     }}
                     loading="lazy"
                 />
@@ -940,65 +984,8 @@ function DonateDetail() {
 
             {/* ฟอร์มบริจาค */}
             <div className="donate-detail-content-item">
-                {/* แสดงแจ้งเตือนหากมีข้อมูลที่บันทึกไว้ */}
-                {hasSavedData && (
-                    <div className="saved-data-indicator" style={{
-                        backgroundColor: "#48bb78",
-                        color: "white",
-                        padding: "12px 16px",
-                        borderRadius: "6px",
-                        marginBottom: "20px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        fontSize: "14px"
-                    }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                            <FaCheck />
-                            <span>ใช้ข้อมูลที่บันทึกไว้</span>
-                        </div>
-                        <button
-                            type="button"
-                            onClick={() => {
-                                if (window.confirm('ต้องการล้างข้อมูลและเริ่มใหม่หรือไม่?')) {
-                                    // Reset form
-                                    setFormData({
-                                        amount: "",
-                                        user_id: userId,
-                                        project_id: projectId,
-                                        file: null,
-                                        name: "",
-                                        tax_number: "",
-                                        slipText: "",
-                                        phone: "",
-                                        email: ""
-                                    });
-                                    setShowTaxForm(false);
-                                    setTaxType("");
-                                    setSelectedTaxId("");
-                                    setFilePreview(null);
-                                    setErrors({});
-                                    clearSavedFormData();
-                                }
-                            }}
-                            style={{
-                                background: "rgba(255,255,255,0.2)",
-                                border: "none",
-                                color: "white",
-                                padding: "4px 12px",
-                                borderRadius: "4px",
-                                cursor: "pointer",
-                                fontSize: "12px"
-                            }}
-                        >
-                            ล้างข้อมูล
-                        </button>
-                    </div>
-                )}
-
                 <form onSubmit={handleSubmit} noValidate>
                     <div className="donate-detail-form-items">
-
                         <label className="donate-detail-form-titleLabel" htmlFor="amount">
                             <PiCoinsFill className="custom-icon" />ระบุจำนวนเงิน<span className="asterisk">*</span>
                         </label>
@@ -1012,7 +999,7 @@ function DonateDetail() {
                             required
                             autoComplete="off"
                         />
-                        {errors.amount && <span className="error-message">{errors.amount}</span>}
+                        {errors.amount && <span>{errors.amount}</span>}
                         {/*ปุ่มจำนวนเงินที่กำหนดไว้ */}
                         <div className="quick-amount-buttons">
                             {[100, 500, 1000, 5000].map((amt) => (
@@ -1031,39 +1018,95 @@ function DonateDetail() {
                     </div>
 
                     <div className="donate-detail-form-items">
-                        <label><MdOutlinePayment className="custom-icon" />ช่องทางการชำระเงิน</label>
-                        <div className="group-promptPay-layout">
-                            <div className="title-promptPay-layout">
-                                <p><BiScan className="custom-icon" /> QR PromptPay</p>
+                        <label className="flex items-center gap-2 text-lg font-semibold mb-3">
+                            <MdOutlinePayment className="custom-icon text-blue-600" />
+                            ช่องทางการชำระเงิน
+                        </label>
+
+                        <div className="bank-info-container bg-gray-50 rounded-2xl p-4 shadow-sm border border-gray-200">
+                            <div className="title-bank-layout mb-3 flex items-center gap-2">
+                                <RiBankLine />
+                                <p className="text-base mb-0">ข้อมูลบัญชีธนาคาร</p>
                             </div>
-                            <div className="promptPay-layout">
-                                {qrGenerating ? (
-                                    <div className="qr-loading">
-                                        <AiOutlineLoading3Quarters className="loading-spinner" />
-                                        <p>กำลังสร้าง QR Code...</p>
+
+                            {projectData?.is_official == 1 ? (
+                                <div className="bank-info-content flex flex-col gap-3">
+                                    {/* ชื่อบัญชี */}
+                                    <div className="bank-info-line flex flex-col sm:flex-row sm:items-center justify-between bg-white rounded-xl p-3">
+                                        <div className="flex items-center gap-2 text-gray-700">
+                                            <strong>ชื่อบัญชี: </strong>
+                                            <span className="font-medium">{addressesOffical[0]?.account_name || projectData.account_name || "-"}</span>
+                                        </div>
                                     </div>
-                                ) : qrCode ? (
-                                    <div className="qr-container">
-                                        <img
-                                            src={qrCode}
-                                            alt="QR Code สำหรับการชำระเงิน"
-                                            style={{ width: "200px", height: "200px", objectFit: "contain" }}
-                                        />
-                                        <p className="qr-amount">จำนวน: {formatCurrency(parseFloat(formData.amount || 0))} บาท</p>
-                                        <a href={qrCode}
-                                            download={`PromptPay_${formData.amount || 0}Baht.png`}
-                                            className="download-qr-btn"
-                                        > ดาวน์โหลด QR Code </a>
+
+                                    {/* ธนาคาร */}
+                                    {addressesOffical[0]?.bank_name && (
+                                        <div className="bank-info-line flex flex-col sm:flex-row sm:items-center justify-between bg-white rounded-xl p-3">
+                                            <div className="flex items-center gap-2 text-gray-700">
+                                                <strong>ธนาคาร: </strong>
+                                                <span className="font-medium">{addressesOffical[0].bank_name || projectData.bank_name || "-"}</span>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* เลขบัญชี */}
+                                    <div className="bank-info-line flex flex-col sm:flex-row sm:items-center justify-between bg-white rounded-xl p-3">
+                                        <div className="flex items-center gap-2 text-gray-700">
+                                            <strong>เลขบัญชี: </strong>
+                                            <span className="font-medium">{addressesOffical[0]?.account_number || projectData.account_number || "-"}</span>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                navigator.clipboard.writeText(addressesOffical[0]?.account_number || "")
+                                            }
+                                            className="copy-btn flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 transition"
+                                        >
+                                            <FiCopy className="text-base" />
+                                        </button>
                                     </div>
-                                ) : formData.amount && !errors.amount && parseFloat(formData.amount) > 0 ? (
-                                    <p>กรุณารอสักครู่...</p>
-                                ) : (
-                                    <p>กรอกจำนวนเงินเพื่อสร้าง QR Code</p>
-                                )}
-                                {errors.qr && <span className="error-message">{errors.qr}</span>}
-                            </div>
+                                </div>
+                            ) : (
+                                <div className="bank-info-content flex flex-col gap-3">
+                                    {/* ชื่อบัญชี */}
+                                    <div className="bank-info-line flex flex-col sm:flex-row sm:items-center justify-between bg-white rounded-xl p-3">
+                                        <div className="flex items-center gap-2 text-gray-700">
+                                            <strong>ชื่อบัญชี: </strong>
+                                            <span className="font-medium">{projectData?.account_name || "-"}</span>
+                                        </div>
+                                    </div>
+
+                                    {/* ธนาคาร */}
+                                    {projectData?.bank_name && (
+                                        <div className="bank-info-line flex flex-col sm:flex-row sm:items-center justify-between bg-white rounded-xl p-3">
+                                            <div className="flex items-center gap-2 text-gray-700">
+                                                <strong>ธนาคาร: </strong>
+                                                <span className="font-medium">{projectData.bank_name}</span>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* เลขบัญชี */}
+                                    <div className="bank-info-line flex flex-col sm:flex-row sm:items-center justify-between bg-white rounded-xl p-3">
+                                        <div className="flex items-center gap-2 text-gray-700">
+                                            <strong>เลขบัญชี: </strong>
+                                            <span className="font-medium">{projectData?.account_number || "-"}</span>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                navigator.clipboard.writeText(projectData?.account_number || "")
+                                            }
+                                            className="copy-btn flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 transition"
+                                        >
+                                            <FiCopy className="text-base" />
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
+
 
                     <div className="donate-detail-form-items">
                         <label htmlFor="slip"><IoReceiptOutline className="custom-icon" />หลักฐานการชำระเงิน<span className="asterisk">*</span></label>
@@ -1086,7 +1129,7 @@ function DonateDetail() {
                                         maxWidth: "200px",
                                         maxHeight: "200px",
                                         objectFit: "contain",
-                                        cursor: "zoom-in", // เพิ่มเครื่องหมายซูม
+                                        cursor: "zoom-in",
                                         transition: "transform 0.3s",
                                     }}
                                     onClick={(e) => {
@@ -1095,7 +1138,7 @@ function DonateDetail() {
                                             img.style.transform = "scale(1)";
                                             img.style.cursor = "zoom-in";
                                         } else {
-                                            img.style.transform = "scale(2)"; // ขยาย 2 เท่า
+                                            img.style.transform = "scale(2)";
                                             img.style.cursor = "zoom-out";
                                         }
                                     }}
@@ -1148,13 +1191,9 @@ function DonateDetail() {
                                     </label>
 
                                 </label>
-
                             </div>
-                            {/* <p>showTaxForm: {showTaxForm.toString()}</p>
-                            <p>useTax: {useTax.toString()}</p>
-                            <p>taxType: {taxType}</p> */}
-
                         </div>
+
                         {/* หากเลือกต้องการ */}
                         {showTaxForm && (
                             <div className="donate-detail-tax-form">
@@ -1164,16 +1203,13 @@ function DonateDetail() {
                                         type="button"
                                         className={`tax-btn ${taxType === "individual" ? "active" : ""}`}
                                         onClick={() => handleTaxTypeChange("individual")}
-                                    >
-                                        บุคคลธรรมดา
+                                    >บุคคลธรรมดา
                                     </button>
-
                                     <button
                                         type="button"
                                         className={`tax-btn ${taxType === "corporate" ? "active" : ""}`}
                                         onClick={() => handleTaxTypeChange("corporate")}
-                                    >
-                                        นิติบุคคล
+                                    >นิติบุคคล
                                     </button>
                                 </div>
 
@@ -1264,15 +1300,16 @@ function DonateDetail() {
                                         </>
                                     ) : (
                                         <>
-                                            <div className="input-group">
+                                            <div className="input-group w-100">
                                                 {corporateAddresses.length > 0 ? (
-                                                    <div className="saved-addresses">
+                                                    <div className="saved-addresses w-100">
                                                         <label htmlFor="saved-address">เลือกที่อยู่ที่เคยบันทึก</label>
                                                         <select
                                                             id="saved-address"
-                                                            className="styled-select"
+                                                            className="styled-select w-100"
                                                             onChange={handleTaxAddressChange}
                                                             value={selectedTaxId}
+                                                            style={{ width: '100%' }}
                                                         >
                                                             <option value="">-- เลือกที่อยู่ที่เคยบันทึก --</option>
                                                             {corporateAddresses.map(addr => (

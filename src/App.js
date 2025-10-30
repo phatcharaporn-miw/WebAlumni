@@ -1,7 +1,7 @@
 // import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import React, { Suspense, lazy } from "react";
+import { Suspense, lazy } from "react";
 import './App.css';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AppLayout from "./components/AppLayout";
@@ -46,6 +46,10 @@ import AlumniManageOrders from './pages/alumni/alumni-manage-orders';
 import CheckFullName from './pages/check-fullName';
 import DonateConfirm from './pages/donate-confirm';
 import DashboardStatic from './pages/dashboard-stat';
+import DashboardActivitiesPage from './pages/dashboard-activity';
+import DashboardDonationPage from './pages/dashboard-donation';
+import DashboardProjectsPage from './pages/dashboard-project';
+import DashboardAlumniPage from './pages/dashboard-alumni';
 
 // ส่วนของ การ import component ที่ใช้สำหรับการตรวจสอบสิทธิ์
 import AlumniOnly from './components/AlumniOnly';
@@ -84,9 +88,8 @@ import AdminAlumni from './pages/admin/admin-alumni';
 import AdminAlumniView from './pages/admin/admin-alumniView';
 import AdminNewsDetail from './pages/admin/admin-newDetail';
 import AdminDonate from './pages/admin/admin-donate';
-import AdminOrderManager from './pages/admin/admin-manage-orders';
+// import AdminOrderManager from './pages/admin/admin-manage-orders';
 import AdminCheckPaymentDonateDetail from './pages/admin/admin-donate-checkPayment-detail';
-// import AdminCheckPaymentDonate from './pages/admin/admin-donate-checkPayment';
 import AdminEditProject from './pages/admin/admin-donate-edit';
 import AdminDonateRequest from './pages/admin/admin-donate-request';
 import AdminProjectDetail from './pages/admin/admin-donate-detail';
@@ -112,6 +115,15 @@ const AlumniMajor = lazy(() => import("./pages/major-detail"));
 const Webboard = lazy(() => import("./pages/webboard"));
 const Home = lazy(() => import("./pages/home"));
 const Alumni = lazy(() => import("./pages/alumni"));
+const AdminOrderManager = lazy(() => import("./pages/admin/admin-manage-orders"));
+const AdminDashboarsProjectsPage = lazy(() => import("./pages/admin/admin-dashboard-project"));
+const AdminDashboardActivitiesPages = lazy(() => import("./pages/admin/admin-dashboard-activity"));
+const AdminDashboardDonationsPage = lazy(() => import("./pages/admin/admin-dashboard-donation"));
+const AdminDashboardAlumniPage = lazy(() => import("./pages/admin/admin-dashboard-alumni"));
+const DonationGeneral = lazy(() => import("./pages/donate-general"));
+const DonationSummaryDetail = lazy(() => import("./pages/donation-summary-detail"));
+const AdminDonationLists = lazy(() => import("./pages/admin/admin-donate-list"));
+const WalkInDonationForm = lazy(() => import("./pages/admin/admin-donate-walkin"));
 
 function App() {
   const clientId = '766363116725-8u97fa7f736i56p1vgm3l3261f0neud2.apps.googleusercontent.com';
@@ -157,8 +169,16 @@ function App() {
                   <Route path="/check-fullName" element={<CheckFullName />} />
                   <Route path="/donate/donatedetail/donateconfirm/:id" element={<DonateConfirm />} />
                   <Route path="/dashboard-stat" element={<DashboardStatic />} />
-
-                  
+                  <Route path="/dashboard-activity" element={<DashboardActivitiesPage />} />
+                  <Route path="/dashboard-donation" element={<DashboardDonationPage />} />
+                  <Route path="/dashboard-project" element={<DashboardProjectsPage />} />
+                  <Route path="/dashboard-alumni" element={<DashboardAlumniPage />} />
+                  <Route path="/donate/donate-general" element={<DonationGeneral />} />
+                  <Route path="/donate/donation-summary-detail/project" element={<DonationSummaryDetail />} />
+                  <Route path="/donate/donation-summary-detail/general" element={<DonationSummaryDetail />} />
+                  <Route path="/donate/donation-summary-detail/all" element={<DonationSummaryDetail />} />
+                  <Route path="/donate/donation-summary-detail" element={<DonationSummaryDetail />} />
+        
                   {/* ลองทำไว้ก่อน */}
                   <Route path="/change-password" element={<ChangePassword />} />
 
@@ -223,6 +243,8 @@ function App() {
                   <Route path="/admin/users" element={<AdminOnly><UserManagement /></AdminOnly>} />
                   <Route path="/admin/users/user-profile/:userId" element={<AdminOnly><UserProfile /></AdminOnly>} />
                   <Route path="/admin/users/edit-user-profile/:userId" element={<AdminOnly><EditUserProfile /></AdminOnly>} />
+                  <Route path="/admin-home/dashboard-alumni/:userId" element={<AdminOnly><UserProfile /></AdminOnly>} />
+                  {/* <Route path="/admin-home/dashboard-alumni/edit-user-profile/:userId" element={<AdminOnly><EditUserProfile /></AdminOnly>} /> */}
                   <Route path="/admin/admin-alumni" element={<AdminOnly><AdminAlumni /></AdminOnly>} />
                   <Route path="/admin/admin-alumni/admin-alumniView/:major" element={<AdminOnly><AdminAlumniView /></AdminOnly>} />
                   <Route path="/admin/donations" element={<AdminOnly><AdminDonate /></AdminOnly>} />
@@ -233,6 +255,12 @@ function App() {
                   <Route path="/admin/donations/donate-detail/:id" element={<AdminOnly><AdminProjectDetail /></AdminOnly>} />
                   <Route path="/admin/users/add-user" element={<AdminOnly><AddUser /></AdminOnly>} />
                   <Route path="/admin/souvenir/product-slot/:productId" element={<AdminOnly><ProductSlots /></AdminOnly>} />
+                  <Route path="/admin-home/dashboard-activity" element={<AdminOnly><AdminDashboardActivitiesPages /></AdminOnly>} />
+                  <Route path="/admin-home/dashboard-project" element={<AdminOnly><AdminDashboarsProjectsPage /></AdminOnly>} />
+                  <Route path="/admin-home/dashboard-donation" element={<AdminOnly><AdminDashboardDonationsPage /></AdminOnly>} />
+                  <Route path="/admin-home/dashboard-alumni" element={<AdminOnly><AdminDashboardAlumniPage /></AdminOnly>} />
+                  <Route path="/admin/donations/donation-list" element={<AdminOnly><AdminDonationLists /></AdminOnly>} />
+                  <Route path="/admin/donations/walkin-donation" element={<AdminOnly><WalkInDonationForm /></AdminOnly>} />
                 </Route>
               </Routes>
             </CartProvider>

@@ -97,6 +97,7 @@ function SouvenirDetail() {
         navigate("/souvenir/checkout", { state: { selectedItems: selectedItem } });
     };
 
+    // เพิ่มสินค้าลงตะกร้า
     const handleAddToCart = async () => {
         if (!user || !user.user_id) {
             Swal.fire({
@@ -123,7 +124,7 @@ function SouvenirDetail() {
 
             Swal.fire({
                 title: "เพิ่มลงตะกร้าสำเร็จ",
-                text: `เพิ่ม ${product.product_name} (${product.slot.slot_name}) จำนวน ${quantity} ชิ้น ลงตะกร้าแล้ว`,
+                text: `เพิ่ม ${product.product_name} จำนวน ${quantity} ชิ้น ลงตะกร้าแล้ว`,
                 icon: "success",
                 timer: 2000,
                 showConfirmButton: false

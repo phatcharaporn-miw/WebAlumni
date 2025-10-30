@@ -334,8 +334,15 @@ function CreateActivity() {
                     </div>
 
                     {/* ปุ่มส่งฟอร์ม */}
-                    <div className="form-group">
-                      <button type="submit" className="btn btn-success w-100">
+                    <div className="col-12 d-flex justify-content-center mt-3 ">
+                      <button
+                                        type="button"
+                                        className="btn btn-secondary px-4"
+                                        onClick={() => navigate('/admin/activities')}
+                                    >
+                                        ยกเลิก
+                                    </button>
+                      <button type="submit" className="btn btn-primary px-4 me-2 ">
                         เพิ่มกิจกรรม
                       </button>
                     </div>

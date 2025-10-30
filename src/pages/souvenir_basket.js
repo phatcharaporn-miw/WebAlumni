@@ -188,7 +188,7 @@ function SouvenirBasket() {
                 quantity: newQuantity
             }, { withCredentials: true });
 
-            console.log('Backend response:', res.data);
+            // console.log('Backend response:', res.data);
 
             // ใช้ cart_summary.total_items ตาม Backend
             if (res.data.cart_summary && res.data.cart_summary.total_items !== undefined) {
@@ -261,71 +261,6 @@ function SouvenirBasket() {
             });
         }
     };
-
-    //     const handleUpdateQuantity = async (productId, delta) => {
-    //         const cartItem = cart.find(item => item.product_id === productId);
-    //         if (!cartItem) return;
-
-    //         const newQuantity = cartItem.quantity + delta;
-    //         if (newQuantity < 1) return;
-
-    //         const stock = stockInfo[productId];
-    //         if (stock && newQuantity > stock.remaining + cartItem.quantity) {
-    //             Swal.fire({
-    //                 title: "จำนวนสินค้าไม่เพียงพอ",
-    //                 text: `สินค้ามีจำนวนคงเหลือ ${stock.remaining} ชิ้น`,
-    //                 icon: "warning",
-    //                 confirmButtonText: "ตกลง"
-    //             });
-    //             return;
-    //         }
-
-    //         if (updatingItems.has(productId)) return;
-    //         // Optimistic update (รวม subtotal ด้วย)
-    //         setCart(prev =>
-    //             prev.map(item =>
-    //                 item.product_id === productId
-    //                     ? {
-    //                         ...item,
-    //                         quantity: newQuantity,
-    //                         subtotal: newQuantity * (item.price || 0)   //เพิ่ม subtotal ทันที
-    //                     }
-    //                     : item
-    //             )
-    //         );
-
-    //         setUpdatingItems(prev => new Set([...prev, productId]));
-
-    //         try {
-    //             const res = await axios.put(HOSTNAME + `/souvenir/cart/update`, {
-    //                 user_id: user.user_id,
-    //                 product_id: productId,
-    //                 quantity: newQuantity
-    //             }, { withCredentials: true });
-
-    //             if (res.data.cart_summary?.items) {
-    //     setCart(res.data.cart_summary.items.map(i => ({
-    //         ...i,
-    //         subtotal: i.total  // ✅ ใช้ total จาก backend
-    //     })));
-    // }
-
-    //         } catch (error) {
-    //             Swal.fire({
-    //                 title: "ไม่สามารถอัปเดตจำนวนได้",
-    //                 text: error.response?.data?.message || "กรุณาลองใหม่อีกครั้ง",
-    //                 icon: "warning",
-    //                 confirmButtonText: "ตกลง"
-    //             });
-    //             await Promise.all([fetchCart(), getCartCount(user.user_id)]);
-    //         } finally {
-    //             setUpdatingItems(prev => {
-    //                 const newSet = new Set(prev);
-    //                 newSet.delete(productId);
-    //                 return newSet;
-    //             });
-    //         }
-    //     };
 
 
     // ลบสินค้าออกจากตะกร้า

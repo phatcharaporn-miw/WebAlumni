@@ -285,8 +285,6 @@ function AdminProjectDetail() {
                                                 </div>
                                             </div>
                                         </div>
-
-                                    {/* </div> */}
                                 </div>
 
 
@@ -295,7 +293,6 @@ function AdminProjectDetail() {
                                     <div className="col-12">
                                         <div className="description-section">
                                             <h5 className="fw-bold mb-3 d-flex align-items-center">
-                                                <i className="fas fa-file-alt me-2 text-primary"></i>
                                                 รายละเอียดโครงการ
                                             </h5>
                                             <div className="description-content p-4 rounded-3 shadow-sm">
@@ -303,7 +300,6 @@ function AdminProjectDetail() {
                                                     <p className="mb-0 lh-lg" style={{ whiteSpace: 'pre-wrap' }}>
                                                         {project.description || (
                                                             <span className="text-muted fst-italic">
-                                                                <i className="fas fa-info-circle me-2"></i>
                                                                 ไม่มีรายละเอียด
                                                             </span>
                                                         )}
@@ -370,14 +366,12 @@ function AdminProjectDetail() {
                                             className="btn btn-secondary btn-lg px-4 enhanced-btn back-btn"
                                             onClick={handleBack}
                                         >
-                                            <i className="fas fa-arrow-left me-2"></i>
-                                            กลับ
+                                            ย้อนกลับ
                                         </button>
                                         <button
                                             className="btn btn-warning btn-lg px-4 enhanced-btn edit-btn"
                                             onClick={handleEdit}
                                         >
-                                            <i className="fas fa-edit me-2"></i>
                                             แก้ไข
                                         </button>
                                     </div>

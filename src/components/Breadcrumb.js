@@ -97,9 +97,16 @@ function Breadcrumb() {
   return (
     <nav aria-label="breadcrumb">
       <ol className="breadcrumb">
-        <li className="breadcrumb-item">
-          <Link to="/">หน้าหลัก</Link>
-        </li>
+        <li
+  className={`breadcrumb-item ${
+    location.pathname === "/" ? "text-decoration-underline fw-bold" : ""
+  }`}
+>
+  <Link to="/" className="text-reset text-decoration-inherit">
+    หน้าหลัก
+  </Link>
+</li>
+
         {pathnames.map((value, index) => {
           const path = `/${pathnames.slice(0, index + 1).join('/')}`;
           let translatedText = breadcrumbMapping[path] || value;

@@ -271,7 +271,7 @@ function PresidentProfileDonation() {
                                 <div className='menu d-block mt-3 w-100'>
                                     {[
                                         ['โปรไฟล์ของฉัน', '/president-profile'],
-                                        ['จัดการคำสั่งซื้อของที่ระลึก', '/president-profile/president-manage-orders'],
+                                        // ['จัดการคำสั่งซื้อของที่ระลึก', '/president-profile/president-manage-orders'],
                                         ['กระทู้ที่สร้าง', '/president-profile/president-profile-webboard'],
                                         ['ประวัติการบริจาค', '/president-profile/president-profile-donation'],
                                         ['ประวัติการเข้าร่วมกิจกรรม', '/president-profile/president-profile-activity'],

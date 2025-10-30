@@ -368,8 +368,8 @@ function AlumniManageOrders() {
                                                         <div className="card-body py-3">
                                                             <div className="row align-items-center">
                                                                 <div className="col-6 col-md-3">
-                                                                    <div className="fw-bold text-primary mb-1">#{order.order_id}</div>
-                                                                    <small className="text-muted d-none d-md-block">
+                                                                    <div className="text-muted mb-1">วันที่สั่งซื้อ</div>
+                                                                    <small className="fw-bold text-primary d-none d-md-block">
                                                                         {order.order_date ? format(new Date(order.order_date), 'dd/MM/yyyy') : '-'}
                                                                     </small>
                                                                     <small className="text-muted d-md-none">

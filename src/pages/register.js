@@ -531,7 +531,7 @@ function Register() {
                                     </Link>
                                 </div>
                                 <div>
-                                    <button className="submit-button" type="submit">สมัครสมาชิก</button>
+                                    <button className="submit-button" type="submit">ลงทะเบียน</button>
                                 </div>
                             </div>
 

@@ -611,7 +611,7 @@ function PresidentProfileSouvenir() {
                             <hr className="w-100" />
                             <div className="menu d-block mt-3 w-100">
                                 <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/president-profile")}>โปรไฟล์ของฉัน</div>
-                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/president-profile/president-manage-orders")}>จัดการคำสั่งซื้อของที่ระลึก</div>
+                                {/* <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/president-profile/president-manage-orders")}>จัดการคำสั่งซื้อของที่ระลึก</div> */}
                                 <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/president-profile/president-profile-webboard")}>กระทู้ที่สร้าง</div>
                                 <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/president-profile/president-profile-donation")}>ประวัติการบริจาค</div>
                                 <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/president-profile/president-profile-activity")}>ประวัติการเข้าร่วมกิจกรรม</div>
@@ -667,7 +667,9 @@ function PresidentProfileSouvenir() {
                                     <div className="card border-0 shadow-sm mb-3 rounded-3" key={order.order_id || idx}>
                                         <div className="card-body d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
                                             <div className="mb-2 mb-md-0">
-                                                <h6 className="fw-bold mb-1">รหัสคำสั่งซื้อ #{order.order_id}</h6>
+                                                {order.products.map((item, i) => (
+                                                    <h6 key={i} className="fw-bold mb-1">{item.product_name}</h6>
+                                                ))}
                                                 <small className="text-muted">
                                                     วันที่:{" "}
                                                     {order.order_date

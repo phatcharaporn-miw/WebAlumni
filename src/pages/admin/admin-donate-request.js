@@ -234,24 +234,35 @@ function AdminDonateRequest() {
     return (
         <div className="donate-activity-container">
             {/* Top Menu Navigation */}
-            <div className="mb-4">
-                <nav className="nav Adminnav-tabs">
-                    <Link
-                        className={`adminnav-link ${location.pathname === '/admin/donations' ? 'active' : ''}`}
-                        to="/admin/donations"
-                    >
-                        <i className="fas fa-project-diagram me-2"></i>
-                        การจัดการโครงการบริจาค
-                    </Link>
-                    <Link
-                        className={`adminnav-link ${location.pathname === '/admin/donations/donate-request' ? 'active' : ''}`}
-                        to="/admin/donations/donate-request"
-                    >
-                        <i className="fas fa-plus me-2"></i>
-                        เพิ่มโครงการใหม่
-                    </Link>
-                </nav>
-            </div>
+                        <div className="mb-4">
+                            <nav className="nav Adminnav-tabs">
+                                <Link 
+                                    className={`adminnav-link ${location.pathname === '/admin/donations/donation-list' ? 'active' : ''}`} 
+                                    to="/admin/donations/donation-list"
+                                >
+                                    รายการบริจาคทั้งหมด
+                                </Link>
+                                <Link
+                                    className={`adminnav-link ${location.pathname === '/admin/donations' ? 'active' : ''}`}
+                                    to="/admin/donations"
+                                >
+                                    การจัดการโครงการบริจาค
+                                </Link>
+                    
+                                <Link 
+                                    className={`adminnav-link ${location.pathname === '/admin/donations/walkin-donation' ? 'active' : ''}`} 
+                                    to="/admin/donations/walkin-donation"
+                                >
+                                    บันทึกการบริจาค Walk-in
+                                </Link>
+                                <Link
+                                    className={`adminnav-link ${location.pathname === '/admin/donations/donate-request' ? 'active' : ''}`}
+                                    to="/admin/donations/donate-request"
+                                >
+                                    เพิ่มโครงการใหม่
+                                </Link>
+                            </nav>
+                        </div>
 
             <div className="container mt-4">
                 <div className="row justify-content-center">
@@ -548,43 +559,43 @@ function AdminDonateRequest() {
                 >
                     <Box sx={style}>
                         <Typography id="modal-title" variant="h6" style={{ color: '#2196F3', marginBottom: '20px' }}>
-                            🔍 ตรวจสอบข้อมูลโครงการ
+                            ตรวจสอบข้อมูลโครงการ
                         </Typography>
                         <Typography id="modal-description" component="div" sx={{ mt: 2 }}>
                             <div style={{ lineHeight: '1.6' }}>
-                                <strong>📋 ชื่อโครงการ:</strong> {formData.projectName} <br />
-                                <strong>📝 รายละเอียด:</strong> <br />
+                                <strong>ชื่อโครงการ:</strong> {formData.projectName} <br />
+                                <strong>รายละเอียด:</strong> <br />
                                 <div style={{ backgroundColor: '#f5f5f5', padding: '10px', borderRadius: '5px', margin: '5px 0' }}>
                                     {formData.description}
                                 </div>
-                                <strong>🏷️ ประเภทการบริจาค:</strong> {
-                                    formData.donationType === "fundraising" ? "📈 ระดมทุน" :
-                                        formData.donationType === "unlimited" ? "💝 ไม่จำกัดจำนวน" :
-                                            formData.donationType === "things" ? "📦 บริจาคสิ่งของ" : formData.donationType
+                                <strong>ประเภทการบริจาค:</strong> {
+                                    formData.donationType === "fundraising" ? "ระดมทุน" :
+                                        formData.donationType === "unlimited" ? "ไม่จำกัดจำนวน" :
+                                            formData.donationType === "things" ? "บริจาคสิ่งของ" : formData.donationType
                                 } <br />
 
                                 {formData.donationType === "fundraising" && (
-                                    <><strong>🎯 เป้าหมาย:</strong> {Number(formData.targetAmount).toLocaleString()} บาท <br /></>
+                                    <><strong>เป้าหมาย:</strong> {Number(formData.targetAmount).toLocaleString()} บาท <br /></>
                                 )}
 
                                 {formData.donationType === "things" && (
                                     <>
-                                        <strong>📦 ประเภทสิ่งของ:</strong> {formData.typeThings} <br />
-                                        <strong>🔢 จำนวน:</strong> {formData.quantityThings} ชิ้น <br />
-                                        <strong>👥 บริจาคให้กับ:</strong> {formData.forThings} <br />
+                                        <strong>ประเภทสิ่งของ:</strong> {formData.typeThings} <br />
+                                        <strong>จำนวน:</strong> {formData.quantityThings} ชิ้น <br />
+                                        <strong>บริจาคให้กับ:</strong> {formData.forThings} <br />
                                     </>
                                 )}
 
-                                <strong>📅 วันที่เริ่มต้น:</strong> {new Date(formData.startDate).toLocaleDateString('th-TH')} <br />
-                                <strong>📅 วันที่สิ้นสุด:</strong> {new Date(formData.endDate).toLocaleDateString('th-TH')} <br />
-                                <strong>🏦 ธนาคาร:</strong> {formData.bankName} <br />
-                                <strong>👤 ชื่อบัญชี:</strong> {formData.accountName} <br />
-                                <strong>💳 เลขบัญชี:</strong> {formData.accountNumber} <br />
-                                <strong>📱 พร้อมเพย์:</strong> {formData.numberPromtpay} <br />
+                                <strong>วันที่เริ่มต้น:</strong> {new Date(formData.startDate).toLocaleDateString('th-TH')} <br />
+                                <strong>วันที่สิ้นสุด:</strong> {new Date(formData.endDate).toLocaleDateString('th-TH')} <br />
+                                <strong>ธนาคาร:</strong> {formData.bankName} <br />
+                                <strong>ชื่อบัญชี:</strong> {formData.accountName} <br />
+                                <strong>เลขบัญชี:</strong> {formData.accountNumber} <br />
+                                <strong>พร้อมเพย์:</strong> {formData.numberPromtpay} <br />
 
                                 {formData.image && (
                                     <div style={{ marginTop: '15px' }}>
-                                        <strong>🖼️ รูปภาพประกอบโครงการ:</strong>
+                                        <strong>รูปภาพประกอบโครงการ:</strong>
                                         <br />
                                         <img
                                             src={URL.createObjectURL(formData.image)}
