@@ -396,7 +396,7 @@ function AlumniProfileSouvenir() {
 
             if (!result.isConfirmed) return;
 
-            const res = await axios.post(`http://localhost:3001/orders/resolve-issue/${orderId}`);
+            const res = await axios.post(HOSTNAME + `/orders/resolve-issue/${orderId}`);
 
             if (res.data.success) {
                 Swal.fire("สำเร็จ", "ปัญหานี้แก้ไขเรียบร้อยแล้ว", "success");
@@ -584,7 +584,7 @@ function AlumniProfileSouvenir() {
             <div className='alumni-profile-page'>
                 <div className="row justify-content-center g-4">
                     {/* Sidebar/Profile */}
-                    <div className="col-12 col-md-3 mb-4">
+                    <div className="col-12 col-lg-3 col-md-4 mb-4">
                         <div className="bg-white rounded-4 shadow-sm text-center p-4">
                             <img
                                 src={previewImage || profile.profilePicture}

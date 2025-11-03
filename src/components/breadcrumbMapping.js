@@ -37,6 +37,7 @@ export const breadcrumbMapping = {
     "/donate/donation-summary-detail/project": "ยอดบริจาคโครงการ",
     "/donate/donation-summary-detail/general": "ยอดบริจาคทั่วไป",
     "/donate/donation-summary-detail/all": "ยอดบริจาครวมทั้งหมด",
+    "/donate/donation-all": "รายชื่อผู้บริจาค",
 
     // ส่วนของศิษย์เก่า
     "/alumni-profile": "โปรไฟล์",
@@ -78,5 +79,6 @@ export const breadcrumbMapping = {
     "/news/president-create-news": "เพิ่มข่าวประชาสัมพันธ์",
     "/president-profile/president-profile-donation": "ประวัติการบริจาค",
     "/president-profile/president-manage-orders": "จัดการคำสั่งซื้อของที่ระลึก",
+    "/president-profile/president-summary-all": "ภาพรวมข้อมูลทั้งหมด",
 
   };

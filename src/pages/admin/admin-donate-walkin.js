@@ -121,7 +121,7 @@ function WalkInDonationForm() {
                 icon: "success",
                 confirmButtonText: "ตกลง"
             }).then(() => {
-                navigate("/admin/donations/check-donation-list");
+                navigate("/admin/donations/donation-list");
             });
 
 

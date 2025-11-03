@@ -5,7 +5,7 @@ import { useNavigate, Link, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { HOSTNAME } from '../config.js';
+import { HOSTNAME,IMAGE_URL } from '../config.js';
 
 function SouvenirDetail() {
     const { productId } = useParams();
@@ -232,61 +232,14 @@ function SouvenirDetail() {
                     )}
                 </div>
                 <hr />
-                {/* <div className="souvenirDetail-content-item">
-                    <p className="souvenirDetail-other-products-title">สินค้าอื่นๆ</p>
-                    <div className="souvenirDetail-other-products">
-                        {randomProducts.length > 0 ? (
-                            randomProducts.map((product) =>
-                                product.is_sold_out ? (
-                                    <div className="col" key={product.product_id}>
-                                        <div className="souvenir-item card h-100 shadow-sm border-0 position-relative">
-                                            <img
-                                                className="souvenir-item-img card-img-top"
-                                                src={HOSTNAME + `/uploads/${product.image}`}
-                                                alt={product.product_name}
-                                                style={{ filter: "grayscale(90%)", opacity: 0.6 }}
-                                            />
-                                            <div className="card-body text-center">
-                                                <p className="card-title fw-semibold">{product.product_name}</p>
-                                                <p className="souvenir-item-price text-muted">฿{product.price}</p>
-                                                <span className="badge bg-danger mt-2">สินค้าหมดแล้ว</span>
-                                                <small className="text-muted">รอผู้ดูแลเพิ่มสินค้า</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="col" key={product.product_id}>
-                                        <Link
-                                            to={`/souvenir/souvenirDetail/${product.product_id}`}
-                                            className="text-decoration-none text-dark"
-                                        >
-                                            <div className="souvenir-item card h-100 shadow-sm border-0 position-relative">
-                                                <img
-                                                    className="souvenir-item-img card-img-top"
-                                                    src={HOSTNAME + `/uploads/${product.image}`}
-                                                    alt={product.product_name}
-                                                />
-                                                <div className="card-body text-center">
-                                                    <p className="card-title fw-semibold">{product.product_name}</p>
-                                                    <p className="souvenir-item-price text-success">฿{product.price}</p>
-                                                </div>
-                                            </div>
-                                        </Link>
-                                    </div>
-                                )
-                            )
-                        ) : (
-                            <p>ไม่มีสินค้าอื่นๆ</p>
-                        )}
-                    </div>
-                </div> */}
+        
                 <div className="souvenirDetail-content-item mt-5">
                     <h5 className="souvenirDetail-other-products-title text-center mb-4 fw-bold">
                         สินค้าอื่นๆ
                     </h5>
 
                     {randomProducts.length > 0 ? (
-                        <div className="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-4">
+                        <div className="row row-cols-sm-12 row-cols-md-2 row-cols-lg-4 g-4">
                             {randomProducts.map((product) => (
                                 <div className="col" key={product.product_id}>
                                     {/* ถ้าสินค้าหมด */}

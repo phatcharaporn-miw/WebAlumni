@@ -123,9 +123,10 @@ function Login() {
         <div className="form-login">
           <form onSubmit={handleSubmit}>
             <h2>เข้าสู่ระบบ</h2>
-            <p>
-              <label>ชื่อผู้ใช้งาน<span className="important">*</span></label><br />
+            <p className="mb-0">
+              <label htmlFor="username">ชื่อผู้ใช้งาน<span className="important">*</span></label><br />
               <input
+              className="form-control w-100"
                 placeholder="ชื่อผู้ใช้งาน"
                 type="text"
                 value={username}
@@ -135,8 +136,9 @@ function Login() {
               />
             </p>
             <p>
-              <label>รหัสผ่าน<span className="important">*</span></label><br />
+              <label htmlFor="password">รหัสผ่าน<span className="important">*</span></label><br />
               <input
+              className="form-control w-100"
                 placeholder="รหัสผ่าน"
                 type="password"
                 value={password}

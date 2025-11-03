@@ -6,9 +6,9 @@ import 'bootstrap/dist/js/bootstrap.bundle.min';
 import { SlMagnifier } from "react-icons/sl";
 import { SlArrowDown } from "react-icons/sl";
 import { SlBasket } from "react-icons/sl";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { IoMdNotificationsOutline } from "react-icons/io";
-import { FaTrash } from "react-icons/fa";
+import { FaTrash, FaBars, FaTimes } from 'react-icons/fa';
 import Swal from "sweetalert2";
 import axios from "axios";
 import { useCart } from '../context/CartContext';
@@ -29,6 +29,19 @@ function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
   const { addToCart, clearCart, refreshCartCount } = useCart();
+  const [sidenavOpen, setSidenavOpen] = useState(false);
+
+  const openSidenav = () => setSidenavOpen(true);
+  const closeSidenav = () => setSidenavOpen(false);
+
+  const location = useLocation();
+
+  // ตั้งชื่อเมนูตาม path
+  const currentPage = (() => {
+    if (location.pathname === "/news") return "ประชาสัมพันธ์";
+    if (location.pathname === "/activity") return "กิจกรรม";
+    return "ประชาสัมพันธ์"; // ค่า default
+  })();
 
   // ดึงแจ้งเตือนเมื่อผู้ใช้เข้าสู่ระบบ
   useEffect(() => {
@@ -305,121 +318,126 @@ function Header() {
   const profileImg = user?.profilePicture || "/default-profile.png";
 
   return (
-    <header className="header">
-      <div className="header-top">
-        {/* โลโก้ */}
-        <NavLink className="navbar-brand" to="/">
-          <img className="logo" src="/image/logoCP1.png" alt="College of Computing Logo" />
-        </NavLink>
+    <>
+      <header className="header">
+        <div className="header-top">
+          {/* Mobile Menu Button */}
+          <button className="mobile-menu-btn" onClick={openSidenav}>
+            <FaBars />
+          </button>
 
-        <div className={`search-and-login ${menuOpen ? "open" : ""}`}>
-          {/* ค้นหา */}
-          <div className="search">
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={handleSearchChange}
-              className="form-control"
-              placeholder="ค้นหา..."
-            />
-            <button onClick={handleSearchClick} className="search-icon-btn">
-              <SlMagnifier className="search-icon" />
-            </button>
-          </div>
+          {/* โลโก้ */}
+          <NavLink className="navbar-brand" to="/">
+            <img className="logo" src="/image/logoCP1.png" alt="College of Computing Logo" />
+          </NavLink>
 
-          {/* Suggestions */}
-          {showSuggestions && suggestions.length > 0 && (
-            <div className="suggestions-dropdown">
-              {suggestions.map((suggestion, index) => {
-                const config = typeConfig[suggestion.type];
-                const label = config ? config.label : "อื่นๆ";
-                return (
-                  <div
-                    key={index}
-                    className="suggestion-item"
-                    onClick={() => handleSuggestionClick(suggestion)}
-                  >
-                    <p className="suggestion-text">
-                      {`${label}: ${suggestion.title}`}
-                    </p>
-                  </div>
-                );
-              })}
+          {/* Desktop Search and Login */}
+          <div className="search-and-login desktop-only">
+            {/* ค้นหา */}
+            <div className="search">
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={handleSearchChange}
+                className="form-control"
+                placeholder="ค้นหา..."
+              />
+              <button onClick={handleSearchClick} className="search-icon-btn">
+                <SlMagnifier className="search-icon" />
+              </button>
             </div>
-          )}
 
-          {/* ตะกร้า */}
-          <div className="cart-container me-4 mx-4">
-            <NavLink to="/souvenir/souvenir_basket">
-              <SlBasket className="cart-icon" />
-              {cartCount > 0 && <span className="cart-count">{cartCount}</span>}
-            </NavLink>
-          </div>
+            {showSuggestions && suggestions.length > 0 && (
+              <div className="suggestions-dropdown">
+                {suggestions.map((suggestion, index) => {
+                  const config = typeConfig[suggestion.type];
+                  const label = config ? config.label : "อื่นๆ";
+                  return (
+                    <div
+                      key={index}
+                      className="suggestion-item"
+                      onClick={() => handleSuggestionClick(suggestion)}
+                    >
+                      <p className="suggestion-text">
+                        {`${label}: ${suggestion.title}`}
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
 
-          {/* ผู้ใช้ - เปลี่ยนจาก user เป็น isLoggedIn && user เพื่อความชัดเจน */}
-          {isLoggedIn && userId ? (
-            <div className="user-profile">
-              {/* แจ้งเตือน */}
-              <div className="notification-container me-4">
-                <div className="notification-icon" onClick={toggleNotifications}>
-                  <IoMdNotificationsOutline />
-                  {unreadCount > 0 && <span className="unread-count">{unreadCount}</span>}
+            {/* ตะกร้า */}
+            <div className="cart-container">
+              <NavLink to="/souvenir/souvenir_basket">
+                <SlBasket className="cart-icon" />
+                {cartCount > 0 && <span className="cart-count">{cartCount}</span>}
+              </NavLink>
+            </div>
+
+            {/* ผู้ใช้ */}
+            {isLoggedIn && userId ? (
+              <div className="user-profile">
+                {/* แจ้งเตือน */}
+                <div className="notification-container">
+                  <div className="notification-icon" onClick={toggleNotifications}>
+                    <IoMdNotificationsOutline />
+                    {unreadCount > 0 && <span className="unread-count">{unreadCount}</span>}
+                  </div>
+
+                  {showNotifications && (
+                    <div className="notification-dropdown" onClick={handleDropdownClick}>
+                      <h5 className="notification-title">การแจ้งเตือน</h5>
+                      {notifications.length > 0 ? (
+                        notifications.map((notification) => (
+                          <div
+                            key={notification.notification_id}
+                            className={`notification-item ${notification.status === "ยังไม่อ่าน" ? "unread" : ""}`}
+                          >
+                            <p className="message">{notification.message}</p>
+                            <p className="notification-date">
+                              {formatDate(notification.send_date).toLocaleString()}
+                            </p>
+                            <button
+                              className="delete-btn"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                deleteNotification(notification.notification_id);
+                              }}
+                            >
+                              <FaTrash />
+                            </button>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="no-notifications text-center small">ไม่มีการแจ้งเตือน</p>
+                      )}
+                    </div>
+                  )}
                 </div>
 
-                {showNotifications && (
-                  <div className="notification-dropdown" onClick={handleDropdownClick}>
-                    <h5 className="notification-title">การแจ้งเตือน</h5>
-                    {notifications.length > 0 ? (
-                      notifications.map((notification) => (
-                        <div
-                          key={notification.notification_id}
-                          className={`notification-item ${notification.status === "ยังไม่อ่าน" ? "unread" : ""}`}
-                        >
-                          <p className="message">{notification.message}</p>
-                          <p className="notification-date">
-                            {formatDate(notification.send_date).toLocaleString()}
-                          </p>
-                          <button
-                            className="delete-btn"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              deleteNotification(notification.notification_id);
-                            }}
-                          >
-                            <FaTrash />
-                          </button>
-                        </div>
-                      ))
-                    ) : (
-                      <p className="no-notifications text-center small">ไม่มีการแจ้งเตือน</p>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* รูปโปรไฟล์ - เพิ่มการจัดการ error ของรูป */}
-              <NavLink
-                to={
-                  user.role === 1
-                    ? "/admin-profile"
-                    : user.role === 2
-                      ? "/president-profile"
-                      : user.role === 4
-                        ? "/student-profile"
-                        : "/alumni-profile"
-                }
-                className="profile-container"
-              >
-                <img
-                  src={profileImg}
-                  alt="User Profile"
-                  className="profile-img"
-                  loading="lazy"
-                  onError={(e) => {
-                    e.target.src = "/default-profile.png"; // fallback image
-                  }}
-                />
-
+                {/* รูปโปรไฟล์ */}
+                <NavLink
+                  to={
+                    user.role === 1
+                      ? "/admin-profile"
+                      : user.role === 2
+                        ? "/president-profile"
+                        : user.role === 4
+                          ? "/student-profile"
+                          : "/alumni-profile"
+                  }
+                  className="profile-container"
+                >
+                  <img
+                    src={profileImg}
+                    alt="User Profile"
+                    className="profile-img"
+                    loading="lazy"
+                    onError={(e) => {
+                      e.target.src = "/default-profile.png";
+                    }}
+                  />
                 <div className="user-info mt-2 text-center">
                   <p className="user-role mb-1">
                     {user.role === 1
@@ -433,97 +451,158 @@ function Header() {
                             : "ไม่ทราบบทบาท"}
                   </p>
                 </div>
-              </NavLink>
-            </div>
-          ) : (
-            <NavLink to="/login">
-              <button className="login-btn m-2 ms-5">เข้าสู่ระบบ</button>
-            </NavLink>
-          )}
-        </div>
-      </div>
-
-      {/* Navigation Menu */}
-      <nav className={`nav-menu ${menuOpen ? "open" : ""}`}>
-        <ul className="nav">
-          <li className="nav-item">
-            <NavLink
-              to="/"
-              className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}
-            >
-              หน้าหลัก
-            </NavLink>
-          </li>
-          <li className="nav-item">
-            <NavLink
-              to="/about"
-              className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}
-            >
-              เกี่ยวกับ
-            </NavLink>
-          </li>
-          <li className="dropdown">
-            <div className="dropbtn">ประชาสัมพันธ์ <SlArrowDown className="arrow-down" /></div>
-            <div className="dropdown-content">
-              <NavLink
-                to="/news"
-                className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}
-              >
-                ประชาสัมพันธ์
-              </NavLink>
-              <NavLink
-                to="/activity"
-                className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}
-              >
-                กิจกรรม
-              </NavLink>
-            </div>
-          </li>
-          <li className="nav-item">
-            <NavLink
-              to="/donate"
-              className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}
-            >
-              บริจาค
-            </NavLink>
-          </li>
-          <li className="nav-item">
-            <NavLink
-              to="/alumni"
-              className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}
-            >
-              ทำเนียบศิษย์เก่า
-            </NavLink>
-          </li>
-          <li className="nav-item">
-            <NavLink
-              to="/souvenir"
-              className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}
-            >
-              ของที่ระลึก
-            </NavLink>
-          </li>
-          <li className="nav-item">
-            <NavLink
-              to="/webboard"
-              className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}
-            >
-              เว็บบอร์ด
-            </NavLink>
-          </li>
-          <li className="nav-item">
-            {!isLoggedIn && (
-              <NavLink
-                to="/check-fullName"
-                className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}
-              >
-                ตรวจสอบข้อมูล
+                </NavLink>
+              </div>
+            ) : (
+              <NavLink to="/login">
+                <button className="login-btn">เข้าสู่ระบบ</button>
               </NavLink>
             )}
-          </li>
-        </ul>
-      </nav>
-    </header>
+          </div>
+
+          {/* Mobile Icons */}
+          <div className="mobile-icons">
+            <NavLink to="/souvenir/souvenir_basket" className="mobile-cart">
+              <SlBasket />
+              {cartCount > 0 && <span className="cart-count">{cartCount}</span>}
+            </NavLink>
+            {isLoggedIn && (
+              <div className="mobile-notification" onClick={toggleNotifications}>
+                <IoMdNotificationsOutline />
+                {unreadCount > 0 && <span className="unread-count">{unreadCount}</span>}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Desktop Navigation Menu */}
+        <nav className="nav-menu desktop-only">
+          <ul className="nav">
+            <li className="nav-item">
+              <NavLink to="/" className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}>
+                หน้าหลัก
+              </NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink to="/about" className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}>
+                เกี่ยวกับ
+              </NavLink>
+            </li>
+            <li className="dropdown">
+              <div className="dropbtn">
+                {currentPage} <SlArrowDown className="arrow-down" />
+              </div>
+              <div className="dropdown-content">
+                <NavLink
+                  to="/news"
+                  className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}
+                >
+                  ประชาสัมพันธ์
+                </NavLink>
+                <NavLink
+                  to="/activity"
+                  className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}
+                >
+                  กิจกรรม
+                </NavLink>
+              </div>
+            </li>
+            <li className="nav-item">
+              <NavLink to="/donate" className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}>
+                บริจาค
+              </NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink to="/alumni" className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}>
+                ทำเนียบศิษย์เก่า
+              </NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink to="/souvenir" className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}>
+                ของที่ระลึก
+              </NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink to="/webboard" className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}>
+                เว็บบอร์ด
+              </NavLink>
+            </li>
+            {!isLoggedIn && (
+              <li className="nav-item">
+                <NavLink to="/check-fullName" className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}>
+                  ตรวจสอบข้อมูล
+                </NavLink>
+              </li>
+            )}
+          </ul>
+        </nav>
+      </header>
+
+      {/* Mobile Sidenav */}
+      
+      <div className={`sidenav ${sidenavOpen ? 'open' : ''}`}>
+        <button className="closebtn" onClick={closeSidenav}>
+          <FaTimes />
+        </button>
+
+        {/* User Profile in Sidenav */}
+        {isLoggedIn && userId ? (
+          <div className="sidenav-profile">
+            <img
+              src={profileImg}
+              alt="Profile"
+              className="sidenav-profile-img"
+              onError={(e) => { e.target.src = "/default-profile.png"; }}
+            />
+            <p className="sidenav-role">
+              {user.role === 1 ? "แอดมิน" : user.role === 2 ? "นายกสมาคม" : user.role === 3 ? "ศิษย์เก่า" : "ศิษย์ปัจจุบัน"}
+            </p>
+          </div>
+        ) : null}
+
+        {/* Search in Sidenav */}
+        <div className="sidenav-search">
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={handleSearchChange}
+            placeholder="ค้นหา..."
+          />
+          <SlMagnifier className="search-icon" onClick={handleSearchClick} />
+        </div>
+
+
+        {/* Navigation Links */}
+        <NavLink to="/" onClick={closeSidenav}>หน้าหลัก</NavLink>
+        <NavLink to="/about" onClick={closeSidenav}>เกี่ยวกับ</NavLink>
+        <NavLink to="/news" onClick={closeSidenav}>ประชาสัมพันธ์</NavLink>
+        <NavLink to="/activity" onClick={closeSidenav}>กิจกรรม</NavLink>
+        <NavLink to="/donate" onClick={closeSidenav}>บริจาค</NavLink>
+        <NavLink to="/alumni" onClick={closeSidenav}>ทำเนียบศิษย์เก่า</NavLink>
+        <NavLink to="/souvenir" onClick={closeSidenav}>ของที่ระลึก</NavLink>
+        <NavLink to="/webboard" onClick={closeSidenav}>เว็บบอร์ด</NavLink>
+        {!isLoggedIn && <NavLink to="/check-fullName" onClick={closeSidenav}>ตรวจสอบข้อมูล</NavLink>}
+        
+        {isLoggedIn ? (
+          <>
+            <NavLink 
+              to={user.role === 1 ? "/admin-profile" : user.role === 2 ? "/president-profile" : user.role === 4 ? "/student-profile" : "/alumni-profile"}
+              onClick={closeSidenav}
+            >
+              โปรไฟล์
+            </NavLink>
+            <a href="#" onClick={(e) => { e.preventDefault(); handleLogout(); }} className="logout-link">
+              ออกจากระบบ
+            </a>
+          </>
+        ) : (
+          <NavLink to="/login" onClick={closeSidenav}>เข้าสู่ระบบ</NavLink>
+        )}
+      </div>
+
+      {/* Overlay */}
+      {sidenavOpen && <div className="overlay" onClick={closeSidenav}></div>}
+    </>
   );
 };
 

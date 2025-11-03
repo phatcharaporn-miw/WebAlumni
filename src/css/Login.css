@@ -32,7 +32,7 @@ body {
 
 /* Form Container */
 .form-login {
-    display: flex;
+    /* display: flex; */
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -246,19 +246,30 @@ button:hover {
     }
 }
 
-@media (max-width: 768px) {
+@media screen and (min-width: 1440px) {
+    .all-form {
+    /* margin-top: 90px; */
+    display: grid;
+    justify-content: center;
+    z-index: 2;
+    position: relative;
+    margin-bottom: 20px;
+    }
+}
+
+@media screen and (min-width: 768px) and (max-width: 1024px) {
     body {
         padding: 10px;
     }
     
     .form-login-logo {
-        width: 300px;
-        height: 100px;
+        width: 400px;
+        height: 200px;
     }
 
     .form-login-bg {
-        padding: 30px 20px;
         border-radius: 15px;
+        width: 400px;
     }
 
     .form-login input {
@@ -273,22 +284,30 @@ button:hover {
     .form-login h2 {
         font-size: 28px;
     }
+
+    .all-form {
+    margin-top: 110px;
+    display: grid;
+    justify-content: center;
+    z-index: 2;
+    position: relative;
+    margin-bottom: 20px;
+}
+
 }
 
 @media (max-width: 468px) {
     .form-login-logo {
-        width: 280px;
+        width: 300px;
         height: 90px;
     }
 
     .form-login input {
         width: 100% !important;
-        padding: 12px 15px;
+        padding: 10px 15px;
     }
 
     .form-login-bg {
-        padding: 20px 15px;
-        width: 100%;
         max-width: 100%;
         margin: 0 10px;
     }
@@ -301,4 +320,21 @@ button:hover {
         padding: 12px 15px;
         font-size: 14px;
     }
+
+    .form-login label {
+        font-size: 14px;
+        color: #0F75BC;
+        font-weight: 500;
+        display: block;
+        transition: color 0.3s ease;
+    }
+
+    .all-form {
+    margin-top: 130px;
+    display: grid;
+    justify-content: center;
+    z-index: 2;
+    position: relative;
+    margin-bottom: 20px;
+}
 }

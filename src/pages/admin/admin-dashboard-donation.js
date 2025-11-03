@@ -86,7 +86,7 @@ function DashboardDonationsPage() {
     }, [projects, searchTerm, selectedRange]);
 
 
-    const totalAmount = filteredProjects.reduce((sum, d) => sum + d.amount, 0);
+    // const totalAmount = filteredProjects.reduce((sum, d) => sum + d.amount, 0);
     const recentDonors = filteredProjects.slice(0, 10);
 
     const displayProjectName = (pName) => pName || "บริจาคทั่วไป";
@@ -157,6 +157,35 @@ function DashboardDonationsPage() {
         const [start, end] = range.split("-").map(Number);
         return month >= start && month <= end;
     };
+
+    // รวมยอดบริจาคของคนเดียวกัน (ตามชื่อ)
+    const donorTotals = projects.reduce((acc, curr) => {
+        const key = curr.full_name.trim();
+        if (!acc[key]) {
+            acc[key] = {
+                full_name: key,
+                total_amount: 0,
+                profile_image: curr.profile_image,
+                last_donation_date: curr.donation_date,
+                project_name: curr.project_name,
+            };
+        }
+        acc[key].total_amount += curr.amount;
+        if (new Date(curr.donation_date) > new Date(acc[key].last_donation_date)) {
+            acc[key].last_donation_date = curr.donation_date;
+        }
+        return acc;
+    }, {});
+
+    // แปลงเป็น Array และเรียงลำดับจากมากไปน้อย
+    const donorList = Object.values(donorTotals).sort((a, b) => b.total_amount - a.total_amount);
+
+    //บริจาคมากสุด
+    const topDonor = donorList.length > 0 ? donorList[0] : null;
+
+
+    // ยอดบริจาครวมทั้งหมด
+    const totalAmount = donorList.reduce((sum, d) => sum + d.total_amount, 0);
 
     // Pagination
     const itemsPerPage = 10;
@@ -280,8 +309,33 @@ function DashboardDonationsPage() {
                     {/*รายชื่อผู้บริจาค */}
                     <div className="recent-donors-section">
                         <div className="recent-donors-header">
-                            <h4>รายชื่อผู้บริจาค</h4>
+                            <FaUsers />
+                            <h4>รายชื่อผู้บริจาคล่าสุด</h4>
                         </div>
+                        {topDonor && (
+                            <div className="top-donor-card shadow-sm rounded-4 p-4 mb-4 text-center bg-gradient-to-r from-yellow-200 to-yellow-50">
+                                <div className="top-donor-avatar mb-3 mx-auto" style={{ width: "100px", height: "100px" }}>
+                                    <img
+                                        src={
+                                            topDonor.profile_image
+                                                ? `${HOSTNAME}/${topDonor.profile_image}`
+                                                : `${HOSTNAME}/uploads/default-profile.png`
+                                        }
+                                        alt={topDonor.full_name}
+                                        className="w-100 h-100 rounded-circle object-cover border border-warning border-3"
+                                    />
+                                </div>
+                                <h3 className="fw-bold text-dark">{topDonor.full_name}</h3>
+                                <p className="text-muted mb-1">ยอดบริจาคสูงสุดทั้งหมด</p>
+                                <h4 className="donor-amount fs-3">
+                                    ฿{formatCurrency(topDonor.total_amount)}
+                                </h4>
+                                <p className="text-secondary small mt-2">
+                                    โครงการล่าสุด: {topDonor.project_name || "บริจาคทั่วไป"}
+                                </p>
+                            </div>
+                        )}
+
                         {currentProjects.length > 0 ? (
                             <div className="recent-donors-list">
                                 {currentProjects.map((donor) => (

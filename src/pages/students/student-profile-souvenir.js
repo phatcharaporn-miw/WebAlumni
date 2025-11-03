@@ -407,7 +407,7 @@ function StudentProfileSouvenir() {
 
             if (!result.isConfirmed) return;
 
-            const res = await axios.post(`http://localhost:3001/orders/resolve-issue/${orderId}`);
+            const res = await axios.post(HOSTNAME+`/orders/resolve-issue/${orderId}`);
 
             if (res.data.success) {
                 Swal.fire("สำเร็จ", "ปัญหานี้แก้ไขเรียบร้อยแล้ว", "success");
@@ -595,7 +595,7 @@ function StudentProfileSouvenir() {
             <div className='alumni-profile-page'>
                 <div className="row justify-content-center g-4">
                     {/* Sidebar/Profile */}
-                    <div className="col-12 col-md-3 mb-4">
+                    <div className="col-12 col-lg-3 col-md-4  mb-4">
                         <div className="bg-white rounded-4 shadow-sm text-center p-4">
                             <img
                                 src={previewImage || profile.profilePicture}
@@ -1128,22 +1128,6 @@ function StudentProfileSouvenir() {
                                                                     </div>
 
                                                                     <div className="modal-body">
-                                                                        {/* วันที่สั่งซื้อ */}
-                                                                        {/* <div className="mb-3 text-start">
-                                                                            <label className="form-label fw-bold">วันที่สั่งซื้อ</label>
-                                                                            <p>
-                                                                                {selectedOrder.order_date
-                                                                                    ? `${formatDate(selectedOrder.order_date)}`
-                                                                                    : "ยังไม่ทราบวันที่สั่งซื้อ"}
-                                                                            </p>
-                                                                        </div> */}
-
-                                                                        {/* สินค้า */}
-                                                                        {/* <div className="mb-3 text-start">
-                                                                            <label className="form-label fw-bold">สินค้า</label>
-                                                                            <p>{selectedOrder.product_name}</p>
-                                                                        </div> */}
-
                                                                         {/* เหตุผล */}
                                                                         <div className="mb-3 text-start">
                                                                             <label className="form-label fw-bold">เหตุผล/ปัญหาที่เจอ</label>

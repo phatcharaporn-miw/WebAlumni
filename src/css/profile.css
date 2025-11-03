@@ -50,8 +50,6 @@
   }
   
 
-  
-
 textarea{
   /* width: 50%; */
   height: 150px;
@@ -68,7 +66,7 @@ textarea{
   transform: translateY(-50%);
   background: none;
   border: none;
-  color: #007bff;
+  color: #0F75BC;
   cursor: pointer;
   font-size: 14px;
 }
@@ -77,12 +75,435 @@ textarea{
   text-decoration: underline;
 }
 
-@media (max-width: 767.98px) {
-  .alumni-profile-page .btn {
-    width: 100% !important;
-    margin-bottom: 10px;
+/* Base Styles */
+.alumni-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.legend-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #444;
+  border-bottom: 2px solid #0F75BC;
+  padding-bottom: 8px;
+}
+
+.importent {
+  color: #dc3545;
+  margin-left: 2px;
+}
+
+/* Profile Image Container */
+.profile-image-container {
+  position: relative;
+  display: inline-block;
+}
+
+/* Menu Styles */
+.menu-item {
+  cursor: pointer;
+  padding: 12px 16px;
+  transition: all 0.3s ease;
+  color: #555;
+  font-size: 0.95rem;
+  text-align: left;
+}
+
+.menu-item:hover {
+  background-color: #f8f9fa;
+  color: #007bff;
+}
+
+.menu-item.active {
+  background-color: #0F75BC;
+  color: white;
+  font-weight: 500;
+}
+
+/* Form Controls */
+.form-control:disabled {
+  background-color: #f8f9fa;
+  cursor: not-allowed;
+}
+
+
+/* Buttons */
+.btn {
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+
+@media (max-width: 768px) {
+  /* Card Body Spacing */
+  .card-body.py-3 {
+    padding: 16px 12px !important;
   }
-  .alumni-profile-page .bg-light {
-    padding: 1.5rem !important;
+
+  /* Row Alignment */
+  .row.align-items-center {
+    row-gap: 10px;
+  }
+
+  /* Column Adjustments */
+  .col-6,
+  .col-md-3,
+  .col-md-2 {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  /* วันที่สั่งซื้อ - แสดงเต็มในแท็บเล็ต */
+  .col-6.col-md-3:first-child {
+    flex: 0 0 25%;
+    max-width: 25%;
+  }
+
+  .text-muted.mb-1 {
+    font-size: 0.8rem;
+    margin-bottom: 4px !important;
+  }
+
+  .fw-bold.text-primary {
+    font-size: 0.9rem !important;
+  }
+
+  /* ผู้สั่งซื้อ - ซ่อนใน 768px */
+  .col-6.col-md-3.d-none.d-md-block {
+    display: none !important;
+  }
+
+  .col-6.col-md-3.d-none.d-md-block small {
+    font-size: 0.8rem;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .col-6.col-md-3.d-none.d-md-block .fw-semibold {
+    font-size: 0.9rem;
+    max-width: 100%;
+  }
+
+  /* Status Badge - ซ่อนเฉพาะสถานะ ใน 768px */
+  .col-3.col-md-2:not(.text-end) {
+    flex: 0 0 40%;
+    max-width: 40%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .badge.rounded-pill {
+    padding: 5px 10px !important;
+    font-size: 0.75rem !important;
+    min-width: 70px;
+    text-align: center;
+  }
+
+  /* Action Button - ขยายพื้นที่ */
+  .col-3.col-md-2.text-end {
+    flex: 0 0 35%;
+    max-width: 35%;
+    display: block !important;
+  }
+
+  .btn-outline-primary.btn-sm {
+    padding: 6px 12px !important;
+    font-size: 0.8rem !important;
+    white-space: nowrap;
+  }
+
+  /* แสดงข้อความ "จัดการ" ในแท็บเล็ต */
+  .d-none.d-sm-inline {
+    display: inline !important;
+  }
+
+  .stat-item .icon-wrapper {
+    padding: 0.6rem !important; 
+  }
+
+  .stat-item i {
+    font-size: 0.9rem !important; 
+  }
+
+  .stat-item h5 {
+    font-size: 1rem !important; 
+  }
+
+  .stat-item p {
+    font-size: 0.75rem !important; 
+  }
+
+  /* การ์ดแต่ละใบให้ padding น้อยลง */
+  .donation-item {
+    padding: 1rem !important;
+  }
+
+  /* หัวข้อชื่อโครงการ */
+  .donation-item h5 {
+    font-size: 1rem !important;
+    margin-bottom: 0.4rem !important;
+  }
+
+  /* ป้าย badge */
+  .donation-item .badge {
+    font-size: 0.75rem !important;
+    padding: 0.25rem 0.4rem !important;
+  }
+
+  /* ข้อความรายละเอียด */
+  .donation-item p,
+  .donation-item small {
+    font-size: 0.8rem !important;
+    line-height: 1.3 !important;
+  }
+
+  /* จำนวนเงินบริจาค */
+  .donation-item .h4 {
+    font-size: 1.1rem !important;
+  }
+
+  /* ลดช่องว่างระหว่างแถวหลัก */
+  .donation-item .row.align-items-center {
+    gap: 0.5rem !important;
+  }
+
+  /* จัด layout ให้เป็นคอลัมน์เวลาแคบ */
+  .donation-item .col-md-8,
+  .donation-item .col-md-4 {
+    width: 100% !important;
+    text-align: left !important;
+  }
+
+  /* จัดข้อความส่วนยอดเงินให้อยู่ชิดซ้ายในแท็บเล็ต */
+  .donation-item .text-md-end {
+    text-align: left !important;
+  }
+
+  /* ช่องว่างบน/ล่างของรายละเอียด */
+  .donation-item .mt-3 {
+    margin-top: 0.5rem !important;
+  }
+}
+
+/* ========================================
+   EXACTLY 768px - Fine Tuning
+   ======================================== */
+
+@media (min-width: 768px) and (max-width: 768px) {
+  /* Perfect Balance for 768px Width - ซ่อนผู้สั่งซื้อ */
+  .col-6.col-md-3:first-child {
+    flex: 0 0 25%;
+    max-width: 25%;
+  }
+
+  /* ซ่อนผู้สั่งซื้อ */
+  .col-6.col-md-3.d-none.d-md-block {
+    display: none !important;
+  }
+
+  /* แสดงสถานะ */
+  .col-3.col-md-2:not(.text-end) {
+    flex: 0 0 40%;
+    max-width: 40%;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .col-3.col-md-2.text-end {
+    flex: 0 0 35%;
+    max-width: 35%;
+    display: block !important;
+  }
+}
+
+/* ========================================
+   SMALL TABLET (577px - 767px)
+   ======================================== */
+
+@media (min-width: 577px) and (max-width: 767px) {
+  /* Adjust for Smaller Tablets */
+  .col-6.col-md-3:first-child {
+    flex: 0 0 28%;
+    max-width: 28%;
+  }
+
+  .col-6.col-md-3.d-none.d-md-block {
+    flex: 0 0 32%;
+    max-width: 32%;
+  }
+
+  .col-3.col-md-2 {
+    flex: 0 0 22%;
+    max-width: 22%;
+  }
+
+  .col-3.col-md-2.text-end {
+    flex: 0 0 18%;
+    max-width: 18%;
+  }
+
+  /* Smaller Font Sizes */
+  .fw-bold.text-primary,
+  .fw-semibold {
+    font-size: 0.85rem !important;
+  }
+
+  .badge.rounded-pill {
+    font-size: 0.7rem !important;
+    padding: 4px 8px !important;
+    min-width: 65px;
+  }
+}
+
+/* ========================================
+   MOBILE OPTIMIZATION (< 576px)
+   ======================================== */
+
+@media (max-width: 576px) {
+  /* Card Body */
+  .card-body.py-3 {
+    padding: 12px 10px !important;
+  }
+
+  /* วันที่สั่งซื้อ - เต็มความกว้าง */
+  .col-6.col-md-3:first-child {
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
+
+  /* ซ่อนผู้สั่งซื้อในมือถือ */
+  .col-6.col-md-3.d-none.d-md-block {
+    display: none !important;
+  }
+
+  /* แสดงเฉพาะวันที่แบบสั้น */
+  .d-none.d-md-block {
+    display: none !important;
+  }
+
+  .d-md-none {
+    display: block !important;
+  }
+
+  .text-muted.d-md-none {
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  /* Status Badge - เต็มพื้นที่ */
+  .col-3.col-md-2 {
+    flex: 0 0 27%;
+    max-width: 27%;
+  }
+
+  .badge.rounded-pill {
+    padding: 4px 8px !important;
+    font-size: 0.7rem !important;
+    min-width: 60px;
+  }
+
+  /* Action Button - Icon Only */
+  .col-3.col-md-2.text-end {
+    flex: 0 0 23%;
+    max-width: 23%;
+  }
+
+  .btn-outline-primary.btn-sm {
+    padding: 5px 10px !important;
+    font-size: 0.75rem !important;
+  }
+
+  /* ซ่อนข้อความ แสดงเฉพาะไอคอนในมือถือ */
+  .d-none.d-sm-inline {
+    display: none !important;
+  }
+}
+
+/* ========================================
+   EXTRA SMALL MOBILE (< 375px)
+   ======================================== */
+
+@media (max-width: 375px) {
+  .card-body.py-3 {
+    padding: 10px 8px !important;
+  }
+
+  .col-6.col-md-3:first-child {
+    flex: 0 0 45%;
+    max-width: 45%;
+  }
+
+  .col-3.col-md-2 {
+    flex: 0 0 30%;
+    max-width: 30%;
+  }
+
+  .col-3.col-md-2.text-end {
+    flex: 0 0 25%;
+    max-width: 25%;
+  }
+
+  .text-muted.mb-1 {
+    font-size: 0.75rem;
+  }
+
+  .badge.rounded-pill {
+    font-size: 0.65rem !important;
+    padding: 3px 6px !important;
+    min-width: 55px;
+  }
+
+  .btn-outline-primary.btn-sm {
+    padding: 4px 8px !important;
+  }
+}
+
+/* Button Active State */
+.btn-outline-primary:active {
+  transform: translateY(0);
+}
+
+/* Badge Hover (for clickable badges) */
+.badge.rounded-pill.clickable {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.badge.rounded-pill.clickable:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+/* ========================================
+   ACCESSIBILITY
+   ======================================== */
+
+/* Focus States for Keyboard Navigation */
+.btn-outline-primary:focus {
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
+  outline: none;
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+  .badge.rounded-pill {
+    border: 2px solid currentColor;
+  }
+  
+  .btn-outline-primary {
+    border-width: 2px;
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .card-body,
+  .btn-outline-primary,
+  .badge.rounded-pill {
+    transition: none;
   }
 }

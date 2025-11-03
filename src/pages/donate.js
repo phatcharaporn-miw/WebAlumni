@@ -9,9 +9,13 @@ import { AiOutlineClose } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
 import { BiCoin } from 'react-icons/bi';
 import { FaCoins } from 'react-icons/fa6';
-import {HOSTNAME} from '../config.js';
+import { HOSTNAME } from '../config.js';
+import Swal from "sweetalert2";
+import { useAuth } from "../context/AuthContext.js";
 
 function Donate() {
+    const { user } = useAuth();
+    const userId = user?.user_id;
     const [projects, setProjects] = useState([]);
     const [recentDonors, setRecentDonors] = useState([]);
     const [filter, setFilter] = useState("all");
@@ -128,7 +132,7 @@ function Donate() {
         setCurrentPage(1);
     };
 
-     // ฟังก์ชันช่วยเช็กว่าเดือนอยู่ในช่วงที่เลือกหรือไม่
+    // ฟังก์ชันช่วยเช็กว่าเดือนอยู่ในช่วงที่เลือกหรือไม่
     const isInSelectedMonthRange = (date, range) => {
         if (!date || range === "all") return true;
         const month = new Date(date).getMonth() + 1; // getMonth() = 0-11
@@ -225,6 +229,24 @@ function Donate() {
         }
     };
 
+    const handleDonateClick = () => {
+        if (!userId) {
+            //ถ้ายังไม่เข้าสู่ระบบ
+            Swal.fire({
+                title: "กรุณาเข้าสู่ระบบ",
+                text: "คุณต้องเข้าสู่ระบบก่อน",
+                icon: "warning",
+                confirmButtonText: "เข้าสู่ระบบ"
+            }).then(() => {
+                navigate("/login");
+            });
+            return;
+        }
+
+        navigate("/donate/donate-general");
+    };
+
+
     const handleTagClick = (type) => {
         setFilter(type || "all");
         setCurrentPage(1);
@@ -238,7 +260,7 @@ function Donate() {
                 {/* Filters */}
                 <div className="donate-filters">
                     <div className="row g-3">
-                        <div className="col-md-3">
+                        <div className="col-lg-3 col-md-4">
                             <label htmlFor="search" className="form-label">ค้นหาโครงการ:</label>
                             <div className="input-group">
                                 <span className="input-group-text">
@@ -255,7 +277,7 @@ function Donate() {
                             </div>
                         </div>
 
-                        <div className="col-md-3">
+                        <div className="col-lg-3 col-md-4">
                             <label htmlFor="donation-type" className="form-label">ประเภทการบริจาค:</label>
                             <select
                                 id="donation-type"
@@ -270,7 +292,7 @@ function Donate() {
                             </select>
                         </div>
 
-                        <div className="col-md-3">
+                        <div className="col-lg-2 col-md-3">
                             <label htmlFor="month-range" className="form-label">ช่วงเดือน:</label>
                             <select
                                 id="month-range"
@@ -285,7 +307,7 @@ function Donate() {
                             </select>
                         </div>
 
-                        <div className="col-md-3">
+                        <div className="col-lg-2 col-md-4">
                             <label htmlFor="status-filter" className="form-label">สถานะกิจกรรม:</label>
                             <select
                                 id="status-filter"
@@ -299,7 +321,7 @@ function Donate() {
                             </select>
                         </div>
 
-                        <div className="col-md-2 d-flex flex-column">
+                        <div className="col-lg-2 col-md-4 d-flex flex-column">
                             <label className="form-label invisible">ล้าง</label>
                             <button
                                 className="btn btn-outline-secondary"
@@ -382,10 +404,7 @@ function Donate() {
                             <h3>บริจาคทั่วไป</h3>
                             <p className="text-center">สนับสนุนสมาคมศิษย์เก่าวิทยาลัยการคอมพิวเตอร์โดยตรง ไม่ผ่านโครงการเฉพาะ</p>
                         </div>
-                        <button
-                            className="btn-general-donate"
-                            onClick={() => navigate('/donate/donate-general')}
-                        >
+                        <button className="btn-general-donate" onClick={handleDonateClick}>
                             บริจาคเลย
                             <FaArrowRight className="ms-2" />
                         </button>
@@ -396,7 +415,14 @@ function Donate() {
                 <div className="recent-donors-section">
                     <div className="recent-donors-header">
                         <FaUsers />
-                        <h4>ผู้บริจาคล่าสุด</h4>
+                        <h4>รายชื่อผู้บริจาคล่าสุด</h4>
+                        <button
+                            className="btn btn-sm btn-primary"
+                            style={{ marginLeft: 'auto' }}
+                            onClick={() => navigate('/donate/donation-all')}
+                        >
+                            ดูทั้งหมด
+                        </button>
                     </div>
 
                     {recentDonors.length > 0 ? (
@@ -608,7 +634,7 @@ function Donate() {
                                                 </div>
                                             </div>
 
-                                            <div className="donate-project-footer">
+                                            {/* <div className="donate-project-footer">
                                                 <button
                                                     className={`btn donate-action-button ${isExpired
                                                         ? "btn-detail"
@@ -633,7 +659,47 @@ function Donate() {
                                                             </>
                                                     }
                                                 </button>
+                                            </div> */}
+                                            <div className="donate-project-footer">
+                                                <button
+                                                    className={`btn donate-action-button ${isExpired
+                                                            ? "btn-detail"
+                                                            : isUpcoming
+                                                                ? "btn-secondary"
+                                                                : "btn-primary"
+                                                        } rounded-pill px-3`}
+                                                    disabled={isUpcoming}
+                                                    onClick={() => {
+                                                        if (isUpcoming) return;
+
+                                                        if (!userId) {
+                                                            Swal.fire({
+                                                                title: "กรุณาเข้าสู่ระบบ",
+                                                                text: "คุณต้องเข้าสู่ระบบก่อน",
+                                                                icon: "warning",
+                                                                confirmButtonText: "เข้าสู่ระบบ"
+                                                            }).then(() => {
+                                                                navigate("/login");
+                                                            });
+                                                            return;
+                                                        }
+
+                                                        navigate(`/donate/donatedetail/${project?.project_id}`);
+                                                    }}
+                                                >
+                                                    {isExpired ? (
+                                                        "ดูรายละเอียด"
+                                                    ) : isUpcoming ? (
+                                                        "กำลังจะเริ่ม"
+                                                    ) : (
+                                                        <>
+                                                            บริจาคเลย
+                                                            <FaArrowRight className="ms-2" size={14} />
+                                                        </>
+                                                    )}
+                                                </button>
                                             </div>
+
                                         </div>
                                     );
                                 })}

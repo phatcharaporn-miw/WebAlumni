@@ -2,7 +2,13 @@
   position: relative;
   min-height: 100vh;
   overflow: hidden;
+}
 
+.carousel-item img{
+  width: 100%;
+  height: 420px;
+  max-height: 80vh;
+  object-fit: cover;
 }
 
 .background-image {
@@ -24,7 +30,17 @@
     overflow: hidden;
     margin-bottom: 5%;
     background-color: #fff;
+    transition: transform 0.2s ease-in-out;
   }
+
+
+.card-homeweb:hover {
+  transform: translateY(-3px);
+}
+
+.text-post {
+  font-size: 1rem;
+}
 
 .news-card img {
   object-fit: cover;
@@ -48,10 +64,6 @@
   color: #0F75BC;
   font-size: 2rem;
   font-weight: 700;
-}
-
-.activity-title {
-  color: #0F75BC;
 }
 
 .title-icon {
@@ -161,12 +173,29 @@
   font-size: 0.9rem;
 }
 
+.act-name{
+color: #2c3e50;
+font-size: 15px;
+}
+
 .activity-title {
-  color: #2c3e50;
-  font-size: 1.3rem;
+  color: #0F75BC;
   text-align: center;
   position: relative;
 }
+
+.act-home-item{
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    border-radius: 15px;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, rgb(248, 249, 250) 0%, rgb(233, 236, 239) 100%);
+    border: 1px solid rgb(222, 226, 230);
+    transition: 0.3s ease-in-out;
+    position: relative;
+    overflow: hidden;
+    }
 
 .activity-icon {
   font-size: 1.2rem;
@@ -263,6 +292,54 @@
   font-size: 0.85rem;
 }
 
+.webboard-home {
+    width: 50%;
+    height: 300px;
+}
+
+.card-title-about{
+    color: rgb(44, 62, 80);
+    font-size: 1.8rem;
+    line-height: 1.3;
+}
+
+.card-text-about{
+    font-size: 1.1rem;
+    text-align: justify;
+    text-indent: 2rem;
+}
+
+.text-post{
+  font-size: 18px;
+}
+
+/* กราฟแท่ง */
+.chart-wrapper {
+  width: 100%;
+  overflow-x: auto; 
+}
+
+.chart-container {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  height: 350px; 
+}
+
+/* กราฟวงกลม */
+.pie-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pie-container {
+  position: relative;
+  width: 100%;
+  max-width: 350px; 
+  height: 350px;
+}
 @keyframes pulse {
 
   0%,
@@ -276,7 +353,6 @@
 }
 
 /* ส่วนของการ์ดโครงการบริจาค */
-
 .donate-content-home-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -287,7 +363,6 @@
 
 .item-detail-home {
     width: 100%;
-    /* height: 550px; */
     border-radius: 10px;
     border: 1px solid #ddd;
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
@@ -296,7 +371,7 @@
     display: flex;
     flex-direction: column;
     position: relative;
-    /* overflow: hidden; */
+
 }
 
 .item-detail:hover {
@@ -307,7 +382,6 @@
 .image-donate-frame {
     width: 100%;
     height: 280px;
-    /* overflow: hidden; */
     border-radius: 12px 12px 0 0;
     display: flex;
     align-items: center;
@@ -322,24 +396,30 @@
     display: block;
 }
 
-@media (max-width: 768px) {
+.home-dashboard{
+  padding: 5px;
+}
+
+.chart-container {
+  position: relative;
+  width: 100%;
+  height: 300px; 
+}
+
+/* ipad */
+@media screen and (min-width: 768px) and (max-width: 1024px) {
+  .carousel-item img {
+      width: 100%;
+      height: 200px;
+      max-height: 80vh;
+      object-fit: cover;
+  }
+
   .section-title {
     font-size: 1.5rem;
     margin-bottom: 2rem;
   }
 
-  .activity-section {
-    margin-top: 2rem;
-  }
-
-  .activity-link {
-    padding: 12px !important;
-  }
-
-  .act-date {
-    min-width: 60px !important;
-    padding: 8px !important;
-  }
 
   .day {
     font-size: 1.2rem !important;
@@ -349,17 +429,280 @@
     margin: 0 20px;
   }
 
+  .pie-container {
+    max-width: 280px;
+    height: 280px;
+  }
+
+  .custom-modal {
+    width: 95%;
+    max-height: 90vh;
+    padding: 0.8rem;
+    border-radius: 12px;
+  }
+
+  .modal-content h5 {
+    font-size: 1rem;
+  }
+
+  .modal-content p,
+  .modal-content small {
+    font-size: 0.85rem;
+  }
+
+  .comment-item {
+    padding: 0.75rem;
+  }
+
+  .close-modal-button {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+  }
+  
   .card-homeweb {
-    height: auto;
-    margin-bottom: 30px;
+    padding: 1rem;
+  }
+
+  .text-post {
+    font-size: 0.95rem;
+  }
+
+  .card-homeweb img {
+    width: 45px;
+    height: 45px;
+  }
+
+  .activity-content {
+    padding: 1rem;
   }
 
   .act-home-item {
-    padding: 10px;
+    flex-direction: row; 
+    gap: 0.5rem;
+    padding: 1rem;
   }
 
   .act-date {
-    width: auto;
-    display: inline-block;
+    padding: 8px;
+    min-width: 60px;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(255, 107, 107, 0.2);
   }
+
+  .act-date .day {
+    font-size: 1.2rem;
+  }
+
+  .act-date .month-year {
+    font-size: 0.7rem;
+  }
+
+  .act-content {
+    margin-left: 0.5rem;
+  }
+
+  .act-name {
+    font-size: 0.95rem;
+  }
+
+  .act-text {
+    font-size: 0.8rem;
+  }
+
+  .empty-activity-title {
+    font-size: 1rem;
+  }
+
+  .empty-activity-text {
+    font-size: 0.85rem;
+  }
+
+  .donate-progress-section,
+  .donate-amounts,
+  .donate-days-remaining {
+    display: none; 
+  }
+
+  .donate-project-description {
+    font-size: 0.85rem; 
+    max-height: 3em; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .donate-project-image img {
+    height: 180px;
+    object-fit: cover;
+  }
+
+  .donate-content-home-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+    padding: 0 20px;
+  }
+}
+
+/*  Mobile / Tablet  */
+@media screen and (max-width: 767px) {
+.carousel-item img {
+      height: 420px;
+  }
+}
+
+/* iphone 12 pro */
+@media screen and (min-width: 300px) and (max-width: 480px){
+  .carousel-item img {
+      height: 200px;
+      object-fit: cover;
+  }
+
+  #head-text {
+    text-align: center;
+    margin: 30px;
+    padding: 0px;
+    color: #0F75BC;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.activity-title {
+    font-size: 20px;
+    text-align: center;
+    color: #0F75BC;
+}
+
+.activity-content{
+  padding: 0 !important; 
+}
+    .act-home-item{
+    display: flex;
+    align-items: center;
+    border-radius: 15px;
+    margin-bottom: 25px;
+    background: linear-gradient(135deg, rgb(248, 249, 250) 0%, rgb(233, 236, 239) 100%);
+    border: 1px solid rgb(222, 226, 230);
+    transition: 0.3s ease-in-out;
+    position: relative;
+    overflow: hidden;
+    }
+.home-dashboard{
+  padding: 0px;
+}
+
+#row-webboard {
+    padding: 0;
+}
+
+.webboard-home {
+    width: 100%;
+    height: 180px;
+}
+
+  .text-post {
+    font-size: 0.9rem;
+    white-space: normal;
+  }
+
+  .card-homeweb img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .card-homeweb p {
+    font-size: 0.8rem;
+  }
+
+  .card-homeweb .badge {
+    font-size: 0.7rem;
+    padding: 4px 8px;
+  }
+
+.card-title-about{
+    color: rgb(44, 62, 80);
+    font-size: 20px;
+}
+.card-text-about{
+    font-size: 14px;
+    text-align: justify;
+    text-indent: 1rem;
+}
+
+.footer, #foot-text, .footer-contact, .footer-contact2, .footer-contact3, .foot-news, .foot-act, .foot-donate, .foot-faq {
+        text-align: center;
+        justify-content: center;
+        font-size: 14px;
+}
+
+.donate-content-home-grid {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 30px;
+    margin: 40px 0;
+    padding: 0px;
+}
+
+.donate-badge {
+    font-size: 11px;
+    padding: 5px 10px;
+    border-radius: 20px;
+}
+
+.donate-project-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.donate-project-header {
+    display: block;
+}
+
+.donate-project-date {
+    color: #6c757d;
+    font-size: 12px;
+    display: flex;
+    margin-top: 15px;
+}
+
+.donate-project-image {
+    width: 100%;
+    height: 180px !important;
+    position: relative;
+}
+
+ .chart-container {
+    height: 260px;
+  }
+
+  .modal-content {
+        width: 100%;
+        margin: 0px;
+  }
+
+  .donate-progress-section,
+  .donate-amounts,
+  .donate-days-remaining {
+    display: none; 
+  }
+
+  .donate-project-description {
+    font-size: 0.8rem;
+    max-height: 2.5em;
+  }
+
+  .donate-project-image img {
+    height: 150px;
+    object-fit: cover;
+  }
+
+  .donate-project-card {
+        height: 300px;
+        max-width: 400px;
+        margin: 0 auto;
+        min-height: 500px;
+    }
+
 }

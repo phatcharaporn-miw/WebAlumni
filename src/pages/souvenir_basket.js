@@ -387,15 +387,6 @@ function SouvenirBasket() {
                         <div className="d-flex justify-content-between align-items-center mb-3">
                             <h5>รายการสินค้า ({cart.length} รายการ)</h5>
                             <div>
-                                {/* 
-                                <button
-                                    className="btn btn-outline-primary btn-sm me-2"
-                                    onClick={handleSelectAll}
-                                    disabled // ปิดการใช้งาน
-                                >
-                                    เลือกทั้งหมด
-                                </button>
-                                */}
                                 {selectedItems.length > 0 && (
                                     <button
                                         className="btn btn-outline-danger btn-sm"

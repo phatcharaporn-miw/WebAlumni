@@ -71,8 +71,8 @@ function AdminHome() {
             datasets: [{
               label: 'จำนวนกิจกรรม',
               data,
-              backgroundColor: 'rgba(13, 110, 253, 0.8)',
-              borderColor: 'rgba(13, 110, 253, 1)',
+              backgroundColor: 'rgba(253, 202, 60, 0.8)',
+              borderColor: 'rgba(206, 157, 8, 1)',
               borderWidth: 2,
               borderRadius: 6,
               borderSkipped: false,
@@ -91,8 +91,8 @@ function AdminHome() {
           labels,
           datasets: [{
             data,
-            backgroundColor: ['#98d662ff', '#6f42c1', '#241f12ff'],
-            borderColor: ['#98d662ff', '#6f42c1', '#241f12ff'],
+            backgroundColor: ['#5493f1ff', '#f093fb', '#f5576c'], 
+            borderColor: ['#5493f1ff', '#f093fb', '#f5576c'],
             borderWidth: 2,
           }],
         });

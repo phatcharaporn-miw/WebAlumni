@@ -137,7 +137,7 @@ const removeEducation = (index) => {
       withCredentials: true, 
     })
       .then((response) => {
-         Swal.fire({
+        Swal.fire({
           title: "สำเร็จ!",
           text: "แก้ไขข้อมูลส่วนตัวสำเร็จ",
           icon: "success",
@@ -197,7 +197,7 @@ return (
       <div className='alumni-profile-page'>
         <div className="row justify-content-center g-4">
           {/* Sidebar/Profile */}
-          <div className="col-12 col-md-3 mb-4">
+          <div className="col-12 col-lg-3 col-md-4 mb-4">
             <div className="bg-white rounded-4 shadow-sm text-center p-4">
               <img
                 src={previewImage || profile.profilePicture}
@@ -359,7 +359,7 @@ return (
                 <legend className="legend-title">ข้อมูลการศึกษา</legend>
                 {Array.isArray(profile.educations) && profile.educations.length > 0 ? (
                   profile.educations.map((edu, index) => (
-                    <div key={index} className="education-item mb-4 p-3 rounded-3 border bg-light">
+                    <div key={index} className="education-item mb-4 p-3 rounded-3">
                       <div className="row g-3">
                         <div className="col-md-6">
                           <label>ระดับการศึกษา<span className="importent">*</span></label>

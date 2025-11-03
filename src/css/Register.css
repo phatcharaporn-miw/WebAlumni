@@ -246,14 +246,6 @@ button:hover {
     opacity: 0.6;
 }
 
-/* .btn {
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: background-color 0.3s;
-} */
 
 .btn-primary {
     background-color: #007bff;
@@ -274,6 +266,14 @@ button:hover {
 }
 
 @media (max-width: 768px) {
+
+    .register-logo {
+        width: 350px;
+        height: 150px;
+        margin: 0 auto 20px auto;
+        object-fit: cover;
+    }
+
     .form-group {
         flex-direction: column;
         align-items: flex-start;
@@ -298,11 +298,68 @@ button:hover {
         gap: 10px;
     }
 
-    button {
-        width: 100%;
-    }
-
     .form-regis fieldset {
         grid-template-columns: 1fr;
     }
+}
+@media (max-width: 414px) {
+    .register-logo {
+        width: 350px;
+        height: 150px;
+        margin: 0 auto 20px auto;
+        object-fit: cover;
+    }
+
+    .form-regis-bg {
+        background-color: #F5F5F5;
+        border-radius: 9px;
+        padding: 20px;
+        width: 100%;
+        max-width: 400px;
+        margin: 0 auto;
+        box-sizing: border-box;
+        overflow: hidden;
+        margin-bottom: 10%;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-regis h2 {
+    font-size: 25px;
+    text-align: center;
+    color: #0F75BC;
+}
+
+.legend-title {
+    font-weight: bold;
+    font-size: 17px;
+    color: #0F75BC;
+    margin-top: 15px;
+}
+
+    .form-group label {
+        width: auto;
+        text-align: left;
+        margin-right: 0;
+        font-size: 15px;
+    }
+
+    .role-btn {
+    flex: 1 1;
+    padding: 10px;
+    border: 2px solid #ddd;
+    background-color: white;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    text-align: center;
+}
+
+.form-group input, .form-group select {
+    flex: 1 1;
+    padding: 8px;
+    font-size: 13px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
 }

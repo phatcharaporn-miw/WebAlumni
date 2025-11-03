@@ -229,7 +229,15 @@ function DashboardDonationsPage() {
                     {/*รายชื่อผู้บริจาค */}
                     <div className="recent-donors-section">
                         <div className="recent-donors-header">
-                            <h4>รายชื่อผู้บริจาค</h4>
+                            <FaUsers />
+                            <h4>รายชื่อผู้บริจาคล่าสุด</h4>
+                            <button
+                                className="btn btn-sm btn-primary"
+                                style={{ marginLeft: 'auto' }}
+                                onClick={() => navigate('/donate/donation-all')}
+                            >
+                                ดูทั้งหมด
+                            </button>
                         </div>
                         {currentProjects.length > 0 ? (
                             <div className="recent-donors-list">
@@ -277,6 +285,14 @@ function DashboardDonationsPage() {
                         )}
                     </div>
 
+                    <div className="donate-page-info text-center mt-2">
+                        <small>
+                            หน้า {currentPage} จาก {totalPages} (แสดง {indexOfFirstProject + 1}–
+                            {Math.min(indexOfLastProject, filteredProjects.length)} จาก{" "}
+                            {filteredProjects.length} รายการ)
+                        </small>
+                    </div>
+
                     {/*Pagination */}
                     {totalPages > 1 && (
                         <nav aria-label="Page navigation" className="donate-pagination">
@@ -315,13 +331,6 @@ function DashboardDonationsPage() {
                         </nav>
                     )}
 
-                    <div className="donate-page-info text-center mt-2">
-                        <small>
-                            หน้า {currentPage} จาก {totalPages} (แสดง {indexOfFirstProject + 1}–
-                            {Math.min(indexOfLastProject, filteredProjects.length)} จาก{" "}
-                            {filteredProjects.length} รายการ)
-                        </small>
-                    </div>
                 </div>
 
             </div>

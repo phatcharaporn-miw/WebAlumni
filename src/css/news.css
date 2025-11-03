@@ -130,16 +130,63 @@
     font-size: medium;
 }
 
-@media (max-width: 768px) {
-  .news-image {
-    max-width: 100%; 
-  }
+/* @media screen and (min-width: 1440px) {
 
-  .head-news{
+  .news {
+    position: absolute;
+    top: 37%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #fff;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    z-index: 2;
+}
+
+} */
+
+/* ipad */
+@media screen and (min-width: 768px) and (max-width: 1024px) {
+  .news {
+    position: absolute;
+    top: 35%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #fff;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    z-index: 2;
+}
+
+.news-image {
+    max-width: 30%;
+    height: 120px;
+    border-radius: 5px;
+    object-fit: cover;
+}
+}
+
+/* iphone 12 pro */
+@media screen and (min-width: 300px) and (max-width: 480px){
+.head-news {
     position: relative;
     width: 100%;
     height: 200px;
     object-fit: cover;
     overflow: hidden;
-  }
+}
+
+.news {
+    position: absolute;
+    top: 37%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #fff;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    z-index: 2;
+}
+  
+
+  
 }

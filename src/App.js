@@ -50,6 +50,7 @@ import DashboardActivitiesPage from './pages/dashboard-activity';
 import DashboardDonationPage from './pages/dashboard-donation';
 import DashboardProjectsPage from './pages/dashboard-project';
 import DashboardAlumniPage from './pages/dashboard-alumni';
+import DonationAll from './pages/donation-all';
 
 // ส่วนของ การ import component ที่ใช้สำหรับการตรวจสอบสิทธิ์
 import AlumniOnly from './components/AlumniOnly';
@@ -110,6 +111,8 @@ import Approve from './pages/president/president-approve';
 import PresidentProfileSouvenir from './pages/president/president-profile-souvenir';
 import PresidentProfileDonation from './pages/president/president-profile-donation';
 import PresidentManageOrders from './pages/president/president-manage-orders';
+import PresidentSummaryAll from './pages/president/president-summary-all';
+import PresidentOrdersList from './pages/president/president-orderlist';
 
 const AlumniMajor = lazy(() => import("./pages/major-detail"));
 const Webboard = lazy(() => import("./pages/webboard"));
@@ -178,6 +181,7 @@ function App() {
                   <Route path="/donate/donation-summary-detail/general" element={<DonationSummaryDetail />} />
                   <Route path="/donate/donation-summary-detail/all" element={<DonationSummaryDetail />} />
                   <Route path="/donate/donation-summary-detail" element={<DonationSummaryDetail />} />
+                  <Route path="/donate/donation-all" element={<DonationAll />} />
         
                   {/* ลองทำไว้ก่อน */}
                   <Route path="/change-password" element={<ChangePassword />} />
@@ -219,6 +223,8 @@ function App() {
                   <Route path="/president-profile/president-profile-souvenir" element={<PresidentOnly><PresidentProfileSouvenir /></PresidentOnly>} />
                   <Route path="/president-profile/president-profile-donation" element={<PresidentOnly><PresidentProfileDonation /></PresidentOnly>} />
                   <Route path="/president-profile/president-manage-orders" element={<PresidentOnly><PresidentManageOrders /></PresidentOnly>} />
+                  <Route path="/president-profile/president-summary-all" element={<PresidentOnly><PresidentSummaryAll /></PresidentOnly>} />
+                  <Route path="/president-profile/president-orderlist" element={<PresidentOnly><PresidentOrdersList /></PresidentOnly>} />
                 </Route>
 
                 {/* route ของแอดมิน */}

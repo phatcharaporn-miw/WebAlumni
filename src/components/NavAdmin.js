@@ -264,7 +264,7 @@ function NavAdmin() {
 
                 {/* Profile - ใช้ข้อมูลจาก user context โดยตรง */}
                 {userId && (
-                    <div className="card-body text-center" style={{ padding: "20px"}}>
+                    <div className="text-center" style={{ padding: "12px"}}>
                         <div
                             className="position-relative d-inline-block"
                             style={{

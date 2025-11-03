@@ -325,7 +325,7 @@ function Activity() {
                 <div className="donate-filters">
                     <div className="row g-3">
                         {/* ค้นหากิจกรรม */}
-                        <div className="col-md-4">
+                        <div className="col-lg-4 col-md-4">
                             <label htmlFor="search" className="form-label">ค้นหากิจกรรม:</label>
                             <div className="input-group">
                                 <span className="input-group-text">
@@ -343,7 +343,7 @@ function Activity() {
                         </div>
 
                         {/* สถานะ */}
-                        <div className="col-md-4">
+                        <div className="col-lg-4 col-md-3">
                             <label htmlFor="status-filter" className="form-label">สถานะ:</label>
                             <select
                                 id="status-filter"
@@ -424,7 +424,7 @@ function Activity() {
                     <div className="row">
                         {paginatedActivity.length > 0 ? (
                             paginatedActivity.map(activity => (
-                                <div className="col-md-4 mb-5" key={activity.activity_id}>
+                                <div className="col-lg-4 col-md-6 mb-5" key={activity.activity_id}>
                                     <div className="card activity-card">
                                         <div className="image-container-act">
                                             <img
@@ -494,52 +494,51 @@ function Activity() {
                         )}
                     </div>
                     {/* Pagination */}
-                    <div className="donate-page-info">
-                        <small>
-                            หน้า {currentPage} จาก {totalPages} (แสดง{" "}
-                            {(currentPage - 1) * itemsPerPage + 1} -{" "}
-                            {Math.min(currentPage * itemsPerPage, filteredActivity.length)} จาก{" "}
-                            {filteredActivity.length} โครงการ)
-                        </small>
-                    </div>
-
-                    {/* Pagination Buttons */}
                     {totalPages > 1 && (
-                        <nav aria-label="Page navigation" className="donate-pagination">
-                            <ul className="pagination">
-                                <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
-                                    <button
-                                        className="page-link"
-                                        onClick={() => handlePageChange(currentPage - 1)}
-                                        disabled={currentPage === 1}
-                                    >
-                                        <FaChevronLeft />
-                                    </button>
-                                </li>
+                <nav aria-label="Page navigation" className="donate-pagination">
+                  <ul className="pagination">
+                    <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                      <button
+                        className="page-link"
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                      >
+                        <FaChevronLeft />
+                      </button>
+                    </li>
+        
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
+                      <li
+                        key={number}
+                        className={`page-item ${number === currentPage ? "active" : ""}`}
+                      >
+                        <button className="page-link" onClick={() => handlePageChange(number)}>
+                          {number}
+                        </button>
+                      </li>
+                    ))}
+        
+                    <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                      <button
+                        className="page-link"
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                      >
+                        <FaChevronRight />
+                      </button>
+                    </li>
+                  </ul>
+                </nav>
+        )}
 
-                                {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
-                                    <li
-                                        key={number}
-                                        className={`page-item ${number === currentPage ? "active" : ""}`}
-                                    >
-                                        <button className="page-link" onClick={() => handlePageChange(number)}>
-                                            {number}
-                                        </button>
-                                    </li>
-                                ))}
-
-                                <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
-                                    <button
-                                        className="page-link"
-                                        onClick={() => handlePageChange(currentPage + 1)}
-                                        disabled={currentPage === totalPages}
-                                    >
-                                        <FaChevronRight />
-                                    </button>
-                                </li>
-                            </ul>
-                        </nav>
-                    )}
+          <div className="donate-page-info mb-4">
+            <small>
+              หน้า {currentPage} จาก {totalPages} (แสดง{" "}
+              {(currentPage - 1) * itemsPerPage + 1} -{" "}
+              {Math.min(currentPage * itemsPerPage, filteredActivity.length)} จาก{" "}
+              {filteredActivity.length} โครงการ)
+            </small>
+        </div>
 
 
                 </div>

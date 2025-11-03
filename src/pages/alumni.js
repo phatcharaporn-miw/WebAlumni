@@ -69,7 +69,7 @@ function Alumni() {
                 <h5 className="alumni-title mb-4 fs-3 fw-bold">สาขา</h5>
                 <div className="row justify-content-between my-4">
                     {majors.map((major, index) => (
-                        <div className="col-6 col-sm-4 col-md-3 col-lg-2 mb-4" key={index}>
+                        <div className="col-sm-6 col-md-6 col-lg-2 mb-4" key={index}>
                             <Link to={`/alumni/major-detail/${major.slug}`} className="text-decoration-none w-100">
                                 <div className="major-card text-center">
                                     <img
@@ -86,41 +86,6 @@ function Alumni() {
                         </div>
                     ))}
                 </div>
-
-                {/* <h5 className="alumni-title mb-4 fs-3 fw-bold">ศิษย์เก่าผู้มีคุณูปการ</h5>
-                <div className="person text-center my-5">
-                    <div className="row" id="person-card">
-                        <div className="col-sm-6 col-md-4 col-lg-3 mb-4">
-                            <div className="card">
-                                <img
-                                    src="/image/profile-picture.png"
-                                    className="card-img-top"
-                                    alt="บุคลากร"
-                                    loading="lazy"
-                                />
-                                <div className="card-body">
-                                    <h5 className="card-title">นายวิมล นามอาษา</h5>
-                                    <p className="card-text">นายกสมาคมศิษย์เก่าวิทยาลัยการคอมพิวเตอร์</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="col-sm-6 col-md-4 col-lg-3 mb-4">
-                            <div className="card">
-                                <img
-                                    src="/image/profile-picture.png"
-                                    className="card-img-top"
-                                    alt="บุคลากร"
-                                    loading="lazy"
-                                />
-                                <div className="card-body">
-                                    <h5 className="card-title">นางแก้วกมล วงศ์ตระกูล</h5>
-                                    <p className="card-text">อุปนายกสมาคมคนที่ 1</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div> */}
-
                 
                 <div className="outstanding mb-5">
                     <h5 className="alumni-title mb-4 fs-3 fw-bold">ศิษย์เก่าดีเด่น</h5>

@@ -113,7 +113,6 @@ useEffect(() => {
   const handleLogout = async () => {
   try {
     setIsLoggingOut(true);
-    // console.log('Logging out...');
     
     // ล้าง state/session
     setUser(null);

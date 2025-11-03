@@ -89,7 +89,14 @@ function DonationSummaryDetail() {
             <div className="recent-donors-section">
                 <div className="recent-donors-header">
                     <FaUsers />
-                    <h4>รายชื่อผู้บริจาค</h4>
+                    <h4>รายชื่อผู้บริจาคล่าสุด</h4>
+                    <button
+                        className="btn btn-sm btn-primary"
+                        style={{ marginLeft: 'auto' }}
+                        onClick={() => navigate('/donate/donation-all')}
+                    >
+                        ดูทั้งหมด
+                    </button>
                 </div>
                 {recentDonors.length > 0 ? (
                     <div className="recent-donors-list">

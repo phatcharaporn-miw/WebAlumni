@@ -55,7 +55,7 @@ function AdminAlumni() {
             {/* ผู้มีคุณูปการ */}
             <div className="mb-5">
                 <h5 className="border-start border-4 border-primary ps-3 mb-3 fw-bold">
-                    🏅 ศิษย์เก่าผู้มีคุณูปการ
+                    ศิษย์เก่าผู้มีคุณูปการ
                 </h5>
                 <div className="table-responsive rounded-3 shadow-sm">
                     <table className="table table-bordered table-striped align-middle mb-0">
@@ -84,7 +84,6 @@ function AdminAlumni() {
             {/* ศิษย์เก่าดีเด่น */}
             <div className="mb-5">
                 <h5 className="border-start border-4 border-warning ps-3 mb-3 fw-bold">
-                    <BsAwardFill className="me-2 text-warning" />
                     ศิษย์เก่าดีเด่น
                 </h5>
                 <div className="table-responsive shadow-sm rounded-3">

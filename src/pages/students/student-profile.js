@@ -209,7 +209,7 @@ const toggleMenu = () => {
     <section className="container py-4">
     <div className="row justify-content-center">
       {/* Sidebar/Profile */}
-      <div className="col-12 col-md-3 mb-4">
+      <div className="col-12 col-lg-3 col-md-4 mb-4">
         <div className="bg-white rounded-4 shadow-sm text-center p-4">
           <img
             src={previewImage || profile.profilePicture}

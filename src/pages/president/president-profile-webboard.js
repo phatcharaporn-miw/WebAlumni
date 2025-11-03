@@ -143,7 +143,7 @@ function PresidentProfileWebboard() {
             <div className='alumni-profile-page'>
                 <div className="row justify-content-center g-4">
                     {/* Sidebar/Profile */}
-                    <div className="col-12 col-md-3 mb-4">
+                    <div className="col-12 col-lg-3 col-md-4 mb-4">
                         <div className="bg-white rounded-4 shadow-sm text-center p-4">
                             <img
                                 src={previewImage || profile.profilePicture}
@@ -170,8 +170,7 @@ function PresidentProfileWebboard() {
                             <hr className="w-100" />
                             <div className="menu d-block mt-3 w-100">
                                 <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/president-profile")}>โปรไฟล์ของฉัน</div>
-                                {/* <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/president-profile/president-manage-orders")}>จัดการคำสั่งซื้อของที่ระลึก</div> */}
-                                <div className="menu-item active py-2 mb-2 rounded" onClick={() => handleClick("/president-profile/president-profile-webboard")}>กระทู้ที่สร้าง</div>
+                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/president-profile/president-summary-all")}>ภาพรวมข้อมูลทั้งหมด</div>                                <div className="menu-item active py-2 mb-2 rounded" onClick={() => handleClick("/president-profile/president-profile-webboard")}>กระทู้ที่สร้าง</div>
                                 <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/president-profile/president-profile-donation")}>ประวัติการบริจาค</div>
                                 <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/president-profile/president-profile-activity")}>ประวัติการเข้าร่วมกิจกรรม</div>
                                 <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/president-profile/president-profile-souvenir")}>ประวัติการสั่งซื้อของที่ระลึก</div>

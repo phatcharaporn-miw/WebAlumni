@@ -137,27 +137,6 @@ function Souvenir() {
             </div>
           </div>
 
-          {/* ช่วงราคา */}
-          <div className="col-md-3">
-            <label htmlFor="price" className="form-label">
-              ช่วงราคา:
-            </label>
-            <select
-              id="price"
-              className="form-select"
-              value={priceRange}
-              onChange={(e) => {
-                setPriceRange(e.target.value);
-                setCurrentPage(1);
-              }}
-            >
-              <option value="all">ทั้งหมด</option>
-              <option value="low">ต่ำกว่า 100 บาท</option>
-              <option value="medium">100 - 500 บาท</option>
-              <option value="high">มากกว่า 500 บาท</option>
-            </select>
-          </div>
-
           {/* ประเภทสินค้า */}
           <div className="col-md-3">
             <label htmlFor="type" className="form-label">
@@ -178,6 +157,27 @@ function Souvenir() {
             </select>
           </div>
 
+          {/* ช่วงราคา */}
+          <div className="col-lg-3 col-md-2">
+            <label htmlFor="price" className="form-label">
+              ช่วงราคา:
+            </label>
+            <select
+              id="price"
+              className="form-select"
+              value={priceRange}
+              onChange={(e) => {
+                setPriceRange(e.target.value);
+                setCurrentPage(1);
+              }}
+            >
+              <option value="all">ทั้งหมด</option>
+              <option value="low">ต่ำกว่า 100 บาท</option>
+              <option value="medium">100 - 500 บาท</option>
+              <option value="high">มากกว่า 500 บาท</option>
+            </select>
+          </div>
+
           {/* ปุ่มล้าง */}
           <div className="col-md-2 d-flex flex-column">
             <label className="form-label invisible">ล้าง</label>
@@ -191,38 +191,38 @@ function Souvenir() {
         </div>
       </div>
 
-{/* ปุ่มเพิ่มของที่ระลึก */}
-<div className="container">
-    <div className="souvenir-top d-flex justify-content-end mb-3">
-        {user && (
+      {/* ปุ่มเพิ่มของที่ระลึก */}
+      <div className="container">
+        <div className="souvenir-top d-flex justify-content-end mb-3">
+          {user && (
             <Link to={`/souvenir/souvenir_request`} className="text-decoration-none">
-                <button
-                    className="btn btn-gradient d-flex align-items-center gap-2 px-4 py-2 rounded-pill shadow-sm"
-                    style={{
-                        background: "linear-gradient(45deg, #0d6efd, #4dabf7)",
-                        color: "white",
-                        fontWeight: "600",
-                        border: "none",
-                        transition: "all 0.3s ease",
-                    }}
-                    onMouseEnter={(e) => {
-                        e.currentTarget.style.background = "linear-gradient(45deg, #0a58ca, #339af0)";
-                        e.currentTarget.style.transform = "translateY(-2px)";
-                        e.currentTarget.style.boxShadow = "0 8px 16px rgba(13, 110, 253, 0.3)";
-                    }}
-                    onMouseLeave={(e) => {
-                        e.currentTarget.style.background = "linear-gradient(45deg, #0d6efd, #4dabf7)";
-                        e.currentTarget.style.transform = "translateY(0)";
-                        e.currentTarget.style.boxShadow = "0 4px 8px rgba(0,0,0,0.1)";
-                    }}
-                >
-                    <IoIosAddCircleOutline size={24} />
-                    เพิ่มของที่ระลึก
-                </button>
+              <button
+                className="btn btn-gradient d-flex align-items-center gap-2 px-4 py-2 rounded-pill shadow-sm"
+                style={{
+                  background: "linear-gradient(45deg, #0d6efd, #4dabf7)",
+                  color: "white",
+                  fontWeight: "600",
+                  border: "none",
+                  transition: "all 0.3s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "linear-gradient(45deg, #0a58ca, #339af0)";
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                  e.currentTarget.style.boxShadow = "0 8px 16px rgba(13, 110, 253, 0.3)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "linear-gradient(45deg, #0d6efd, #4dabf7)";
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "0 4px 8px rgba(0,0,0,0.1)";
+                }}
+              >
+                <IoIosAddCircleOutline size={24} />
+                เพิ่มของที่ระลึก
+              </button>
             </Link>
-        )}
-    </div>
-</div>
+          )}
+        </div>
+      </div>
 
       {/* แสดงสินค้า */}
       <div className="souvenir-content container">
@@ -231,62 +231,61 @@ function Souvenir() {
             {officialFilter === "all"
               ? "สินค้าทั้งหมด"
               : officialFilter === "official"
-              ? "สินค้าสมาคมศิษย์เก่า"
-              : "สินค้าสมาชิกทั่วไป"}
+                ? "สินค้าสมาคมศิษย์เก่า"
+                : "สินค้าสมาชิกทั่วไป"}
           </h3>
-          <div className="souvenir-item-group-home row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3">
-  {paginatedProducts.length > 0 ? (
-    paginatedProducts.map((product) => (
-      <div className="col" key={product.product_id}>
-        {product.is_sold_out ? (
-          <div className="souvenir-item card h-100 shadow-sm border-0 position-relative">
-            <img
-              className="souvenir-item-img card-img-top"
-              src={HOSTNAME + `/uploads/${product.image}`}
-              alt={product.product_name}
-              style={{ filter: "grayscale(90%)", opacity: 0.6 }}
-            />
-            <div className="card-body text-center">
-              <p className="card-title fw-semibold">{product.product_name}</p>
-              <p className="souvenir-item-price text-muted">฿{product.price}</p>
-              <span className="badge bg-danger mt-2">สินค้าหมดแล้ว</span>
-              <small className="text-muted">รอผู้ดูแลเพิ่มสินค้า</small>
-            </div>
-          </div>
-        ) : (
-          <Link
-            to={`/souvenir/souvenirDetail/${product.product_id}`}
-            className="text-decoration-none text-dark"
-          >
-            <div className="souvenir-item card h-100 shadow-sm border-0 position-relative">
-              <img
-                className="souvenir-item-img card-img-top"
-                src={HOSTNAME + `/uploads/${product.image}`}
-                alt={product.product_name}
-              />
-              <div className="card-body text-center">
-                <p className="card-title fw-semibold">{product.product_name}</p>
-                <p className="souvenir-item-price text-success">
-                  ฿{product.price}
+          <div className="souvenir-item-group-home row row-cols-1 row-cols-sm-2 row-cols-lg-4 row-cols-md-2 g-3">
+            {paginatedProducts.length > 0 ? (
+              paginatedProducts.map((product) => (
+                <div className="col" key={product.product_id}>
+                  {product.is_sold_out ? (
+                    <div className="souvenir-item card h-100 shadow-sm border-0 position-relative">
+                      <img
+                        className="souvenir-item-img card-img-top"
+                        src={HOSTNAME + `/uploads/${product.image}`}
+                        alt={product.product_name}
+                        style={{ filter: "grayscale(90%)", opacity: 0.6 }}
+                      />
+                      <div className="card-body text-center">
+                        <p className="card-title fw-semibold">{product.product_name}</p>
+                        <p className="souvenir-item-price text-muted">฿{product.price}</p>
+                        <span className="badge bg-danger mt-2">สินค้าหมดแล้ว</span>
+                        <small className="text-muted">รอผู้ดูแลเพิ่มสินค้า</small>
+                      </div>
+                    </div>
+                  ) : (
+                    <Link
+                      to={`/souvenir/souvenirDetail/${product.product_id}`}
+                      className="text-decoration-none text-dark"
+                    >
+                      <div className="souvenir-item card h-100 shadow-sm border-0 position-relative">
+                        <img
+                          className="souvenir-item-img card-img-top"
+                          src={HOSTNAME + `/uploads/${product.image}`}
+                          alt={product.product_name}
+                        />
+                        <div className="card-body text-center">
+                          <p className="card-title fw-semibold">{product.product_name}</p>
+                          <p className="souvenir-item-price text-success">
+                            ฿{product.price}
+                          </p>
+                        </div>
+                      </div>
+                    </Link>
+                  )}
+                </div>
+              ))
+            ) : (
+              <div
+                className="d-flex justify-content-center align-items-center"
+                style={{ minHeight: "50vh", width: "100%" }}
+              >
+                <p className="text-muted ">
+                  ขออภัย ไม่มีสินค้าตรงตามเงื่อนไขที่เลือก
                 </p>
               </div>
-            </div>
-          </Link>
-        )}
-      </div>
-    ))
-  ) : (
-    <div
-      className="d-flex justify-content-center align-items-center"
-      style={{ minHeight: "50vh", width: "100%" }}
-    >
-      <p className="text-muted ">
-        ขออภัย ไม่มีสินค้าตรงตามเงื่อนไขที่เลือก
-      </p>
-    </div>
-  )}
-</div>
-
+            )}
+          </div>
         </div>
       </div>
 
@@ -332,9 +331,8 @@ function Souvenir() {
 
             {/* ปุ่มไปหน้าถัดไป */}
             <li
-              className={`page-item ${
-                currentPage === totalPages ? "disabled" : ""
-              }`}
+              className={`page-item ${currentPage === totalPages ? "disabled" : ""
+                }`}
             >
               <button
                 className="page-link"

@@ -254,7 +254,7 @@ function StudentProfileDonation() {
             <section className='container py-4'>
                 <div className='alumni-profile-page'>
                     <div className='row justify-content-center g-4'>
-                        <div className='col-12 col-md-3 mb-4'>
+                        <div className='col-12 col-lg-3 col-md-4 mb-4'>
                             <div className='bg-white rounded-4 shadow-sm text-center p-4'>
                                 <img
                                     src={previewImage || profile.profilePicture}
@@ -302,21 +302,21 @@ function StudentProfileDonation() {
                             <div className='row g-3 mb-4'>
                                 <div className='col-md-4'>
                                     <div className='bg-white rounded-4 shadow-sm p-4 h-100'>
-                                        <div className='d-flex align-items-center'>
-                                            <div className='bg-success bg-opacity-10 rounded-circle p-3 me-3'>
-                                                <i className='fas fa-donate text-success fs-5'></i>
+                                        <div className="d-flex align-items-center stat-item">
+                                            <div className="icon-wrapper bg-success bg-opacity-10 rounded-circle p-3 me-3">
+                                                <i className="fas fa-donate text-success fs-5"></i>
                                             </div>
                                             <div>
-                                                <h5 className='fw-bold mb-0'>{totalDonations.toLocaleString()}</h5>
-                                                <p className='text-muted mb-0 small'>บาท ยอดรวมทั้งหมด</p>
+                                                <h5 className="fw-bold mb-0">{totalDonations.toLocaleString()}</h5>
+                                                <p className="text-muted mb-0 small">บาท ยอดรวมทั้งหมด</p>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div className='col-md-4'>
                                     <div className='bg-white rounded-4 shadow-sm p-4 h-100'>
-                                        <div className='d-flex align-items-center'>
-                                            <div className='bg-primary bg-opacity-10 rounded-circle p-3 me-3'>
+                                        <div className='d-flex align-items-center stat-item'>
+                                            <div className='icon-wrapper bg-primary bg-opacity-10 rounded-circle p-3 me-3'>
                                                 <i className='fas fa-check-circle text-primary fs-5'></i>
                                             </div>
                                             <div>
@@ -328,8 +328,8 @@ function StudentProfileDonation() {
                                 </div>
                                 <div className='col-md-4'>
                                     <div className='bg-white rounded-4 shadow-sm p-4 h-100'>
-                                        <div className='d-flex align-items-center'>
-                                            <div className='bg-warning bg-opacity-10 rounded-circle p-3 me-3'>
+                                        <div className='d-flex align-items-center stat-item'>
+                                            <div className='icon-wrapper bg-warning bg-opacity-10 rounded-circle p-3 me-3'>
                                                 <i className='fas fa-clock text-warning fs-5'></i>
                                             </div>
                                             <div>

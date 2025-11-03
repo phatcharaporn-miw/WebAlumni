@@ -1,0 +1,78 @@
+@media  screen and (max-width: 480px) {
+
+  .hero-image-container {
+    height: 220px !important;
+  }
+
+  .hero-image-container img {
+    object-fit: cover;
+  }
+
+  .position-absolute.bottom-0.start-0.p-4.text-white {
+    padding: 10px !important;
+  }
+
+  .position-absolute.bottom-0.start-0.p-4.text-white h1 {
+    font-size: 1.3rem !important;
+    line-height: 1.4 !important;
+  }
+
+  .position-absolute.top-0.end-0.m-3 span.badge {
+    font-size: 0.7rem !important;
+    padding: 3px 6px !important;
+  }
+
+  .row.g-3.mb-5 {
+    margin-bottom: 1rem !important;
+  }
+
+  .row.g-3.mb-5 > .col-md-3 {
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+  }
+
+  .row.g-3.mb-5 .card-body {
+    padding: 0.75rem !important;
+  }
+
+  .card-body.text-center h6.card-title {
+    font-size: 0.85rem !important;
+  }
+
+  .card-body.text-center p.card-text {
+    font-size: 0.95rem !important;
+  }
+
+  .row > .col-lg-8,
+  .row > .col-lg-4 {
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+  }
+
+  h3.text-primary.mb-0 {
+    font-size: 1.1rem !important;
+  }
+
+  .bg-light.p-4.rounded-3.border-start {
+    padding: 0.75rem !important;
+  }
+
+  .bg-light.p-4.rounded-3.border-start p {
+    font-size: 0.9rem !important;
+    line-height: 1.5 !important;
+  }
+
+
+  .list-group-item {
+    font-size: 0.85rem !important;
+    padding: 0.5rem 0 !important;
+  }
+
+  .list-group-item small.text-muted {
+    font-size: 0.75rem !important;
+  }
+
+  .mb-5, .mb-4 {
+    margin-bottom: 1rem !important;
+  }
+}

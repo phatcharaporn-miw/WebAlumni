@@ -97,15 +97,22 @@ function Breadcrumb() {
   return (
     <nav aria-label="breadcrumb">
       <ol className="breadcrumb">
-        <li
-  className={`breadcrumb-item ${
-    location.pathname === "/" ? "text-decoration-underline fw-bold" : ""
-  }`}
->
-  <Link to="/" className="text-reset text-decoration-inherit">
-    หน้าหลัก
-  </Link>
-</li>
+      <li
+        className="breadcrumb-item"
+        style={{
+          textDecoration:
+            location.pathname === "/" ? "underline" : "none",
+          textDecorationColor:
+            location.pathname === "/" ? "#0F75BC" : "inherit",
+          fontWeight: location.pathname === "/" ? "600" : "normal",
+        }}
+      >
+        <Link
+          to="/"
+        >
+          หน้าหลัก
+        </Link>
+      </li>
 
         {pathnames.map((value, index) => {
           const path = `/${pathnames.slice(0, index + 1).join('/')}`;

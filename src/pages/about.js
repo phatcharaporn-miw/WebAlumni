@@ -79,7 +79,6 @@ function About() {
                   </div>
                 </h3>
 
-                {/* Decorative elements */}
                 <div className="position-absolute top-0 start-0 translate-middle">
                   <div className="bg-primary opacity-25 rounded-circle"
                     style={{ width: '20px', height: '20px' }}>
@@ -143,12 +142,8 @@ function About() {
               <div className="card-body p-5">
                 {/* Enhanced Title */}
                 <div className="text-center mb-4">
-                  <h4 className="card-title fw-bold mb-3 position-relative d-inline-block"
-                    style={{
-                      color: '#2c3e50',
-                      fontSize: '1.8rem',
-                      lineHeight: '1.3'
-                    }}>
+                  <h4 className="card-title-about fw-bold mb-3 position-relative d-inline-block"
+                    >
                     สมาคมศิษย์เก่าวิทยาลัยการคอมพิวเตอร์ มหาวิทยาลัยขอนแก่น
                     <div className="position-absolute bottom-0 start-50 translate-middle-x bg-primary"
                       style={{ width: '60px', height: '3px', borderRadius: '2px' }}>
@@ -158,12 +153,8 @@ function About() {
 
                 {/* Enhanced Description */}
                 <div className="mb-5">
-                  <p className="card-text text-muted text-center lh-lg px-3"
-                    style={{
-                      fontSize: '1.1rem',
-                      textAlign: 'justify',
-                      textIndent: '2rem'
-                    }}>
+                  <p className="card-text-about text-muted text-center lh-lg px-3"
+                  >
                     สมาคมศิษย์เก่ามหาวิทยาลัยขอนแก่นก่อตั้งขึ้นเพื่อเสริมสร้างเครือข่ายและความร่วมมือระหว่างศิษย์เก่า
                     ศิษย์ปัจจุบัน และคณาจารย์ รวมถึงสนับสนุนการพัฒนาด้านเทคโนโลยีสารสนเทศ
                     ส่งเสริมโอกาสทางอาชีพ และให้การสนับสนุนแก่ศิษย์ปัจจุบันในการศึกษาวิจัยและนวัตกรรม
@@ -176,7 +167,6 @@ function About() {
                     <div className="card border-primary border-2 bg-light-subtle h-100">
                       <div className="card-header bg-primary text-white text-center py-3">
                         <h5 className="mb-0 fw-bold">
-                          <i className="fas fa-eye me-2"></i>
                           วิสัยทัศน์
                         </h5>
                       </div>
@@ -299,11 +289,7 @@ function About() {
           <div className="container position-relative">
             <h3 className="about-title text-center mt-5 mb-5 position-relative">
               <span className="text-dark fw-bold"
-                style={{
-                  fontSize: '2.5rem',
-                  letterSpacing: '1px',
-                  textShadow: '0 2px 4px rgba(0,0,0,0.1)'
-                }}
+                
               >
                 บุคลากรที่เกี่ยวข้อง
               </span>
@@ -520,12 +506,7 @@ function About() {
 
             <div className="container position-relative">
               <h3 className="about-title text-center mb-5 text-white position-relative">
-                <span style={{
-                  fontSize: '2.5rem',
-                  fontWeight: 'bold',
-                  letterSpacing: '1px',
-                  textShadow: '0 2px 4px rgba(0,0,0,0.3)'
-                }}>
+                <span>
                   ช่องทางการติดต่อ
                 </span>
                 <div className="position-absolute start-50 translate-middle-x d-flex align-items-center justify-content-center" style={{
@@ -552,136 +533,135 @@ function About() {
               </h3>
 
               <div className="row mb-5 mt-5">
-                <div className="col-lg-6 mb-4">
-                  <div className="contact-info-wrapper" style={{
-                    background: 'rgba(255,255,255,0.1)',
-                    backdropFilter: 'blur(20px)',
-                    borderRadius: '20px',
-                    padding: '2rem',
-                    border: '1px solid rgba(255,255,255,0.2)',
-                    boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
-                  }}>
-                    <div className="contact-item phone mb-4" style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      padding: '1rem',
-                      background: 'rgba(255,255,255,0.05)',
-                      borderRadius: '15px',
-                      border: '1px solid rgba(255,255,255,0.1)',
-                    }}>
-                      <div className="contact-icon-wrapper me-3" style={{
-                        width: '50px',
-                        height: '50px',
-                        borderRadius: '50%',
-                        background: 'linear-gradient(45deg, #28a745, #20c997)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        boxShadow: '0 4px 15px rgba(40,167,69,0.3)'
-                      }}>
-                        <IoMdCall style={{ fontSize: '1.5rem', color: 'white' }} />
-                      </div>
-                      <div className="text-white">
-                        <p className="mb-1 fw-bold" style={{ fontSize: '1.1rem' }}>เบอร์โทร</p>
-                        <p className="mb-0" style={{ fontSize: '1rem', opacity: '0.9' }}>044-870000</p>
-                      </div>
-                    </div>
-
-                    <div className="contact-item email mb-4" style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      padding: '1rem',
-                      background: 'rgba(255,255,255,0.05)',
-                      borderRadius: '15px',
-                      border: '1px solid rgba(255,255,255,0.1)',
-                    }}>
-                      <div className="contact-icon-wrapper me-3" style={{
-                        width: '50px',
-                        height: '50px',
-                        borderRadius: '50%',
-                        background: 'linear-gradient(45deg, #dc3545, #fd7e14)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        boxShadow: '0 4px 15px rgba(220,53,69,0.3)'
-                      }}>
-                        <MdEmail style={{ fontSize: '1.5rem', color: 'white' }} />
-                      </div>
-                      <div className="text-white">
-                        <p className="mb-1 fw-bold" style={{ fontSize: '1.1rem' }}>อีเมล</p>
-                        <p className="mb-0" style={{ fontSize: '1rem', opacity: '0.9' }}>alumnicomputing@gmail.com</p>
-                      </div>
-                    </div>
-
-                    <div className="contact-item address" style={{
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                      padding: '1rem',
-                      background: 'rgba(255,255,255,0.05)',
-                      borderRadius: '15px',
-                      border: '1px solid rgba(255,255,255,0.1)',
-                    }}>
-                      <div className="contact-icon-wrapper me-3" style={{
-                        width: '50px',
-                        height: '50px',
-                        borderRadius: '50%',
-                        background: 'linear-gradient(45deg, #007bff, #00c6ff)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        boxShadow: '0 4px 15px rgba(0,123,255,0.3)',
-                        flexShrink: 0
-                      }}>
-                        <IoMdPin style={{ fontSize: '1.5rem', color: 'white' }} />
-                      </div>
-                      <div className="text-white">
-                        <p className="mb-1 fw-bold" style={{ fontSize: '1.1rem' }}>ที่อยู่</p>
-                        <p className="mb-1" style={{ fontSize: '1rem', opacity: '0.9', lineHeight: '1.4' }}>วิทยาลัยการคอมพิวเตอร์</p>
-                        <p className="mb-1" style={{ fontSize: '1rem', opacity: '0.9', lineHeight: '1.4' }}>123 ถ.มิตรภาพ ต.ในเมือง</p>
-                        <p className="mb-0" style={{ fontSize: '1rem', opacity: '0.9', lineHeight: '1.4' }}>อ.เมือง จ.ขอนแก่น 40002</p>
-                      </div>
-                    </div>
-                  </div>
+          {/* Contact Information */}
+          <div className="col-lg-6 mb-4">
+            <div className="contact-container" style={{
+              background: 'rgba(255,255,255,0.1)',
+              backdropFilter: 'blur(20px)',
+              borderRadius: '20px',
+              padding: '2rem',
+              border: '1px solid rgba(255,255,255,0.2)',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
+            }}>
+              {/* Phone */}
+              <div className="contact-item" style={{
+                display: 'flex',
+                alignItems: 'center',
+                padding: '1rem',
+                background: 'rgba(255,255,255,0.05)',
+                borderRadius: '15px',
+                border: '1px solid rgba(255,255,255,0.1)',
+                marginBottom: '1rem'
+              }}>
+                <div className="contact-icon-wrapper" style={{
+                  width: '50px',
+                  height: '50px',
+                  borderRadius: '50%',
+                  background: 'linear-gradient(45deg, #28a745, #20c997)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 4px 15px rgba(40,167,69,0.3)',
+                  marginRight: '1rem',
+                  flexShrink: 0
+                }}>
+                  <IoMdCall className="contact-icon" style={{ fontSize: '1.5rem', color: 'white' }} />
                 </div>
+                <div style={{ color: 'white' }}>
+                  <p className="contact-title" style={{ marginBottom: '0.25rem', fontWeight: 'bold', fontSize: '1.1rem' }}>เบอร์โทร</p>
+                  <p className="contact-text" style={{ marginBottom: 0 }}>044-870000</p>
+                </div>
+              </div>
 
-                <div className="col-lg-6">
-                  <div className="map-container" style={{
-                    borderRadius: '20px',
-                    overflow: 'hidden',
-                    boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
-                    border: '3px solid rgba(255,255,255,0.2)',
-                    position: 'relative'
-                  }}>
-                    <div className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style={{
-                      background: 'rgba(255,255,255,0.1)',
-                      backdropFilter: 'blur(10px)',
-                      zIndex: 1,
-                      pointerEvents: 'none'
-                    }}>
-                      <div className="text-white text-center" style={{
-                        background: 'rgba(0,0,0,0.7)',
-                        padding: '1rem',
-                        borderRadius: '10px',
-                        backdropFilter: 'blur(20px)'
-                      }}>
-                        <h5 className="mb-2">📍 ตำแหน่งสถานที่</h5>
-                        <p className="mb-0 small">คลิกเพื่อดูแผนที่</p>
-                      </div>
-                    </div>
-                    <iframe
+              {/* Email */}
+              <div className="contact-item" style={{
+                display: 'flex',
+                alignItems: 'center',
+                padding: '1rem',
+                background: 'rgba(255,255,255,0.05)',
+                borderRadius: '15px',
+                border: '1px solid rgba(255,255,255,0.1)',
+                marginBottom: '1rem'
+              }}>
+                <div className="contact-icon-wrapper" style={{
+                  width: '50px',
+                  height: '50px',
+                  borderRadius: '50%',
+                  background: 'linear-gradient(45deg, #dc3545, #fd7e14)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 4px 15px rgba(220,53,69,0.3)',
+                  marginRight: '1rem',
+                  flexShrink: 0
+                }}>
+                  <MdEmail className="contact-icon" style={{ fontSize: '1.5rem', color: 'white' }} />
+                </div>
+                <div style={{ color: 'white' }}>
+                  <p className="contact-title" style={{ marginBottom: '0.25rem', fontWeight: 'bold', fontSize: '1.1rem' }}>อีเมล</p>
+                  <p className="contact-text" style={{ marginBottom: 0, wordBreak: 'break-all' }}>alumnicomputing@gmail.com</p>
+                </div>
+              </div>
+
+              {/* Address */}
+              <div className="contact-item" style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                padding: '1rem',
+                background: 'rgba(255,255,255,0.05)',
+                borderRadius: '15px',
+                border: '1px solid rgba(255,255,255,0.1)',
+              }}>
+                <div className="contact-icon-wrapper" style={{
+                  width: '50px',
+                  height: '50px',
+                  borderRadius: '50%',
+                  background: 'linear-gradient(45deg, #007bff, #00c6ff)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 4px 15px rgba(0,123,255,0.3)',
+                  marginRight: '1rem',
+                  flexShrink: 0
+                }}>
+                  <IoMdPin className="contact-icon" style={{ fontSize: '1.5rem', color: 'white' }} />
+                </div>
+                <div style={{ color: 'white' }}>
+                  <p className="contact-title" style={{ marginBottom: '0.25rem', fontWeight: 'bold', fontSize: '1.1rem' }}>ที่อยู่</p>
+                  <p className="contact-text" style={{ marginBottom: '0.25rem' }}>วิทยาลัยการคอมพิวเตอร์</p>
+                  <p className="contact-text" style={{ marginBottom: '0.25rem' }}>123 ถ.มิตรภาพ ต.ในเมือง</p>
+                  <p className="contact-text" style={{ marginBottom: 0 }}>อ.เมือง จ.ขอนแก่น 40002</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Map */}
+          <div className='col-lg-6 mb-4'>
+            <div className="map-container" style={{
+              borderRadius: '20px',
+              overflow: 'hidden',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+              border: '3px solid rgba(255,255,255,0.2)',
+              position: 'relative',
+              // height: '400px'
+            }}>
+              
+              <iframe
                       src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d30607.44894393471!2d102.81615358599814!3d16.47902518541837!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31228b8217d082cb%3A0xb58fd61bc8e85e11!2sCollege%20of%20Computing%20Khon%20Kaen%20University!5e0!3m2!1sen!2sth!4v1736759203949!5m2!1sen!2sth"
                       width="100%"
                       height="400"
                       style={{ border: 0 }}
                       allowFullScreen=""
                       loading="lazy"
-                      onLoad={(e) => {
-                        e.target.parentElement.querySelector('.position-absolute').style.opacity = '0';
-                      }}
+                      // onLoad={(e) => {
+                      //   e.target.parentElement.querySelector('.position-absolute').style.opacity = '0';
+                      // }}
                     ></iframe>
-                  </div>
-                </div>
-              </div>
+            </div>
+          </div>
+        </div>
+
             </div>
           </div>
         </div>

@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { FaCalendarAlt, FaClock, FaCheckCircle, FaSpinner, FaHourglassStart, FaUsers, FaInfoCircle,FaBuilding } from 'react-icons/fa';
 import {HOSTNAME} from '../config.js';
+import '../css/activity-detail.css'
 
 function ActivityDetail() {
     const { activityId } = useParams();
@@ -246,13 +247,6 @@ const formatDate = (dateStr) => {
                                                     {activity.current_participants}/{activity.max_participants || "ไม่จำกัด"}
                                                 </div>
                                             </div>
-                                            {/* <div className="list-group-item d-flex align-items-center border-0 px-0">
-                                                <FaInfoCircle className="me-3 text-secondary" />
-                                                <div>
-                                                    <small className="text-muted d-block">รหัสกิจกรรม</small>
-                                                    #{activityId}
-                                                </div>
-                                            </div> */}
                                         </div>
                                     </div>
                                 </div>

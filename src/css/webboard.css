@@ -360,8 +360,16 @@
   animation: fadeInUp 0.6s ease-out;
 }
 
-/* Responsive Enhancements */
-@media (max-width: 768px) {
+/* ขนาด ipad */
+@media screen and (min-width: 768px) and (max-width: 1024px) {
+
+  .custom-modal {
+        width: 95%;
+        max-height: 90vh;
+        padding: 0.8rem;
+        border-radius: 12px;
+    }
+
   .webboard-title, .category-title {
     font-size: 1.8rem;
   }
@@ -383,3 +391,106 @@
   }
 }
 
+/* iphone 12pro */
+@media screen and (min-width: 300px) and (max-width: 480px){
+  .close-modal-button {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+    position: absolute;
+    right: 0px;
+}
+
+    .form-group {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .custom-modal {
+    width: 95% !important;
+    max-width: 95% !important;
+    margin: 0 auto;
+    padding: 10px;
+  }
+
+  .modal-content {
+    padding: 10px !important;
+  }
+
+  /* ส่วนหัว - ปุ่มปิดและไอคอน */
+  .custom-modal .d-flex.justify-content-between {
+    /* flex-direction: column-reverse; */
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .custom-modal .badge {
+    font-size: 0.8rem !important;
+    padding: 4px 8px !important;
+    margin: 0 !important;
+  }
+
+  .custom-modal svg {
+    font-size: 1.2rem !important;
+  }
+
+  /* โปรไฟล์ผู้โพสต์ */
+  .custom-modal .d-flex.mt-4 {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .custom-modal img.rounded-circle {
+    width: 40px;
+    height: 40px;
+  }
+
+  .custom-modal h5.fw-bold.mb-1 {
+    font-size: 1rem;
+  }
+
+  .custom-modal p {
+    font-size: 0.8rem !important;
+  }
+
+  /* รูปประกอบ */
+  .custom-modal img.img-fluid.rounded-3 {
+    width: 100%;
+    height: auto;
+    margin-top: 10px;
+  }
+
+  /* comment section */
+  .comment-item, .reply-item {
+    padding: 8px !important;
+  }
+
+  .comment-item img.rounded-circle,
+  .reply-item img.rounded-circle {
+    width: 30px;
+    height: 30px;
+  }
+
+  .replies-section {
+    margin-left: 0 !important;
+  }
+
+  .comment-form .d-flex {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .comment-form input.form-control {
+    width: 100% !important;
+    font-size: 0.85rem;
+  }
+
+  .comment-form button.btn {
+    width: 100%;
+    font-size: 0.85rem;
+  }
+
+  /* ปรับ text */
+  .text-muted, .small {
+    font-size: 0.75rem !important;
+  }
+}

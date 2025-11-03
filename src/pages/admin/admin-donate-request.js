@@ -33,7 +33,7 @@ function AdminDonateRequest() {
     const [errorMessage, setErrorMessage] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const { user} = useAuth();
-    const userId = user?.id;
+    const userId = user?.user_id;
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -91,7 +91,7 @@ function AdminDonateRequest() {
             const data = new FormData();
 
             // ตรวจสอบการเข้าสู่ระบบ
-            const adminId = user?.id; // ใช้ userId แทน adminId
+            const adminId = user?.user_id; // ใช้ userId แทน adminId
             const userRole = user?.role;
 
             if (!adminId) {
@@ -102,11 +102,11 @@ function AdminDonateRequest() {
             }
 
             // ตรวจสอบว่าเป็น admin หรือไม่
-            if (userRole !== "1") {
-                alert("คุณไม่มีสิทธิ์ในการเพิ่มโครงการ");
-                setIsSubmitting(false);
-                return;
-            }
+            // if (userRole !== "1") {
+            //     alert("คุณไม่มีสิทธิ์ในการเพิ่มโครงการ");
+            //     setIsSubmitting(false);
+            //     return;
+            // }
 
             // เพิ่มข้อมูลลงใน FormData - ใช้ชื่อที่ตรงกับ backend
             data.append("userId", adminId); // แก้จาก adminId

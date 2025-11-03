@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useLocation, useParams } from 'react-router-dom';
-import { HOSTNAME } from "../config.js";
+import { HOSTNAME} from "../config.js";
 import Modal from 'react-modal';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
@@ -11,7 +11,7 @@ import { BiSolidComment } from "react-icons/bi";
 import { MdEdit } from "react-icons/md";
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
-import { FaEye } from "react-icons/fa";
+import { FaSearch, FaChevronLeft, FaChevronRight, FaEye  } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 // import moment from "moment";
 import { format } from 'date-fns';
@@ -19,7 +19,6 @@ import { th } from 'date-fns/locale';
 import Swal from "sweetalert2";
 import { MdDelete } from "react-icons/md";
 import { useAuth } from "../context/AuthContext";
-import { FaSearch } from "react-icons/fa";
 import { AiOutlineClose } from "react-icons/ai";
 Modal.setAppElement('#root');
 
@@ -614,7 +613,7 @@ function Webboard() {
           </div>
 
           {/* เรียงลำดับ */}
-          <div className="col-md-3">
+          <div className="col-lg-3 col-md-2">
             <label htmlFor="sort-order" className="form-label">ลำดับ:</label>
             <select
               id="sort-order"
@@ -997,7 +996,7 @@ function Webboard() {
             {recommendedPosts.length > 0 ? (
               <div className="row">
                 {recommendedPosts.map((post) => (
-                  <div key={post.webboard_id} className="col-12 col-md-6 mb-4">
+                  <div key={post.webboard_id} className="col-12 col-md-12 mb-4">
                     <div className="card shadow-sm border-0 rounded-4 h-100 d-flex flex-column">
                       <div className="card-body d-flex flex-column justify-content-between">
                         <div>
@@ -1025,40 +1024,51 @@ function Webboard() {
           </div>
         </div>
 
-        <div className="donate-page-info mb-4">
-          <small>
-            หน้า {currentPage} จาก {totalPages} (แสดง{" "}
-            {(currentPage - 1) * itemsPerPage + 1} -{" "}
-            {Math.min(currentPage * itemsPerPage, filteredPosts.length)} จาก{" "}
-            {filteredPosts.length} โครงการ)
-          </small>
-        </div>
         {totalPages > 1 && (
-          <nav
-            className="d-flex justify-content-center "
-            style={{
-              position: "absolute",
-              left: 0,
-              right: 0,
-              bottom: 0,
-              marginBottom: "10px"
-            }}
-          >
-            <ul className="pagination">
-              <li className={`page-item${currentPage === 1 ? ' disabled' : ''}`}>
-                <button className="page-link" onClick={() => handlePageChange(currentPage - 1)}>&laquo;</button>
-              </li>
-              {Array.from({ length: totalPages }, (_, i) => (
-                <li key={i + 1} className={`page-item${currentPage === i + 1 ? ' active' : ''}`}>
-                  <button className="page-link" onClick={() => handlePageChange(i + 1)}>{i + 1}</button>
-                </li>
-              ))}
-              <li className={`page-item${currentPage === totalPages ? ' disabled' : ''}`}>
-                <button className="page-link" onClick={() => handlePageChange(currentPage + 1)}>&raquo;</button>
-              </li>
-            </ul>
-          </nav>
+                <nav aria-label="Page navigation" className="donate-pagination">
+                  <ul className="pagination">
+                    <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                      <button
+                        className="page-link"
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                      >
+                        <FaChevronLeft />
+                      </button>
+                    </li>
+        
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
+                      <li
+                        key={number}
+                        className={`page-item ${number === currentPage ? "active" : ""}`}
+                      >
+                        <button className="page-link" onClick={() => handlePageChange(number)}>
+                          {number}
+                        </button>
+                      </li>
+                    ))}
+        
+                    <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                      <button
+                        className="page-link"
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                      >
+                        <FaChevronRight />
+                      </button>
+                    </li>
+                  </ul>
+                </nav>
         )}
+
+          <div className="donate-page-info mb-4">
+            <small>
+              หน้า {currentPage} จาก {totalPages} (แสดง{" "}
+              {(currentPage - 1) * itemsPerPage + 1} -{" "}
+              {Math.min(currentPage * itemsPerPage, filteredPosts.length)} จาก{" "}
+              {filteredPosts.length} โครงการ)
+            </small>
+        </div>
       </div>
     </section>
   )

@@ -127,7 +127,6 @@
   z-index: 1000; 
 }
 
-
 .join-form {
   background-color: #fff;
   padding: 20px;
@@ -139,7 +138,6 @@
   position: relative;
 }
 
-
 .join-form .close-button {
   position: absolute;
   top: 10px;
@@ -148,4 +146,44 @@
   border: none;
   font-size: 20px;
   cursor: pointer;
+}
+
+@media screen and (min-width: 768px) and (max-width: 1024px) {
+  .card-body .btn {
+    flex: 1 1;
+    margin-right: 0px;
+    text-align: center;
+}
+
+  #card-news-home {
+    border-radius: 15px;
+  }
+
+  .news-image-home {
+    height: auto !important;           
+    max-height: 200px;                 
+    width: 100%;
+    /* object-fit: contain !important;    */
+    background-color: #f8f9fa;         
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+  }
+
+  .news-title {
+    font-size: 1rem !important;
+    margin-bottom: 0.5rem;
+  }
+
+  .news-text {
+    font-size: 0.9rem !important;
+    line-height: 1.5;
+  }
+
+  .btn-news-home {
+    font-size: 0.85rem !important;
+    padding: 10px 16px !important;
+  }
+
+  
+
 }

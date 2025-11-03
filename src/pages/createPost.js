@@ -195,14 +195,14 @@ function CreatePost() {
         <section className="createPost-page">
             <div className="container">
                 <h3 className="webboard-title">สร้างกระทู้ใหม่</h3>
-                <div className="form-create-post shadow p-4 bg-white rounded mb-5" style={{ maxWidth: "80%", margin: "0 auto" }}>
+                <div className="form-create-post shadow p-4 bg-white rounded mb-5" style={{ maxWidth: "100%", margin: "0 auto" }}>
                     <form onSubmit={handleSubmit}>
                         <fieldset>
                             <div className="form-group mb-3">
                                 <label>หัวข้อกระทู้ <span className="text-danger">*</span></label>
                                 <input
                                     type="text"
-                                    className="form-control"
+                                    className="form-control w-100"
                                     placeholder="หัวข้อกระทู้"
                                     value={title}
                                     onChange={(e) => setTitle(e.target.value)}
@@ -225,7 +225,7 @@ function CreatePost() {
                                 <label>อัปโหลดรูปภาพประกอบ (ถ้ามี)</label>
                                 <input
                                     type="file"
-                                    className="form-control"
+                                    className="form-control w-100"
                                     onChange={handleFileChange}
                                 />
                             </div>
@@ -234,7 +234,7 @@ function CreatePost() {
                                 <label>วันที่สร้างกระทู้ <span className="text-danger">*</span></label>
                                 <input
                                     type="date"
-                                    className="form-control"
+                                    className="form-control w-100"
                                     value={startDate}
                                     onChange={(e) => setStartDate(e.target.value)}
                                     required
@@ -246,7 +246,7 @@ function CreatePost() {
                             <div className="form-group mb-3">
                                 <label>เลือกหมวดหมู่ <span className="text-danger">*</span></label>
                                 <select
-                                    className="form-control"
+                                    className="form-control w-100"
                                     value={categoryId}
                                     onChange={handleCategoryChange}
                                     required
@@ -270,7 +270,7 @@ function CreatePost() {
                                 <div className="form-group mb-3 d-flex align-items-center">
                                     <input
                                         type="text"
-                                        className="form-control me-2"
+                                        className="form-control me-2 w-100"
                                         placeholder="กรอกชื่อหมวดหมู่"
                                         value={newCategory}
                                         onChange={(e) => setNewCategory(e.target.value)}
@@ -281,15 +281,18 @@ function CreatePost() {
                                 </div>
                             )}
 
-                            <div className="form-group ">
+                            <div className="form-group d-flex flex-column flex-md-row justify-content-center align-items-center">
                                 <button
                                     type="button"
-                                    className="btn btn-secondary w-50 mt-3 g-2 mx-2"
+                                    className="btn btn-secondary w-100 w-md-50 mt-3 mx-md-2"
                                     onClick={handleCancel}
                                 >
                                     ยกเลิก
                                 </button>
-                                <button type="submit" className="btn btn-primary w-50 mt-3 mx-2">
+                                <button
+                                    type="submit"
+                                    className="btn btn-primary w-100 w-md-50 mt-3 mx-md-2"
+                                >
                                     สร้างกระทู้
                                 </button>
                             </div>

@@ -10,7 +10,7 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from '../context/AuthContext';
 import { HOSTNAME } from '../config.js';
-import { FaSearch } from "react-icons/fa";
+import { FaSearch, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { AiOutlineClose } from "react-icons/ai";
 
 function News() {
@@ -123,13 +123,11 @@ function News() {
             <h3 className="news text-center">ข่าวประชาสัมพันธ์</h3>
 
             <div className="py-3 container">
-               
-
                 {/* Filters */}
                 <div className="donate-filters">
                     <div className="row g-3">
                         {/* ค้นหากิจกรรม */}
-                        <div className="col-md-6">
+                        <div className="col-lg-6 col-md-4 col-sm-12">
                             <label htmlFor="search" className="form-label">ค้นหาข่าวประขาสัมพันธ์:</label>
                             <div className="input-group">
                                 <span className="input-group-text">
@@ -165,7 +163,7 @@ function News() {
                         </div>
 
                         {/* ปุ่มล้างตัวกรอง */}
-                        <div className="col-md-2 d-flex flex-column">
+                        <div className="col-lg-2 col-md-3 d-flex flex-column">
                             <label className="form-label invisible">ล้าง</label>
                             <button
                                 className="btn btn-outline-secondary"
@@ -177,7 +175,7 @@ function News() {
                         </div>
                     </div>
                 </div>
-<div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                     {userRole === 2 && (
                         <div className="ms-auto ">
                             <Link to={`/news/president-create-news`} className="text-decoration-none">
@@ -212,7 +210,7 @@ function News() {
                         <p className="text-center text-muted">ไม่พบข่าวที่ค้นหา</p>
                     ) : (
                         paginatedNews.map((item) => (
-                            <div key={item.news_id} className="col-8 mb-3">
+                            <div key={item.news_id} className="col-lg-8 col-md-12 col-sm-12 mb-3">
                                 <div className="position-relative d-flex flex-column flex-md-row border rounded p-3 h-100">
                                     {userRole === "2" && (
                                         <div className="dropdown position-absolute top-0 end-0 m-2">
@@ -274,24 +272,51 @@ function News() {
                         ))
                     )}
                 </div>
-                {/* Pagination */}
                 {totalPages > 1 && (
-                    <nav className="d-flex justify-content-center mt-4">
-                        <ul className="pagination pagination-lg">
-                            <li className={`page-item${currentPage === 1 ? ' disabled' : ''}`}>
-                                <button className="page-link" style={{ minWidth: 44 }} onClick={() => handlePageChange(currentPage - 1)}>&laquo;</button>
+                    <nav aria-label="Page navigation" className="donate-pagination">
+                        <ul className="pagination">
+                            <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                                <button
+                                    className="page-link"
+                                    onClick={() => handlePageChange(currentPage - 1)}
+                                    disabled={currentPage === 1}
+                                >
+                                    <FaChevronLeft />
+                                </button>
                             </li>
-                            {Array.from({ length: totalPages }, (_, i) => (
-                                <li key={i + 1} className={`page-item${currentPage === i + 1 ? ' active' : ''}`}>
-                                    <button className="page-link" style={{ minWidth: 44 }} onClick={() => handlePageChange(i + 1)}>{i + 1}</button>
+
+                            {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
+                                <li
+                                    key={number}
+                                    className={`page-item ${number === currentPage ? "active" : ""}`}
+                                >
+                                    <button className="page-link" onClick={() => handlePageChange(number)}>
+                                        {number}
+                                    </button>
                                 </li>
                             ))}
-                            <li className={`page-item${currentPage === totalPages ? ' disabled' : ''}`}>
-                                <button className="page-link" style={{ minWidth: 44 }} onClick={() => handlePageChange(currentPage + 1)}>&raquo;</button>
+
+                            <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                                <button
+                                    className="page-link"
+                                    onClick={() => handlePageChange(currentPage + 1)}
+                                    disabled={currentPage === totalPages}
+                                >
+                                    <FaChevronRight />
+                                </button>
                             </li>
                         </ul>
                     </nav>
                 )}
+
+                <div className="donate-page-info mb-4">
+                    <small>
+                        หน้า {currentPage} จาก {totalPages} (แสดง{" "}
+                        {(currentPage - 1) * itemsPerPage + 1} -{" "}
+                        {Math.min(currentPage * itemsPerPage, filteredNews.length)} จาก{" "}
+                        {filteredNews.length} โครงการ)
+                    </small>
+                </div>
             </div>
         </section>
     );

@@ -229,7 +229,7 @@ function AlumniManageOrders() {
             <div className='alumni-profile-page'>
                 <div className="row justify-content-center g-4">
                     {/* Sidebar/Profile */}
-                    <div className="col-12 col-md-3 mb-4">
+                    <div className="col-12 col-lg-3 col-md-4 mb-4">
                         <div className="bg-white rounded-4 shadow-sm text-center p-4">
                             <img
                                 src={previewImage || profile.profilePicture}
@@ -303,7 +303,7 @@ function AlumniManageOrders() {
                                     <div className="row">
                                         {products.length > 0 ? (
                                             products.map(product => (
-                                                <div key={product.product_id} className="col-md-4 col-lg-3 mb-4">
+                                                <div key={product.product_id} className="col-lg-4 col-md-6 mb-4">
                                                     <div
                                                         className="card h-100 shadow-sm border-0 hover-card"
                                                         style={{ cursor: 'pointer', transition: 'all 0.3s ease' }}

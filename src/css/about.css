@@ -29,15 +29,11 @@
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.contact-item .contact-icon {
-  font-size: 24px;
-  color: #0056b3;
-  margin-right: 10px;
-}
+/* */
 
 .contact-item p {
   margin: 0;
-  font-size: 14px;
+  font-size: 16px;
 }
 
 .contact-item p:first-child {
@@ -49,16 +45,107 @@
   height: 300px;
 }
 
+.about-title span{
+  font-size: 2.5rem;
+    letter-spacing: 1px;
+    text-shadow: rgba(0, 0, 0, 0.1) 0px 2px 4px;
+}
+
 
 @media (max-width: 768px) {
-    .card-img-top {
-      height: 200px;
-    }
-  }
+          .contact-container {
+            padding: 1.5rem 1rem !important;
+          }
+          .contact-item {
+            padding: 0.75rem !important;
+          }
+          .contact-icon-wrapper {
+            width: 40px !important;
+            height: 40px !important;
+          }
+          .contact-icon {
+            font-size: 1.2rem !important;
+          }
+          .contact-title {
+            font-size: 0.95rem !important;
+          }
+          .contact-text {
+            font-size: 0.85rem !important;
+          }
+          .map-container {
+            height: 300px !important;
+          }
+}
   
-  @media (max-width: 576px) {
-    .card-img-top {
+/* Small Mobile */
+@media screen and (min-width: 300px) and (max-width: 480px){
+  .carousel-item img {
       height: 200px;
-    }
   }
+
+  #head-text {
+    text-align: center;
+    margin: 30px;
+    padding: 0px;
+    color: #0F75BC;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.card-title-about{
+    color: rgb(44, 62, 80);
+    font-size: 20px;
+}
+.card-text-about{
+    font-size: 14px;
+    text-align: justify;
+    text-indent: 1rem;
+}
+
+.footer, #foot-text, .footer-contact, .footer-contact2, .footer-contact3, .foot-news, .foot-act, .foot-donate, .foot-faq {
+        text-align: center;
+        justify-content: center;
+        font-size: 14px;
+}
+
+.about-title span{
+  font-size: 23px;
+    letter-spacing: 1px;
+    text-shadow: rgba(0, 0, 0, 0.1) 0px 2px 4px;
+}
+
+.contact-container {
+            padding: 1rem 0.75rem !important;
+          }
+          .contact-item {
+            padding: 0.65rem !important;
+            margin-bottom: 0.75rem !important;
+          }
+          .contact-icon-wrapper {
+            width: 35px !important;
+            height: 35px !important;
+            margin-right: 0.75rem !important;
+          }
+          .contact-icon {
+            font-size: 1rem !important;
+          }
+          .contact-title {
+            font-size: 0.9rem !important;
+          }
+          .contact-text {
+            font-size: 0.8rem !important;
+            line-height: 1.4 !important;
+          }
+          .map-container {
+            height: 250px !important;
+            border-width: 2px !important;
+          }
+          .map-overlay-text h5 {
+            font-size: 1rem !important;
+          }
+          .map-overlay-text p {
+            font-size: 0.75rem !important;
+          }
+
+}
 

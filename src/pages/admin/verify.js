@@ -5,7 +5,7 @@ import { FaHeart, FaShoppingCart } from 'react-icons/fa';
 import '../../css/verify.css';
 import { CiSearch } from "react-icons/ci";
 import { useAuth } from '../../context/AuthContext';
-import {HOSTNAME} from '../../config.js';
+import { HOSTNAME } from '../../config.js';
 
 function AdminVerifySlip() {
     // การสั่งซื้อ
@@ -14,6 +14,7 @@ function AdminVerifySlip() {
     const [rejectReason, setRejectReason] = useState("");
     const [rejectingOrderId, setRejectingOrderId] = useState(null);
     const [activeTab, setActiveTab] = useState('purchase');
+    const [selectedStatus, setSelectedStatus] = useState("all");
 
     // การบริจาค
     const [rejectingDonationId, setRejectingDonationId] = useState(null);
@@ -22,7 +23,7 @@ function AdminVerifySlip() {
     const [searchQuery, setSearchQuery] = useState("");
     const [filterStatus, setFilterStatus] = useState("all");
     const [sortBy, setSortBy] = useState("date");
-    const {user} = useAuth();
+    const { user } = useAuth();
     const userId = user?.user_id;
 
 
@@ -33,7 +34,7 @@ function AdminVerifySlip() {
     const fetchOrders = async () => {
         setLoading(true);
         try {
-            const res = await axios.get(HOSTNAME +"/orders/pending-payment", {
+            const res = await axios.get(HOSTNAME + "/orders/pending-payment", {
                 withCredentials: true
             });
             // console.log(res.data);
@@ -60,8 +61,8 @@ function AdminVerifySlip() {
 
         try {
             const res = await axios.post(
-                HOSTNAME +"/orders/verify-payment",
-                { order_id: orderId, isApproved: true},
+                HOSTNAME + "/orders/verify-payment",
+                { order_id: orderId, isApproved: true },
                 { withCredentials: true }
             );
 
@@ -100,7 +101,7 @@ function AdminVerifySlip() {
 
         try {
             const res = await axios.post(
-                HOSTNAME +"/orders/verify-payment",
+                HOSTNAME + "/orders/verify-payment",
                 {
                     order_id: rejectingOrderId,
                     isApproved: false,
@@ -139,7 +140,7 @@ function AdminVerifySlip() {
         const fetchPayments = async () => {
             try {
                 setLoading(true);
-                const response = await axios.get(HOSTNAME +"/admin/check-payment-donate");
+                const response = await axios.get(HOSTNAME + "/admin/check-payment-donate");
                 setPayments(response.data);
             } catch (err) {
                 setError(err.response?.data?.message || "เกิดข้อผิดพลาดในการโหลดข้อมูล");
@@ -168,8 +169,8 @@ function AdminVerifySlip() {
 
         try {
             const res = await axios.put(
-                HOSTNAME +`/admin/check-payment-donate/approve/${donationId}`,
-                { isApproved: true }, 
+                HOSTNAME + `/admin/check-payment-donate/approve/${donationId}`,
+                { isApproved: true },
                 { withCredentials: true }
             );
 
@@ -201,7 +202,7 @@ function AdminVerifySlip() {
         }
         try {
             const res = await axios.put(
-                HOSTNAME +`/admin/check-payment-donate/reject/${donationId}`,
+                HOSTNAME + `/admin/check-payment-donate/reject/${donationId}`,
                 {
                     reject_reason: rejectReason,
                 },
@@ -237,14 +238,25 @@ function AdminVerifySlip() {
 
 
     const keyword = searchQuery.trim().toLowerCase();
-    const filteredPayments = payments.filter(payment => {
-        const matchesSearch =
-            (payment.donor_name || "").toLowerCase().includes(keyword) ||
-            (payment.product_name || "").toLowerCase().includes(keyword) ||
-            (payment.project_name || "").toLowerCase().includes(keyword);
-        const matchesStatus = filterStatus === "all" || payment.payment_status === filterStatus;
-        return matchesSearch && matchesStatus;
-    });
+
+    const filteredPayments = payments
+        .filter(p => {
+            if (searchQuery && activeTab === 'donation') {
+                const lower = searchQuery.toLowerCase();
+                return (
+                    p.donor_name?.toLowerCase().includes(lower) ||
+                    p.project_name?.toLowerCase().includes(lower)
+                );
+            }
+            return true;
+        })
+        .filter(p => filterStatus === 'all' || p.payment_status === filterStatus)
+        .sort((a, b) => {
+            if (sortBy === 'date') return new Date(b.start_date) - new Date(a.start_date);
+            if (sortBy === 'name') return (a.donor_name || '').localeCompare(b.donor_name || '');
+            if (sortBy === 'amount') return parseFloat(b.amount) - parseFloat(a.amount);
+            return 0;
+        });
 
     const sortedPayments = [...filteredPayments].sort((a, b) => {
         if (sortBy === "date") {
@@ -256,6 +268,31 @@ function AdminVerifySlip() {
         }
         return 0;
     });
+
+    // ด้านบน component
+    const filteredOrders = orders.filter(order => order.type === 'purchase' || !order.type);
+
+    // ตัวอย่างการกรองสถานะ (filterStatus) หรือ search (searchQuery) ถ้ามี
+    const filteredAndSearchedOrders = filteredOrders.filter(order => {
+        const searchLower = searchQuery.toLowerCase();
+        return (
+            order.buyer_name.toLowerCase().includes(searchLower) ||
+            order.products?.some(p => p.product_name.toLowerCase().includes(searchLower))
+        );
+    }).filter(order => filterStatus === 'all' ? true : order.payment_status === filterStatus);
+
+    // ตัวอย่างการ sort
+    const sortedOrders = filteredAndSearchedOrders.sort((a, b) => {
+        if (sortBy === 'date') {
+            return new Date(b.order_date) - new Date(a.order_date);
+        } else if (sortBy === 'name') {
+            return a.buyer_name.localeCompare(b.buyer_name);
+        } else if (sortBy === 'amount') {
+            return b.total_amount - a.total_amount;
+        }
+        return 0;
+    });
+
 
     const formatDate = (dateStr) => {
         if (!dateStr || dateStr === "0000-00-00") return "ไม่ระบุวันที่";
@@ -284,10 +321,11 @@ function AdminVerifySlip() {
                         การสั่งซื้อ
                         <span
                             className={`badge ${activeTab === 'purchase' ? 'bg-white text-primary' : 'bg-primary'} ms-1`}
-                            >
-                            {orders.length}
+                        >
+                            {filteredAndSearchedOrders.length}
                         </span>
                     </button>
+
                     <button
                         className={`btn btn-sm ${activeTab === 'donation' ? 'btn-success' : 'btn-outline-success'}`}
                         onClick={() => setActiveTab('donation')}
@@ -325,7 +363,7 @@ function AdminVerifySlip() {
                         <option value="all">สถานะทั้งหมด</option>
                         <option value="pending">รอการตรวจสอบ</option>
                         <option value="paid">อนุมัติแล้ว</option>
-                        <option value="failed">ไม่อนุมัติ</option>
+                        <option value="rejected">ไม่อนุมัติ</option>
                     </select>
                 </div>
                 <div className="col-md-3">
@@ -339,373 +377,323 @@ function AdminVerifySlip() {
                     <div className="text-muted">
                         {activeTab === 'donation'
                             ? `พบ ${filteredPayments.length} รายการ`
-                            : `พบ ${orders.filter(order =>
-                                (activeTab === 'donation'
-                                    ? order.type === 'donation'
-                                    : order.type === 'purchase' || !order.type
-                                ) && order.payment_status === 'pending'
-                            ).length} รายการ`}
+                            : `พบ ${filteredAndSearchedOrders.length} รายการ`}
                     </div>
                 </div>
             </div>
 
-            {/* Orders Container */}
-            <div className="container-fluid">
-                {(() => {
-                    const filteredOrders = orders.filter(order =>
-                        (activeTab === 'donation'
-                            ? order.type === 'donation'
-                            : order.type === 'purchase' || !order.type
-                        ) && order.payment_status === 'pending'
-                    );
-
-                    // Orders List
-                    return (
-                        <div className="row">
-                            <div className="col-12">
-                                {filteredOrders.map((order, idx) => {
-                                    const isDonation = order.type === 'donation';
-                                    const isPurchase = order.type === 'purchase' || !order.type;
-
-                                    return (
-                                        <div
-                                            className="card border-0 shadow-sm mb-2 rounded-3"
-                                            key={order.order_id || idx}
-                                        >
-                                            <div className="card-body py-3">
-                                                <div className="row align-items-center">
-                                                    <div className="col-6 col-md-4">
-                                                        <div className="d-flex align-items-center">
-                                                            <div
-                                                                className={`me-3 rounded-circle d-flex align-items-center justify-content-center ${isDonation ? 'bg-success bg-opacity-10' : 'bg-primary bg-opacity-10'
-                                                                    }`}
-                                                                style={{ width: '40px', height: '40px' }}
-                                                            >
-                                                                {isDonation ? (
-                                                                    <FaHeart className="text-success" size={16} />
-                                                                ) : (
-                                                                    <FaShoppingCart className="text-primary" size={16} />
-                                                                )}
-                                                            </div>
-                                                            <div>
-                                                                <div className="fw-bold">
-                                                                    {order.products?.[0]?.product_name || "ไม่พบชื่อสินค้า"}
-                                                                </div>
-                                                                <small
-                                                                    className={`${isDonation ? 'text-success' : 'text-primary'
-                                                                        } fw-semibold`}
-                                                                >
-                                                                    {isDonation ? 'การบริจาค' : 'การสั่งซื้อ'}
-                                                                </small>
-                                                            </div>
+            {/* Orders content */}
+            {activeTab === 'purchase' && (
+                <div className="row">
+                    <div className="col-12">
+                        {sortedOrders.length === 0 ? (
+                            <div className="text-center py-5">
+                                <h5 className="text-muted mb-3">ไม่มีสลิปการสั่งซื้อที่รอตรวจสอบ</h5>
+                                <p className="text-muted">ยังไม่มีการสั่งซื้อที่ส่งสลิปมาตรวจสอบ</p>
+                            </div>
+                        ) : (
+                            sortedOrders.map((order, idx) => (
+                                <div className="card border-0 shadow-sm mb-2 rounded-3" key={order.order_id || idx}>
+                                    <div className="card-body py-3">
+                                        <div className="row align-items-center">
+                                            <div className="col-6 col-md-4">
+                                                <div className="d-flex align-items-center">
+                                                    <div className="me-3 rounded-circle d-flex align-items-center justify-content-center bg-success bg-opacity-10" style={{ width: '40px', height: '40px' }}>
+                                                        <FaShoppingCart className="text-primary" size={16} />
+                                                    </div>
+                                                    <div>
+                                                        <div className="fw-bold">
+                                                            {order.products?.[0]?.product_name || "ไม่พบชื่อสินค้า"}
                                                         </div>
-                                                    </div>
-
-                                                    <div className="col-6 col-md-3 d-none d-md-block">
-                                                        <div>
-                                                            {/* <div className="fw-semibold text-truncate">
-                                                                {order.buyer_name}
-                                                            </div> */}
-                                                            <small className="text-muted">
-                                                                {formatDate(order.order_date)}
-                                                            </small>
-                                                        </div>
-                                                    </div>
-
-                                                    <div className="col-3 col-md-2">
-                                                        <div className="fw-bold text-primary">
-                                                            ฿{parseFloat(order.total_amount).toLocaleString()}
-                                                        </div>
-                                                    </div>
-
-                                                    <div className="col-3 col-md-2 text-center">
-                                                        <span
-                                                            className={`badge px-2 py-1 rounded-pill 
-                                                                ${order.payment_status === 'pending' ? 'bg-warning bg-opacity-10 text-warning' :
-                                                                    order.payment_status === 'approved' ? 'bg-success text-success bg-opacity-10' :
-                                                                        order.payment_status === 'rejected' ? 'bg-danger text-danger bg-opacity-10' : ''
-                                                                }`}
-                                                            style={{ fontSize: '0.8rem' }}
-                                                        >
-                                                            {order.payment_status === 'pending' && 'รอตรวจสอบ'}
-                                                            {order.payment_status === 'approved' && 'ยืนยันแล้ว'}
-                                                            {order.payment_status === 'rejected' && 'ถูกปฏิเสธ'}
-                                                        </span>
-                                                    </div>
-
-                                                    <div className="col-12 col-md-1 text-end mt-2 mt-md-0">
-                                                        <button
-                                                            className="btn btn-outline-primary btn-sm px-2 py-1"
-                                                            style={{ fontSize: '0.7rem' }}
-                                                            data-bs-toggle="collapse"
-                                                            data-bs-target={`#slipDetail-${idx}`}
-                                                            aria-expanded="false"
-                                                            aria-controls={`slipDetail-${idx}`}
-                                                        >
-                                                            <span className="d-none d-sm-inline">ตรวจสอบ</span>
-                                                        </button>
+                                                        <small className="text-success fw-semibold">การสั่งซื้อ</small>
                                                     </div>
                                                 </div>
                                             </div>
+                                            <div className="col-6 col-md-3 d-none d-md-block">
+                                                <div>
+                                                    <small className="text-muted">
+                                                        {formatDate(order.order_date)}
+                                                    </small>
+                                                </div>
+                                            </div>
+                                            <div className="col-3 col-md-2">
+                                                <div className="fw-bold text-primary">
+                                                    ฿{parseFloat(order.total_amount).toLocaleString()}
+                                                </div>
+                                            </div>
+                                            <div className="col-3 col-md-2 text-center">
+                                                <span className={`badge px-2 py-1 rounded-pill 
+                                                    ${order.payment_status === 'pending' ? 'bg-warning bg-opacity-10 text-warning' :
+                                                        order.payment_status === 'paid' ? 'bg-success text-success bg-opacity-10' :
+                                                            order.payment_status === 'failed' ? 'bg-danger text-danger bg-opacity-10' : ''
+                                                    }`}
+                                                    style={{ fontSize: '0.8rem' }}
+                                                >
+                                                    {order.payment_status === 'pending' && 'รอตรวจสอบ'}
+                                                    {order.payment_status === 'paid' && 'อนุมัติแล้ว'}
+                                                    {order.payment_status === 'failed' && 'ไม่อนุมัติ'}
+                                                </span>
+                                            </div>
+                                            <div className="col-12 col-md-1 text-end mt-2 mt-md-0">
+                                                <button
+                                                    className="btn btn-outline-primary btn-sm px-2 py-1"
+                                                    style={{ fontSize: '0.7rem' }}
+                                                    data-bs-toggle="collapse"
+                                                    data-bs-target={`#donateSlipDetail-${idx}`}
+                                                    aria-expanded="false"
+                                                    aria-controls={`donateSlipDetail-${idx}`}
+                                                >
+                                                    <span className="d-none d-sm-inline">ตรวจสอบ</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
 
-                                            <div className="collapse" id={`slipDetail-${idx}`}>
-                                                <div className="card-body border-top pt-3 bg-light bg-opacity-25">
-                                                    <div className="row g-4">
-                                                        {/* Slip Image */}
-                                                        <div className="col-lg-4">
-                                                            <div className="card border-2 border-primary border-opacity-25">
-                                                                <div className="card-header bg-primary bg-opacity-10 text-center py-2">
-                                                                    <small className="text-primary fw-bold">
-                                                                        สลิปการโอน
-                                                                    </small>
-                                                                </div>
-                                                                <div className="card-body p-2 text-center">
-                                                                    {order.slip_path ? (
-                                                                        <>
-                                                                            <img
-                                                                                src={HOSTNAME +`/uploads/${order.slip_path}`}
-                                                                                alt="slip"
-                                                                                className="img-fluid rounded-2 shadow-sm border"
-                                                                                style={{
-                                                                                    maxHeight: 200,
-                                                                                    objectFit: 'contain',
-                                                                                    cursor: 'pointer',
-                                                                                }}
-                                                                                onClick={() => {
-                                                                                    window.open(
-                                                                                        HOSTNAME +`/uploads/${order.slip_path}`,
-                                                                                        '_blank'
-                                                                                    );
-                                                                                }}
-                                                                            />
-                                                                            <div className="mt-2">
-                                                                                <button
-                                                                                    className="btn btn-outline-primary btn-sm"
-                                                                                    onClick={() => {
-                                                                                        window.open(
-                                                                                            HOSTNAME +`/uploads/${order.slip_path}`,
-                                                                                            '_blank'
-                                                                                        );
-                                                                                    }}
-                                                                                >
-                                                                                    ดูเต็มจอ
-                                                                                </button>
-                                                                            </div>
-                                                                        </>
-                                                                    ) : (
-                                                                        <div className="text-muted py-3">
-                                                                            <p className="small">ไม่มีสลิป</p>
-                                                                        </div>
-                                                                    )}
-                                                                </div>
-                                                            </div>
+                                    <div className="collapse" id={`donateSlipDetail-${idx}`}>
+                                        <div className="card-body border-top pt-3 bg-light bg-opacity-25">
+                                            <div className="row g-4">
+                                                {/* Slip Image */}
+                                                <div className="col-lg-4">
+                                                    <div className="card border-2 border-primary border-opacity-25">
+                                                        <div className="card-header bg-primary bg-opacity-10 text-center py-2">
+                                                            <small className="text-primary fw-bold">
+                                                                สลิปการโอน
+                                                            </small>
                                                         </div>
-
-                                                        <div className="col-lg-8">
-                                                            <div className="card border-0 bg-white shadow-sm mb-3">
-                                                                <div className="card-body p-3">
-                                                                    {/* หัวข้อ */}
-                                                                    <h6 className="fw-bold text-primary mb-3 d-flex align-items-center">
-                                                                        {isDonation ? 'ผู้บริจาค' : 'ผู้สั่งซื้อ'}
-                                                                    </h6>
-
-                                                                    {/* รายการสินค้า */}
-                                                                    {order.products && order.products.length > 0 && (
-                                                                        <div className="mb-3">
-                                                                            <h6 className="fw-bold text-primary mb-2">
-                                                                                <i className="fas fa-box me-2"></i>
-                                                                                สินค้า ({order.products.length} รายการ)
-                                                                            </h6>
-                                                                            <div className="">
-                                                                                {order.products.slice(0, 3).map((prod, i) => (
-                                                                                    <div key={i} className="col-12 col-sm-6 col-md-6">
-                                                                                        <div className="d-flex align-items-center p-2 bg-light rounded-2 h-100">
-                                                                                            <img
-                                                                                                src={
-                                                                                                    prod.image
-                                                                                                        ? HOSTNAME +`/uploads/${prod.image}`
-                                                                                                        : ''
-                                                                                                }
-                                                                                                alt={prod.product_name}
-                                                                                                className="rounded flex-shrink-0"
-                                                                                                style={{
-                                                                                                    width: 150,
-                                                                                                    height: 150,
-                                                                                                    objectFit: 'cover',
-                                                                                                }}
-                                                                                            />
-                                                                                            <div className="ms-2">
-                                                                                                <div
-                                                                                                    className="fw-semibold text-truncate"
-                                                                                                    style={{ fontSize: '0.9rem' }}
-                                                                                                >
-                                                                                                    {prod.product_name}
-                                                                                                </div>
-                                                                                                <small className="text-muted d-block">
-                                                                                                    จำนวน: {prod.quantity}
-                                                                                                </small>
-                                                                                                <small className="text-muted d-block">
-                                                                                                    ราคา: ฿{parseFloat(prod.price).toLocaleString()}
-                                                                                                </small>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                ))}
-                                                                                {order.products.length > 3 && (
-                                                                                    <div className="col-12">
-                                                                                        <small className="text-muted">
-                                                                                            และอีก {order.products.length - 3} รายการ...
-                                                                                        </small>
-                                                                                    </div>
-                                                                                )}
-                                                                            </div>
-                                                                        </div>
-                                                                    )}
-
-                                                                    {/* ข้อมูลผู้ซื้อ */}
-                                                                    <div className="row mb-3">
-                                                                        <div className="col-12 col-md-6 mb-2">
-                                                                            <small className="text-muted">ชื่อ</small>
-                                                                            <div className="fw-semibold">{order.buyer_name}</div>
-                                                                        </div>
-                                                                        <div className="col-12 col-md-6 mb-2">
-                                                                            <small className="text-muted">วันที่</small>
-                                                                            <div className="fw-semibold">
-                                                                                {order.order_date
-                                                                                    ? new Date(order.order_date).toLocaleDateString('th-TH', {
-                                                                                        year: 'numeric',
-                                                                                        month: 'short',
-                                                                                        day: 'numeric',
-                                                                                        hour: '2-digit',
-                                                                                        minute: '2-digit',
-                                                                                    })
-                                                                                    : '-'}
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-
-                                                                    {/* ยอดรวม */}
-                                                                    <div className="bg-primary bg-opacity-10 rounded-2 p-3 text-center">
-                                                                        <small className="text-muted d-block">ยอดโอนรวม</small>
-                                                                        <div className="fs-4 fw-bold text-primary">
-                                                                            ฿{parseFloat(order.total_amount).toLocaleString()}
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-
-
-                                                            {/* Products */}
-                                                            {!isDonation && (
+                                                        <div className="card-body p-2 text-center">
+                                                            {order.slip_path ? (
                                                                 <>
-                                                                    {/* ข้อมูลผู้ขาย */}
-                                                                    <div className="card border-0 bg-white shadow-sm mb-3">
-                                                                        <div className="card-body p-3">
-                                                                            <h6 className="fw-bold text-primary mb-2">
-                                                                                ข้อมูลผู้ขาย
-                                                                            </h6>
-                                                                            <div className="row">
-                                                                                <div className="col-md-6 mb-2">
-                                                                                    <small className="text-muted">ชื่อผู้ขาย</small>
-                                                                                    <div className="fw-semibold">{order.seller_name || '-'}</div>
-                                                                                </div>
-                                                                                <div className="col-md-6 mb-2">
-                                                                                    <small className="text-muted">บัญชีธนาคาร</small>
-                                                                                    <div className="fw-semibold">{order.seller_account_name || '-'}</div>
-                                                                                </div>
-                                                                                <div className="col-md-6 mb-2">
-                                                                                    <small className="text-muted">หมายเลขบัญชี</small>
-                                                                                    <div className="fw-semibold">{order.account_number || '-'}</div>
-                                                                                </div>
-                                                                                <div className="col-md-6 mb-2">
-                                                                                    <small className="text-muted">หมายเลขพร้อมเพย์</small>
-                                                                                    <div className="fw-semibold">{order.promptpay_number || '-'}</div>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
+                                                                    <img
+                                                                        src={HOSTNAME + `/uploads/${order.slip_path}`}
+                                                                        alt="slip"
+                                                                        className="img-fluid rounded-2 shadow-sm border"
+                                                                        style={{
+                                                                            maxHeight: 200,
+                                                                            objectFit: 'contain',
+                                                                            cursor: 'pointer',
+                                                                        }}
+                                                                        onClick={() => {
+                                                                            window.open(
+                                                                                HOSTNAME + `/uploads/${order.slip_path}`,
+                                                                                '_blank'
+                                                                            );
+                                                                        }}
+                                                                    />
+                                                                    <div className="mt-2">
+                                                                        <button
+                                                                            className="btn btn-outline-primary btn-sm"
+                                                                            onClick={() => {
+                                                                                window.open(
+                                                                                    HOSTNAME + `/uploads/${order.slip_path}`,
+                                                                                    '_blank'
+                                                                                );
+                                                                            }}
+                                                                        >
+                                                                            ดูเต็มจอ
+                                                                        </button>
                                                                     </div>
                                                                 </>
+                                                            ) : (
+                                                                <div className="text-muted py-3">
+                                                                    <p className="small">ไม่มีสลิป</p>
+                                                                </div>
                                                             )}
                                                         </div>
                                                     </div>
-
-                                                    {/* Action Buttons */}
-                                                    <div className="border-top pt-3 mt-3">
-                                                        <div className="d-flex justify-content-between align-items-center">
-                                                            <h6 className="mb-0 fw-bold">
-                                                                การดำเนินการ
+                                                </div>
+                                                <div className="col-lg-8">
+                                                    <div className="card border-0 bg-white shadow-sm mb-3">
+                                                        <div className="card-body p-3">
+                                                            {/* หัวข้อ */}
+                                                            <h6 className="fw-bold text-primary mb-3 d-flex align-items-center">
+                                                                ผู้สั่งซื้อ
                                                             </h6>
-                                                        </div>
 
-                                                        {rejectingOrderId !== order.order_id ? (
-                                                            <div className="d-flex gap-2 mt-3">
-                                                                <button
-                                                                    className="btn btn-success btn-sm flex-fill"
-                                                                    onClick={() =>
-                                                                        handleApprove(order.order_id)
-                                                                    }
-                                                                >
-                                                                    ยืนยันสลิป
-                                                                </button>
-                                                                <button
-                                                                    className="btn btn-danger btn-sm flex-fill"
-                                                                    onClick={() => {
-                                                                        setRejectingOrderId(order.order_id);
-                                                                        setRejectReason('');
-                                                                    }}
-                                                                >
-                                                                    ปฏิเสธ
-                                                                </button>
-                                                            </div>
-                                                        ) : (
-                                                            <div className="bg-white rounded-2 p-3 border border-danger border-opacity-25 mt-3">
+                                                            {/* รายการสินค้า */}
+                                                            {order.products && order.products.length > 0 && (
                                                                 <div className="mb-3">
-                                                                    <label className="form-label fw-bold text-danger">
-                                                                        เหตุผลในการปฏิเสธ
-                                                                    </label>
-                                                                    <textarea
-                                                                        className="form-control border-2 w-100 "
-                                                                        placeholder="กรุณาระบุเหตุผลที่ชัดเจน..."
-                                                                        rows={3}
-                                                                        value={rejectReason}
-                                                                        onChange={e =>
-                                                                            setRejectReason(e.target.value)
-                                                                        }
-                                                                    />
+                                                                    <h6 className="fw-bold text-primary mb-2">
+                                                                        <i className="fas fa-box me-2"></i>
+                                                                        สินค้า ({order.products.length} รายการ)
+                                                                    </h6>
+                                                                    <div className="">
+                                                                        {order.products.slice(0, 3).map((prod, i) => (
+                                                                            <div key={i} className="col-12 col-sm-6 col-md-6">
+                                                                                <div className="d-flex align-items-center p-2 bg-light rounded-2 h-100">
+                                                                                    <img
+                                                                                        src={
+                                                                                            prod.image
+                                                                                                ? HOSTNAME + `/uploads/${prod.image}`
+                                                                                                : ''
+                                                                                        }
+                                                                                        alt={prod.product_name}
+                                                                                        className="rounded flex-shrink-0"
+                                                                                        style={{
+                                                                                            width: 150,
+                                                                                            height: 150,
+                                                                                            objectFit: 'cover',
+                                                                                        }}
+                                                                                    />
+                                                                                    <div className="ms-2">
+                                                                                        <div
+                                                                                            className="fw-semibold text-truncate"
+                                                                                            style={{ fontSize: '0.9rem' }}
+                                                                                        >
+                                                                                            {prod.product_name}
+                                                                                        </div>
+                                                                                        <small className="text-muted d-block">
+                                                                                            จำนวน: {prod.quantity}
+                                                                                        </small>
+                                                                                        <small className="text-muted d-block">
+                                                                                            ราคา: ฿{parseFloat(prod.price).toLocaleString()}
+                                                                                        </small>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        ))}
+                                                                        {order.products.length > 3 && (
+                                                                            <div className="col-12">
+                                                                                <small className="text-muted">
+                                                                                    และอีก {order.products.length - 3} รายการ...
+                                                                                </small>
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
                                                                 </div>
-                                                                <div className="d-flex gap-2">
-                                                                    <button
-                                                                        className="btn btn-outline-secondary btn-sm"
-                                                                        onClick={() =>
-                                                                            setRejectingOrderId(null)
-                                                                        }
-                                                                    >
-                                                                        ยกเลิก
-                                                                    </button>
-                                                                    <button
-                                                                        className="btn btn-danger btn-sm"
-                                                                        onClick={handleRejectSubmit}
-                                                                        disabled={!rejectReason.trim()}
-                                                                    >
-                                                                        ยืนยันการปฏิเสธ
-                                                                    </button>
+                                                            )}
+
+                                                            {/* ข้อมูลผู้ซื้อ */}
+                                                            <div className="row mb-3">
+                                                                <div className="col-12 col-md-6 mb-2">
+                                                                    <small className="text-muted">ชื่อ</small>
+                                                                    <div className="fw-semibold">{order.buyer_name}</div>
+                                                                </div>
+                                                                <div className="col-12 col-md-6 mb-2">
+                                                                    <small className="text-muted">วันที่</small>
+                                                                    <div className="fw-semibold">
+                                                                        {order.order_date
+                                                                            ? new Date(order.order_date).toLocaleDateString('th-TH', {
+                                                                                year: 'numeric',
+                                                                                month: 'short',
+                                                                                day: 'numeric',
+                                                                                hour: '2-digit',
+                                                                                minute: '2-digit',
+                                                                            })
+                                                                            : '-'}
+                                                                    </div>
                                                                 </div>
                                                             </div>
-                                                        )}
+
+                                                            {/* ยอดรวม */}
+                                                            <div className="bg-primary bg-opacity-10 rounded-2 p-3 text-center">
+                                                                <small className="text-muted d-block">ยอดโอนรวม</small>
+                                                                <div className="fs-4 fw-bold text-primary">
+                                                                    ฿{parseFloat(order.total_amount).toLocaleString()}
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     </div>
+
+                                                    <>
+                                                        {/* ข้อมูลผู้ขาย */}
+                                                        <div className="card border-0 bg-white shadow-sm mb-3">
+                                                            <div className="card-body p-3">
+                                                                <h6 className="fw-bold text-primary mb-2">
+                                                                    ข้อมูลผู้ขาย
+                                                                </h6>
+                                                                <div className="row">
+                                                                    <div className="col-md-6 mb-2">
+                                                                        <small className="text-muted">ชื่อผู้ขาย</small>
+                                                                        <div className="fw-semibold">{order.seller_name || '-'}</div>
+                                                                    </div>
+                                                                    <div className="col-md-6 mb-2">
+                                                                        <small className="text-muted">บัญชีธนาคาร</small>
+                                                                        <div className="fw-semibold">{order.seller_account_name || '-'}</div>
+                                                                    </div>
+                                                                    <div className="col-md-6 mb-2">
+                                                                        <small className="text-muted">หมายเลขบัญชี</small>
+                                                                        <div className="fw-semibold">{order.account_number || '-'}</div>
+                                                                    </div>
+                                                                    <div className="col-md-6 mb-2">
+                                                                        <small className="text-muted">หมายเลขพร้อมเพย์</small>
+                                                                        <div className="fw-semibold">{order.promptpay_number || '-'}</div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </>
+
                                                 </div>
                                             </div>
+                                            {/* Action Buttons */}
+                                            {order.payment_status === 'pending' && (
+                                                <div className="border-top pt-3 mt-3">
+                                                    <div className="d-flex justify-content-between align-items-center">
+                                                        <h6 className="mb-0 fw-bold">การดำเนินการ</h6>
+                                                    </div>
+
+                                                    {rejectingOrderId !== order.order_id ? (
+                                                        <div className="d-flex gap-2 mt-3">
+                                                            <button
+                                                                className="btn btn-success btn-sm flex-fill"
+                                                                onClick={() => handleApprove(order.order_id)}
+                                                            >
+                                                                ยืนยันสลิป
+                                                            </button>
+                                                            <button
+                                                                className="btn btn-danger btn-sm flex-fill"
+                                                                onClick={() => {
+                                                                    setRejectingOrderId(order.order_id);
+                                                                    setRejectReason('');
+                                                                }}
+                                                            >
+                                                                ปฏิเสธ
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="bg-white rounded-2 p-3 border border-danger border-opacity-25 mt-3">
+                                                            <div className="mb-3">
+                                                                <label className="form-label fw-bold text-danger">
+                                                                    เหตุผลในการปฏิเสธ
+                                                                </label>
+                                                                <textarea
+                                                                    className="form-control border-2 w-100"
+                                                                    placeholder="กรุณาระบุเหตุผลที่ชัดเจน..."
+                                                                    rows={3}
+                                                                    value={rejectReason}
+                                                                    onChange={e => setRejectReason(e.target.value)}
+                                                                />
+                                                            </div>
+                                                            <div className="d-flex gap-2">
+                                                                <button
+                                                                    className="btn btn-outline-secondary btn-sm"
+                                                                    onClick={() => setRejectingOrderId(null)}
+                                                                >
+                                                                    ยกเลิก
+                                                                </button>
+                                                                <button
+                                                                    className="btn btn-danger btn-sm"
+                                                                    onClick={handleRejectSubmit}
+                                                                    disabled={!rejectReason.trim()}
+                                                                >
+                                                                    ยืนยันการปฏิเสธ
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+
                                         </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </div>
+            )}
 
-                    );
-                })()}
-            </div>
-
-            {/* Donation Tab Content */}
+            {/* Donation content */}
             {activeTab === 'donation' && (
                 <div className="row">
                     <div className="col-12">
@@ -725,7 +713,7 @@ function AdminVerifySlip() {
                                                         <FaHeart className="text-success" size={16} />
                                                     </div>
                                                     <div>
-                                                        <div className="fw-bold">รายการที่: {payment.order_number}</div>
+                                                        <div className="fw-bold">{payment.project_name || 'ไม่ระบุชื่อโครงการ'}</div>
                                                         <small className="text-success fw-semibold">การบริจาค</small>
                                                     </div>
                                                 </div>
@@ -785,16 +773,16 @@ function AdminVerifySlip() {
                                                             {payment.slip ? (
                                                                 <>
                                                                     <img
-                                                                        src={HOSTNAME +`/uploads/${payment.slip}`}
+                                                                        src={HOSTNAME + `/uploads/${payment.slip}`}
                                                                         alt="slip"
                                                                         className="img-fluid rounded-2 shadow-sm border"
                                                                         style={{ maxHeight: 200, objectFit: 'contain', cursor: 'pointer' }}
-                                                                        onClick={() => window.open(HOSTNAME +`/uploads/${payment.slip}`, '_blank')}
+                                                                        onClick={() => window.open(HOSTNAME + `/uploads/${payment.slip}`, '_blank')}
                                                                     />
                                                                     <div className="mt-2">
                                                                         <button
                                                                             className="btn btn-outline-success btn-sm"
-                                                                            onClick={() => window.open(HOSTNAME +`/uploads/${payment.slip}`, '_blank')}
+                                                                            onClick={() => window.open(HOSTNAME + `/uploads/${payment.slip}`, '_blank')}
                                                                         >
                                                                             ดูเต็มจอ
                                                                         </button>
@@ -874,65 +862,67 @@ function AdminVerifySlip() {
                                                 </div>
                                             </div>
                                             {/* Action Buttons */}
-                                            <div className="border-top pt-3 mt-3">
-                                                <div className="d-flex justify-content-between align-items-center">
-                                                    <h6 className="mb-0 fw-bold">การดำเนินการ</h6>
-                                                </div>
+                                            {payment.payment_status === 'pending' && (
+                                                <div className="border-top pt-3 mt-3">
+                                                    <div className="d-flex justify-content-between align-items-center">
+                                                        <h6 className="mb-0 fw-bold">การดำเนินการ</h6>
+                                                    </div>
 
-                                                {rejectingDonationId !== payment.donation_id ? (
-                                                    <div className="d-flex gap-2 mt-3">
-                                                        {payment.payment_status === 'pending' && (
-                                                            <>
+                                                    {rejectingDonationId !== payment.donation_id ? (
+                                                        <div className="d-flex gap-2 mt-3">
+                                                            {payment.payment_status === 'pending' && (
+                                                                <>
+                                                                    <button
+                                                                        className="btn btn-success btn-sm flex-fill"
+                                                                        onClick={() => approvePayment(payment.donation_id)}
+                                                                    >
+                                                                        อนุมัติ
+                                                                    </button>
+                                                                    <button
+                                                                        className="btn btn-danger btn-sm flex-fill"
+                                                                        onClick={() => {
+                                                                            setRejectingDonationId(payment.donation_id);
+                                                                            setRejectReason('');
+                                                                        }}
+                                                                    >
+                                                                        ปฏิเสธ
+                                                                    </button>
+                                                                </>
+                                                            )}
+                                                        </div>
+                                                    ) : (
+                                                        <div className="bg-white rounded-2 p-3 border border-danger border-opacity-25 mt-3">
+                                                            <div className="mb-3">
+                                                                <label className="form-label fw-bold text-danger">
+                                                                    เหตุผลในการปฏิเสธ
+                                                                </label>
+                                                                <textarea
+                                                                    className="form-control border-2 w-100"
+                                                                    placeholder="กรุณาระบุเหตุผลที่ชัดเจน..."
+                                                                    rows={3}
+                                                                    value={rejectReason}
+                                                                    onChange={e => setRejectReason(e.target.value)}
+                                                                />
+                                                            </div>
+                                                            <div className="d-flex gap-2">
                                                                 <button
-                                                                    className="btn btn-success btn-sm flex-fill"
-                                                                    onClick={() => approvePayment(payment.donation_id)}
+                                                                    className="btn btn-outline-secondary btn-sm"
+                                                                    onClick={() => setRejectingDonationId(null)}
                                                                 >
-                                                                    อนุมัติ
+                                                                    ยกเลิก
                                                                 </button>
                                                                 <button
-                                                                    className="btn btn-danger btn-sm flex-fill"
-                                                                    onClick={() => {
-                                                                        setRejectingDonationId(payment.donation_id);
-                                                                        setRejectReason('');
-                                                                    }}
+                                                                    className="btn btn-danger btn-sm"
+                                                                    onClick={() => handleRejectDonation(payment.donation_id)}
+                                                                    disabled={!rejectReason.trim()}
                                                                 >
-                                                                    ปฏิเสธ
+                                                                    ยืนยันการปฏิเสธ
                                                                 </button>
-                                                            </>
-                                                        )}
-                                                    </div>
-                                                ) : (
-                                                    <div className="bg-white rounded-2 p-3 border border-danger border-opacity-25 mt-3">
-                                                        <div className="mb-3">
-                                                            <label className="form-label fw-bold text-danger">
-                                                                เหตุผลในการปฏิเสธ
-                                                            </label>
-                                                            <textarea
-                                                                className="form-control border-2 w-100"
-                                                                placeholder="กรุณาระบุเหตุผลที่ชัดเจน..."
-                                                                rows={3}
-                                                                value={rejectReason}
-                                                                onChange={e => setRejectReason(e.target.value)}
-                                                            />
+                                                            </div>
                                                         </div>
-                                                        <div className="d-flex gap-2">
-                                                            <button
-                                                                className="btn btn-outline-secondary btn-sm"
-                                                                onClick={() => setRejectingDonationId(null)}
-                                                            >
-                                                                ยกเลิก
-                                                            </button>
-                                                            <button
-                                                                className="btn btn-danger btn-sm"
-                                                                onClick={() => handleRejectDonation(payment.donation_id)}
-                                                                disabled={!rejectReason.trim()}
-                                                            >
-                                                                ยืนยันการปฏิเสธ
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </div>
+                                                    )}
+                                                </div>
+                                            )}
 
                                         </div>
                                     </div>
