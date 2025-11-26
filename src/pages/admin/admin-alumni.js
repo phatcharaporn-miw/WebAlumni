@@ -20,7 +20,7 @@ function AdminAlumni() {
 
     useEffect(() => {
         axios.get(HOSTNAME +"/alumni/outstanding-alumni")
-            .then((res) => setAlumniData(res.data))
+            .then((res) => setAlumniData(res.data.data))
             .catch((err) => console.error("ไม่สามารถโหลดศิษย์เก่าดีเด่น:", err));
     }, []);
 

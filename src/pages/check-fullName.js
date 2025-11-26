@@ -40,7 +40,7 @@ function CheckFullName() {
         setResult(null);
 
         try {
-            const res = await axios.post(HOSTNAME + '/api/check-fullname', { full_name: fullName });
+            const res = await axios.post(HOSTNAME +'/api/check-fullname', { full_name: fullName });
 
             if (res.data.success) {
                 setResult({
@@ -176,9 +176,6 @@ function CheckFullName() {
                                             <a href="/login" className="btn btn-outline-success btn-sm">
                                                 ไปหน้าเข้าสู่ระบบ
                                             </a>
-                                            {/* <p  className="text-primary">
-                                                ติดต่อ email: Alumni college of computing@gmail.com
-                                            </p> */}
                                         </>
                                     ) : (
                                         <>

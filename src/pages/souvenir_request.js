@@ -1,10 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button, Modal, Box, Typography } from '@mui/material';
 import "../css/Souvenir_request.css";
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
-import DeleteIcon from '@mui/icons-material/Delete';
-import AddIcon from '@mui/icons-material/Add';
 import Swal from "sweetalert2";
 import { useAuth } from '../context/AuthContext';
 import {HOSTNAME} from '../config.js';
@@ -35,6 +33,28 @@ function SouvenirRequest() {
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
+
+    // ดึงบัญชีธนาคารอัตโนมัติตอนโหลดหน้า
+useEffect(() => {
+    const fetchBankInfo = async () => {
+        try {
+            const res = await axios.get(HOSTNAME + '/donate/bank-info');
+            const bank = res.data;
+
+            setFormData(prev => ({
+                ...prev,
+                bankName: bank.bank_name || '',
+                accountName: bank.account_name || '',
+                accountNumber: bank.account_number || '',
+                promptpayNumber: bank.promptpay_number || ''
+            }));
+        } catch (err) {
+            console.error('Error fetching bank info:', err);
+        }
+    };
+
+    fetchBankInfo();
+}, []);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -159,20 +179,14 @@ function SouvenirRequest() {
             handleClose();
             Swal.fire({
                 title: "เพิ่มสินค้าสำเร็จ!",
-                text: (role === '1' || role === '2')
+                text: (role === 1 || role === 2)
                     ? "เพิ่มสินค้าเรียบร้อยแล้ว"
                     : "สินค้าของคุณอยู่ระหว่างการตรวจสอบ กรุณารอการอนุมัติ",
                 icon: "success",
                 confirmButtonText: "ตกลง"
             }).then(() => {
-                if (role === '1') {
+                if (role === 1) {
                     navigate("/admin/souvenir");
-                } else if (role === '2') {
-                    navigate("/souvenir");
-                } else if (role === '4') {
-                    navigate("/student-profile/student-request");
-                } else {
-                    navigate("/alumni-profile/alumni-request");
                 }
             });
         } catch (error) {

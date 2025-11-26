@@ -138,6 +138,74 @@ function Activity() {
             });
     };
 
+    //     const handleFormSubmit = (e) => {
+    //     e.preventDefault();
+
+    //     if (hasJoined) {
+    //         Swal.fire({
+    //             title: "แจ้งเตือน",
+    //             text: "คุณได้เข้าร่วมกิจกรรมนี้แล้ว",
+    //             icon: "info",
+    //             confirmButtonText: "ตกลง"
+    //         });
+    //         return;
+    //     }
+
+    //     if (!/^\d{10}$/.test(formData.phone)) {
+    //         Swal.fire({
+    //             title: "ข้อผิดพลาด!",
+    //             text: "กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง (10 หลัก)",
+    //             icon: "error",
+    //             confirmButtonText: "ตกลง"
+    //         });
+    //         return;
+    //     }
+
+    //     // สร้าง FormData สำหรับส่งไฟล์และข้อมูล
+    //     const fd = new FormData();
+    //     for (const key in formData) {
+    //         if (formData[key] !== null && formData[key] !== undefined) {
+    //             fd.append(key, formData[key]);
+    //         }
+    //     }
+
+    //     axios.post(HOSTNAME + '/activity/activity-form', fd, {
+    //         withCredentials: true,
+    //         headers: {
+    //             'Content-Type': 'multipart/form-data'
+    //         }
+    //     })
+    //     .then(response => {
+    //         Swal.fire({
+    //             title: "สำเร็จ!",
+    //             text: "คุณได้เข้าร่วมกิจกรรมเรียบร้อยแล้ว",
+    //             icon: "success",
+    //             confirmButtonText: "ตกลง",
+    //             timer: 3000
+    //         });
+    //         setHasJoined(true);
+    //         setShowForm(false);
+    //     })
+    //     .catch(error => {
+    //         if (error.response?.status === 400) {
+    //             Swal.fire({
+    //                 title: "แจ้งเตือน!",
+    //                 text: error.response.data.message,
+    //                 icon: "warning",
+    //                 confirmButtonText: "ตกลง"
+    //             });
+    //         } else {
+    //             Swal.fire({
+    //                 title: "เกิดข้อผิดพลาด!",
+    //                 text: "ไม่สามารถเข้าร่วมกิจกรรมได้ กรุณาลองใหม่",
+    //                 icon: "error",
+    //                 confirmButtonText: "ตกลง"
+    //             });
+    //         }
+    //     });
+    // };
+
+
     useEffect(() => {
         if (activityId) {
             setHasJoined(false);
@@ -445,7 +513,7 @@ function Activity() {
                                                 ผู้เข้าร่วม: {activity.current_participants}/{activity.max_participants || "ไม่จำกัด"}
                                             </p>
                                             <div className="button-group">
-                                                {activity.status === 0 && (  // ตรวจสอบกิจกรรมที่ยังไม่เสร็จสิ้น
+                                                {activity.status === 0 && (user?.role === 3 || user?.role === 4) && (
                                                     hasJoined ? (
                                                         <button className="btn btn-secondary" disabled>
                                                             เข้าร่วมแล้ว
@@ -495,56 +563,61 @@ function Activity() {
                     </div>
                     {/* Pagination */}
                     {totalPages > 1 && (
-                <nav aria-label="Page navigation" className="donate-pagination">
-                  <ul className="pagination">
-                    <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
-                      <button
-                        className="page-link"
-                        onClick={() => handlePageChange(currentPage - 1)}
-                        disabled={currentPage === 1}
-                      >
-                        <FaChevronLeft />
-                      </button>
-                    </li>
-        
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
-                      <li
-                        key={number}
-                        className={`page-item ${number === currentPage ? "active" : ""}`}
-                      >
-                        <button className="page-link" onClick={() => handlePageChange(number)}>
-                          {number}
-                        </button>
-                      </li>
-                    ))}
-        
-                    <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
-                      <button
-                        className="page-link"
-                        onClick={() => handlePageChange(currentPage + 1)}
-                        disabled={currentPage === totalPages}
-                      >
-                        <FaChevronRight />
-                      </button>
-                    </li>
-                  </ul>
-                </nav>
-        )}
+                        <nav aria-label="Page navigation" className="donate-pagination">
+                            <ul className="pagination">
+                                <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                                    <button
+                                        className="page-link"
+                                        onClick={() => handlePageChange(currentPage - 1)}
+                                        disabled={currentPage === 1}
+                                    >
+                                        <FaChevronLeft />
+                                    </button>
+                                </li>
 
-          <div className="donate-page-info mb-4">
-            <small>
-              หน้า {currentPage} จาก {totalPages} (แสดง{" "}
-              {(currentPage - 1) * itemsPerPage + 1} -{" "}
-              {Math.min(currentPage * itemsPerPage, filteredActivity.length)} จาก{" "}
-              {filteredActivity.length} โครงการ)
-            </small>
-        </div>
+                                {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
+                                    <li
+                                        key={number}
+                                        className={`page-item ${number === currentPage ? "active" : ""}`}
+                                    >
+                                        <button className="page-link" onClick={() => handlePageChange(number)}>
+                                            {number}
+                                        </button>
+                                    </li>
+                                ))}
+
+                                <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                                    <button
+                                        className="page-link"
+                                        onClick={() => handlePageChange(currentPage + 1)}
+                                        disabled={currentPage === totalPages}
+                                    >
+                                        <FaChevronRight />
+                                    </button>
+                                </li>
+                            </ul>
+                        </nav>
+                    )}
+
+                    <div className="donate-page-info mb-4">
+                        <small>
+                            หน้า {currentPage} จาก {totalPages} (แสดง{" "}
+                            {(currentPage - 1) * itemsPerPage + 1} -{" "}
+                            {Math.min(currentPage * itemsPerPage, filteredActivity.length)} จาก{" "}
+                            {filteredActivity.length} โครงการ)
+                        </small>
+                    </div>
 
 
                 </div>
                 {showForm && (
                     <div className="form-overlay">
-                        <form className="join-form " onSubmit={handleFormSubmit}>
+                        <form
+                            className="join-form"
+                            onSubmit={handleFormSubmit} // ฟังก์ชันส่งข้อมูลไป backend
+                            encType="multipart/form-data"
+                        >
+                            {/* ปุ่มปิดฟอร์ม */}
                             <button
                                 type="button"
                                 className="close-button"
@@ -552,11 +625,61 @@ function Activity() {
                             >
                                 <IoMdClose />
                             </button>
+
                             <h4 className="mb-4 text-center">เข้าร่วมกิจกรรม</h4>
-                            <div className="activity-info">
-                                <label className="form-label"><strong>กิจกรรม:</strong></label>
-                                <p>{activity.find(act => act.activity_id === formData.activity_id)?.activity_name || "ไม่พบข้อมูลกิจกรรม"}</p>
+
+                            {/* แสดงชื่อกิจกรรม */}
+                            <div className="activity-info mb-3">
+                                <label className="form-label">
+                                    <strong>กิจกรรม:</strong>
+                                </label>
+                                <p>
+                                    {activity.find((act) => act.activity_id === formData.activity_id)
+                                        ?.activity_name || "ไม่พบข้อมูลกิจกรรม"}
+                                </p>
                             </div>
+
+                            {/* แสดงฟิลด์สำหรับกิจกรรมที่ต้องจ่ายเงิน */}
+                            {activity.find((act) => act.activity_id === formData.activity_id)
+                                ?.is_paid_required === 1 && (
+                                    <div className="mb-3 border rounded p-3 bg-light">
+                                        <h6 className="text-primary mb-2">กิจกรรมนี้มีค่าเข้าร่วม</h6>
+                                        <p>
+                                            <strong>ค่าธรรมเนียม:</strong>{" "}
+                                            {
+                                                activity.find((act) => act.activity_id === formData.activity_id)
+                                                    ?.price
+                                            }{" "}
+                                            บาท
+                                        </p>
+
+                                        {/* ดึงบัญชีจาก official_accounts ของกิจกรรม */}
+                                        {activity.find((act) => act.activity_id === formData.activity_id)
+                                            ?.official_accounts?.map((acc, idx) => (
+                                                <div key={idx} className="mb-1">
+                                                    <p className="mb-0"><strong>ธนาคาร:</strong> {acc.bank_name}</p>
+                                                    <p className="mb-0"><strong>ชื่อบัญชี:</strong> {acc.account_name}</p>
+                                                    <p className="mb-0"><strong>เลขบัญชี:</strong> {acc.account_number || "-"}</p>
+                                                    {acc.promptpay_number && <p className="mb-0"><strong>PromptPay:</strong> {acc.promptpay_number}</p>}
+                                                </div>
+                                            ))}
+
+                                        <div className="mb-2 mt-2">
+                                            <label className="form-label">อัปโหลดสลิปการโอนเงิน</label>
+                                            <input
+                                                type="file"
+                                                className="form-control"
+                                                accept="image/*"
+                                                onChange={(e) =>
+                                                    setFormData({ ...formData, paymentSlip: e.target.files[0] })
+                                                }
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+
+                            {/* ข้อมูลส่วนตัว */}
                             <div className="mb-3">
                                 <label htmlFor="full_name" className="form-label">ชื่อ-นามสกุล</label>
                                 <input
@@ -568,6 +691,7 @@ function Activity() {
                                     required
                                 />
                             </div>
+
                             <div className="mb-3">
                                 <label htmlFor="email" className="form-label">อีเมล</label>
                                 <input
@@ -579,6 +703,7 @@ function Activity() {
                                     required
                                 />
                             </div>
+
                             <div className="mb-3">
                                 <label htmlFor="phone_number" className="form-label">เบอร์โทรศัพท์</label>
                                 <input
@@ -590,8 +715,9 @@ function Activity() {
                                     required
                                 />
                             </div>
-                            {/* แสดงปีการศึกษา/ระดับการศึกษา */}
-                            {userRole === '4' ? ( // ถ้าเป็นศิษย์ปัจจุบัน
+
+                            {/* ฟิลด์เพิ่มเติมตาม role */}
+                            {userRole === 4 ? (
                                 <>
                                     <div className="mb-3">
                                         <label htmlFor="education_level" className="form-label">ระดับการศึกษา</label>
@@ -609,8 +735,7 @@ function Activity() {
                                         </select>
                                     </div>
 
-                                    {/* ถ้าเลือก ป.ตรี จะแสดงช่องเลือกปีการศึกษา */}
-                                    {formData.education_level === 'undergraduate' && (
+                                    {formData.education_level === "undergraduate" && (
                                         <div className="mb-3">
                                             <label htmlFor="year_level" className="form-label">ชั้นปีการศึกษา</label>
                                             <select
@@ -630,7 +755,6 @@ function Activity() {
                                     )}
                                 </>
                             ) : (
-                                // ถ้าเป็นศิษย์เก่าจะแสดงฟิลด์ปีที่จบการศึกษา
                                 <div className="mb-3">
                                     <label htmlFor="batch_year" className="form-label">ปีที่จบการศึกษา</label>
                                     <input
@@ -655,15 +779,16 @@ function Activity() {
                                     required
                                 />
                             </div>
+
                             <div className="d-flex justify-content-between">
-                                <button type="submit" className="btn btn-success">
+                                <button type="submit" className="btn btn-success w-100">
                                     ยืนยัน
                                 </button>
                             </div>
-
                         </form>
                     </div>
                 )}
+
             </div>
         </section>
     )

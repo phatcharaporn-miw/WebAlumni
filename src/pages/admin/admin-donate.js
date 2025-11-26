@@ -61,19 +61,19 @@ function AdminDonate() {
     };
 
     //ฟังก์ชันสำหรับอนุมัติโครงการ
-    const Approve = async (projectId) => {
-        try {
-            await axios.put(HOSTNAME + `/admin/approveDonate/${projectId}`);
-            setProjects(projects.map(project =>
-                project.project_id === projectId
-                    ? { ...project, status: "1" }
-                    : project
-            ));
-            alert("อนุมัติโครงการสำเร็จ");
-        } catch (error) {
-            alert("เกิดข้อผิดพลาดในการอนุมัติโครงการ");
-        }
-    };
+    // const Approve = async (projectId) => {
+    //     try {
+    //         await axios.put(HOSTNAME + `/admin/approveDonate/${projectId}`);
+    //         setProjects(projects.map(project =>
+    //             project.project_id === projectId
+    //                 ? { ...project, status: "1" }
+    //                 : project
+    //         ));
+    //         alert("อนุมัติโครงการสำเร็จ");
+    //     } catch (error) {
+    //         alert("เกิดข้อผิดพลาดในการอนุมัติโครงการ");
+    //     }
+    // };
 
     // ฟังก์ชันสำหรับแสดง/ซ่อนรายละเอียดเพิ่มเติม
     const handleViewMoreToggle = (projectId) => {
@@ -115,8 +115,6 @@ function AdminDonate() {
     // ฟังก์ชันแสดงสถานะ
     const getStatusBadge = (status) => {
         switch (status) {
-            case "0":
-                return <span className="badge bg-warning">รอการอนุมัติ</span>;
             case "1":
                 return <span className="badge bg-success">อนุมัติแล้ว</span>;
             case "2":
@@ -436,14 +434,14 @@ function AdminDonate() {
 
                                                         {/* ปุ่มจัดการ */}
                                                         <div className="d-flex gap-2 mt-3">
-                                                            {project.status === "0" && (
+                                                            {/* {project.status === "0" && (
                                                                 <button
                                                                     className="btn btn-outline-success btn-sm"
                                                                     onClick={() => Approve(project.project_id)}
                                                                 >
                                                                     อนุมัติ
                                                                 </button>
-                                                            )}
+                                                            )} */}
                                                             <Link
                                                                 to={`/admin/donations/edit/${project.project_id}`}
                                                                 className="btn btn-outline-warning btn-sm"

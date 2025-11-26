@@ -35,6 +35,11 @@ function DashboardActivitiesPages() {
     const [searchTerm, setSearchTerm] = useState("");
     const [hasJoined, setHasJoined] = useState(false);
 
+    // Scroll to top on mount
+        useEffect(() => {
+            window.scrollTo(0, 0);
+        }, []);
+
     const handleJoinClick = (activityId) => {
         if (!userId) {
             Swal.fire({

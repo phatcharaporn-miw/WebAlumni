@@ -46,6 +46,11 @@ function AdminDashboardActivitiesPages() {
     });
     const [searchTerm, setSearchTerm] = useState("");
 
+    // Scroll to top on mount
+        useEffect(() => {
+            window.scrollTo(0, 0);
+        }, []);
+
 
     useEffect(() => {
         axios.get(HOSTNAME + '/api/activities/ongoing')

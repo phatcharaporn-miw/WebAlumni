@@ -91,7 +91,6 @@ function DonateRequest() {
             });
             alert("เพิ่มโครงการบริจาคสำเร็จ!");
             // navigate("/donate");
-            navigate("/alumni-profile/alumni-request");
         } catch (error) {
             console.error("Error:", error);
             alert(error.response?.data?.error || "เกิดข้อผิดพลาด");

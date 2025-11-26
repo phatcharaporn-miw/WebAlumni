@@ -1,11 +1,12 @@
-// AuthContext.js
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import {HOSTNAME} from '../config.js';
-// import Swal from 'sweetalert2';
+import { HOSTNAME } from '../config.js';
 
 const AuthContext = createContext();
+
+//ตั้งค่า axios ให้ส่ง cookies ทุก request
+axios.defaults.withCredentials = true;
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -23,23 +24,31 @@ export const AuthProvider = ({ children }) => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const navigate = useNavigate();
 
-  const normalizeUser = (u) => ({
+  const normalizeUser = (u) => {
+    if (!u) return null;
+    return({
     user_id: u.userId || u.user_id || u.id,
     username: u.username || u.full_name || u.nick_name || "",
-    role: Number(u.role || u.role_id),
+    // role: Number(u.role || u.role_id),
+    role: Number(u.role ?? u.role_id ?? u.roleId ?? u.role_id_fk) || 0,
     isAdmin: Number(u.role || u.role_id) === 1,
     isUser: Number(u.role || u.role_id) !== 1,
-    profilePicture: u.profilePicture || u.image_path || HOSTNAME +"/uploads/default-profile.png",
-  });
+    profilePicture: u.profilePicture || u.image_path || HOSTNAME + "/uploads/default-profile.png",
+
+    }
+    )
+  }
 
   // ฟังก์ชันเช็ค session กับ server
   const checkSession = async () => {
     try {
-      const res = await axios.get(HOSTNAME +"/users/profile", { 
+      const res = await axios.get(HOSTNAME + "/users/profile", {
         withCredentials: true,
       });
 
       if (res.data.success) {
+        // console.log('Session user:', res.data.success);
+
         const userData = normalizeUser(res.data.user);
         setUser(userData);
         sessionStorage.setItem("user", JSON.stringify(userData));
@@ -56,36 +65,37 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Initialize auth เมื่อ component mount
-useEffect(() => {
-  const initAuth = async () => {      
-    const savedUser = sessionStorage.getItem("user");
-    if (savedUser) {
-      try {
-        const userData = JSON.parse(savedUser);
-        console.log('Found saved user:', userData.username);
-        setUser(userData);
-      } catch (error) {
-        console.error('Invalid saved user data');
-        sessionStorage.removeItem("user");
+  useEffect(() => {
+    const initAuth = async () => {
+      const savedUser = sessionStorage.getItem("user");
+      if (savedUser) {
+        try {
+          const userData = JSON.parse(savedUser);
+          // console.log('Found saved user:', userData.username);
+          setUser(userData);
+        } catch (error) {
+          console.error('Invalid saved user data');
+          sessionStorage.removeItem("user");
+        }
       }
-    }
 
-    const isValidSession = await checkSession();
-    console.log('Session valid:', isValidSession);
+      const isValidSession = await checkSession();
+      // console.log('Session valid:', isValidSession);
 
-    setIsLoading(false);
-    setInitDone(true); 
-    console.log('Auth initialized');
-  };
+      setIsLoading(false);
+      setInitDone(true);
+      // console.log('Auth initialized');
+    };
 
-  initAuth();
-}, []);
+    initAuth();
+  }, []);
 
 
   const handleLogin = async (username, password) => {
     try {
       // console.log('Logging in...');
-      const response = await axios.post(HOSTNAME +"/api/login", {
+
+      const response = await axios.post(HOSTNAME + "/api/login", {
         username,
         password
       }, { withCredentials: true });
@@ -94,12 +104,13 @@ useEffect(() => {
         const userData = normalizeUser(response.data);
         setUser(userData);
         sessionStorage.setItem("user", JSON.stringify(userData));
-        
+        // console.log("Session user:", response.data);
+
         // อัพเดท profile หากจำเป็น
         if (!response.data.profilePicture) {
           await checkSession();
         }
-        
+
         return response.data;
       }
 
@@ -111,30 +122,30 @@ useEffect(() => {
   };
 
   const handleLogout = async () => {
-  try {
-    setIsLoggingOut(true);
-    
-    // ล้าง state/session
-    setUser(null);
-    setNotifications(0);
-    sessionStorage.removeItem("user");
+    try {
+      setIsLoggingOut(true);
 
-    // แจ้ง tabs อื่น
-    localStorage.setItem('logout-event', Date.now().toString());
-    localStorage.removeItem('logout-event');
-    
-    // เรียก API logout
-    await axios.post(HOSTNAME +"/api/logout", {}, { withCredentials: true });
+      // ล้าง state/session
+      setUser(null);
+      setNotifications(0);
+      sessionStorage.removeItem("user");
 
-    // ไปหน้าหลักทันที
-    navigate('/');
-    
-  } catch (error) {
-    console.error('Logout error:', error);
-  } finally {
-    setIsLoggingOut(false);
-  }
-};
+      // แจ้ง tabs อื่น
+      localStorage.setItem('logout-event', Date.now().toString());
+      localStorage.removeItem('logout-event');
+
+      // เรียก API logout
+      await axios.post(HOSTNAME + "/api/logout", {}, { withCredentials: true });
+
+      // ไปหน้าหลักทันที
+      navigate('/');
+
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
 
 
   // cross-tab logout
@@ -154,11 +165,11 @@ useEffect(() => {
 
   // Debug log
   useEffect(() => {
-    console.log('Auth State:', { 
-      user: user?.username || 'none', 
-      isLoading, 
-      isLoggingOut 
-    });
+    // console.log('Auth State:', { 
+    //   user: user?.username || 'none', 
+    //   isLoading, 
+    //   isLoggingOut 
+    // });
   }, [user, isLoading, isLoggingOut]);
 
   const contextValue = {
@@ -172,8 +183,10 @@ useEffect(() => {
     handleLogin,
     handleLogout,
     refreshUser: checkSession,
-    isAdmin: user?.role === 1,
-    isUser: user?.role !== 1 && user?.role,
+    // isAdmin: user?.role === 1,
+    // isUser: user?.role !== 1 && user?.role,
+    isAdmin: Number(user?.role) === 1,
+    isUser: user ? Number(user.role) !== 1 : false,
     isLoggedIn: !!user,
   };
 

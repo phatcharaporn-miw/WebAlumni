@@ -439,9 +439,9 @@ function AdminVerifySlip() {
                                                     className="btn btn-outline-primary btn-sm px-2 py-1"
                                                     style={{ fontSize: '0.7rem' }}
                                                     data-bs-toggle="collapse"
-                                                    data-bs-target={`#donateSlipDetail-${idx}`}
+                                                    data-bs-target={`#orderSlipDetail-${idx}`}
                                                     aria-expanded="false"
-                                                    aria-controls={`donateSlipDetail-${idx}`}
+                                                    aria-controls={`orderSlipDetail-${idx}`}
                                                 >
                                                     <span className="d-none d-sm-inline">ตรวจสอบ</span>
                                                 </button>
@@ -449,7 +449,7 @@ function AdminVerifySlip() {
                                         </div>
                                     </div>
 
-                                    <div className="collapse" id={`donateSlipDetail-${idx}`}>
+                                    <div className="collapse" id={`orderSlipDetail-${idx}`}>
                                         <div className="card-body border-top pt-3 bg-light bg-opacity-25">
                                             <div className="row g-4">
                                                 {/* Slip Image */}
@@ -599,24 +599,24 @@ function AdminVerifySlip() {
                                                         <div className="card border-0 bg-white shadow-sm mb-3">
                                                             <div className="card-body p-3">
                                                                 <h6 className="fw-bold text-primary mb-2">
-                                                                    ข้อมูลผู้ขาย
+                                                                    ข้อมูลบัญชีธนาคาร
                                                                 </h6>
                                                                 <div className="row">
                                                                     <div className="col-md-6 mb-2">
-                                                                        <small className="text-muted">ชื่อผู้ขาย</small>
-                                                                        <div className="fw-semibold">{order.seller_name || '-'}</div>
+                                                                        <small className="text-muted">บัญชีธนาคาร</small>
+                                                                        <div className="fw-semibold">{order.bank_name || 'ไม่ระบุ'}</div>
                                                                     </div>
                                                                     <div className="col-md-6 mb-2">
-                                                                        <small className="text-muted">บัญชีธนาคาร</small>
-                                                                        <div className="fw-semibold">{order.seller_account_name || '-'}</div>
+                                                                        <small className="text-muted">ชื่อบัญชี</small>
+                                                                        <div className="fw-semibold">{order.account_name || 'ไม่ระบุ'}</div>
                                                                     </div>
                                                                     <div className="col-md-6 mb-2">
                                                                         <small className="text-muted">หมายเลขบัญชี</small>
-                                                                        <div className="fw-semibold">{order.account_number || '-'}</div>
+                                                                        <div className="fw-semibold">{order.account_number || 'ไม่ระบุ'}</div>
                                                                     </div>
                                                                     <div className="col-md-6 mb-2">
                                                                         <small className="text-muted">หมายเลขพร้อมเพย์</small>
-                                                                        <div className="fw-semibold">{order.promptpay_number || '-'}</div>
+                                                                        <div className="fw-semibold">{order.promptpay_number || 'ยังไม่มีหมายเลขพร้อมเพย์'}</div>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -713,7 +713,7 @@ function AdminVerifySlip() {
                                                         <FaHeart className="text-success" size={16} />
                                                     </div>
                                                     <div>
-                                                        <div className="fw-bold">{payment.project_name || 'ไม่ระบุชื่อโครงการ'}</div>
+                                                        <div className="fw-bold">{payment.project_name || 'โครงการบริจาคทั่วไป'}</div>
                                                         <small className="text-success fw-semibold">การบริจาค</small>
                                                     </div>
                                                 </div>
@@ -841,19 +841,19 @@ function AdminVerifySlip() {
                                                                 <div className="row">
                                                                     <div className="col-md-6 mb-2">
                                                                         <small className="text-muted">โครงการ</small>
-                                                                        <div className="fw-semibold">{payment.project_name}</div>
+                                                                        <div className="fw-semibold">{payment.project_name || 'โครงการบริจาคทั่วไป'}</div>
                                                                     </div>
                                                                     <div className="col-md-6 mb-2">
                                                                         <small className="text-muted">บัญชีธนาคาร</small>
-                                                                        <div className="fw-semibold">{payment.account_name || '-'}</div>
+                                                                        <div className="fw-semibold">{payment.account_name || 'ไม่ระบุ'}</div>
                                                                     </div>
                                                                     <div className="col-md-6 mb-2">
                                                                         <small className="text-muted">หมายเลขบัญชี</small>
-                                                                        <div className="fw-semibold">{payment.account_number || '-'}</div>
+                                                                        <div className="fw-semibold">{payment.account_number || 'ไม่ระบุ'}</div>
                                                                     </div>
                                                                     <div className="col-md-6 mb-2">
                                                                         <small className="text-muted">หมายเลขพร้อมเพย์</small>
-                                                                        <div className="fw-semibold">{payment.number_promtpay || '-'}</div>
+                                                                        <div className="fw-semibold">{payment.number_promtpay || 'ไม่มีเลขพร้อมเพย์'}</div>
                                                                     </div>
                                                                 </div>
                                                             </div>

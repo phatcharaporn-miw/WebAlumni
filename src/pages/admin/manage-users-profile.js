@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -63,9 +63,9 @@ function UserProfile() {
               </div>
 
               <div className="d-flex justify-content-end mb-3">
-                <a href={`/admin/users/edit-user-profile/${userId}`} className="btn btn-warning btn-sm">
+                <Link to={`/admin/users/edit-user-profile/${userId}`} className="btn btn-warning btn-sm">
                   แก้ไขข้อมูล
-                </a>
+                </Link>
               </div>
             </div>
 

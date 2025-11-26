@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button, Modal, Box, Typography } from '@mui/material';
 import "../../css/adminDonate.css";
 import { Link, useNavigate, useLocation } from "react-router-dom";
@@ -34,6 +34,29 @@ function AdminDonateRequest() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const { user} = useAuth();
     const userId = user?.user_id;
+
+// ดึงบัญชีธนาคารสมาคมอัตโนมัติตอนโหลดหน้า
+useEffect(() => {
+    const fetchBankInfo = async () => {
+        try {
+            const res = await axios.get(HOSTNAME + '/donate/bank-info');
+            const bank = res.data;
+
+            setFormData(prev => ({
+                ...prev,
+                bankName: bank.bank_name || '',
+                accountName: bank.account_name || '',
+                accountNumber: bank.account_number || '',
+                numberPromtpay: bank.promptpay_number || ''
+            }));
+        } catch (err) {
+            console.error('Error fetching bank info:', err);
+        }
+    };
+
+    fetchBankInfo();
+}, []);
+
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -84,127 +107,128 @@ function AdminDonateRequest() {
     };
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        setIsSubmitting(true);
+    e.preventDefault();
+    setIsSubmitting(true);
 
-        try {
-            const data = new FormData();
+    try {
+        const data = new FormData();
 
-            // ตรวจสอบการเข้าสู่ระบบ
-            const adminId = user?.user_id; // ใช้ userId แทน adminId
-            const userRole = user?.role;
+        const adminId = user?.user_id;
+        const userRole = user?.role;
 
-            if (!adminId) {
-                alert("กรุณาเข้าสู่ระบบก่อน");
-                setIsSubmitting(false);
-                navigate("/login");
-                return;
-            }
-
-            // ตรวจสอบว่าเป็น admin หรือไม่
-            // if (userRole !== "1") {
-            //     alert("คุณไม่มีสิทธิ์ในการเพิ่มโครงการ");
-            //     setIsSubmitting(false);
-            //     return;
-            // }
-
-            // เพิ่มข้อมูลลงใน FormData - ใช้ชื่อที่ตรงกับ backend
-            data.append("userId", adminId); // แก้จาก adminId
-            data.append("userRole", userRole);  // ชื่อเหมือนกับ destructuring ของ backend
-            data.append("projectName", formData.projectName); // แก้จาก projectName
-            data.append("description", formData.description);
-            data.append("startDate", formData.startDate); // แก้จาก startDate
-            data.append("endDate", formData.endDate); // แก้จาก endDate
-            data.append("donationType", formData.donationType); // แก้จาก donationType
-            data.append("bankName", formData.bankName); // แก้จาก bankName
-            data.append("accountName", formData.accountName); // แก้จาก accountName
-            data.append("accountNumber", formData.accountNumber); // แก้จาก accountNumber
-            data.append("numberPromtpay", formData.numberPromtpay); // แก้จาก numberPromtpay
-            data.append("status", "1"); // แอดมินสร้างโครงการจะได้รับการอนุมัติทันที
-
-            // เพิ่มข้อมูลตามประเภท
-            if (formData.donationType === "fundraising") {
-                data.append("targetAmount", formData.targetAmount);
-                data.append("currentAmount", 0);
-            } else if (formData.donationType === "things") {
-                data.append("forThings", formData.forThings); // แก้จาก forThings
-                data.append("typeThing", formData.typeThings); // แก้จาก typeThings
-                data.append("quantity_things", formData.quantityThings); // แก้จาก quantityThings
-                data.append("targetAmount", 0);
-                data.append("currentAmount", 0);
-            } else {
-                // unlimited
-                data.append("targetAmount", 0);
-                data.append("currentAmount", 0);
-            }
-
-            // เพิ่มไฟล์รูปภาพ
-            if (formData.image) {
-                data.append("image", formData.image);
-            } else {
-                alert("กรุณาเลือกไฟล์รูปภาพ");
-                setIsSubmitting(false);
-                return;
-            }
-
-            // ส่งข้อมูลไปยัง backend - แก้ไขตรงนี้
-            const response = await axios.post(HOSTNAME +"/admin/donateRequest", data, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-                timeout: 30000
+        if (!adminId) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'กรุณาเข้าสู่ระบบ',
+                text: 'คุณต้องเข้าสู่ระบบก่อน',
             });
-
-            setSuccessMessage("เพิ่มโครงการบริจาคสำเร็จ!");
-            setErrorMessage("");
-
-            // รีเซ็ตฟอร์ม
-            setFormData({
-                projectName: "",
-                description: "",
-                targetAmount: "",
-                currentAmount: "",
-                startDate: "",
-                endDate: "",
-                donationType: "",
-                image: null,
-                bankName: "",
-                accountName: "",
-                accountNumber: "",
-                numberPromtpay: "",
-                forThings: "",
-                typeThings: "",
-                quantityThings: ""
-            });
-
-            setTimeout(() => {
-                navigate("/admin/donations");
-            }, 2000);
-
-        } catch (error) {
-            let errorMsg = "เกิดข้อผิดพลาด";
-            if (error.response?.status === 401) {
-                errorMsg = "ไม่มีสิทธิ์ในการเข้าถึง กรุณาเข้าสู่ระบบใหม่";
-                // sessionStorage.removeItem('userId');
-                // sessionStorage.removeItem('userRole');
-                setTimeout(() => navigate("/login"), 1500);
-            } else if (error.response?.status === 403) {
-                errorMsg = "คุณไม่มีสิทธิ์ในการดำเนินการนี้";
-            } else if (error.response?.data?.error) {
-                errorMsg = error.response.data.error;
-            } else if (error.response?.data?.message) {
-                errorMsg = error.response.data.message;
-            } else if (error.message) {
-                errorMsg = error.message;
-            }
-
-            setErrorMessage(errorMsg);
-            setSuccessMessage("");
-        } finally {
             setIsSubmitting(false);
-            handleClose();
+            navigate("/login");
+            return;
         }
-    };
+
+        // Append ข้อมูล
+        data.append("userId", adminId);
+        data.append("userRole", userRole);
+        data.append("projectName", formData.projectName);
+        data.append("description", formData.description);
+        data.append("startDate", formData.startDate);
+        data.append("endDate", formData.endDate);
+        data.append("donationType", formData.donationType);
+        data.append("bankName", formData.bankName);
+        data.append("accountName", formData.accountName);
+        data.append("accountNumber", formData.accountNumber);
+        data.append("numberPromtpay", formData.numberPromtpay);
+        data.append("status", "1");
+
+        if (formData.donationType === "fundraising") {
+            data.append("targetAmount", formData.targetAmount);
+            data.append("currentAmount", 0);
+        } else if (formData.donationType === "things") {
+            data.append("forThings", formData.forThings);
+            data.append("typeThing", formData.typeThings);
+            data.append("quantity_things", formData.quantityThings);
+            data.append("targetAmount", 0);
+            data.append("currentAmount", 0);
+        } else {
+            data.append("targetAmount", 0);
+            data.append("currentAmount", 0);
+        }
+
+        if (formData.image) {
+            data.append("image", formData.image);
+        } else {
+            Swal.fire({
+                icon: 'warning',
+                title: 'กรุณาเลือกไฟล์รูปภาพ',
+            });
+            setIsSubmitting(false);
+            return;
+        }
+
+        // ส่งข้อมูลไป backend
+        const response = await axios.post(HOSTNAME + "/admin/donateRequest", data, {
+            headers: { "Content-Type": "multipart/form-data" },
+            timeout: 30000
+        });
+
+        // ใช้ swal แจ้งเตือนสำเร็จ
+        Swal.fire({
+            icon: 'success',
+            title: 'สำเร็จ!',
+            text: 'เพิ่มโครงการบริจาคสำเร็จ',
+            timer: 2000,
+            timerProgressBar: true,
+            showConfirmButton: false
+        });
+
+        // รีเซ็ตฟอร์ม
+        setFormData({
+            projectName: "",
+            description: "",
+            targetAmount: "",
+            currentAmount: "",
+            startDate: "",
+            endDate: "",
+            donationType: "",
+            image: null,
+            bankName: "",
+            accountName: "",
+            accountNumber: "",
+            numberPromtpay: "",
+            forThings: "",
+            typeThings: "",
+            quantityThings: ""
+        });
+
+        setTimeout(() => navigate("/admin/donations"), 2000);
+
+    } catch (error) {
+        let errorMsg = "เกิดข้อผิดพลาด";
+        if (error.response?.status === 401) {
+            errorMsg = "ไม่มีสิทธิ์ในการเข้าถึง กรุณาเข้าสู่ระบบใหม่";
+            setTimeout(() => navigate("/login"), 1500);
+        } else if (error.response?.status === 403) {
+            errorMsg = "คุณไม่มีสิทธิ์ในการดำเนินการนี้";
+        } else if (error.response?.data?.error) {
+            errorMsg = error.response.data.error;
+        } else if (error.response?.data?.message) {
+            errorMsg = error.response.data.message;
+        } else if (error.message) {
+            errorMsg = error.message;
+        }
+
+        Swal.fire({
+            icon: 'error',
+            title: 'เกิดข้อผิดพลาด',
+            text: errorMsg
+        });
+    } finally {
+        setIsSubmitting(false);
+        handleClose();
+    }
+};
+
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => {
         // ตรวจสอบข้อมูลก่อนเปิด modal

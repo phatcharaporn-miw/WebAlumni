@@ -3,7 +3,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { useParams } from "react-router-dom";
 import "../../css/verify.css";
-import {HOSTNAME} from '../../config.js';
+import { HOSTNAME } from '../../config.js';
 
 function ProductSlots() {
     const { productId } = useParams();
@@ -21,7 +21,7 @@ function ProductSlots() {
 
     const fetchSlots = async () => {
         try {
-            const res = await axios.get(HOSTNAME +`/admin/product-slots/${productId}`);
+            const res = await axios.get(HOSTNAME + `/admin/product-slots/${productId}`);
             setSlots(res.data);
         } catch (err) {
             console.error(err);
@@ -36,9 +36,9 @@ function ProductSlots() {
             return;
         }
         try {
-            await axios.post(HOSTNAME +`/admin/products/add-slot/${productId}`, newSlot);
+            await axios.post(HOSTNAME + `/admin/products/add-slot/${productId}`, newSlot);
             Swal.fire("สำเร็จ!", "เพิ่มสล็อตสินค้าเรียบร้อยแล้ว", "success");
-            setNewSlot({ slot_name: "", quantity: ""});
+            setNewSlot({ slot_name: "", quantity: "" });
             setShowModal(false);
             fetchSlots();
         } catch (err) {
@@ -58,7 +58,7 @@ function ProductSlots() {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    await axios.delete(HOSTNAME +`/admin/products/delete-slot/${slotId}`);
+                    await axios.delete(HOSTNAME + `/admin/products/delete-slot/${slotId}`);
                     Swal.fire("ลบแล้ว!", "สล็อตถูกลบเรียบร้อย", "success");
                     fetchSlots();
                 } catch (err) {
@@ -72,7 +72,7 @@ function ProductSlots() {
     const handleEditSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.put(HOSTNAME +`/admin/products/edit-slot/${editSlot.slot_id}`, editSlot);
+            await axios.put(HOSTNAME + `/admin/products/edit-slot/${editSlot.slot_id}`, editSlot);
             Swal.fire("สำเร็จ!", "แก้ไขสล็อตเรียบร้อยแล้ว", "success");
             setEditSlot(null); // ปิด modal
             fetchSlots();
@@ -84,12 +84,12 @@ function ProductSlots() {
 
     return (
         <div className="container p-4">
-            <h3 className="admin-title">สล็อตสินค้า</h3>
+            <h3 className="admin-title">ล็อตสินค้า</h3>
             <div className="col-md-2 d-flex align-items-end m-2 ms-auto">
                 <button className="btn btn-primary w-100 d-flex align-items-center justify-content-center"
                     onClick={() => setShowModal(true)}
                 >
-                    เพิ่มสล็อตสินค้า
+                    เพิ่มล็อตสินค้า
                 </button>
             </div>
 
@@ -99,7 +99,7 @@ function ProductSlots() {
                     <div className="custom-modal-slot">
                         <form onSubmit={handleAddSlot}>
                             <div className="custom-modal-header">
-                                <h5 className="text-bold">เพิ่มสล็อตสินค้า</h5>
+                                <h5 className="text-bold">เพิ่มล็อตสินค้า</h5>
                                 <button
                                     type="button"
                                     className="btn-close"
@@ -134,7 +134,7 @@ function ProductSlots() {
                                         required
                                     />
                                 </div>
-                                
+
                             </div>
                             <div className="custom-modal-footer">
                                 <button
@@ -217,56 +217,62 @@ function ProductSlots() {
                 </tbody>
             </table>
 
-            {slots.length === 0 && <p className="text-muted text-center">ยังไม่มีสล็อตสินค้า</p>}
+            {slots.length === 0 && <p className="text-muted text-center">ยังไม่มีล็อตสินค้า</p>}
 
             {/* Modal แก้ไข slot */}
             {editSlot && (
                 <div className="custom-modal-overlay fade show d-block" tabIndex="-1">
                     <div className="custom-modal-slot">
                         {/* <div className="custom-edit-content"> */}
-                            <form onSubmit={handleEditSubmit}>
-                                <div className="custom-edit-header">
-                                    <h5 className="custom-edit-title">แก้ไขสล็อต</h5>
-                                    <button type="button" className="btn-close" onClick={() => setEditSlot(null)}></button>
+                        <form onSubmit={handleEditSubmit}>
+                            <div className="custom-edit-header">
+                                <h5 className="custom-edit-title">แก้ไขล็อต</h5>
+                                <button type="button" className="btn-close" onClick={() => setEditSlot(null)}></button>
+                            </div>
+                            <div className="custom-edit-body">
+                                <div className="mb-3">
+                                    <label className="form-label">ชื่อล็อต</label>
+                                    <input
+                                        type="text"
+                                        className="form-control w-100"
+                                        value={editSlot.slot_name}
+                                        onChange={(e) => setEditSlot({ ...editSlot, slot_name: e.target.value })}
+                                    />
                                 </div>
-                                <div className="custom-edit-body">
-                                    <div className="mb-3">
-                                        <label className="form-label">ชื่อล็อต</label>
-                                        <input
-                                            type="text"
-                                            className="form-control w-100"
-                                            value={editSlot.slot_name}
-                                            onChange={(e) => setEditSlot({ ...editSlot, slot_name: e.target.value })}
-                                        />
-                                    </div>
-                                    <div className="mb-3">
-                                        <label className="form-label">จำนวนทั้งหมด</label>
-                                        <input
-                                            type="number"
-                                            className="form-control w-100"
-                                            value={editSlot.quantity}
-                                            onChange={(e) => setEditSlot({ ...editSlot, quantity: e.target.value })}
-                                        />
-                                    </div>
-                                    
-                                    <div className="mb-3">
-                                        <label className="form-label">สถานะ</label>
-                                        <select
-                                            className="form-select"
-                                            value={editSlot.status}
-                                            onChange={(e) => setEditSlot({ ...editSlot, status: e.target.value })}
-                                        >
-                                            <option value="pending">ยังไม่จำหน่าย</option>
-                                            <option value="active">กำลังจำหน่าย</option>
-                                            <option value="completed">สิ้นสุดการจำหน่าย</option>
-                                        </select>
-                                    </div>
+                                <div className="mb-3">
+                                    <label className="form-label">จำนวนทั้งหมด</label>
+                                    <input
+                                        type="number"
+                                        className="form-control w-100"
+                                        value={editSlot.quantity}
+                                        onChange={(e) => setEditSlot({ ...editSlot, quantity: e.target.value })}
+                                        onBlur={() => {
+                                            // ป้องกันติดลบตอนออกจาก input
+                                            if (Number(editSlot.quantity) < 0) {
+                                                setEditSlot({ ...editSlot, quantity: 0 });
+                                            }
+                                        }}
+                                    />
                                 </div>
-                                <div className="custom-edit-footer">
-                                    <button type="button" className="btn btn-secondary" onClick={() => setEditSlot(null)}>ยกเลิก</button>
-                                    <button type="submit" className="btn btn-success">บันทึก</button>
+
+                                <div className="mb-3">
+                                    <label className="form-label">สถานะ</label>
+                                    <select
+                                        className="form-select"
+                                        value={editSlot.status}
+                                        onChange={(e) => setEditSlot({ ...editSlot, status: e.target.value })}
+                                    >
+                                        <option value="pending">ยังไม่จำหน่าย</option>
+                                        <option value="active">กำลังจำหน่าย</option>
+                                        <option value="completed">สิ้นสุดการจำหน่าย</option>
+                                    </select>
                                 </div>
-                            </form>
+                            </div>
+                            <div className="custom-edit-footer">
+                                <button type="button" className="btn btn-secondary" onClick={() => setEditSlot(null)}>ยกเลิก</button>
+                                <button type="submit" className="btn btn-success">บันทึก</button>
+                            </div>
+                        </form>
                         {/* </div> */}
                     </div>
                 </div>

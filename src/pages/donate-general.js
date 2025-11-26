@@ -13,6 +13,7 @@ import axios from "axios";
 import jsQR from "jsqr";
 import Swal from "sweetalert2";
 import { HOSTNAME } from "../config";
+import { useAuth } from '../context/AuthContext';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ALLOWED_FILE_TYPES = ["image/jpeg", "image/png", "image/jpg", "image/jfif"];
@@ -20,7 +21,9 @@ const MAX_AMOUNT = 1000000;
 
 function DonationGeneral() {
     const navigate = useNavigate();
-    const userId = localStorage.getItem("userId");
+    // const userId = localStorage.getItem("userId");
+    const { user } = useAuth();
+    const userId = user?.user_id;
 
     const [userData, setUserData] = useState({});
     const [taxType, setTaxType] = useState("");
@@ -125,19 +128,36 @@ function DonationGeneral() {
         }
     }, [userId]);
 
+    // useEffect(() => {
+    //     const fetchPromptpayNumber = async () => {
+    //         try {
+    //             const response = await axios.get(HOSTNAME + "/donate/promptpay-general");
+    //             if (response.data.number_promtpay) {
+    //                 setPromptpayNumber(response.data.number_promtpay);
+    //             }
+    //         } catch (err) {
+    //             console.error("Error fetching promptpay:", err);
+    //         }
+    //     };
+    //     fetchPromptpayNumber();
+    // }, []);
+
     useEffect(() => {
-        const fetchPromptpayNumber = async () => {
-            try {
-                const response = await axios.get(HOSTNAME + "/donate/promptpay-general");
-                if (response.data.number_promtpay) {
-                    setPromptpayNumber(response.data.number_promtpay);
-                }
-            } catch (err) {
-                console.error("Error fetching promptpay:", err);
+    const fetchBankInfo = async () => {
+        try {
+            const response = await axios.get(HOSTNAME + "/donate/bank-info");
+            console.log("Bank info response:", response.data); // <-- เช็กตรงนี้
+            if (response.data) {
+                setAddressesOffical([response.data]); // ใส่เป็น array 1 element
             }
-        };
-        fetchPromptpayNumber();
-    }, []);
+        } catch (err) {
+            console.error("Error fetching bank info:", err);
+        }
+    };
+    fetchBankInfo();
+}, []);
+
+
 
     useEffect(() => {
         const fetchAddresses = async () => {

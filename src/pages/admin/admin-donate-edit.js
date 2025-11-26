@@ -22,6 +22,7 @@ function AdminEditProject() {
         end_date: '',
         current_amount: '',
         bank_name: '',
+        account_name: '',
         account_number: '',
         number_promtpay: '',
         image: null,
@@ -45,6 +46,7 @@ function AdminEditProject() {
                     end_date: project.end_date ? project.end_date.split('T')[0] : '',
                     current_amount: project.current_amount || '0',
                     bank_name: project.bank_name || '',
+                    account_name: project.account_name || '',
                     account_number: project.account_number || '',
                     number_promtpay: project.number_promtpay || '',
                     image: null,
@@ -65,6 +67,25 @@ function AdminEditProject() {
 
         fetchProject();
     }, [id]);
+
+
+    // ดึงบัญชีธนาคาร
+    useEffect(() => {
+    axios.get(HOSTNAME + '/donate/bank-info')
+        .then(res => {
+            setFormData(prev => ({
+                ...prev,
+                bank_name: prev.bank_name || res.data.bank_name,
+                account_name: prev.account_name || res.data.account_name,
+                account_number: prev.account_number || res.data.account_number,
+                number_promtpay: prev.number_promtpay || res.data.promptpay_number
+            }));
+        })
+        .catch(err => {
+            console.error('Error fetching bank info:', err);
+        });
+}, []);
+
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -161,6 +182,7 @@ function AdminEditProject() {
             submitData.append('status', '');
             submitData.append('current_amount', formData.current_amount || 0);
             submitData.append('bank_name', formData.bank_name);
+            submitData.append('account_name', formData.account_name);
             submitData.append('account_number', formData.account_number);
             submitData.append('number_promtpay', formData.number_promtpay);
 
@@ -401,6 +423,23 @@ function AdminEditProject() {
 
                                     <div className="col-md-6">
                                         <label className="form-label">
+                                            ชื่อบัญชี <span className="text-danger">*</span>
+                                        </label>
+                                        <input
+                                            type="text"
+                                            className="form-control w-100"
+                                            name="account_name"
+                                            value={formData.account_name}
+                                            onChange={handleInputChange}
+                                            placeholder="กรอกชื่อบัญชี"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="row mb-3">
+                                    <div className="col-md-6">
+                                        <label className="form-label">
                                             เลขบัญชี <span className="text-danger">*</span>
                                         </label>
                                         <input
@@ -413,19 +452,19 @@ function AdminEditProject() {
                                             required
                                         />
                                     </div>
-                                </div>
 
-                                {/* PromptPay */}
-                                <div className="mb-4">
-                                    <label className="form-label">หมายเลข PromptPay</label>
-                                    <input
-                                        type="text"
-                                        className="form-control w-50"
-                                        name="number_promtpay"
-                                        value={formData.number_promtpay}
-                                        onChange={handleInputChange}
-                                        placeholder="กรอกหมายเลข PromptPay (ถ้ามี)"
-                                    />
+                                    {/* PromptPay */}
+                                    <div className="col-md-6">
+                                        <label className="form-label">หมายเลข PromptPay</label>
+                                        <input
+                                            type="text"
+                                            className="form-control w-100"
+                                            name="number_promtpay"
+                                            value={formData.number_promtpay}
+                                            onChange={handleInputChange}
+                                            placeholder="กรอกหมายเลข PromptPay (ถ้ามี)"
+                                        />
+                                    </div>
                                 </div>
 
                                 {/* ปุ่มจัดการ */}

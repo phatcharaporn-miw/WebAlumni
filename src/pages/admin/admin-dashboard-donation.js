@@ -26,6 +26,11 @@ function DashboardDonationsPage() {
         all: "ผู้บริจาคทั้งหมด",
     };
 
+    // Scroll to top on mount
+        useEffect(() => {
+            window.scrollTo(0, 0);
+        }, []);
+
     useEffect(() => {
         const fetchDonations = async () => {
             try {
@@ -202,32 +207,9 @@ function DashboardDonationsPage() {
     return (
         <div className="donate-page p-5">
             <div className="text-center mb-5">
-                <div className="d-inline-block position-relative">
-                    <h3 id="head-text" className="text-center mb-3 position-relative">
-                        ยอดบริจาครวมทั้งหมด
-                        <div className="title-underline position-absolute start-50 translate-middle-x mt-2"
-                            style={{
-                                width: '120px',
-                                height: '4px',
-                                background: 'linear-gradient(90deg, #007bff, #6610f2)',
-                                borderRadius: '2px',
-                                boxShadow: '0 2px 8px rgba(0,123,255,0.3)'
-                            }}>
-                        </div>
-                    </h3>
-
-                    {/* Decorative elements */}
-                    <div className="position-absolute top-0 start-0 translate-middle">
-                        <div className="bg-primary opacity-25 rounded-circle"
-                            style={{ width: '20px', height: '20px' }}>
-                        </div>
-                    </div>
-                    <div className="position-absolute top-0 end-0 translate-middle">
-                        <div className="bg-success opacity-25 rounded-circle"
-                            style={{ width: '15px', height: '15px' }}>
-                        </div>
-                    </div>
-                </div>
+                <h3 className="admin-title">
+                    ยอดบริจาครวมทั้งหมด
+                </h3>
             </div>
             <div className="donate-content-wrapper">
                 {/* Filters */}

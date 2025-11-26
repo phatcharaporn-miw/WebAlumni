@@ -136,30 +136,64 @@ function Approve() {
         });
     };
 
-
-    const handleDelete = (productId) => {
-        Swal.fire({
-            title: "คุณแน่ใจหรือไม่?",
-            text: "เมื่อลบแล้วจะไม่สามารถกู้คืนได้!",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#e3342f",
-            cancelButtonColor: "#6c757d",
-            confirmButtonText: "ใช่, ลบเลย",
-            cancelButtonText: "ยกเลิก"
-        }).then((result) => {
-            if (result.isConfirmed) {
-                axios.delete(HOSTNAME +`/admin/deleteSouvenir/${productId}`)
-                    .then(() => {
-                        setProducts(products.filter(product => product.product_id !== productId));
-                        Swal.fire("ลบเรียบร้อย!", "สินค้าถูกลบออกจากระบบแล้ว", "success");
-                    })
-                    .catch(() => {
-                        Swal.fire("ผิดพลาด", "ไม่สามารถลบสินค้าได้", "error");
-                    });
+    const handleDelete = (productId, productStatus, stockRemain) => {
+            // เช็กสถานะการจำหน่ายสินค้า
+            if (productStatus === "1" && stockRemain !== "0") {
+                Swal.fire({
+                    title: 'ไม่สามารถลบสินค้า',
+                    text: 'สินค้ากำลังจำหน่ายอยู่ ไม่สามารถลบได้',
+                    icon: 'warning',
+                    confirmButtonText: 'ตกลง'
+                });
+                return;
             }
-        });
-    };
+    
+            // เมื่อผู้ใช้ยืนยันการลบ กรณีที่สินค้ายังไม่จำหน่าย
+            Swal.fire({
+                title: "ลบสินค้า?",
+                text: "คุณต้องการลบสินค้านี้ใช่หรือไม่?",
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "ใช่, ลบ",
+                cancelButtonText: "ยกเลิก"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    axios.delete(HOSTNAME + `/admin/deleteSouvenir/${productId}`)
+                        .then(() => {
+                            setProducts(products.filter(product => product.product_id !== productId));
+                        })
+                        .catch(error => {
+                            console.error("เกิดข้อผิดพลาดในการลบ:", error);
+                        });
+                }
+            });
+        };
+
+    // const handleDelete = (productId) => {
+    //     Swal.fire({
+    //         title: "คุณแน่ใจหรือไม่?",
+    //         text: "เมื่อลบแล้วจะไม่สามารถกู้คืนได้!",
+    //         icon: "warning",
+    //         showCancelButton: true,
+    //         confirmButtonColor: "#e3342f",
+    //         cancelButtonColor: "#6c757d",
+    //         confirmButtonText: "ใช่, ลบเลย",
+    //         cancelButtonText: "ยกเลิก"
+    //     }).then((result) => {
+    //         if (result.isConfirmed) {
+    //             axios.delete(HOSTNAME +`/admin/deleteSouvenir/${productId}`)
+    //                 .then(() => {
+    //                     setProducts(products.filter(product => product.product_id !== productId));
+    //                     Swal.fire("ลบเรียบร้อย!", "สินค้าถูกลบออกจากระบบแล้ว", "success");
+    //                 })
+    //                 .catch(() => {
+    //                     Swal.fire("ผิดพลาด", "ไม่สามารถลบสินค้าได้", "error");
+    //                 });
+    //         }
+    //     });
+    // };
 
     const getStatusColor = (status) => {
         if (status === "1") {
@@ -253,7 +287,7 @@ function Approve() {
                                 <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/president-profile/president-profile-donation")}>ประวัติการบริจาค</div>
                                 <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/president-profile/president-profile-activity")}>ประวัติการเข้าร่วมกิจกรรม</div>
                                 <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/president-profile/president-profile-souvenir")}>ประวัติการสั่งซื้อของที่ระลึก</div>
-                                <div className="menu-item active py-2 mb-2 rounded" onClick={() => handleClick("/president-profile/president-approve")}>การอนุมัติ</div>
+                                <div className="menu-item active py-2 mb-2 rounded" onClick={() => handleClick("/president-profile/president-approve")}>จัดการสินค้า</div>
                                 <div className="menu-item py-2 rounded" onClick={handleLogout}>ออกจากระบบ</div>
                             </div>
                         </div>
@@ -265,8 +299,8 @@ function Approve() {
                             <div className="d-flex justify-content-between align-items-center">
                                 <div className="d-flex align-items-center">
                                     <div>
-                                        <h4 className="fw-bold mb-1">การอนุมัติ</h4>
-                                        <p className="text-muted mb-0 small">รวบรวมการการอนุมัติ</p>
+                                        <h4 className="fw-bold mb-1">จัดการสินค้า</h4>
+                                        <p className="text-muted mb-0 small">สินค้าทั้งหมด</p>
                                     </div>
                                 </div>
                             </div>
@@ -360,7 +394,7 @@ function Approve() {
                                                         </button>
                                                         <button
                                                             className="btn btn-sm btn-outline-danger rounded-pill w-100"
-                                                            onClick={() => handleDelete(product.product_id)}
+                                                            onClick={() => handleDelete(product.product_id, product.status, product.stock_remain)}
                                                         >
                                                             ลบ
                                                         </button>

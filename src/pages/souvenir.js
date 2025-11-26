@@ -52,9 +52,6 @@ function Souvenir() {
       if (priceRange === "medium" && (price < 100 || price > 500)) return false;
       if (priceRange === "high" && price <= 500) return false;
 
-      // ฟิลเตอร์ประเภทสินค้า
-      if (officialFilter === "official" && p.is_official !== 1) return false;
-      if (officialFilter === "member" && p.is_official !== 0) return false;
 
       return true;
     });
@@ -116,7 +113,7 @@ function Souvenir() {
       <div className="donate-filters mb-4 container">
         <div className="row g-3">
           {/* ค้นหา */}
-          <div className="col-md-4">
+          <div className="col-lg-6 col-md-4">
             <label htmlFor="search" className="form-label">
               ค้นหาสินค้า:
             </label>
@@ -137,28 +134,8 @@ function Souvenir() {
             </div>
           </div>
 
-          {/* ประเภทสินค้า */}
-          <div className="col-md-3">
-            <label htmlFor="type" className="form-label">
-              ประเภทสินค้า:
-            </label>
-            <select
-              id="type"
-              className="form-select"
-              value={officialFilter}
-              onChange={(e) => {
-                setOfficialFilter(e.target.value);
-                setCurrentPage(1);
-              }}
-            >
-              <option value="all">สินค้าทั้งหมด</option>
-              <option value="official">สินค้าสมาคมศิษย์เก่า</option>
-              <option value="member">สินค้าสมาชิกทั่วไป</option>
-            </select>
-          </div>
-
           {/* ช่วงราคา */}
-          <div className="col-lg-3 col-md-2">
+          <div className="col-lg-4 col-md-2">
             <label htmlFor="price" className="form-label">
               ช่วงราคา:
             </label>
@@ -192,7 +169,7 @@ function Souvenir() {
       </div>
 
       {/* ปุ่มเพิ่มของที่ระลึก */}
-      <div className="container">
+      {/* <div className="container">
         <div className="souvenir-top d-flex justify-content-end mb-3">
           {user && (
             <Link to={`/souvenir/souvenir_request`} className="text-decoration-none">
@@ -222,17 +199,18 @@ function Souvenir() {
             </Link>
           )}
         </div>
-      </div>
+      </div> */}
 
       {/* แสดงสินค้า */}
       <div className="souvenir-content container">
         <div className="souvenir-content-item mb-5">
           <h3 className="titlesouvenir-type">
-            {officialFilter === "all"
+            {/* {officialFilter === "all"
               ? "สินค้าทั้งหมด"
               : officialFilter === "official"
                 ? "สินค้าสมาคมศิษย์เก่า"
-                : "สินค้าสมาชิกทั่วไป"}
+                : "สินค้าสมาชิกทั่วไป"} */}
+                สินค้าทั้งหมด
           </h3>
           <div className="souvenir-item-group-home row row-cols-1 row-cols-sm-2 row-cols-lg-4 row-cols-md-2 g-3">
             {paginatedProducts.length > 0 ? (

@@ -50,13 +50,13 @@ function Login() {
 
   try {
     const response = await handleLogin(username.trim(), password.trim());
-    console.log('Login response:', response);
+    // console.log('Login response:', response);
 
     if (response.success) {
       const { role, firstLogin } = response;
 
       if (firstLogin) {
-        console.log('First login detected, redirecting to change-password');
+        // console.log('First login detected, redirecting to change-password');
         navigate('/change-password');
         return;
       }

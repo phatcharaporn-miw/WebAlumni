@@ -1,10 +1,8 @@
 import React, { useEffect, useState, useMemo } from "react";
 import "../css/Donate.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Link } from "react-router-dom";
 import axios from "axios";
 import { FaSearch, FaRegClock, FaArrowRight, FaChevronLeft, FaChevronRight, FaHeart, FaUsers } from "react-icons/fa";
-import { FaPlus } from "react-icons/fa";
 import { AiOutlineClose } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
 import { BiCoin } from 'react-icons/bi';
@@ -28,9 +26,6 @@ function Donate() {
 
     const navigate = useNavigate();
     const projectsPerPage = 6;
-
-    // const [startMonth, setStartMonth] = useState("");
-    // const [endMonth, setEndMonth] = useState("");
 
     const [summary, setSummary] = useState({
         totalProjectsAmount: 0,
@@ -85,6 +80,15 @@ function Donate() {
             maximumFractionDigits: 0,
         }).format(amount || 0);
     };
+
+
+    // เพิ่ม state สำหรับเก็บ filters (ถ้ายังไม่มี)
+    const [filters, setFilters] = useState({
+        startDate: '',
+        endDate: '',
+        minAmount: '',
+        maxAmount: ''
+    });
 
     const calculateDaysRemaining = (endDate) => {
         if (!endDate) return null;
@@ -196,23 +200,22 @@ function Donate() {
         return text.length <= maxLength ? text : text.substring(0, maxLength) + "...";
     };
 
+
     const getProjectStatusBadge = (project) => {
+        if (!project?.start_date || !project?.end_date) return null;
+
         const now = new Date();
-        const endDate = project?.end_date ? new Date(project.end_date) : null;
-        const startDate = new Date(project?.start_date);
-        const comingSoonDays = startDate && now < startDate;
+        const startDate = new Date(project.start_date);
+        const endDate = new Date(project.end_date);
 
-        if (!endDate) return null;
-
-        if (now > endDate) {
-            return <span className="donate-badge donate-badge-expired">สิ้นสุดแล้ว</span>;
-        }
-
+        // คำนวณวันเหลือ
+        const calculateDaysRemaining = (end) => {
+            const diffTime = end - now;
+            return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        };
         const daysRemaining = calculateDaysRemaining(endDate);
-        if (daysRemaining <= 5) {
-            return <span className="donate-badge donate-badge-warning">ใกล้สิ้นสุด</span>;
-        }
 
+        // เงื่อนไขสถานะ
         if (now < startDate) {
             return (
                 <span className="donate-badge donate-badge-secondary">
@@ -220,13 +223,31 @@ function Donate() {
                 </span>
             );
         }
-        if (now > startDate && now <= endDate) {
+
+        if (now >= startDate && now <= endDate) {
+            if (daysRemaining <= 5) {
+                return (
+                    <span className="donate-badge donate-badge-warning">
+                        ใกล้สิ้นสุด
+                    </span>
+                );
+            }
             return (
                 <span className="donate-badge donate-badge-active">
                     กำลังดำเนินการ
                 </span>
             );
         }
+
+        if (now > endDate) {
+            return (
+                <span className="donate-badge donate-badge-expired">
+                    สิ้นสุดแล้ว
+                </span>
+            );
+        }
+
+        return null;
     };
 
     const handleDonateClick = () => {
@@ -464,14 +485,14 @@ function Donate() {
                     )}
                 </div>
 
-                <div className="donate-create-button-wrapper">
+                {/* <div className="donate-create-button-wrapper">
                     <Link to="/donate/donaterequest">
                         <button className="donate-create-button">
                             <FaPlus className="me-2" />
                             สร้างโครงการบริจาค
                         </button>
                     </Link>
-                </div>
+                </div> */}
 
                 <h2 className="donate-title">
                     {getFilterTitle(filter)}
@@ -663,10 +684,10 @@ function Donate() {
                                             <div className="donate-project-footer">
                                                 <button
                                                     className={`btn donate-action-button ${isExpired
-                                                            ? "btn-detail"
-                                                            : isUpcoming
-                                                                ? "btn-secondary"
-                                                                : "btn-primary"
+                                                        ? "btn-detail"
+                                                        : isUpcoming
+                                                            ? "btn-secondary"
+                                                            : "btn-primary"
                                                         } rounded-pill px-3`}
                                                     disabled={isUpcoming}
                                                     onClick={() => {

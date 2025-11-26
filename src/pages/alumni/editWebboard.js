@@ -3,12 +3,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Swal from "sweetalert2";
 import { useAuth } from '../../context/AuthContext';
-import {HOSTNAME} from '../../config.js';
+import { HOSTNAME } from '../../config.js';
 
 function EditWebboard() {
     const { webboardId } = useParams();
-    const { user} = useAuth();
-    const userId = user?.user_id; 
+    const { user } = useAuth();
+    const userId = user?.user_id;
     const navigate = useNavigate();
     const [category, setCategory] = useState([]);
     const [formData, setFormData] = useState({
@@ -20,7 +20,7 @@ function EditWebboard() {
 
     // ดึงข้อมูลกระทู้ที่ต้องการแก้ไข
     useEffect(() => {
-        axios.get(HOSTNAME +`/users/webboard/${webboardId}`)
+        axios.get(HOSTNAME + `/users/webboard/${webboardId}`)
             .then((response) => {
                 if (response.data.success) {
                     setFormData(response.data.data);
@@ -57,7 +57,7 @@ function EditWebboard() {
             formDataToSend.append("image_path", formData.image_path);
         }
 
-        axios.put(HOSTNAME +`/users/edit-webboard/${webboardId}`, formDataToSend, {
+        axios.put(HOSTNAME + `/users/edit-webboard/${webboardId}`, formDataToSend, {
             headers: { "Content-Type": "multipart/form-data" },
         })
             .then((response) => {
@@ -68,8 +68,8 @@ function EditWebboard() {
                         icon: "success",
                         confirmButtonColor: "#0F75BC",
                         confirmButtonText: "ตกลง",
-                    }).then(() => {                     
-                        navigate("/alumni-profile/alumni-profile-webboard");                       
+                    }).then(() => {
+                        navigate("/alumni-profile/alumni-profile-webboard");
                     });
                 }
             })
@@ -87,7 +87,7 @@ function EditWebboard() {
 
     // ดึงหมวดหมู่
     useEffect(() => {
-        axios.get(HOSTNAME +`/category/category-all`)
+        axios.get(HOSTNAME + `/category/category-all`)
             .then(response => {
                 if (response.data.success) {
                     setCategory(response.data.data);
@@ -143,7 +143,7 @@ function EditWebboard() {
                                     {formData.image_path && (
                                         <div className="mt-2">
                                             <img
-                                                src={HOSTNAME +`/${formData.image_path.replace(/^\/+/, '')}`}
+                                                src={HOSTNAME + `/${formData.image_path.replace(/^\/+/, '')}`}
                                                 alt="Webboard"
                                                 className="img-fluid rounded"
                                                 width="200"
@@ -177,14 +177,8 @@ function EditWebboard() {
                                     <button
                                         type="button"
                                         className="btn btn-secondary"
-                                        onClick={() => {
-                                            if (userId.role === 2) {
-                                            navigate('/president-profile-webboard');
-                                            } else {
-                                            navigate('/alumni-profile/alumni-profile-webboard');
-                                            }
-                                        }}
-                                        >
+                                        onClick={() => navigate(-1)}
+                                    >
                                         ยกเลิก
                                     </button>
                                 </div>

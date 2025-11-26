@@ -620,7 +620,6 @@ function DonateDetail() {
         return Object.keys(newErrors).length === 0;
     };
 
-
     // ยืนยันการบริจาค
     const handleSubmit = async (e) => {
         e.preventDefault();

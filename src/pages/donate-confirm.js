@@ -246,6 +246,7 @@ function DonateConfirm() {
 
             const response = await axios.post(HOSTNAME + `/donate/donation`, donationData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
+                withCredentials: true,
             });
 
             if (response.data?.donationId) {

@@ -30,6 +30,8 @@ function AdminProjectDetail() {
         fetchProject();
     }, [id]);
 
+    
+
     // ฟังก์ชันแปลงประเภทการบริจาค
     const getDonationTypeText = (type) => {
         switch (type) {
@@ -349,7 +351,7 @@ function AdminProjectDetail() {
                                                         <div className="promptpay-info">
                                                             <span className="text-muted small">หมายเลขพร้อมเพย์</span>
                                                             <p className="promptpay-number fs-4 fw-bold text-success mb-0 font-monospace">
-                                                                {project.number_promtpay || 'ไม่มีข้อมูล PromptPay'}
+                                                                {project.promptpay_number || 'ไม่มีข้อมูล PromptPay'}
                                                             </p>
                                                         </div>
                                                     </div>

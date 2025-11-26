@@ -25,6 +25,11 @@ function AdminDashboarsProjectsPage() {
     const navigate = useNavigate();
     const projectsPerPage = 6;
 
+    // Scroll to top on mount
+        useEffect(() => {
+            window.scrollTo(0, 0);
+        }, []);
+
     useEffect(() => {
         const fetchProjects = async () => {
             try {

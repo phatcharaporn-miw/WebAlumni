@@ -7,7 +7,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AppLayout from "./components/AppLayout";
 import { CartProvider } from './context/CartContext'; 
 import { AuthProvider } from './context/AuthContext';
-// import { UserProvider } from "./context/UserContext";
 import About from "./pages/about";
 import News from './pages/news';
 import Activity from './pages/activity';
@@ -39,10 +38,10 @@ import AlumniProfileSouvenir from './pages/alumni/alumni-profile-souvenir';
 import AlumniProfileActivity from './pages/alumni/alumni-profile-activity';
 import SouvenirBasket from './pages/souvenir_basket';
 import HomeAlumniProfile from './pages/alumniProfile';
-import AlumniProfileRequest from './pages/alumni/alumni-request';
+// import AlumniProfileRequest from './pages/alumni/alumni-request';
 import ChangePassword from './pages/change-password';
 import AlumniProfileDonation from './pages/alumni/alumni-profile-donation';
-import AlumniManageOrders from './pages/alumni/alumni-manage-orders';
+// import AlumniManageOrders from './pages/alumni/alumni-manage-orders';
 import CheckFullName from './pages/check-fullName';
 import DonateConfirm from './pages/donate-confirm';
 import DashboardStatic from './pages/dashboard-stat';
@@ -51,6 +50,7 @@ import DashboardDonationPage from './pages/dashboard-donation';
 import DashboardProjectsPage from './pages/dashboard-project';
 import DashboardAlumniPage from './pages/dashboard-alumni';
 import DonationAll from './pages/donation-all';
+
 
 // ส่วนของ การ import component ที่ใช้สำหรับการตรวจสอบสิทธิ์
 import AlumniOnly from './components/AlumniOnly';
@@ -65,9 +65,9 @@ import StudentProfileWebboard from './pages/students/student-profile-webboard';
 import StudentProfileActivity from './pages/students/student-profile-activity';
 import StudentProfileSouvenir from './pages/students/student-profile-souvenir';
 import StudentEditWebboard from './pages/students/student-editWebboard';
-import StudentProfileRequest from './pages/students/student-request';
+// import StudentProfileRequest from './pages/students/student-request';
 import StudentProfileDonation from './pages/students/student-profile-donation';
-import StudentManageOrders from './pages/students/student-manage-orders';
+// import StudentManageOrders from './pages/students/student-manage-orders';
 
 // import ของแอดมิน
 import AdminHome from './pages/admin/home';
@@ -94,7 +94,6 @@ import AdminCheckPaymentDonateDetail from './pages/admin/admin-donate-checkPayme
 import AdminEditProject from './pages/admin/admin-donate-edit';
 import AdminDonateRequest from './pages/admin/admin-donate-request';
 import AdminProjectDetail from './pages/admin/admin-donate-detail';
-import AddUser from './pages/admin/add-user';
 import ProductSlots from './pages/admin/product-slot';
 
 
@@ -112,7 +111,7 @@ import PresidentProfileSouvenir from './pages/president/president-profile-souven
 import PresidentProfileDonation from './pages/president/president-profile-donation';
 import PresidentManageOrders from './pages/president/president-manage-orders';
 import PresidentSummaryAll from './pages/president/president-summary-all';
-import PresidentOrdersList from './pages/president/president-orderlist';
+import PresidentEditWebboard from './pages/president/president-edit-webboard';
 
 const AlumniMajor = lazy(() => import("./pages/major-detail"));
 const Webboard = lazy(() => import("./pages/webboard"));
@@ -177,9 +176,7 @@ function App() {
                   <Route path="/dashboard-project" element={<DashboardProjectsPage />} />
                   <Route path="/dashboard-alumni" element={<DashboardAlumniPage />} />
                   <Route path="/donate/donate-general" element={<DonationGeneral />} />
-                  <Route path="/donate/donation-summary-detail/project" element={<DonationSummaryDetail />} />
-                  <Route path="/donate/donation-summary-detail/general" element={<DonationSummaryDetail />} />
-                  <Route path="/donate/donation-summary-detail/all" element={<DonationSummaryDetail />} />
+                  <Route path="/donate/donation-summary-detail/:type" element={<DonationSummaryDetail />} />
                   <Route path="/donate/donation-summary-detail" element={<DonationSummaryDetail />} />
                   <Route path="/donate/donation-all" element={<DonationAll />} />
         
@@ -194,9 +191,9 @@ function App() {
                   <Route path="/alumni-profile/alumni-profile-activity" element={<AlumniOnly><AlumniProfileActivity /></AlumniOnly>} />
                   <Route path="/alumni-profile/alumni-profile-souvenir" element={<AlumniOnly><AlumniProfileSouvenir /></AlumniOnly>} />
                   <Route path="/alumni-profile" element={<AlumniOnly><Profile /></AlumniOnly>} />
-                  <Route path="/alumni-profile/alumni-request" element={<AlumniOnly><AlumniProfileRequest /></AlumniOnly>} />
+                  {/* <Route path="/alumni-profile/alumni-request" element={<AlumniOnly><AlumniProfileRequest /></AlumniOnly>} /> */}
                   <Route path="/alumni-profile/alumni-profile-donation" element={<AlumniOnly><AlumniProfileDonation /></AlumniOnly>} />
-                  <Route path="/alumni-profile/alumni-manage-orders" element={<AlumniOnly><AlumniManageOrders /></AlumniOnly>} />
+                  {/* <Route path="/alumni-profile/alumni-manage-orders" element={<AlumniOnly><AlumniManageOrders /></AlumniOnly>} /> */}
 
                   {/* route ของศิษย์ปัจจุบัน */}
                   <Route path="/student-profile" element={<StudentOnly><StudentProfile /></StudentOnly>} />
@@ -206,9 +203,9 @@ function App() {
                   <Route path="/student-home" element={<StudentOnly><StudentHome /></StudentOnly>} />
                   <Route path="/student-profile/student-profile-webboard/edit-webboard/:webboardId" element={<StudentOnly><StudentEditWebboard /></StudentOnly>} />
                   <Route path="/student-profile/student-profile-webboard/edit-webboard" element={<StudentOnly><StudentEditWebboard /></StudentOnly>} />
-                  <Route path="/student-profile/student-request" element={<StudentOnly><StudentProfileRequest /></StudentOnly>} />
+                  {/* <Route path="/student-profile/student-request" element={<StudentOnly><StudentProfileRequest /></StudentOnly>} /> */}
                   <Route path="/student-profile/student-profile-donation" element={<StudentOnly><StudentProfileDonation /></StudentOnly>} />
-                  <Route path="/student-profile/student-manage-orders" element={<StudentOnly><StudentManageOrders /></StudentOnly>} />
+                  {/* <Route path="/student-profile/student-manage-orders" element={<StudentOnly><StudentManageOrders /></StudentOnly>} /> */}
 
                   {/* route ของนายกสมาคม */}
                   <Route path="/president-home" element={<PresidentOnly><PresidentHome /></PresidentOnly>} />
@@ -219,12 +216,14 @@ function App() {
                   <Route path="/president-profile" element={<PresidentOnly><PresidentProfile /></PresidentOnly>} />
                   <Route path="/president-profile/president-profile-activity" element={<PresidentOnly><PresidentProfileActivity /></PresidentOnly>} />
                   <Route path="/president-profile/president-profile-webboard" element={<PresidentOnly><PresidentProfileWebboard /></PresidentOnly>} />
+                  <Route path="/president-profile/president-profile-webboard/president-edit-webboard/:webboardId" element={<PresidentOnly><PresidentEditWebboard /></PresidentOnly>} />
+                  <Route path="/president-profile/president-profile-webboard/president-edit-webboard" element={<PresidentOnly><PresidentEditWebboard /></PresidentOnly>} />
                   <Route path="/president-profile/president-approve" element={<PresidentOnly><Approve /></PresidentOnly>} />
                   <Route path="/president-profile/president-profile-souvenir" element={<PresidentOnly><PresidentProfileSouvenir /></PresidentOnly>} />
                   <Route path="/president-profile/president-profile-donation" element={<PresidentOnly><PresidentProfileDonation /></PresidentOnly>} />
                   <Route path="/president-profile/president-manage-orders" element={<PresidentOnly><PresidentManageOrders /></PresidentOnly>} />
                   <Route path="/president-profile/president-summary-all" element={<PresidentOnly><PresidentSummaryAll /></PresidentOnly>} />
-                  <Route path="/president-profile/president-orderlist" element={<PresidentOnly><PresidentOrdersList /></PresidentOnly>} />
+                  {/* <Route path="/president-profile/president-orderlist" element={<PresidentOnly><PresidentOrdersList /></PresidentOnly>} /> */}
                 </Route>
 
                 {/* route ของแอดมิน */}
@@ -259,7 +258,6 @@ function App() {
                   <Route path="/admin/donations/edit/:id" element={<AdminOnly><AdminEditProject /></AdminOnly>} />
                   <Route path="/admin/donations/donate-request" element={<AdminOnly><AdminDonateRequest /></AdminOnly>} />
                   <Route path="/admin/donations/donate-detail/:id" element={<AdminOnly><AdminProjectDetail /></AdminOnly>} />
-                  <Route path="/admin/users/add-user" element={<AdminOnly><AddUser /></AdminOnly>} />
                   <Route path="/admin/souvenir/product-slot/:productId" element={<AdminOnly><ProductSlots /></AdminOnly>} />
                   <Route path="/admin-home/dashboard-activity" element={<AdminOnly><AdminDashboardActivitiesPages /></AdminOnly>} />
                   <Route path="/admin-home/dashboard-project" element={<AdminOnly><AdminDashboarsProjectsPage /></AdminOnly>} />

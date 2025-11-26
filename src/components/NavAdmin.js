@@ -37,8 +37,8 @@ function NavAdmin() {
             return;
         }
 
-        console.log("User data:", user);
-        console.log("Profile picture:", profilePicture);
+        // console.log("User data:", user);
+        // console.log("Profile picture:", profilePicture);
     }, [initialized, loading, user, role, navigate]);
 
     // เปลี่ยนรูปโปรไฟล์
@@ -54,9 +54,9 @@ function NavAdmin() {
 
         try {
             const res = await axios.post(
-                HOSTNAME +"/users/update-profile-image",
+                HOSTNAME + "/users/update-profile-image",
                 formData,
-                { headers: { "Content-Type": "multipart/form-data" } }
+                { headers: { "Content-Type": "multipart/form-data" }, withCredentials: true, }
             );
 
             if (res.status === 200) {
@@ -98,7 +98,7 @@ function NavAdmin() {
         }
     }, [role, user, navigate]);
 
-    // แจ้งเตือน
+    // ดึงแจ้งเตือนเมื่อผู้ใช้เข้าสู่ระบบ
     useEffect(() => {
         if (!userId) return;
         const fetchNotifications = () => {
@@ -115,9 +115,10 @@ function NavAdmin() {
         };
 
         fetchNotifications();
-        const interval = setInterval(fetchNotifications, 30000);
+        const interval = setInterval(fetchNotifications, 30000); // รีเฟรชทุก 30 วินาที
         return () => clearInterval(interval);
     }, [userId]);
+
 
     const markAsRead = (notificationId) => {
         axios.put(HOSTNAME + `/notice/read/${notificationId}`)
@@ -125,7 +126,7 @@ function NavAdmin() {
                 setNotifications((prevNotifications) =>
                     prevNotifications.map((n) =>
                         n.notification_id === notificationId
-                            ? { ...n, read_status: "อ่านแล้ว" }
+                            ? { ...n, status: "อ่านแล้ว" } 
                             : n
                     )
                 );
@@ -150,7 +151,7 @@ function NavAdmin() {
 
     const toggleNotifications = () => {
         setShowNotifications(!showNotifications);
-        if (!showNotifications && notifications.some(n => n.read_status === "ยังไม่อ่าน")) {
+        if (!showNotifications && notifications.some(n => n.status === "ยังไม่อ่าน")) {
             markAllAsRead();
         }
     };
@@ -191,7 +192,6 @@ function NavAdmin() {
             </div>
         );
     }
-
     if (!user) {
         return null;
     }
@@ -237,7 +237,8 @@ function NavAdmin() {
                                     notifications.map((notification) => (
                                         <div
                                             key={notification.notification_id}
-                                            className={`notification-item ${notification.read_status === "ยังไม่อ่าน" ? "unread" : ""}`}
+                                            className={`notification-item ${notification.status === "ยังไม่อ่าน" ? "unread" : ""}`}
+
                                         >
                                             <p className="message">{notification.message}</p>
                                             <p className="notification-date">
@@ -264,7 +265,7 @@ function NavAdmin() {
 
                 {/* Profile - ใช้ข้อมูลจาก user context โดยตรง */}
                 {userId && (
-                    <div className="text-center" style={{ padding: "12px"}}>
+                    <div className="text-center" style={{ padding: "12px" }}>
                         <div
                             className="position-relative d-inline-block"
                             style={{

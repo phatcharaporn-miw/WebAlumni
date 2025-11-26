@@ -309,8 +309,8 @@ function AlumniProfileDonation() {
                                 <div className='menu d-block mt-3 w-100'>
                                     {[
                                         ['ข้อมูลส่วนตัว', '/alumni-profile'],
-                                        ['คำร้องขอ', '/alumni-profile/alumni-request'],
-                                        ['จัดการคำสั่งซื้อของคุณ', '/alumni-profile/alumni-manage-orders'],
+                                        // ['คำร้องขอ', '/alumni-profile/alumni-request'],
+                                        // ['จัดการคำสั่งซื้อของคุณ', '/alumni-profile/alumni-manage-orders'],
                                         ['กระทู้ที่สร้าง', '/alumni-profile/alumni-profile-webboard'],
                                         ['ประวัติการบริจาค', '/alumni-profile/alumni-profile-donation'],
                                         ['ประวัติการเข้าร่วมกิจกรรม', '/alumni-profile/alumni-profile-activity'],

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-import { FaCalendarAlt, FaClock, FaCheckCircle, FaSpinner, FaHourglassStart, FaUsers, FaInfoCircle,FaBuilding } from 'react-icons/fa';
-import {HOSTNAME} from '../config.js';
+import { FaCalendarAlt, FaClock, FaCheckCircle, FaSpinner, FaHourglassStart, FaUsers, FaInfoCircle, FaBuilding } from 'react-icons/fa';
+import { HOSTNAME } from '../config.js';
 import '../css/activity-detail.css'
 
 function ActivityDetail() {
@@ -13,7 +13,7 @@ function ActivityDetail() {
 
     useEffect(() => {
         // ดึงข้อมูลกิจกรรมตาม id
-        axios.get(HOSTNAME +`/activity/${activityId}`)
+        axios.get(HOSTNAME + `/activity/${activityId}`)
             .then(response => {
                 setActivity(response.data.data);
                 setLoading(false);
@@ -48,14 +48,14 @@ function ActivityDetail() {
         );
     }
 
-const formatDate = (dateStr) => {
-    if (!dateStr || dateStr === "0000-00-00") return "ไม่ระบุวันที่";
-    const date = new Date(dateStr);
-    const day = date.getDate();
-    const month = date.getMonth() + 1; // เดือนเป็นเลข
-    const year = date.getFullYear() + 543; // ปีไทย
-    return `${day}/${month}/${year}`;
-};
+    const formatDate = (dateStr) => {
+        if (!dateStr || dateStr === "0000-00-00") return "ไม่ระบุวันที่";
+        const date = new Date(dateStr);
+        const day = date.getDate();
+        const month = date.getMonth() + 1; // เดือนเป็นเลข
+        const year = date.getFullYear() + 543; // ปีไทย
+        return `${day}/${month}/${year}`;
+    };
 
     const formatTime = (startTime, endTime) => {
         if (!startTime && !endTime) return "ไม่ระบุเวลา";
@@ -114,7 +114,7 @@ const formatDate = (dateStr) => {
                     <div className="position-relative">
                         <div className="hero-image-container" style={{ height: '400px', overflow: 'hidden' }}>
                             <img
-                                src={HOSTNAME +`${activity.image_path}`}
+                                src={HOSTNAME + `${activity.image_path}`}
                                 alt="กิจกรรม"
                                 className={`w-100 h-100 object-fit-cover transition-opacity ${imageLoaded ? 'opacity-100' : 'opacity-50'}`}
                                 onLoad={() => setImageLoaded(true)}
@@ -225,6 +225,33 @@ const formatDate = (dateStr) => {
                                 </div>
                             </div>
 
+                            {/* แสดงข้อมูลบัญชี */}
+                            {/* {activity.is_paid_required === 1 && activity.official_accounts && activity.official_accounts.length > 0 && (
+                                <div className="card border-0 shadow-sm mt-4">
+                                    <div className="card-header bg-white border-0 pb-0">
+                                        <h3 className="text-primary mb-0">วิธีชำระเงิน</h3>
+                                    </div>
+                                    <div className="card-body">
+                                        <ul className="list-group list-group-flush">
+                                            {activity.official_accounts.map((acc, idx) => (
+                                                <li key={idx} className="list-group-item border-0 px-0">
+                                                    <p className="mb-1"><strong>ธนาคาร:</strong> {acc.bank_name}</p>
+                                                    <p className="mb-1"><strong>ชื่อบัญชี:</strong> {acc.account_name}</p>
+                                                    <p className="mb-1"><strong>เลขบัญชี:</strong> {acc.account_number || '-'}</p>
+                                                    {acc.promptpay_number && <p className="mb-1"><strong>PromptPay:</strong> {acc.promptpay_number}</p>}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                        <div className="mt-3">
+                                            <a href={GOOGLE_FORM_LINK} target="_blank" rel="noopener noreferrer" className="btn btn-success w-100">
+                                                กรอกแบบฟอร์มเข้าร่วม & อัปโหลดสลิป
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            )} */}
+
+
                             {/* Additional Info */}
                             <div className="col-lg-4 mb-4">
                                 <div className="card border-0 shadow-sm h-100">
@@ -238,7 +265,7 @@ const formatDate = (dateStr) => {
                                             <div className="list-group-item d-flex align-items-center border-0 px-0">
                                                 <div>
                                                     <small className="text-muted d-block">สาขา</small>
-                                                    {activity.department_restriction|| "ไม่ระบุ"}
+                                                    {activity.department_restriction || "ไม่ระบุ"}
                                                 </div>
                                             </div>
                                             <div className="list-group-item d-flex align-items-center border-0 px-0">

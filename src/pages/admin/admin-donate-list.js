@@ -35,6 +35,7 @@ function AdminDonationLists() {
             } finally {
                 setLoading(false);
             }
+            // console.log("Donations fetched:", donations);
         };
         fetchDonations();
     }, []);
@@ -495,7 +496,6 @@ function AdminDonationLists() {
                                                 className="btn btn-outline-primary w-100"
                                                 onClick={() => viewProjectDonations(project.name)}
                                             >
-                                                <Eye size={16} className="me-2" />
                                                 ดูรายการบริจาค
                                             </button>
                                         </div>
@@ -729,8 +729,8 @@ function AdminDonationLists() {
                                                         <FileText size={18} className="me-2" />ข้อมูลการบริจาค
                                                     </h6>
                                                     <div className="mb-2">
-                                                        <small className="text-muted">หมายเลขบริจาค:</small>
-                                                        <div className="fw-bold">{selectedDonation.order_number || "-"}</div>
+                                                        <small className="text-muted">ชื่อโครงการ:</small>
+                                                        <div className="fw-bold">{selectedDonation.project_name || "บริจาคทั่วไป"}</div>
                                                     </div>
                                                     <div className="mb-2">
                                                         <small className="text-muted">จำนวนเงิน:</small>
@@ -745,8 +745,8 @@ function AdminDonationLists() {
                                                     <div className="mb-2">
                                                         <small className="text-muted">วันที่บริจาค:</small>
                                                         <div className="fw-bold">
-                                                            {selectedDonation.created_at
-                                                                ? new Date(selectedDonation.created_at).toLocaleString("th-TH", {
+                                                            {selectedDonation.donation_created_at
+                                                                ? new Date(selectedDonation.donation_created_at).toLocaleString("th-TH", {
                                                                     dateStyle: "medium",
                                                                     timeStyle: "short",
                                                                 })
@@ -775,11 +775,11 @@ function AdminDonationLists() {
                                                     </div>
                                                     <div className="mb-2">
                                                         <small className="text-muted">เบอร์โทรศัพท์:</small>
-                                                        <div className="fw-bold">{selectedDonation.phone || "-"}</div>
+                                                        <div className="fw-bold">{selectedDonation.phone || selectedDonation.profile_phone || "-"}</div>
                                                     </div>
                                                     <div className="mb-2">
                                                         <small className="text-muted">อีเมล:</small>
-                                                        <div className="fw-bold">{selectedDonation.email || "-"}</div>
+                                                        <div className="fw-bold">{selectedDonation.email || selectedDonation.profile_email || "-"}</div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -799,15 +799,15 @@ function AdminDonationLists() {
                                                         </div>
                                                         <div className="col-md-6 mb-2">
                                                             <small className="text-muted">ชื่อบนใบเสร็จ:</small>
-                                                            <div className="fw-bold">{selectedDonation.name || "-"}</div>
+                                                            <div className="fw-bold">{selectedDonation.name || "ยังไม่มีข้อมูล"}</div>
                                                         </div>
                                                         <div className="col-md-6 mb-2">
                                                             <small className="text-muted">เลขประจำตัวผู้เสียภาษี:</small>
-                                                            <div className="fw-bold">{selectedDonation.tax_number || "-"}</div>
+                                                            <div className="fw-bold">{selectedDonation.tax_number || "ยังไม่มีข้อมูล"}</div>
                                                         </div>
                                                         <div className="col-12 mb-2">
                                                             <small className="text-muted">ที่อยู่:</small>
-                                                            <div className="fw-bold">{selectedDonation.address || "-"}</div>
+                                                            <div className="fw-bold">{selectedDonation.address || "ยังไม่มีข้อมูล"}</div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -840,11 +840,9 @@ function AdminDonationLists() {
                                                 </p>
                                             </div>
                                         )}
-
                                     </div>
                                 </div>
                                 <div className="modal-footer">
-                                    {/* <button type="button" className="btn btn-outline-secondary" onClick={closeModal}>ปิด</button> */}
                                     <button
                                         type="button"
                                         className="btn btn-outline-danger"
@@ -858,7 +856,6 @@ function AdminDonationLists() {
                     </div>
                 </>
             )}
-
         </div>
     );
 }

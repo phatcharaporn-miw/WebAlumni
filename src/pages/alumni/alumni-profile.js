@@ -32,10 +32,10 @@ function Profile() {
       withCredentials: true, 
     })
       .then((response) => {
-        console.log('majors:', response.data.major);     
         if (response.data.success) {
           setProfile(response.data.user);
         }
+        console.log(response.data)
       })
       .catch((error) => {
         console.error('เกิดข้อผิดพลาดในการดึงข้อมูลโปรไฟล์:', error.response ? error.response.data.message : error.message);
@@ -132,7 +132,7 @@ const removeEducation = (index) => {
 
   const handleSave = () => {
     const updatedProfile = { ...profile };
-    // console.log('ข้อมูลที่ส่งไป Backend:',  updatedProfile); // ตรวจสอบค่า
+    console.log('ข้อมูลที่ส่งไป Backend:',  updatedProfile); // ตรวจสอบค่า
     axios.post(HOSTNAME +'/users/edit-profile',  updatedProfile, {
       withCredentials: true, 
     })
@@ -168,10 +168,17 @@ const removeEducation = (index) => {
         headers: {
           "Content-Type": "multipart/form-data",
         },
+        withCredentials: true,
       });
   
       if (res.status === 200) {
-        alert("อัปโหลดรูปสำเร็จ");
+        Swal.fire({
+          title: "สำเร็จ!",
+          text: "อัปเดตรูปโปรไฟล์สำเร็จ",
+          icon: "success",
+          confirmButtonText: "ตกลง",
+          timer: 3000
+        });
   
         // อัปเดตรูปโปรไฟล์ใน state
         setProfile((prev) => ({
@@ -191,7 +198,6 @@ const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
 };
 
-  
 return (
     <section className="container">
       <div className='alumni-profile-page'>
@@ -224,8 +230,8 @@ return (
               <hr className="w-100" />
               <div className="menu d-block mt-3 w-100">
                 <div className="menu-item active py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile")}>โปรไฟล์ของฉัน</div>
-                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-request")}>คำร้องขอ</div>
-                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-manage-orders")}>จัดการคำสั่งซื้อของที่ระลึก</div>
+                {/* <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-request")}>คำร้องขอ</div>
+                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-manage-orders")}>จัดการคำสั่งซื้อของที่ระลึก</div> */}
                 <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-profile-webboard")}>กระทู้ที่สร้าง</div>
                 <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-profile-donation")}>ประวัติการบริจาค</div>
                 <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-profile-activity")}>ประวัติการเข้าร่วมกิจกรรม</div>

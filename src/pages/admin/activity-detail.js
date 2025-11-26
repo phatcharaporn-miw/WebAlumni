@@ -122,14 +122,14 @@ function AdminActivityDetail() {
                 </div>
                 <div className="card-footer d-flex justify-content-between">
                     <button
-                        className="btn btn-warning"
+                        className="btn btn-outline-warning"
                         onClick={() => navigate(`/admin/activities/edit/${activityId}`)}
                     >
                         แก้ไขกิจกรรม
 
                     </button>
                     <button
-                        className="btn btn-danger"
+                        className="btn btn-outline-danger"
                         onClick={handleDeleteActivity}
                     >
                         ลบกิจกรรม

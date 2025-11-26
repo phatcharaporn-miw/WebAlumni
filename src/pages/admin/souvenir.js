@@ -32,12 +32,12 @@ function Souvenir() {
     }, [user_id]);
 
     const handleOpen = (product) => {
-  setSelectedProduct(product);
-};
+        setSelectedProduct(product);
+    };
 
-const handleClose = () => {
-  setSelectedProduct(null);
-};
+    const handleClose = () => {
+        setSelectedProduct(null);
+    };
 
 
     const handleDetail = (product) => {
@@ -56,8 +56,19 @@ const handleClose = () => {
         p: 4,
     };
 
-    const handleDelete = (productId) => {
-        // เมื่อผู้ใช้ยืนยันการลบ
+    const handleDelete = (productId, productStatus, stockRemain) => {
+        // เช็กสถานะการจำหน่ายสินค้า
+        if (productStatus === "1" && stockRemain !== "0") {
+            Swal.fire({
+                title: 'ไม่สามารถลบสินค้า',
+                text: 'สินค้ากำลังจำหน่ายอยู่ ไม่สามารถลบได้',
+                icon: 'warning',
+                confirmButtonText: 'ตกลง'
+            });
+            return;
+        }
+
+        // เมื่อผู้ใช้ยืนยันการลบ กรณีที่สินค้ายังไม่จำหน่าย
         Swal.fire({
             title: "ลบสินค้า?",
             text: "คุณต้องการลบสินค้านี้ใช่หรือไม่?",
@@ -111,56 +122,28 @@ const handleClose = () => {
         });
     };
 
-    const handleReject = (productId) => {
-        Swal.fire({
-            title: "ยืนยันการปฏิเสธ?",
-            text: "คุณต้องการปฏิเสธสินค้านี้ใช่หรือไม่?",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#d33",
-            cancelButtonColor: "#3085d6",
-            confirmButtonText: "ใช่, ปฏิเสธ",
-            cancelButtonText: "ยกเลิก"
-        }).then((result) => {
-            if (result.isConfirmed) {
-                axios.put(HOSTNAME + `/admin/approveSouvenir/${productId}`, {
-                    approver_id: user_id,
-                    action: "rejected"
-                })
-                    .then(() => {
-                        setProducts(prevProducts =>
-                            prevProducts.filter(product => product.product_id !== productId)
-                        );
-                        Swal.fire("สำเร็จ!", "ปฏิเสธสินค้าสำเร็จแล้ว", "success");
-                    })
-                    .catch(() => {
-                        Swal.fire("เกิดข้อผิดพลาด", "ไม่สามารถปฏิเสธสินค้าได้", "error");
-                    });
-            }
-        });
+
+    const handleEditSubmit = (e) => {
+        e.preventDefault(); // ป้องกันการโหลดหน้าซ้ำ
+
+        axios.put(HOSTNAME + `/admin/editSouvenir/${selectedProduct.product_id}`, selectedProduct)
+            .then(response => {
+                console.log("บันทึกข้อมูลสินค้าสำเร็จ:", response.data);
+                // อัปเดต State ในตาราง
+                setProducts(prevProducts =>
+                    prevProducts.map(product =>
+                        product.product_id === selectedProduct.product_id
+                            ? { ...product, ...selectedProduct }
+                            : product
+                    )
+                );
+                handleClose();
+            })
+            .catch(error => {
+                console.error("เกิดข้อผิดพลาดในการบันทึก:", error);
+                // อาจเพิ่มการแจ้งเตือนข้อผิดพลาด
+            });
     };
-
-const handleEditSubmit = (e) => {
-    e.preventDefault(); // ป้องกันการโหลดหน้าซ้ำเมื่อกด Submit
-
-    axios.put(HOSTNAME + `/admin/editSouvenir/${selectedProduct.product_id}`, selectedProduct)
-        .then(response => {
-            console.log("บันทึกข้อมูลสินค้าสำเร็จ:", response.data);
-            // อัปเดต State ในตาราง
-            setProducts(prevProducts =>
-                prevProducts.map(product =>
-                    product.product_id === selectedProduct.product_id
-                        ? { ...product, ...selectedProduct }
-                        : product
-                )
-            );
-            handleClose();
-        })
-        .catch(error => {
-            console.error("เกิดข้อผิดพลาดในการบันทึก:", error);
-            // อาจเพิ่มการแจ้งเตือนข้อผิดพลาด
-        });
-};
 
     const getStatusColor = (status) => status === "1" ? "green" : "red";
 
@@ -186,74 +169,74 @@ const handleEditSubmit = (e) => {
 
             {/* Controls Section */}
             <div className="donate-filters mb-4">
-  <div className="row g-3">
-    {/* ค้นหาสินค้า */}
-    <div className="col-md-6">
-      <label htmlFor="search" className="form-label fw-semibold">
-        ค้นหาสินค้า:
-      </label>
-      <div className="input-group">
-        <span className="input-group-text">
-          <FaSearch />
-        </span>
-        <input
-          type="text"
-          id="search"
-          className="form-control"
-          placeholder="ค้นหาชื่อสินค้าหรือรายละเอียด..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </div>
-    </div>
+                <div className="row g-3">
+                    {/* ค้นหาสินค้า */}
+                    <div className="col-md-6">
+                        <label htmlFor="search" className="form-label fw-semibold">
+                            ค้นหาสินค้า:
+                        </label>
+                        <div className="input-group">
+                            <span className="input-group-text">
+                                <FaSearch />
+                            </span>
+                            <input
+                                type="text"
+                                id="search"
+                                className="form-control"
+                                placeholder="ค้นหาชื่อสินค้าหรือรายละเอียด..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
+                    </div>
 
-    {/*เรียงตามวันที่ */}
-    <div className="col-md-4">
-      <label htmlFor="sort" className="form-label fw-semibold">
-        เรียงตามวันที่:
-      </label>
-      <select
-        id="sort"
-        className="form-select"
-        onChange={(e) => {
-          const sorted = [...products].sort((a, b) =>
-            e.target.value === "newest"
-              ? new Date(b.created_at) - new Date(a.created_at)
-              : new Date(a.created_at) - new Date(b.created_at)
-          );
-          setProducts(sorted);
-        }}
-      >
-        <option value="newest">ล่าสุด</option>
-        <option value="oldest">เก่าสุด</option>
-      </select>
-    </div>
+                    {/*เรียงตามวันที่ */}
+                    <div className="col-md-4">
+                        <label htmlFor="sort" className="form-label fw-semibold">
+                            เรียงตามวันที่:
+                        </label>
+                        <select
+                            id="sort"
+                            className="form-select"
+                            onChange={(e) => {
+                                const sorted = [...products].sort((a, b) =>
+                                    e.target.value === "newest"
+                                        ? new Date(b.created_at) - new Date(a.created_at)
+                                        : new Date(a.created_at) - new Date(b.created_at)
+                                );
+                                setProducts(sorted);
+                            }}
+                        >
+                            <option value="newest">ล่าสุด</option>
+                            <option value="oldest">เก่าสุด</option>
+                        </select>
+                    </div>
 
-    {/* ปุ่มล้างตัวกรอง / เพิ่มของที่ระลึก */}
-    <div className="col-md-2 d-flex flex-column">
-      <label className="form-label invisible">เพิ่ม</label>
-      <div className="d-flex gap-2">
-        <button
-          className="btn btn-outline-secondary flex-fill"
-          onClick={() => setSearchTerm("")}
-          title="ล้างตัวกรอง"
-        >
-          <AiOutlineClose /> ล้าง
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-<div className="col-md-3 offset-md-9 d-flex align-items-end mb-2">
-  <Link
-    to="/admin/souvenir/souvenir_request"
-    className="text-decoration-none w-100"
-  >
-    <button className="btn btn-primary w-100 d-flex align-items-center justify-content-center">
-      เพิ่มของที่ระลึก
-    </button>
-  </Link>
-</div>
+                    {/* ปุ่มล้างตัวกรอง / เพิ่มของที่ระลึก */}
+                    <div className="col-md-2 d-flex flex-column">
+                        <label className="form-label invisible">เพิ่ม</label>
+                        <div className="d-flex gap-2">
+                            <button
+                                className="btn btn-outline-secondary flex-fill"
+                                onClick={() => setSearchTerm("")}
+                                title="ล้างตัวกรอง"
+                            >
+                                <AiOutlineClose /> ล้าง
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div className="col-md-3 offset-md-9 d-flex align-items-end mb-2">
+                <Link
+                    to="/admin/souvenir/souvenir_request"
+                    className="text-decoration-none w-100"
+                >
+                    <button className="btn btn-primary w-100 d-flex align-items-center justify-content-center">
+                        เพิ่มของที่ระลึก
+                    </button>
+                </Link>
+            </div>
 
 
             <div className="row g-4 ">
@@ -326,10 +309,10 @@ const handleEditSubmit = (e) => {
                                             >
                                                 {product.status === "0" && (
                                                     <button
-                                                        className="btn btn-outline-success btn-sm"
+                                                        className="btn btn-outline-secondary btn-sm"
                                                         onClick={() => handleApprove(product.product_id)}
                                                     >
-                                                        อนุมัติ
+                                                        กดอนุมัติ
                                                     </button>
                                                 )}
                                                 <button
@@ -340,7 +323,7 @@ const handleEditSubmit = (e) => {
                                                 </button>
                                                 <button
                                                     className="btn btn-outline-danger btn-sm"
-                                                    onClick={() => handleDelete(product.product_id)}
+                                                    onClick={() => handleDelete(product.product_id, product.status, product.stock_remain)}
                                                 >
                                                     ลบ
                                                 </button>
@@ -349,7 +332,7 @@ const handleEditSubmit = (e) => {
                                                     className="btn btn-outline-primary btn-sm"
                                                     onClick={(e) => e.stopPropagation()}
                                                 >
-                                                    เพิ่มสล็อตสินค้า
+                                                    เพิ่มล็อตสินค้า
                                                 </Link>
                                             </div>
                                         </div>
@@ -386,7 +369,7 @@ const handleEditSubmit = (e) => {
 
                                             {/* สถานะสินค้า */}
                                             <span
-                                                className={`badge position-absolute top-0 end-0 m-2 px-2 py-1 
+                                            className={`badge position-absolute top-0 end-0 m-2 px-2 py-1 
                                             ${product.stock_remain === "0"
                                                         ? "bg-danger"
                                                         : product.status === "1"
@@ -429,10 +412,10 @@ const handleEditSubmit = (e) => {
                                             >
                                                 {product.status === "0" && (
                                                     <button
-                                                        className="btn btn-outline-success btn-sm"
+                                                        className="btn btn-outline-secondary btn-sm"
                                                         onClick={() => handleApprove(product.product_id)}
                                                     >
-                                                        อนุมัติ
+                                                        กดอนุมัติ
                                                     </button>
                                                 )}
                                                 <button
@@ -443,7 +426,7 @@ const handleEditSubmit = (e) => {
                                                 </button>
                                                 <button
                                                     className="btn btn-outline-danger btn-sm"
-                                                    onClick={() => handleDelete(product.product_id)}
+                                                    onClick={() => handleDelete(product.product_id, product.status, product.stock_remain)}
                                                 >
                                                     ลบ
                                                 </button>
@@ -452,7 +435,7 @@ const handleEditSubmit = (e) => {
                                                     className="btn btn-outline-primary btn-sm"
                                                     onClick={(e) => e.stopPropagation()}
                                                 >
-                                                     เพิ่มสล็อตสินค้า
+                                                    เพิ่มล็อตสินค้า
                                                 </Link>
                                             </div>
                                         </div>
@@ -471,119 +454,115 @@ const handleEditSubmit = (e) => {
                 )}
             </div>
 
-
-{/* modal */}
-{/* ตรวจสอบว่ามี selectedProduct ก่อนแสดง Modal */}
-{selectedProduct && (
-<div className="custom-modal-overlay fade show d-block" tabIndex="-1">
-    <div className="custom-modal-slot"
-        onClick={(e) => e.stopPropagation()}
-    >
-        <form onSubmit={handleEditSubmit}>
-            <div className="custom-edit-header">
-                <h5 className="modal-title fw-bold">
-                    <FaRegEdit className="me-2" />
-                    แก้ไขของที่ระลึก
-                </h5>
-                <button
-                    type="button"
-                    className="btn-close btn-close-black"
-                    onClick={handleClose}
-                ></button>
-            </div>
-            <div className="custom-edit-body">
-
-                <div className="row mb-4">
-                    <div className="col-12 d-flex justify-content-center">
-                        <div
-                            className="border rounded p-3 bg-light"
-                            style={{ width: "250px", height: "200px" }}
-                        >
-                            <img
-                                src={HOSTNAME + `/uploads/${selectedProduct.image}`}
-                                alt={selectedProduct.image}
-                                onError={(e) => (e.target.src = "/image/default.jpg")}
-                                className="w-100 h-100 rounded"
-                                style={{ objectFit: "contain" }}
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                <div className="mb-3">
-                    <label className="form-label fw-semibold">
-                        ชื่อสินค้า
-                    </label>
-                    <input
-                        type="text"
-                        className="form-control w-100"
-                        value={selectedProduct.product_name}
-                        onChange={(e) => setSelectedProduct({
-                            ...selectedProduct,
-                            product_name: e.target.value,
-                        })}
-                        placeholder="กรอกชื่อสินค้า"
-                    />
-                </div>
-                <div className="mb-3">
-                    <label className="form-label fw-semibold">
-                        ราคา (บาท)
-                    </label>
-                    <div className="input-group">
-                        <span className="input-group-text">฿</span>
-                        <input
-                            type="number"
-                            className="form-control"
-                            value={selectedProduct.price}
-                            onChange={(e) => setSelectedProduct({
-                                ...selectedProduct,
-                                price: e.target.value,
-                            })}
-                            placeholder="0.00"
-                            min="0"
-                            step="0.01"
-                        />
-                    </div>
-                </div>
-                
-                <div className="mb-3">
-                    <label className="form-label fw-semibold">
-                        สถานะสินค้า
-                    </label>
-                    <select
-                        className="form-select"
-                        value={selectedProduct.status}
-                        onChange={(e) => setSelectedProduct({
-                            ...selectedProduct,
-                            status: e.target.value,
-                        })}
+            {/* modal */}
+            {selectedProduct && (
+                <div className="custom-modal-overlay fade show d-block" tabIndex="-1">
+                    <div className="custom-modal-slot"
+                        onClick={(e) => e.stopPropagation()}
                     >
-                        <option value="1">กำลังจำหน่าย</option>
-                        <option value="0">ยังไม่จำหน่าย</option>
-                    </select>
-                </div>
-            </div>
-            <div className="custom-edit-footer">
-                <button
-                    type="button"
-                    className="btn btn-secondary px-4 rounded-3"
-                    onClick={handleClose}
-                >
-                    ยกเลิก
-                </button>
-                <button
-                    type="submit"
-                    className="btn btn-success px-4 rounded-3 shadow-sm"
-                >
-                    บันทึก
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-)}
+                        <form onSubmit={handleEditSubmit}>
+                            <div className="custom-edit-header">
+                                <h5 className="modal-title fw-bold">
+                                    <FaRegEdit className="me-2" />
+                                    แก้ไขของที่ระลึก
+                                </h5>
+                                <button
+                                    type="button"
+                                    className="btn-close btn-close-black"
+                                    onClick={handleClose}
+                                ></button>
+                            </div>
+                            <div className="custom-edit-body">
 
-           
+                                <div className="row mb-4">
+                                    <div className="col-12 d-flex justify-content-center">
+                                        <div
+                                            className="border rounded p-3 bg-light"
+                                            style={{ width: "250px", height: "200px" }}
+                                        >
+                                            <img
+                                                src={HOSTNAME + `/uploads/${selectedProduct.image}`}
+                                                alt={selectedProduct.image}
+                                                onError={(e) => (e.target.src = "/image/default.jpg")}
+                                                className="w-100 h-100 rounded"
+                                                style={{ objectFit: "contain" }}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="mb-3">
+                                    <label className="form-label fw-semibold">
+                                        ชื่อสินค้า
+                                    </label>
+                                    <input
+                                        type="text"
+                                        className="form-control w-100"
+                                        value={selectedProduct.product_name}
+                                        onChange={(e) => setSelectedProduct({
+                                            ...selectedProduct,
+                                            product_name: e.target.value,
+                                        })}
+                                        placeholder="กรอกชื่อสินค้า"
+                                    />
+                                </div>
+                                <div className="mb-3">
+                                    <label className="form-label fw-semibold">
+                                        ราคา (บาท)
+                                    </label>
+                                    <div className="input-group">
+                                        <span className="input-group-text">฿</span>
+                                        <input
+                                            type="number"
+                                            className="form-control"
+                                            value={selectedProduct.price}
+                                            onChange={(e) => setSelectedProduct({
+                                                ...selectedProduct,
+                                                price: e.target.value,
+                                            })}
+                                            placeholder="0.00"
+                                            min="0"
+                                            step="0.01"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="mb-3">
+                                    <label className="form-label fw-semibold">
+                                        สถานะสินค้า
+                                    </label>
+                                    <select
+                                        className="form-select"
+                                        value={selectedProduct.status}
+                                        onChange={(e) => setSelectedProduct({
+                                            ...selectedProduct,
+                                            status: e.target.value,
+                                        })}
+                                    >
+                                        <option value="1">กำลังจำหน่าย</option>
+                                        <option value="0">ยังไม่จำหน่าย</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div className="custom-edit-footer">
+                                <button
+                                    type="button"
+                                    className="btn btn-secondary px-4 rounded-3"
+                                    onClick={handleClose}
+                                >
+                                    ยกเลิก
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="btn btn-success px-4 rounded-3 shadow-sm"
+                                >
+                                    บันทึก
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

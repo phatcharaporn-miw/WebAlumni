@@ -17,12 +17,15 @@ function DonationSummaryDetail() {
         all: "ผู้บริจาคทั้งหมด",
     };
 
+    // Scroll to top on mount
+        useEffect(() => {
+            window.scrollTo(0, 0);
+        }, []);
+        
     useEffect(() => {
         const fetchDonations = async () => {
             try {
-                const res = await axios.get(`${HOSTNAME}/donate/donation-summary-details`, {
-                    params: { type }
-                });
+                const res = await axios.get(`${HOSTNAME}/donate/donation-summary-details/${type}`);
                 const safeData = res.data.map(item => ({
                     donation_id: item.donation_id,
                     project_name: item.project_name || null,
@@ -35,6 +38,8 @@ function DonationSummaryDetail() {
                     transaction_id: item.transaction_id || ""
                 }));
                 setDonations(safeData);
+                console.log("Type from params:", type);
+
             } catch (err) {
                 console.error("โหลดข้อมูลไม่สำเร็จ:", err);
             } finally {
@@ -42,7 +47,7 @@ function DonationSummaryDetail() {
             }
         };
         fetchDonations();
-    }, []);
+    }, [type]);
 
     const formatCurrency = (num) => new Intl.NumberFormat("th-TH").format(num || 0);
     const truncateText = (text, maxLength) => text.length <= maxLength ? text : text.substring(0, maxLength) + "...";

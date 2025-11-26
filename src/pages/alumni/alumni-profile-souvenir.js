@@ -143,8 +143,8 @@ function AlumniProfileSouvenir() {
     };
 
     // Submit การยืนยันรับสินค้า
-    const handleProofSubmit = async () => {
-    console.log("selectedOrderForConfirm:", selectedOrderForConfirm);
+const handleProofSubmit = async () => {
+    if (!selectedOrderForConfirm) return;
 
     setIsProofUploading(true);
 
@@ -155,7 +155,7 @@ function AlumniProfileSouvenir() {
 
     try {
         const response = await fetch(
-            `${HOSTNAME}/orders/${selectedOrderForConfirm}/upload-proof`,
+            `${HOSTNAME}/orders/${selectedOrderForConfirm.order_id}/upload-proof`,
             {
                 method: 'POST',
                 body: formData
@@ -169,17 +169,18 @@ function AlumniProfileSouvenir() {
             setShowProofModal(false);
             setProofFile(null);
             // โหลดข้อมูลใหม่
-            setOrderHistory(); //โหลดซ้ำ
+            setOrderHistory(); // ฟังก์ชันโหลดข้อมูลคำสั่งซื้อ
         } else {
-            alert(result.message || "เกิดข้อผิดพลาด");
+            Swal.fire('ผิดพลาด', result.message || "เกิดข้อผิดพลาด", 'error');
         }
     } catch (error) {
         console.error("Error:", error);
-        alert("เกิดข้อผิดพลาดในการยืนยันการรับสินค้า");
+        Swal.fire('ผิดพลาด', 'เกิดข้อผิดพลาดในการยืนยันการรับสินค้า', 'error');
     } finally {
         setIsProofUploading(false);
     }
 };
+
 
 
     const reuploadSlip = (orderId) => {
@@ -190,7 +191,7 @@ function AlumniProfileSouvenir() {
         setSelectedFile(e.target.files[0]);
     };
 
-    // อัปเดต order_status และ payment_status ใน backend
+    // อัปโหลดสลิปใหม่
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!selectedFile) return;
@@ -611,8 +612,8 @@ function AlumniProfileSouvenir() {
                             <hr className="w-100" />
                             <div className="menu d-block mt-3 w-100">
                                 <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile")}>โปรไฟล์ของฉัน</div>
-                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-request")}>คำร้องขอ</div>
-                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-manage-orders")}>จัดการคำสั่งซื้อของที่ระลึก</div>
+                                {/* <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-request")}>คำร้องขอ</div>
+                                <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-manage-orders")}>จัดการคำสั่งซื้อของที่ระลึก</div> */}
                                 <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-profile-webboard")}>กระทู้ที่สร้าง</div>
                                 <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-profile-donation")}>ประวัติการบริจาค</div>
                                 <div className="menu-item py-2 mb-2 rounded" onClick={() => handleClick("/alumni-profile/alumni-profile-activity")}>ประวัติการเข้าร่วมกิจกรรม</div>
@@ -1011,16 +1012,6 @@ function AlumniProfileSouvenir() {
                                                                 {/* Modal Body */}
                                                                 <div className="modal-body">
                                                                     <div className="mb-3 text-start">
-                                                                        <label className="form-label fw-bold">ชื่อสินค้า</label>
-                                                                        <p>{selectedOrder.product_name}</p>
-                                                                    </div>
-
-                                                                    <div className="mb-3 text-start">
-                                                                        <label className="form-label fw-bold">ที่อยู่จัดส่ง</label>
-                                                                        <p>{selectedOrder.address}</p>
-                                                                    </div>
-
-                                                                    <div className="mb-3 text-start">
                                                                         <label className="form-label fw-bold">แนบหลักฐาน (ถ้ามี)</label>
                                                                         <input
                                                                             type="file"
@@ -1089,10 +1080,6 @@ function AlumniProfileSouvenir() {
                                                         </div>
                                                     )}
 
-
-
-
-
                                                     {/* ยกเลิกการสั่งซื้อ */}
                                                     <div>
                                                         {order.order_status === "processing" && (
@@ -1122,27 +1109,6 @@ function AlumniProfileSouvenir() {
                                                                     </div>
 
                                                                     <div className="modal-body">
-                                                                        {/* วันที่สั่งซื้อ */}
-                                                                        <div className="mb-3 text-start">
-                                                                            <label className="form-label fw-bold">วันที่สั่งซื้อ</label>
-                                                                            <p>
-                                                                                {selectedOrder.order_date
-                                                                                    ? `${formatDate(selectedOrder.order_date)}`
-                                                                                    : "ยังไม่ทราบวันที่สั่งซื้อ"}
-                                                                            </p>
-                                                                        </div>
-
-                                                                        {/* สินค้า */}
-                                                                        {/* <div className="mb-3 text-start">
-                                                                            <label className="form-label fw-bold">สินค้า</label>
-                                                                            <p>{selectedOrder.product_name}</p>
-                                                                        </div> */}
-
-                                                                        {/* ที่อยู่จัดส่ง */}
-                                                                        <div className="mb-3 text-start">
-                                                                            <label className="form-label fw-bold">ที่อยู่จัดส่ง</label>
-                                                                            <p>{selectedOrder.address}</p>
-                                                                        </div>
 
                                                                         {/* เหตุผล */}
                                                                         <div className="mb-3 text-start">
@@ -1390,7 +1356,7 @@ function AlumniProfileSouvenir() {
                                 </label>
                                 <input
                                     type="file"
-                                    className="form-control"
+                                    className="form-control w-100"
                                     accept="image/*"
                                     onChange={handleProofFileChange}
                                     disabled={isProofUploading}

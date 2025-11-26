@@ -3,11 +3,11 @@ import '../css/alumni.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from "axios";
-import {HOSTNAME} from '../config.js';
+import { HOSTNAME } from '../config.js';
 
 function Alumni() {
     const [alumniData, setAlumniData] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setIsLoading] = useState(true);
     const navigate = useNavigate();
     const [hoveredAlumni, setHoveredAlumni] = useState(null);
 
@@ -20,16 +20,15 @@ function Alumni() {
     ];
 
     useEffect(() => {
-        axios.get(HOSTNAME +"/alumni/outstanding-alumni")
-            .then((res) => {
-                setAlumniData(res.data);
-                setLoading(false);
-            })
-            .catch((err) => {
-                console.error("ไม่สามารถโหลดศิษย์เก่าดีเด่น:", err);
-                setLoading(false);
-            });
-    }, []);
+    axios
+      .get(`${HOSTNAME}/alumni/outstanding-alumni`)
+      .then((res) => {
+        setAlumniData(Array.isArray(res.data.data) ? res.data.data : []);
+      })
+      .catch((err) => console.error(err))
+      .finally(() => setIsLoading(false));
+  }, []);
+
 
     const handleAlumniClick = (userId) => {
         navigate(`/alumni/${userId}`);
@@ -86,7 +85,7 @@ function Alumni() {
                         </div>
                     ))}
                 </div>
-                
+
                 <div className="outstanding mb-5">
                     <h5 className="alumni-title mb-4 fs-3 fw-bold">ศิษย์เก่าดีเด่น</h5>
 
@@ -120,11 +119,11 @@ function Alumni() {
                                         <div className="position-relative">
                                             <img
                                                 src={alumni.image_path
-                                                ? HOSTNAME +`/${alumni.image_path}` 
-                                                : HOSTNAME +`/uploads/default-profile.png`}
+                                                    ? HOSTNAME + `/${alumni.image_path}`
+                                                    : HOSTNAME + `/uploads/default-profile.png`}
                                                 alt={alumni.name}
                                                 loading="lazy"
-                                                onError={(e) => e.target.src = HOSTNAME +`/uploads/default-profile.png`}
+                                                onError={(e) => e.target.src = HOSTNAME + `/uploads/default-profile.png`}
                                                 className="img-fluid rounded-circle me-3"
                                                 style={{
                                                     width: "90px",
@@ -135,20 +134,52 @@ function Alumni() {
                                                     transform: hoveredAlumni === index ? 'scale(1.1)' : 'scale(1)'
                                                 }}
                                             />
-                                            
+
                                         </div>
                                         <div className="flex-grow-1">
-                                            <h5 className="mb-2 fw-bold" style={{
-                                                color: hoveredAlumni === index ? '#fff' : '#333',
-                                                textShadow: hoveredAlumni === index ? '0 2px 4px rgba(0,0,0,0.3)' : 'none'
-                                            }}>
-                                                {alumni.name}
+                                            <h5
+                                                className="mb-2 fw-bold"
+                                                style={{
+                                                    color: hoveredAlumni === index ? "#fff" : "#333",
+                                                    textShadow: hoveredAlumni === index
+                                                        ? "0 2px 4px rgba(0,0,0,0.3)"
+                                                        : "none",
+                                                }}
+                                            >
+                                                {alumni.name || "ไม่ระบุชื่อ"}
                                             </h5>
-                                            <p className="mb-0" style={{
-                                                color: hoveredAlumni === index ? '#f8f9fa' : '#6c757d',
-                                                fontSize: '0.9rem'
-                                            }}>
-                                                {alumni.position || "ไม่มีข้อมูลตำแหน่ง"}
+
+                                            {/* การศึกษา */}
+                                            <p
+                                                className="mb-1"
+                                                style={{
+                                                    color: hoveredAlumni === index ? "#f8f9fa" : "#6c757d",
+                                                    fontSize: "0.9rem",
+                                                }}
+                                            >
+                                                {alumni.major_name || "ไม่ระบุ"}
+                                            </p>
+
+                                            {/* อีเมล */}
+                                            <p
+                                                className="mb-1"
+                                                style={{
+                                                    color: hoveredAlumni === index ? "#f8f9fa" : "#6c757d",
+                                                    fontSize: "0.85rem",
+                                                }}
+                                            >
+                                                <strong>Email:</strong> {alumni.email || "-"}
+                                            </p>
+
+                                            {/* เบอร์โทร */}
+                                            <p
+                                                className="mb-0"
+                                                style={{
+                                                    color: hoveredAlumni === index ? "#f8f9fa" : "#6c757d",
+                                                    fontSize: "0.85rem",
+                                                }}
+                                            >
+                                                <strong>โทร:</strong> {alumni.phone || "-"}
                                             </p>
                                         </div>
                                         {hoveredAlumni === index && (

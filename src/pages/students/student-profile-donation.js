@@ -270,8 +270,8 @@ function StudentProfileDonation() {
                                 <div className='menu d-block mt-3 w-100'>
                                     {[
                                         ['โปรไฟล์ของฉัน', '/student-profile'],
-                                        ['คำร้องขอ', '/student-profile/student-request'],
-                                        ['จัดการคำสั่งซื้อของที่ระลึก', '/student-profile/student-manage-orders'],
+                                        // ['คำร้องขอ', '/student-profile/student-request'],
+                                        // ['จัดการคำสั่งซื้อของที่ระลึก', '/student-profile/student-manage-orders'],
                                         ['กระทู้ที่สร้าง', '/student-profile/student-profile-webboard'],
                                         ['ประวัติการบริจาค', '/student-profile/student-profile-donation'],
                                         ['ประวัติการเข้าร่วมกิจกรรม', '/student-profile/student-profile-activity'],

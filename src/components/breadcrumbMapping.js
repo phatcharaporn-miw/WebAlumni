@@ -73,7 +73,7 @@ export const breadcrumbMapping = {
     "/president-profile/president-profile-activity": "ประวัติการเข้าร่วมกิจกรรม",
     "/president-profile/president-profile-souvenir": "การซื้อของที่ระลึก",
     "/president-profile/president-profile-webboard": "กระทู้ที่สร้าง",
-    "/president-profile/president-profile-webboard/edit-webboard": "แก้ไขกระทู้ที่สร้าง",
+    "/president-profile/president-profile-webboard/president-edit-webboard": "แก้ไขกระทู้ที่สร้าง",
     "/president-profile/president-approve": "การอนุมัติ",
     "/activity/president-create-activity": "เพิ่มกิจกรรม",
     "/news/president-create-news": "เพิ่มข่าวประชาสัมพันธ์",

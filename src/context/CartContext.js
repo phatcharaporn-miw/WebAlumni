@@ -21,7 +21,6 @@ export const CartProvider = ({ children }) => {
   const userId = user?.user_id;
 
 
-
   // ฟังก์ชันล้างตะกร้า
   const clearCart = () => {
     setCartCount(0);
@@ -105,7 +104,6 @@ export const CartProvider = ({ children }) => {
     setIsLoading(false);
   }
 };
-
 
   // ฟังก์ชันอัปเดตจำนวนสินค้าในตะกร้า 
   const updateCart = async (productId, quantity) => {

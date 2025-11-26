@@ -107,34 +107,44 @@ function SouvenirCheckout() {
         }
     }, [userId]);
 
-    useEffect(() => {
-        // โหลดจังหวัด
-        axios.get("https://raw.githubusercontent.com/kongvut/thai-province-data/refs/heads/master/api/latest/province.json")
-            .then(res => setProvinces(res.data))
-            .catch(err => console.error("Error loading provinces:", err));
-    }, []);
+   
+    // โหลดจังหวัด
+  useEffect(() => {
+    axios
+      .get(`${HOSTNAME}/souvenir/provinces`)
+      .then((res) => setProvinces(res.data))
+      .catch((err) => console.error("Error loading provinces:", err));
+  }, []);
 
-    useEffect(() => {
-        if (selectedProvince) {
-            axios.get("https://raw.githubusercontent.com/kongvut/thai-province-data/refs/heads/master/api/latest/district.json")
-                .then(res => {
-                    const filtered = res.data.filter(dist => dist.province_id === Number(selectedProvince));
-                    setDistricts(filtered);
-                })
-                .catch(err => console.error("Error loading districts:", err));
-        }
-    }, [selectedProvince]);
+  // โหลดอำเภอ
+  useEffect(() => {
+    if (selectedProvince) {
+      axios
+        .get(`${HOSTNAME}/souvenir/districts`)
+        .then((res) => {
+          const filtered = res.data.filter(
+            (dist) => dist.province_id === Number(selectedProvince)
+          );
+          setDistricts(filtered);
+        })
+        .catch((err) => console.error("Error loading districts:", err));
+    }
+  }, [selectedProvince]);
 
-    useEffect(() => {
-        if (selectedDistrict) {
-            axios.get("https://raw.githubusercontent.com/kongvut/thai-province-data/refs/heads/master/api/latest/sub_district.json")
-                .then(res => {
-                    const filtered = res.data.filter(sub => sub.district_id === Number(selectedDistrict));
-                    setSubDistricts(filtered);
-                })
-                .catch(err => console.error("Error loading sub-districts:", err));
-        }
-    }, [selectedDistrict]);
+  // โหลดตำบล
+  useEffect(() => {
+    if (selectedDistrict) {
+      axios
+        .get(`${HOSTNAME}/souvenir/subdistricts`)
+        .then((res) => {
+          const filtered = res.data.filter(
+            (sub) => sub.district_id === Number(selectedDistrict)
+          );
+          setSubDistricts(filtered);
+        })
+        .catch((err) => console.error("Error loading sub-districts:", err));
+    }
+  }, [selectedDistrict]);
 
     // เมื่อเลือกตำบลแล้วให้ดึง zip_code ออกมา
     useEffect(() => {

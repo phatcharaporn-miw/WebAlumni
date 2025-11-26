@@ -19,6 +19,11 @@ function AdminDashboardAlumniPage() {
 
   const navigate = useNavigate();
 
+  // Scroll to top on mount
+      useEffect(() => {
+          window.scrollTo(0, 0);
+      }, []);
+
   useEffect(() => {
     axios
       .get(`${HOSTNAME}/api/alumni-all`)

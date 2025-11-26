@@ -26,6 +26,11 @@ function DashboardDonationsPage() {
         all: "ผู้บริจาคทั้งหมด",
     };
 
+    // Scroll to top on mount
+        useEffect(() => {
+            window.scrollTo(0, 0);
+        }, []);
+
     useEffect(() => {
         const fetchDonations = async () => {
             try {

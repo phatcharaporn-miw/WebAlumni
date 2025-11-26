@@ -276,7 +276,7 @@ function PresidentProfileDonation() {
                                         ['ประวัติการบริจาค', '/president-profile/president-profile-donation'],
                                         ['ประวัติการเข้าร่วมกิจกรรม', '/president-profile/president-profile-activity'],
                                         ['ประวัติการสั่งซื้อของที่ระลึก', '/president-profile/president-profile-souvenir'],
-                                        ['การอนุมัติ', '/president-profile/president-approve'],
+                                        ['จัดการสินค้า', '/president-profile/president-approve'],
                                     ].map(([label, path], i) => (
                                         <div key={i} className={`menu-item py-2 mb-2 rounded ${location.pathname === path ? 'active' : ''}`} onClick={() => handleClick(path)}>{label}</div>
                                     ))}
