@@ -23,7 +23,6 @@ function Header() {
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const { cartCount, getCartCount } = useCart();
-  // const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, isLoggedIn, handleLogout } = useAuth();
   const userId = user?.user_id;
   const [menuOpen, setMenuOpen] = useState(false);
@@ -152,7 +151,6 @@ function Header() {
 
   // ฟังก์ชันเพิ่มสินค้าลงตะกร้าสำหรับใช้ในส่วนอื่นๆ ของ Header (ถ้ามี)
   const handleAddToCartFromHeader = async (productId, quantity, total) => {
-    // ตรวจสอบจาก user prop แทน sessionStorage
     if (!userId) {
       Swal.fire({
         title: "กรุณาเข้าสู่ระบบ",

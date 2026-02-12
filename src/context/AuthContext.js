@@ -29,14 +29,11 @@ export const AuthProvider = ({ children }) => {
     return({
     user_id: u.userId || u.user_id || u.id,
     username: u.username || u.full_name || u.nick_name || "",
-    // role: Number(u.role || u.role_id),
     role: Number(u.role ?? u.role_id ?? u.roleId ?? u.role_id_fk) || 0,
     isAdmin: Number(u.role || u.role_id) === 1,
     isUser: Number(u.role || u.role_id) !== 1,
     profilePicture: u.profilePicture || u.image_path || HOSTNAME + "/uploads/default-profile.png",
-
-    }
-    )
+    })
   }
 
   // ฟังก์ชันเช็ค session กับ server

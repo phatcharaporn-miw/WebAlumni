@@ -40,15 +40,15 @@ function CheckFullName() {
         setResult(null);
 
         try {
-            const res = await axios.post(HOSTNAME +'/api/check-fullname', { full_name: fullName });
-
+            const res = await axios.post(HOSTNAME +`/api/check-fullname`, { full_name: fullName });
             if (res.data.success) {
                 setResult({
                     found: true,
                     message: res.data.message,
-                    student: res.data.data, // อาจเป็น object (1 รายการ) หรือ array (หลายรายการ)
+                    student: res.data.data, 
                 });
             } 
+            // console.log(res.data);
         } catch (error) {
             console.error('เกิดข้อผิดพลาด:', error);
             setResult({
