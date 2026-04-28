@@ -1,70 +1,67 @@
-# Getting Started with Create React App
+# 🎓 Alumni Association Web Application
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A full-stack web application designed to manage alumni community activities, including user registration, profile management, webboard discussions, event participation, and real-time notifications.
 
-## Available Scripts
+This project was developed as part of a university final-year project for improving alumni engagement and digital community interaction.
 
-In the project directory, you can run:
+---
 
-### `npm start`
+## 🚀 Features
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### 👤 User Management
+- Alumni & student registration system
+- Role-based authentication (Admin, President, Alumni, Student)
+- First-time login password setup & reset flow (OTP-based)
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### 📝 Profile System
+- Editable personal profile
+- Education history management (multi-degree support)
+- Alumni directory with filtering by department
 
-### `npm test`
+### 💬 Webboard System
+- Create, edit, delete posts
+- Like & comment functionality
+- Category-based post organization
+- Favorite posts system
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### 🔔 Real-time Notification System
+- Real-time updates using Socket.IO
+- Notifications for likes, comments, and interactions
+- Unread notification counter in navigation bar
 
-### `npm run build`
+### 📅 Events & Activities
+- Admin-created activity posts
+- Event participation tracking
+- QR code-based attendance system
+- Batch/year and department-based access control
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### 🛒 Additional Modules
+- Souvenir / product approval system (admin workflow)
+- Order tracking with status updates
+- PromptPay QR payment integration (checkout flow with expiration timer)
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+---
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## 🛠️ Tech Stack
 
-### `npm run eject`
+### Frontend
+- React.js
+- Bootstrap 5
+- Socket.IO Client
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Backend
+- Node.js (Express.js)
+- Socket.IO
+- RESTful API architecture
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Database
+- MySQL (phpMyAdmin)
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### Others
+- JWT Authentication / Session-based auth
+- OTP Email verification
+- QR Code generation
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+---
 
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## 🧠 System Architecture
